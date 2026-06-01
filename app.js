@@ -1,6 +1,15 @@
 const moods = ['Happy', 'Calm', 'Anxious', 'Stressed', 'Excited', 'Bored', 'Romantic', 'Angry', 'Hopeful'];
 const vibes = ['Dead', 'Chill', 'Buzzing', 'Tense', 'Cozy', 'Chaotic', 'Romantic'];
 const contexts = ['Work', 'Home', 'Commute', 'Nightlife', 'Date', 'Shopping', 'Study'];
+const GNEWS_API_KEY = 'demo';
+const MAX_NEWS_HEADLINES = 3;
+const SENTIMENT_PLACEHOLDER = 'pending';
+const NEWS_PULSE_TEXT = `News pulse: ${MAX_NEWS_HEADLINES} headlines loaded`;
+const GNEWS_SUPPORTED_COUNTRIES = new Set([
+  'au', 'br', 'ca', 'cn', 'eg', 'fr', 'de', 'gr', 'hk', 'in', 'ie',
+  'il', 'it', 'jp', 'nl', 'no', 'pk', 'pe', 'ph', 'pt', 'ro', 'ru',
+  'sg', 'es', 'se', 'ch', 'tw', 'ua', 'gb', 'us', 'ng'
+]);
 
 function getWeatherLabel(weatherCode) {
   if (weatherCode === 0) return 'Sunny';
@@ -42,6 +51,49 @@ async function fetchWeather(city, country) {
     weather_code: currentWeather.weathercode,
     windspeed: currentWeather.windspeed,
     is_day: currentWeather.is_day
+  };
+}
+
+function resolveCountryCode(country) {
+  const normalizedCountry = country.trim().toLowerCase();
+  const countryCodeMap = {
+    nigeria: 'ng',
+    'united kingdom': 'gb',
+    japan: 'jp',
+    brazil: 'br',
+    'united states': 'us',
+    usa: 'us'
+  };
+
+  if (/^[a-z]{2}$/.test(normalizedCountry) && GNEWS_SUPPORTED_COUNTRIES.has(normalizedCountry)) {
+    return normalizedCountry;
+  }
+
+  const mappedCountryCode = countryCodeMap[normalizedCountry];
+  if (mappedCountryCode && GNEWS_SUPPORTED_COUNTRIES.has(mappedCountryCode)) {
+    return mappedCountryCode;
+  }
+
+  return 'us';
+}
+
+async function fetchNews(country) {
+  const countryCode = resolveCountryCode(country);
+  const newsUrl = `https://gnews.io/api/v4/top-headlines?category=general&lang=en&country=${countryCode}&apikey=${GNEWS_API_KEY}`;
+  const newsResponse = await fetch(newsUrl);
+  if (!newsResponse.ok) {
+    throw new Error(`News request failed (${newsResponse.status}).`);
+  }
+  const newsData = await newsResponse.json();
+  const articles = newsData?.articles || [];
+  const topHeadlines = articles.slice(0, MAX_NEWS_HEADLINES).map((article) => ({
+    title: article.title || 'Untitled headline',
+    sentiment: SENTIMENT_PLACEHOLDER
+  }));
+
+  return {
+    headlines: topHeadlines,
+    sentiment: SENTIMENT_PLACEHOLDER
   };
 }
 
@@ -123,6 +175,7 @@ async function handleCheckinSubmit(event) {
   }
 
   let weatherResult = null;
+  let newsResult = null;
   const checkinData = { city, country, mood, vibe, context };
   try {
     weatherResult = await fetchWeather(city, country);
@@ -130,7 +183,13 @@ async function handleCheckinSubmit(event) {
   } catch (error) {
     console.error('Weather fetch failed:', error);
   }
-  console.log('Glotemp check-in:', { ...checkinData, weather: weatherResult });
+  try {
+    newsResult = await fetchNews(country);
+    console.log('News headlines:', newsResult.headlines);
+  } catch (error) {
+    console.error('News fetch failed:', error);
+  }
+  console.log('Glotemp check-in:', { ...checkinData, weather: weatherResult, news: newsResult });
 
   if (message) {
     message.textContent = `Thanks! Your check-in is shaping the Glotemp wave in ${city}.`;
@@ -152,7 +211,14 @@ function createMetaParagraph(label, value) {
   return paragraph;
 }
 
-function createCityCard({ city, moodLabel, tempoLabel, tags, temperature, weatherCode }) {
+function createNewsPulseIndicator(text) {
+  const indicator = document.createElement('small');
+  indicator.className = 'news-pulse';
+  indicator.textContent = text;
+  return indicator;
+}
+
+function createCityCard({ city, moodLabel, tempoLabel, tags, temperature, weatherCode, newsPulseText }) {
   const card = document.createElement('article');
   card.className = 'city-card';
 
@@ -165,6 +231,7 @@ function createCityCard({ city, moodLabel, tempoLabel, tags, temperature, weathe
   card.appendChild(createMetaParagraph('Tags', tags.join(', ')));
   card.appendChild(createMetaParagraph('Temperature', `${temperature}°C`));
   card.appendChild(createMetaParagraph('Weather', getWeatherLabel(weatherCode)));
+  card.appendChild(createNewsPulseIndicator(newsPulseText));
 
   return card;
 }
@@ -174,10 +241,10 @@ function renderCityCards() {
   if (!cityCards) return;
 
   const placeholderCards = [
-    { city: 'Lagos', temperature: 30, weatherCode: 1, moodLabel: 'Hopeful', tempoLabel: 'Buzzing', tags: ['work rush', 'warm evening', 'street energy'] },
-    { city: 'London', temperature: 12, weatherCode: 61, moodLabel: 'Calm', tempoLabel: 'Chill', tags: ['light rain', 'after work', 'coffee'] },
-    { city: 'Tokyo', temperature: 19, weatherCode: 3, moodLabel: 'Anxious', tempoLabel: 'Tense', tags: ['commute', 'late night', 'neon'] },
-    { city: 'São Paulo', temperature: 24, weatherCode: 0, moodLabel: 'Excited', tempoLabel: 'Chaotic', tags: ['traffic', 'music', 'social pulse'] }
+    { city: 'Lagos', temperature: 30, weatherCode: 1, moodLabel: 'Hopeful', tempoLabel: 'Buzzing', tags: ['work rush', 'warm evening', 'street energy'], newsPulseText: NEWS_PULSE_TEXT },
+    { city: 'London', temperature: 12, weatherCode: 61, moodLabel: 'Calm', tempoLabel: 'Chill', tags: ['light rain', 'after work', 'coffee'], newsPulseText: NEWS_PULSE_TEXT },
+    { city: 'Tokyo', temperature: 19, weatherCode: 3, moodLabel: 'Anxious', tempoLabel: 'Tense', tags: ['commute', 'late night', 'neon'], newsPulseText: NEWS_PULSE_TEXT },
+    { city: 'São Paulo', temperature: 24, weatherCode: 0, moodLabel: 'Excited', tempoLabel: 'Chaotic', tags: ['traffic', 'music', 'social pulse'], newsPulseText: NEWS_PULSE_TEXT }
   ];
 
   const cardElements = placeholderCards.map(createCityCard);
