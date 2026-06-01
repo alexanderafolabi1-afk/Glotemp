@@ -156,20 +156,35 @@ function resolveSportsPulse(results) {
     counts[mood] = (counts[mood] || 0) + 1;
     return counts;
   }, {});
+  const positiveCount = moodCounts.positive || 0;
+  const negativeCount = moodCounts.negative || 0;
+  const neutralCount = moodCounts.neutral || 0;
 
-  if ((moodCounts.positive || 0) > (moodCounts.negative || 0) && (moodCounts.positive || 0) >= (moodCounts.neutral || 0)) {
+  if (positiveCount > negativeCount && positiveCount > neutralCount) {
     return 'positive';
   }
 
-  if ((moodCounts.negative || 0) > (moodCounts.positive || 0) && (moodCounts.negative || 0) >= (moodCounts.neutral || 0)) {
+  if (negativeCount > positiveCount && negativeCount > neutralCount) {
     return 'negative';
   }
 
   return 'neutral';
 }
 
+function resolveSportsLeagueId(country) {
+  const normalizedCountry = country.trim().toLowerCase();
+  const leagueByCountry = {
+    england: '4328',
+    'united kingdom': '4328',
+    'great britain': '4328'
+  };
+
+  return leagueByCountry[normalizedCountry] || '4328';
+}
+
 async function fetchSports(country) {
-  const sportsUrl = 'https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=4328';
+  const leagueId = resolveSportsLeagueId(country);
+  const sportsUrl = `https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=${leagueId}`;
   const sportsResponse = await fetch(sportsUrl);
   if (!sportsResponse.ok) {
     throw new Error(`Sports request failed (${sportsResponse.status}).`);
