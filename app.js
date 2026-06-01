@@ -21,7 +21,7 @@ function renderCategoryButtons(options, containerId, category) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  container.innerHTML = '';
+  container.replaceChildren();
   options.forEach((option) => {
     container.appendChild(createSelectionButton(option, category));
   });
