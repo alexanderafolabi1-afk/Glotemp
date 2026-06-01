@@ -4,6 +4,9 @@ const contexts = ['Work', 'Home', 'Commute', 'Nightlife', 'Date', 'Shopping', 'S
 const GNEWS_API_KEY = 'demo';
 const THESPORTSDB_API_KEY = '3';
 const TICKETMASTER_API_KEY = 'demo';
+const CLAUDE_API_KEY = '';
+const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
+const CLAUDE_MODEL = 'claude-opus-4-5';
 const DEFAULT_LEAGUE_ID = '4328';
 const MAX_NEWS_HEADLINES = 3;
 const MAX_SPORTS_RESULTS = 3;
@@ -288,6 +291,47 @@ async function fetchTourism(city) {
   };
 }
 
+async function synthesizeMood(data) {
+  const prompt = `You are a global mood analyst. Given the following real-time signals for a city check-in, return a JSON object with exactly these fields:
+- mood_distribution: object where keys are mood labels and values are percentage weights (0–100) that sum to 100
+- tempo_score: integer from 0 to 100 representing the city's energy level
+- romantic_index: integer from 0 to 100 representing romantic atmosphere
+- economic_vibe: integer from 0 to 100 representing economic optimism
+- summary_text: 1–2 sentence string summarizing the city's current mood and atmosphere
+
+Respond with valid JSON only. No explanation, no markdown fences.
+
+Input signals:
+${JSON.stringify(data, null, 2)}`;
+
+  const response = await fetch(CLAUDE_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': CLAUDE_API_KEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: CLAUDE_MODEL,
+      max_tokens: 512,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Claude API request failed (${response.status}).`);
+  }
+
+  const result = await response.json();
+  const rawText = result?.content?.[0]?.text || '';
+  try {
+    return JSON.parse(rawText);
+  } catch {
+    throw new Error(`Failed to parse Claude response as JSON. Raw response: ${rawText}`);
+  }
+}
+
 const selectionState = {
   mood: '',
   vibe: '',
@@ -401,7 +445,15 @@ async function handleCheckinSubmit(event) {
     console.error('Tourism fetch failed:', error);
   }
   console.log('Tourism data:', tourismResult);
-  console.log('Glotemp check-in:', { ...checkinData, weather: weatherResult, news: newsResult, sports: sportsResult, events: eventsResult, tourism: tourismResult });
+  const allData = { city, country, mood, vibe, context, weather: weatherResult, news: newsResult, sports: sportsResult, events: eventsResult, tourism: tourismResult };
+  console.log('Glotemp check-in:', allData);
+
+  try {
+    const synthesizedMood = await synthesizeMood(allData);
+    console.log('Synthesized mood:', synthesizedMood);
+  } catch (error) {
+    console.error('Mood synthesis failed:', error);
+  }
 
   if (message) {
     message.textContent = `Thanks! Your check-in is shaping the Glotemp wave in ${city}.`;
