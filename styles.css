@@ -92,27 +92,23 @@ button, .btn {
 }
 
 /* Primary: neon accent background, dark text */
-.btn-primary,
-button[type="button"]:first-of-type {
+.btn-primary {
   background: var(--accent-yellow);
   color: var(--bg);
 }
 
-.btn-primary:hover,
-button[type="button"]:first-of-type:hover {
+.btn-primary:hover {
   box-shadow: 0 0 18px var(--accent-yellow);
 }
 
 /* Secondary: transparent with neon border */
-.btn-secondary,
-button[type="button"]:not(:first-of-type) {
+.btn-secondary {
   background: transparent;
   color: var(--text);
   border-color: var(--accent-cyan);
 }
 
-.btn-secondary:hover,
-button[type="button"]:not(:first-of-type):hover {
+.btn-secondary:hover {
   box-shadow: 0 0 18px var(--accent-cyan);
 }
 
