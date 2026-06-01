@@ -2,9 +2,19 @@ const moods = ['Happy', 'Calm', 'Anxious', 'Stressed', 'Excited', 'Bored', 'Roma
 const vibes = ['Dead', 'Chill', 'Buzzing', 'Tense', 'Cozy', 'Chaotic', 'Romantic'];
 const contexts = ['Work', 'Home', 'Commute', 'Nightlife', 'Date', 'Shopping', 'Study'];
 const GNEWS_API_KEY = 'demo';
+const THESPORTSDB_API_KEY = '3';
+const TICKETMASTER_API_KEY = 'demo';
+const DEFAULT_LEAGUE_ID = '4328';
 const MAX_NEWS_HEADLINES = 3;
+const MAX_SPORTS_RESULTS = 3;
+const MAX_EVENTS_RESULTS = 3;
 const SENTIMENT_PLACEHOLDER = 'pending';
 const NEWS_PULSE_TEXT = `News pulse: ${MAX_NEWS_HEADLINES} headlines loaded`;
+const DEFAULT_SPORTS_MOOD = 'neutral';
+const SPORTS_PULSE_CLASS_NAME = 'sports-pulse';
+const EVENTS_PULSE_CLASS_NAME = 'events-pulse';
+const SPORTS_PULSE_LABEL = 'Sports pulse';
+const EVENTS_UPCOMING_LABEL = 'Events';
 const GNEWS_SUPPORTED_COUNTRIES = new Set([
   'au', 'br', 'ca', 'cn', 'eg', 'fr', 'de', 'gr', 'hk', 'in', 'ie',
   'il', 'it', 'jp', 'nl', 'no', 'pk', 'pe', 'ph', 'pt', 'ro', 'ru',
@@ -97,6 +107,156 @@ async function fetchNews(country) {
   };
 }
 
+function toScore(value) {
+  const parsedValue = Number(value);
+  return Number.isFinite(parsedValue) ? parsedValue : null;
+}
+
+function mapMatchOutcome(match) {
+  const homeScore = toScore(match.intHomeScore);
+  const awayScore = toScore(match.intAwayScore);
+  const homeTeam = match.strHomeTeam || 'Unknown team';
+  const awayTeam = match.strAwayTeam || 'Unknown team';
+
+  if (homeScore === null || awayScore === null) {
+    return {
+      homeTeam,
+      awayTeam,
+      winningTeam: 'Pending',
+      losingTeam: 'Pending',
+      sportsMood: 'neutral'
+    };
+  }
+
+  if (homeScore > awayScore) {
+    return {
+      homeTeam,
+      awayTeam,
+      winningTeam: homeTeam,
+      losingTeam: awayTeam,
+      sportsMood: 'positive'
+    };
+  }
+
+  if (awayScore > homeScore) {
+    return {
+      homeTeam,
+      awayTeam,
+      winningTeam: awayTeam,
+      losingTeam: homeTeam,
+      sportsMood: 'negative'
+    };
+  }
+
+  return {
+    homeTeam,
+    awayTeam,
+    winningTeam: 'Draw',
+    losingTeam: 'Draw',
+    sportsMood: 'neutral'
+  };
+}
+
+function resolveSportsPulse(results) {
+  if (!results.length) return 'neutral';
+  const moodCounts = results.reduce((counts, result) => {
+    const mood = result.sportsMood;
+    counts[mood] = (counts[mood] || 0) + 1;
+    return counts;
+  }, {});
+  const positiveCount = moodCounts.positive || 0;
+  const negativeCount = moodCounts.negative || 0;
+  const neutralCount = moodCounts.neutral || 0;
+
+  if (positiveCount > negativeCount && positiveCount > neutralCount) {
+    return 'positive';
+  }
+
+  if (negativeCount > positiveCount && negativeCount > neutralCount) {
+    return 'negative';
+  }
+
+  return 'neutral';
+}
+
+function resolveSportsLeagueId(country) {
+  const normalizedCountry = country.trim().toLowerCase();
+  const leagueByCountry = {
+    england: DEFAULT_LEAGUE_ID,
+    'united kingdom': DEFAULT_LEAGUE_ID,
+    'great britain': DEFAULT_LEAGUE_ID
+  };
+
+  return leagueByCountry[normalizedCountry] || DEFAULT_LEAGUE_ID;
+}
+
+async function fetchSports(country) {
+  const leagueId = resolveSportsLeagueId(country);
+  const sportsUrl = `https://www.thesportsdb.com/api/v1/json/${THESPORTSDB_API_KEY}/eventspastleague.php?id=${leagueId}`;
+  const sportsResponse = await fetch(sportsUrl);
+  if (!sportsResponse.ok) {
+    throw new Error(`Sports request failed (${sportsResponse.status}).`);
+  }
+
+  const sportsData = await sportsResponse.json();
+  const events = sportsData?.events || [];
+  const recentMatches = events.slice(0, MAX_SPORTS_RESULTS).map(mapMatchOutcome);
+
+  return {
+    country,
+    results: recentMatches,
+    sportsMood: resolveSportsPulse(recentMatches),
+    hasResults: recentMatches.length > 0
+  };
+}
+
+function normalizeEventType(type) {
+  if (!type) return 'unknown';
+  const normalizedType = type.trim().toLowerCase();
+  if (normalizedType.includes('concert') || normalizedType.includes('music')) return 'concert';
+  if (normalizedType.includes('festival')) return 'festival';
+  if (normalizedType.includes('sport')) return 'sports';
+  if (normalizedType.includes('theatre') || normalizedType.includes('theater') || normalizedType.includes('art')) return 'theatre';
+  return normalizedType;
+}
+
+function resolveEventEnergy(eventType) {
+  if (eventType === 'concert' || eventType === 'festival') return 'high energy';
+  if (eventType === 'theatre') return 'calm energy';
+  return 'steady energy';
+}
+
+function mapTicketmasterEvent(event) {
+  const segmentName = event?.classifications?.[0]?.segment?.name || '';
+  const genreName = event?.classifications?.[0]?.genre?.name || '';
+  const eventType = normalizeEventType([segmentName, genreName].filter(Boolean).join(' '));
+
+  return {
+    name: event.name || 'Untitled event',
+    type: eventType,
+    eventEnergy: resolveEventEnergy(eventType)
+  };
+}
+
+async function fetchEvents(city) {
+  const encodedCity = encodeURIComponent(city);
+  const eventsUrl = `https://app.ticketmaster.com/discovery/v2/events.json?city=${encodedCity}&apikey=${TICKETMASTER_API_KEY}`;
+  const eventsResponse = await fetch(eventsUrl);
+  if (!eventsResponse.ok) {
+    throw new Error(`Events request failed (${eventsResponse.status}).`);
+  }
+
+  const eventsData = await eventsResponse.json();
+  const events = eventsData?._embedded?.events || [];
+  const topEvents = events.slice(0, MAX_EVENTS_RESULTS).map(mapTicketmasterEvent);
+
+  return {
+    city,
+    events: topEvents,
+    upcomingCount: topEvents.length
+  };
+}
+
 const selectionState = {
   mood: '',
   vibe: '',
@@ -176,6 +336,8 @@ async function handleCheckinSubmit(event) {
 
   let weatherResult = null;
   let newsResult = null;
+  let sportsResult = null;
+  let eventsResult = null;
   const checkinData = { city, country, mood, vibe, context };
   try {
     weatherResult = await fetchWeather(city, country);
@@ -189,7 +351,19 @@ async function handleCheckinSubmit(event) {
   } catch (error) {
     console.error('News fetch failed:', error);
   }
-  console.log('Glotemp check-in:', { ...checkinData, weather: weatherResult, news: newsResult });
+  try {
+    sportsResult = await fetchSports(country);
+    console.log('Sports results:', sportsResult.results);
+  } catch (error) {
+    console.error('Sports fetch failed:', error);
+  }
+  try {
+    eventsResult = await fetchEvents(city);
+    console.log('Events results:', eventsResult.events);
+  } catch (error) {
+    console.error('Events fetch failed:', error);
+  }
+  console.log('Glotemp check-in:', { ...checkinData, weather: weatherResult, news: newsResult, sports: sportsResult, events: eventsResult });
 
   if (message) {
     message.textContent = `Thanks! Your check-in is shaping the Glotemp wave in ${city}.`;
@@ -211,14 +385,24 @@ function createMetaParagraph(label, value) {
   return paragraph;
 }
 
-function createNewsPulseIndicator(text) {
+function createPulseIndicator(className, text) {
   const indicator = document.createElement('small');
-  indicator.className = 'news-pulse';
+  indicator.className = className;
   indicator.textContent = text;
   return indicator;
 }
 
-function createCityCard({ city, moodLabel, tempoLabel, tags, temperature, weatherCode, newsPulseText }) {
+function createCityCard({
+  city,
+  moodLabel,
+  tempoLabel,
+  tags,
+  temperature,
+  weatherCode,
+  newsPulseText,
+  sportsPulseText,
+  upcomingEvents
+}) {
   const card = document.createElement('article');
   card.className = 'city-card';
 
@@ -231,7 +415,9 @@ function createCityCard({ city, moodLabel, tempoLabel, tags, temperature, weathe
   card.appendChild(createMetaParagraph('Tags', tags.join(', ')));
   card.appendChild(createMetaParagraph('Temperature', `${temperature}°C`));
   card.appendChild(createMetaParagraph('Weather', getWeatherLabel(weatherCode)));
-  card.appendChild(createNewsPulseIndicator(newsPulseText));
+  card.appendChild(createPulseIndicator('news-pulse', newsPulseText));
+  card.appendChild(createPulseIndicator(SPORTS_PULSE_CLASS_NAME, `${SPORTS_PULSE_LABEL}: ${sportsPulseText}`));
+  card.appendChild(createPulseIndicator(EVENTS_PULSE_CLASS_NAME, `${EVENTS_UPCOMING_LABEL}: ${upcomingEvents} upcoming`));
 
   return card;
 }
@@ -241,10 +427,10 @@ function renderCityCards() {
   if (!cityCards) return;
 
   const placeholderCards = [
-    { city: 'Lagos', temperature: 30, weatherCode: 1, moodLabel: 'Hopeful', tempoLabel: 'Buzzing', tags: ['work rush', 'warm evening', 'street energy'], newsPulseText: NEWS_PULSE_TEXT },
-    { city: 'London', temperature: 12, weatherCode: 61, moodLabel: 'Calm', tempoLabel: 'Chill', tags: ['light rain', 'after work', 'coffee'], newsPulseText: NEWS_PULSE_TEXT },
-    { city: 'Tokyo', temperature: 19, weatherCode: 3, moodLabel: 'Anxious', tempoLabel: 'Tense', tags: ['commute', 'late night', 'neon'], newsPulseText: NEWS_PULSE_TEXT },
-    { city: 'São Paulo', temperature: 24, weatherCode: 0, moodLabel: 'Excited', tempoLabel: 'Chaotic', tags: ['traffic', 'music', 'social pulse'], newsPulseText: NEWS_PULSE_TEXT }
+    { city: 'Lagos', temperature: 30, weatherCode: 1, moodLabel: 'Hopeful', tempoLabel: 'Buzzing', tags: ['work rush', 'warm evening', 'street energy'], newsPulseText: NEWS_PULSE_TEXT, sportsPulseText: DEFAULT_SPORTS_MOOD, upcomingEvents: 3 },
+    { city: 'London', temperature: 12, weatherCode: 61, moodLabel: 'Calm', tempoLabel: 'Chill', tags: ['light rain', 'after work', 'coffee'], newsPulseText: NEWS_PULSE_TEXT, sportsPulseText: DEFAULT_SPORTS_MOOD, upcomingEvents: 3 },
+    { city: 'Tokyo', temperature: 19, weatherCode: 3, moodLabel: 'Anxious', tempoLabel: 'Tense', tags: ['commute', 'late night', 'neon'], newsPulseText: NEWS_PULSE_TEXT, sportsPulseText: DEFAULT_SPORTS_MOOD, upcomingEvents: 3 },
+    { city: 'São Paulo', temperature: 24, weatherCode: 0, moodLabel: 'Excited', tempoLabel: 'Chaotic', tags: ['traffic', 'music', 'social pulse'], newsPulseText: NEWS_PULSE_TEXT, sportsPulseText: DEFAULT_SPORTS_MOOD, upcomingEvents: 3 }
   ];
 
   const cardElements = placeholderCards.map(createCityCard);
