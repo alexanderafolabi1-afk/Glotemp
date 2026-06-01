@@ -257,6 +257,37 @@ async function fetchEvents(city) {
   };
 }
 
+function buildCitySlug(city) {
+  return city.trim().toLowerCase().replace(/\s+/g, '-');
+}
+
+async function fetchTourism(city) {
+  const citySlug = buildCitySlug(city);
+  const tourismUrl = `https://api.teleport.org/api/urban_areas/slug:${citySlug}/scores/`;
+  let response;
+  try {
+    response = await fetch(tourismUrl);
+  } catch {
+    return null;
+  }
+  if (!response.ok) return null;
+
+  const data = await response.json();
+  const categories = data?.categories || [];
+
+  function findScore(name) {
+    const entry = categories.find((c) => c.name.toLowerCase() === name);
+    return entry ? Math.round(entry.score_out_of_10 * 10) / 10 : null;
+  }
+
+  return {
+    tourismScore: findScore('tourism'),
+    safetyScore: findScore('safety'),
+    costOfLiving: findScore('cost of living'),
+    nightlifeScore: findScore('nightlife')
+  };
+}
+
 const selectionState = {
   mood: '',
   vibe: '',
@@ -338,6 +369,7 @@ async function handleCheckinSubmit(event) {
   let newsResult = null;
   let sportsResult = null;
   let eventsResult = null;
+  let tourismResult = null;
   const checkinData = { city, country, mood, vibe, context };
   try {
     weatherResult = await fetchWeather(city, country);
@@ -363,7 +395,13 @@ async function handleCheckinSubmit(event) {
   } catch (error) {
     console.error('Events fetch failed:', error);
   }
-  console.log('Glotemp check-in:', { ...checkinData, weather: weatherResult, news: newsResult, sports: sportsResult, events: eventsResult });
+  try {
+    tourismResult = await fetchTourism(city);
+  } catch (error) {
+    console.error('Tourism fetch failed:', error);
+  }
+  console.log('Tourism data:', tourismResult);
+  console.log('Glotemp check-in:', { ...checkinData, weather: weatherResult, news: newsResult, sports: sportsResult, events: eventsResult, tourism: tourismResult });
 
   if (message) {
     message.textContent = `Thanks! Your check-in is shaping the Glotemp wave in ${city}.`;
@@ -392,6 +430,12 @@ function createPulseIndicator(className, text) {
   return indicator;
 }
 
+function appendScoreIfDefined(card, label, value) {
+  if (value !== null && value !== undefined) {
+    card.appendChild(createMetaParagraph(label, value));
+  }
+}
+
 function createCityCard({
   city,
   moodLabel,
@@ -401,7 +445,10 @@ function createCityCard({
   weatherCode,
   newsPulseText,
   sportsPulseText,
-  upcomingEvents
+  upcomingEvents,
+  tourismScore,
+  nightlifeScore,
+  safetyScore
 }) {
   const card = document.createElement('article');
   card.className = 'city-card';
@@ -418,6 +465,9 @@ function createCityCard({
   card.appendChild(createPulseIndicator('news-pulse', newsPulseText));
   card.appendChild(createPulseIndicator(SPORTS_PULSE_CLASS_NAME, `${SPORTS_PULSE_LABEL}: ${sportsPulseText}`));
   card.appendChild(createPulseIndicator(EVENTS_PULSE_CLASS_NAME, `${EVENTS_UPCOMING_LABEL}: ${upcomingEvents} upcoming`));
+  appendScoreIfDefined(card, 'Tourism score', tourismScore);
+  appendScoreIfDefined(card, 'Nightlife', nightlifeScore);
+  appendScoreIfDefined(card, 'Safety', safetyScore);
 
   return card;
 }
@@ -427,10 +477,10 @@ function renderCityCards() {
   if (!cityCards) return;
 
   const placeholderCards = [
-    { city: 'Lagos', temperature: 30, weatherCode: 1, moodLabel: 'Hopeful', tempoLabel: 'Buzzing', tags: ['work rush', 'warm evening', 'street energy'], newsPulseText: NEWS_PULSE_TEXT, sportsPulseText: DEFAULT_SPORTS_MOOD, upcomingEvents: 3 },
-    { city: 'London', temperature: 12, weatherCode: 61, moodLabel: 'Calm', tempoLabel: 'Chill', tags: ['light rain', 'after work', 'coffee'], newsPulseText: NEWS_PULSE_TEXT, sportsPulseText: DEFAULT_SPORTS_MOOD, upcomingEvents: 3 },
-    { city: 'Tokyo', temperature: 19, weatherCode: 3, moodLabel: 'Anxious', tempoLabel: 'Tense', tags: ['commute', 'late night', 'neon'], newsPulseText: NEWS_PULSE_TEXT, sportsPulseText: DEFAULT_SPORTS_MOOD, upcomingEvents: 3 },
-    { city: 'São Paulo', temperature: 24, weatherCode: 0, moodLabel: 'Excited', tempoLabel: 'Chaotic', tags: ['traffic', 'music', 'social pulse'], newsPulseText: NEWS_PULSE_TEXT, sportsPulseText: DEFAULT_SPORTS_MOOD, upcomingEvents: 3 }
+    { city: 'Lagos', temperature: 30, weatherCode: 1, moodLabel: 'Hopeful', tempoLabel: 'Buzzing', tags: ['work rush', 'warm evening', 'street energy'], newsPulseText: NEWS_PULSE_TEXT, sportsPulseText: DEFAULT_SPORTS_MOOD, upcomingEvents: 3, tourismScore: 5.5, nightlifeScore: 6.2, safetyScore: 4.1 },
+    { city: 'London', temperature: 12, weatherCode: 61, moodLabel: 'Calm', tempoLabel: 'Chill', tags: ['light rain', 'after work', 'coffee'], newsPulseText: NEWS_PULSE_TEXT, sportsPulseText: DEFAULT_SPORTS_MOOD, upcomingEvents: 3, tourismScore: 8.3, nightlifeScore: 7.9, safetyScore: 7.0 },
+    { city: 'Tokyo', temperature: 19, weatherCode: 3, moodLabel: 'Anxious', tempoLabel: 'Tense', tags: ['commute', 'late night', 'neon'], newsPulseText: NEWS_PULSE_TEXT, sportsPulseText: DEFAULT_SPORTS_MOOD, upcomingEvents: 3, tourismScore: 8.7, nightlifeScore: 7.5, safetyScore: 8.8 },
+    { city: 'São Paulo', temperature: 24, weatherCode: 0, moodLabel: 'Excited', tempoLabel: 'Chaotic', tags: ['traffic', 'music', 'social pulse'], newsPulseText: NEWS_PULSE_TEXT, sportsPulseText: DEFAULT_SPORTS_MOOD, upcomingEvents: 3, tourismScore: 6.4, nightlifeScore: 8.1, safetyScore: 4.5 }
   ];
 
   const cardElements = placeholderCards.map(createCityCard);
