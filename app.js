@@ -124,7 +124,7 @@ function renderCityCards() {
   const placeholderCards = [
     { city: 'Lagos', moodLabel: 'Hopeful', tempoLabel: 'Buzzing', tags: ['work rush', 'warm evening', 'street energy'] },
     { city: 'London', moodLabel: 'Calm', tempoLabel: 'Chill', tags: ['light rain', 'after work', 'coffee'] },
-    { city: 'Tokyo', moodLabel: 'Focused', tempoLabel: 'Tense', tags: ['commute', 'late night', 'neon'] },
+    { city: 'Tokyo', moodLabel: 'Anxious', tempoLabel: 'Tense', tags: ['commute', 'late night', 'neon'] },
     { city: 'São Paulo', moodLabel: 'Excited', tempoLabel: 'Chaotic', tags: ['traffic', 'music', 'social pulse'] }
   ];
 
