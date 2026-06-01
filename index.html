@@ -5,9 +5,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Glotemp | Global Mood and Tempo Map</title>
     <link rel="stylesheet" href="styles.css" />
-    <script src="app.js" defer></script>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <header>
+        <section aria-labelledby="hero-title">
+          <div>
+            <h1 id="hero-title">Glotemp</h1>
+            <p>The world’s mood, in motion.</p>
+            <div>
+              <button type="button">Check in your mood</button>
+              <button type="button">Explore live moods</button>
+            </div>
+          </div>
+          <div aria-hidden="true"></div>
+        </section>
+      </header>
+
+      <main>
+        <section id="mood-map" aria-labelledby="mood-map-title">
+          <h2 id="mood-map-title">Right now</h2>
+          <p>Live mood and tempo across cities.</p>
+          <div id="city-cards"></div>
+        </section>
+
+        <section id="checkin" aria-labelledby="checkin-title">
+          <h2 id="checkin-title">Check in your mood</h2>
+          <form>
+            <div>
+              <label for="city">City</label>
+              <input id="city" name="city" type="text" />
+            </div>
+            <div>
+              <label for="country">Country</label>
+              <input id="country" name="country" type="text" />
+            </div>
+            <div>
+              <h3>Mood</h3>
+              <div id="mood-buttons"></div>
+            </div>
+            <div>
+              <h3>Vibe</h3>
+              <div id="vibe-buttons"></div>
+            </div>
+            <div>
+              <h3>Context</h3>
+              <div id="context-buttons"></div>
+            </div>
+            <button type="submit">Submit</button>
+          </form>
+          <p id="checkin-message"></p>
+        </section>
+
+        <section id="how-it-works" aria-labelledby="how-it-works-title">
+          <h2 id="how-it-works-title">How Glotemp works</h2>
+          <div>
+            <div>
+              <h3>People</h3>
+              <p>Mood check-ins from people on the ground.</p>
+            </div>
+            <div>
+              <h3>Signals</h3>
+              <p>Weather, news, sports, and events shape the live picture.</p>
+            </div>
+            <div>
+              <h3>AI</h3>
+              <p>AI synthesizes mood and tempo into a city snapshot.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="marketers" aria-labelledby="marketers-title">
+          <h2 id="marketers-title">For brands and decision-makers</h2>
+          <p>Target live emotional context and city energy instead of static demographics.</p>
+          <form>
+            <div>
+              <label for="marketer-email">Email</label>
+              <input id="marketer-email" name="email" type="email" />
+            </div>
+            <button type="submit">Get updates</button>
+            <p id="marketer-message"></p>
+          </form>
+        </section>
+      </main>
+
+      <footer>
+        <p>Glotemp – Global mood and tempo, in real time.</p>
+        <p>Contact: hello@glotemp.com</p>
+      </footer>
+    </div>
+    <script src="app.js"></script>
   </body>
 </html>
