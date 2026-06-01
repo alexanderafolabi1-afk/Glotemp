@@ -551,6 +551,17 @@ header > section > div:first-child > div {
 #city-cards > div:nth-child(6)    { animation-delay: 0.45s; }
 #city-cards > div:nth-child(n+7)  { animation-delay: 0.50s; }
 
+.news-pulse {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(77, 242, 255, 0.35);
+  color: var(--accent-cyan);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
 /* ============================================================
    20. Mood Color Utilities
    ============================================================ */
