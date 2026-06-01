@@ -3,6 +3,12 @@ const vibes = ['Dead', 'Chill', 'Buzzing', 'Tense', 'Cozy', 'Chaotic', 'Romantic
 const contexts = ['Work', 'Home', 'Commute', 'Nightlife', 'Date', 'Shopping', 'Study'];
 const GNEWS_API_KEY = 'demo';
 const MAX_NEWS_HEADLINES = 3;
+const SENTIMENT_PLACEHOLDER = 'pending';
+const GNEWS_SUPPORTED_COUNTRIES = new Set([
+  'au', 'br', 'ca', 'cn', 'eg', 'fr', 'de', 'gr', 'hk', 'in', 'ie',
+  'il', 'it', 'jp', 'nl', 'no', 'pk', 'pe', 'ph', 'pt', 'ro', 'ru',
+  'sg', 'es', 'se', 'ch', 'tw', 'ua', 'gb', 'us', 'ng'
+]);
 
 function getWeatherLabel(weatherCode) {
   if (weatherCode === 0) return 'Sunny';
@@ -58,11 +64,16 @@ function resolveCountryCode(country) {
     usa: 'us'
   };
 
-  if (/^[a-z]{2}$/i.test(normalizedCountry)) {
+  if (/^[a-z]{2}$/i.test(normalizedCountry) && GNEWS_SUPPORTED_COUNTRIES.has(normalizedCountry)) {
     return normalizedCountry;
   }
 
-  return countryCodeMap[normalizedCountry] || 'us';
+  const mappedCountryCode = countryCodeMap[normalizedCountry];
+  if (mappedCountryCode && GNEWS_SUPPORTED_COUNTRIES.has(mappedCountryCode)) {
+    return mappedCountryCode;
+  }
+
+  return 'us';
 }
 
 async function fetchNews(country) {
@@ -76,12 +87,12 @@ async function fetchNews(country) {
   const articles = newsData?.articles || [];
   const topHeadlines = articles.slice(0, MAX_NEWS_HEADLINES).map((article) => ({
     title: article.title || 'Untitled headline',
-    sentiment: 'pending'
+    sentiment: SENTIMENT_PLACEHOLDER
   }));
 
   return {
     headlines: topHeadlines,
-    sentiment: 'pending'
+    sentiment: SENTIMENT_PLACEHOLDER
   };
 }
 
