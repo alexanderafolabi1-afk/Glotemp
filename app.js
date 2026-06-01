@@ -122,14 +122,15 @@ async function handleCheckinSubmit(event) {
     return;
   }
 
+  let weatherResult = null;
   const checkinData = { city, country, mood, vibe, context };
-  console.log('Glotemp check-in:', checkinData);
   try {
-    const weather = await fetchWeather(city, country);
-    console.log('Weather result:', weather);
+    weatherResult = await fetchWeather(city, country);
+    console.log('Weather result:', weatherResult);
   } catch (error) {
     console.error('Weather fetch failed:', error);
   }
+  console.log('Glotemp check-in:', { ...checkinData, weather: weatherResult });
 
   if (message) {
     message.textContent = `Thanks! Your check-in is shaping the Glotemp wave in ${city}.`;
