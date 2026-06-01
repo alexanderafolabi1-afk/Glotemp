@@ -4,6 +4,7 @@ const contexts = ['Work', 'Home', 'Commute', 'Nightlife', 'Date', 'Shopping', 'S
 const GNEWS_API_KEY = 'demo';
 const MAX_NEWS_HEADLINES = 3;
 const SENTIMENT_PLACEHOLDER = 'pending';
+const NEWS_PULSE_TEXT = `News pulse: ${MAX_NEWS_HEADLINES} headlines loaded`;
 const GNEWS_SUPPORTED_COUNTRIES = new Set([
   'au', 'br', 'ca', 'cn', 'eg', 'fr', 'de', 'gr', 'hk', 'in', 'ie',
   'il', 'it', 'jp', 'nl', 'no', 'pk', 'pe', 'ph', 'pt', 'ro', 'ru',
@@ -64,7 +65,7 @@ function resolveCountryCode(country) {
     usa: 'us'
   };
 
-  if (/^[a-z]{2}$/i.test(normalizedCountry) && GNEWS_SUPPORTED_COUNTRIES.has(normalizedCountry)) {
+  if (/^[a-z]{2}$/.test(normalizedCountry) && GNEWS_SUPPORTED_COUNTRIES.has(normalizedCountry)) {
     return normalizedCountry;
   }
 
@@ -217,10 +218,6 @@ function createNewsPulseIndicator(text) {
   return indicator;
 }
 
-function createNewsPulseText() {
-  return `News pulse: ${MAX_NEWS_HEADLINES} headlines loaded`;
-}
-
 function createCityCard({ city, moodLabel, tempoLabel, tags, temperature, weatherCode, newsPulseText }) {
   const card = document.createElement('article');
   card.className = 'city-card';
@@ -244,10 +241,10 @@ function renderCityCards() {
   if (!cityCards) return;
 
   const placeholderCards = [
-    { city: 'Lagos', temperature: 30, weatherCode: 1, moodLabel: 'Hopeful', tempoLabel: 'Buzzing', tags: ['work rush', 'warm evening', 'street energy'], newsPulseText: createNewsPulseText() },
-    { city: 'London', temperature: 12, weatherCode: 61, moodLabel: 'Calm', tempoLabel: 'Chill', tags: ['light rain', 'after work', 'coffee'], newsPulseText: createNewsPulseText() },
-    { city: 'Tokyo', temperature: 19, weatherCode: 3, moodLabel: 'Anxious', tempoLabel: 'Tense', tags: ['commute', 'late night', 'neon'], newsPulseText: createNewsPulseText() },
-    { city: 'São Paulo', temperature: 24, weatherCode: 0, moodLabel: 'Excited', tempoLabel: 'Chaotic', tags: ['traffic', 'music', 'social pulse'], newsPulseText: createNewsPulseText() }
+    { city: 'Lagos', temperature: 30, weatherCode: 1, moodLabel: 'Hopeful', tempoLabel: 'Buzzing', tags: ['work rush', 'warm evening', 'street energy'], newsPulseText: NEWS_PULSE_TEXT },
+    { city: 'London', temperature: 12, weatherCode: 61, moodLabel: 'Calm', tempoLabel: 'Chill', tags: ['light rain', 'after work', 'coffee'], newsPulseText: NEWS_PULSE_TEXT },
+    { city: 'Tokyo', temperature: 19, weatherCode: 3, moodLabel: 'Anxious', tempoLabel: 'Tense', tags: ['commute', 'late night', 'neon'], newsPulseText: NEWS_PULSE_TEXT },
+    { city: 'São Paulo', temperature: 24, weatherCode: 0, moodLabel: 'Excited', tempoLabel: 'Chaotic', tags: ['traffic', 'music', 'social pulse'], newsPulseText: NEWS_PULSE_TEXT }
   ];
 
   const cardElements = placeholderCards.map(createCityCard);
