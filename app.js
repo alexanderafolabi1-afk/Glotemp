@@ -93,15 +93,28 @@ function attachFormListeners() {
   checkinForm.addEventListener('submit', handleCheckinSubmit);
 }
 
+function createMetaParagraph(label, value) {
+  const paragraph = document.createElement('p');
+  const strong = document.createElement('strong');
+  strong.textContent = `${label}:`;
+  paragraph.appendChild(strong);
+  paragraph.append(` ${value}`);
+  return paragraph;
+}
+
 function createCityCard({ city, moodLabel, tempoLabel, tags }) {
-  return `
-    <article class="city-card">
-      <h3>${city}</h3>
-      <p><strong>Mood:</strong> ${moodLabel}</p>
-      <p><strong>Tempo:</strong> ${tempoLabel}</p>
-      <p><strong>Tags:</strong> ${tags.join(', ')}</p>
-    </article>
-  `;
+  const card = document.createElement('article');
+  card.className = 'city-card';
+
+  const title = document.createElement('h3');
+  title.textContent = city;
+
+  card.appendChild(title);
+  card.appendChild(createMetaParagraph('Mood', moodLabel));
+  card.appendChild(createMetaParagraph('Tempo', tempoLabel));
+  card.appendChild(createMetaParagraph('Tags', tags.join(', ')));
+
+  return card;
 }
 
 function renderCityCards() {
@@ -115,7 +128,8 @@ function renderCityCards() {
     { city: 'São Paulo', moodLabel: 'Excited', tempoLabel: 'Chaotic', tags: ['traffic', 'music', 'social pulse'] }
   ];
 
-  cityCards.innerHTML = placeholderCards.map(createCityCard).join('');
+  const cardElements = placeholderCards.map(createCityCard);
+  cityCards.replaceChildren(...cardElements);
 }
 
 function init() {
