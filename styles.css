@@ -433,6 +433,46 @@ body {
   color: #4ade80;
 }
 
+.gt-sponsor-banner {
+  margin: 8px 0;
+  font-size: 11px;
+  color: #ffd166;
+  border: 1px solid rgba(255, 209, 102, 0.45);
+  background: rgba(255, 209, 102, 0.08);
+  border-radius: 999px;
+  padding: 4px 10px;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.gt-sponsor-wall-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+.gt-sponsor-card {
+  background: radial-gradient(circle at top left, rgba(255, 209, 102, 0.12), transparent 55%), var(--gt-card);
+  border: 1px solid var(--gt-border);
+  border-radius: var(--gt-radius);
+  padding: 12px;
+  box-shadow: var(--gt-shadow-soft);
+}
+
+.gt-sponsor-brand {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gt-gold);
+}
+
+.gt-sponsor-meta,
+.gt-sponsor-copy,
+.gt-sponsor-reward {
+  font-size: 12px;
+  color: var(--gt-text-soft);
+  margin-top: 4px;
+}
+
 .gt-scoreboard {
   background: var(--gt-card);
   border-radius: var(--gt-radius);
@@ -653,6 +693,10 @@ body {
 
   .gt-explorer-layout {
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+  }
+
+  .gt-sponsor-wall-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
