@@ -894,11 +894,25 @@ body {
   margin-bottom: 6px;
 }
 
+.gt-checkin-identity-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
 .gt-checkin-identity {
   font-size: 12px;
   font-weight: 600;
   color: var(--gt-text);
   margin-bottom: 3px;
+}
+
+.gt-checkin-mode {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gt-accent);
 }
 
 .gt-checkin-meta {
