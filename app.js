@@ -16,6 +16,7 @@ const SENTIMENT_PLACEHOLDER = 'pending';
 const NEWS_PULSE_TEXT = `News pulse: ${MAX_NEWS_HEADLINES} headlines loaded`;
 const DEFAULT_SPORTS_MOOD = 'neutral';
 const DEFAULT_MOOD_TAG_LABEL = 'Mood pending';
+const DEFAULT_PROFILE_AVATAR = '◉';
 const SPORTS_PULSE_CLASS_NAME = 'sports-pulse';
 const EVENTS_PULSE_CLASS_NAME = 'events-pulse';
 const SPORTS_PULSE_LABEL = 'Sports pulse';
@@ -27,6 +28,24 @@ const [SURGE_GOLDEN_DROP, GIFT_GOLDEN_DROP, EVENT_GOLDEN_DROP] = GOLDEN_DROP_TYP
 const GOLDEN_DROP_PULSE_SCORE_THRESHOLD = 70;
 const GOLDEN_DROP_CULTURAL_HEAT_THRESHOLD = 2;
 const GOLDEN_DROP_ELIGIBILITY_DISTANCE_KM = 20;
+const CHECKIN_DEBOUNCE_MS = 700;
+const GOLDEN_PATH_STORAGE_KEY = 'glotemp.goldenPath.v1';
+const CITY_HEAT_STORAGE_KEY = 'glotemp.cityHeat.v1';
+const MAX_SCOREBOARD_ITEMS = 10;
+const EXPLORER_USERNAME = 'Explorer';
+const MAX_HEAT_DISPLAY_VALUE = 100;
+const MAX_PULSE_SCORE_FOR_GLOW = 100;
+const MAX_GOLDEN_MAP_ZOOM = 2.2;
+const MIN_GOLDEN_MAP_ZOOM = 0.8;
+const GOLDEN_MAP_ZOOM_STEP = 0.15;
+const HEAT_BORDER_BASE_ALPHA = 0.25;
+const HEAT_BORDER_DIVISOR = 250;
+const HEAT_SHADOW_BASE_SIZE = 12;
+const HEAT_SHADOW_SIZE_DIVISOR = 4;
+const HEAT_SHADOW_BASE_ALPHA = 0.16;
+const HEAT_SHADOW_ALPHA_DIVISOR = 380;
+const MIN_PULSE_GLOW = 0.1;
+const MAX_PULSE_GLOW = 0.9;
 const GNEWS_SUPPORTED_COUNTRIES = new Set([
   'au', 'br', 'ca', 'cn', 'eg', 'fr', 'de', 'gr', 'hk', 'in', 'ie',
   'il', 'it', 'jp', 'nl', 'no', 'pk', 'pe', 'ph', 'pt', 'ro', 'ru',
@@ -126,6 +145,12 @@ async function fetchNews(country) {
 function toScore(value) {
   const parsedValue = Number(value);
   return Number.isFinite(parsedValue) ? parsedValue : null;
+}
+
+function clearObjectInPlace(objectReference) {
+  Object.keys(objectReference).forEach((key) => {
+    delete objectReference[key];
+  });
 }
 
 function mapMatchOutcome(match) {
@@ -397,12 +422,29 @@ let latestPulseScore = 0;
 let goldenMapSvg = null;
 let goldenMapLineLayer = null;
 let goldenMapDotLayer = null;
+let goldenMapViewport = null;
+let goldenMapScale = 1;
+let goldenMapOffsetX = 0;
+let goldenMapOffsetY = 0;
+let goldenLinesVisible = true;
+const cityPulseByName = new Map();
+const cityVisitCount = new Map();
+let claimedDropCount = 0;
+let checkinTimeoutId = null;
 
 function projectGoldenCoord(coord) {
   // Simple equirectangular projection into the 1000x360 SVG viewBox.
   const x = ((coord.longitude + 180) / 360) * 1000;
   const y = ((90 - coord.latitude) / 180) * 360;
   return { x, y };
+}
+
+function applyGoldenMapTransform() {
+  if (!goldenMapViewport) return;
+  goldenMapViewport.setAttribute(
+    'transform',
+    `translate(${goldenMapOffsetX} ${goldenMapOffsetY}) scale(${goldenMapScale})`
+  );
 }
 
 function initGoldenMap() {
@@ -420,24 +462,27 @@ function initGoldenMap() {
   goldenMapSvg.setAttribute('role', 'img');
   goldenMapSvg.setAttribute('aria-label', 'Golden Path travel map');
 
+  goldenMapViewport = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   goldenMapLineLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   goldenMapDotLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 
-  goldenMapSvg.appendChild(goldenMapLineLayer);
-  goldenMapSvg.appendChild(goldenMapDotLayer);
+  goldenMapViewport.appendChild(goldenMapLineLayer);
+  goldenMapViewport.appendChild(goldenMapDotLayer);
+  goldenMapSvg.appendChild(goldenMapViewport);
   mapContainer.appendChild(goldenMapSvg);
+  applyGoldenMapTransform();
 }
 
 function drawGoldenPath() {
   initGoldenMap();
   if (!goldenMapLineLayer || !goldenMapDotLayer) return;
 
-  goldenMapLineLayer.replaceChildren();
-  goldenMapDotLayer.replaceChildren();
-
   const points = goldenPath.visitedCoords
     .filter((coord) => coord && Number.isFinite(coord.latitude) && Number.isFinite(coord.longitude))
     .map(projectGoldenCoord);
+
+  const lineFragment = document.createDocumentFragment();
+  const dotFragment = document.createDocumentFragment();
 
   points.forEach((point, index) => {
     if (index > 0) {
@@ -448,7 +493,7 @@ function drawGoldenPath() {
       line.setAttribute('x2', point.x);
       line.setAttribute('y2', point.y);
       line.setAttribute('class', 'golden-line');
-      goldenMapLineLayer.appendChild(line);
+      lineFragment.appendChild(line);
     }
 
     const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -456,8 +501,12 @@ function drawGoldenPath() {
     dot.setAttribute('cy', point.y);
     dot.setAttribute('r', '4');
     dot.setAttribute('class', 'golden-dot');
-    goldenMapDotLayer.appendChild(dot);
+    dotFragment.appendChild(dot);
   });
+
+  goldenMapLineLayer.replaceChildren(lineFragment);
+  goldenMapDotLayer.replaceChildren(dotFragment);
+  goldenMapLineLayer.style.display = goldenLinesVisible ? 'block' : 'none';
 }
 
 function showGoldenMap() {
@@ -470,36 +519,243 @@ function showGoldenMap() {
   drawGoldenPath();
 }
 
+function saveGoldenPath() {
+  const storagePayload = {
+    visitedCities: goldenPath.visitedCities,
+    visitedCoords: goldenPath.visitedCoords,
+    pilgrimScore: goldenPath.pilgrimScore,
+    goldenDrops: goldenPath.goldenDrops,
+    unlocked: goldenPath.unlocked,
+    claimedDropCount
+  };
+  try {
+    localStorage.setItem(GOLDEN_PATH_STORAGE_KEY, JSON.stringify(storagePayload));
+    localStorage.setItem(CITY_HEAT_STORAGE_KEY, JSON.stringify(cityHeat));
+  } catch (error) {
+    console.error('Unable to persist Golden Path state:', error);
+  }
+}
+
+function loadGoldenPath() {
+  try {
+    const savedGoldenPath = JSON.parse(localStorage.getItem(GOLDEN_PATH_STORAGE_KEY) || '{}');
+    goldenPath.visitedCities = Array.isArray(savedGoldenPath.visitedCities) ? savedGoldenPath.visitedCities : [];
+    goldenPath.visitedCoords = Array.isArray(savedGoldenPath.visitedCoords) ? savedGoldenPath.visitedCoords : [];
+    goldenPath.goldenDrops = Array.isArray(savedGoldenPath.goldenDrops) ? savedGoldenPath.goldenDrops : [];
+    goldenPath.unlocked = Boolean(savedGoldenPath.unlocked);
+    goldenPath.pilgrimScore = Number.isFinite(savedGoldenPath.pilgrimScore) ? savedGoldenPath.pilgrimScore : 0;
+    claimedDropCount = Number.isFinite(savedGoldenPath.claimedDropCount)
+      ? Math.max(0, savedGoldenPath.claimedDropCount)
+      : 0;
+  } catch {
+    goldenPath.visitedCities = [];
+    goldenPath.visitedCoords = [];
+    goldenPath.goldenDrops = [];
+    goldenPath.unlocked = false;
+    goldenPath.pilgrimScore = 0;
+    claimedDropCount = 0;
+  }
+
+  try {
+    const savedCityHeat = JSON.parse(localStorage.getItem(CITY_HEAT_STORAGE_KEY) || '{}');
+    clearObjectInPlace(cityHeat);
+    Object.assign(cityHeat, savedCityHeat);
+  } catch {
+    clearObjectInPlace(cityHeat);
+  }
+
+  cityVisitCount.clear();
+  goldenPath.visitedCities.forEach((cityName) => {
+    const key = cityName?.trim().toLowerCase();
+    if (!key) return;
+    cityVisitCount.set(key, (cityVisitCount.get(key) || 0) + 1);
+  });
+}
+
+function updateUserProfileUI() {
+  const username = document.getElementById('profile-username');
+  const pilgrimScore = document.getElementById('profile-pilgrim-score');
+  const visitedCount = document.getElementById('profile-visited-count');
+  const dropsClaimed = document.getElementById('profile-drops-claimed');
+  const avatar = document.querySelector('.avatar-placeholder');
+
+  if (username) username.textContent = `Username: ${EXPLORER_USERNAME}`;
+  if (pilgrimScore) pilgrimScore.textContent = `Pilgrim Score: ${goldenPath.pilgrimScore}`;
+  if (visitedCount) visitedCount.textContent = `Visited Cities: ${goldenPath.visitedCities.length}`;
+  if (dropsClaimed) dropsClaimed.textContent = `Golden Drops Claimed: ${claimedDropCount}`;
+  if (avatar) avatar.textContent = DEFAULT_PROFILE_AVATAR;
+}
+
+function updateGlobalScoreboard() {
+  const scoreboard = document.getElementById('global-scoreboard-list');
+  if (!scoreboard) return;
+
+  const rows = Object.entries(cityHeat)
+    .map(([city, data]) => ({ city, ...data }))
+    .sort((a, b) => (b.heatScore || 0) - (a.heatScore || 0))
+    .slice(0, MAX_SCOREBOARD_ITEMS)
+    .map((entry) => {
+      const row = document.createElement('article');
+      row.className = 'scoreboard-row';
+      const heatScore = Math.round(entry.heatScore || 0);
+      const pulseScore = getAveragePulseScore(entry);
+      const cityLabel = document.createElement('strong');
+      cityLabel.textContent = entry.city;
+      const heatLabel = document.createElement('span');
+      heatLabel.textContent = `Heat ${heatScore}`;
+      const pulseLabel = document.createElement('span');
+      pulseLabel.textContent = `Pulse ${pulseScore}`;
+      const visitsLabel = document.createElement('span');
+      visitsLabel.textContent = `Visits ${entry.explorerVisits || 0}`;
+      const barTrack = document.createElement('div');
+      barTrack.className = 'scoreboard-heat-bar-track';
+      const bar = document.createElement('div');
+      bar.className = 'scoreboard-heat-bar';
+      bar.style.width = `${Math.min(MAX_HEAT_DISPLAY_VALUE, heatScore)}%`;
+      barTrack.appendChild(bar);
+      row.append(cityLabel, heatLabel, pulseLabel, visitsLabel, barTrack);
+      return row;
+    });
+
+  if (!rows.length) {
+    const empty = document.createElement('p');
+    empty.textContent = 'No heat data yet.';
+    scoreboard.replaceChildren(empty);
+    return;
+  }
+
+  scoreboard.replaceChildren(...rows);
+}
+
+function showGoldenDropUI(drop) {
+  if (!drop) return;
+  const icon = document.getElementById('golden-drop-icon');
+  const modal = document.getElementById('golden-drop-modal');
+  const type = document.getElementById('golden-drop-type');
+  const city = document.getElementById('golden-drop-city');
+  const time = document.getElementById('golden-drop-time');
+  if (!icon || !modal || !type || !city || !time) return;
+
+  type.textContent = `Drop type: ${drop.type}`;
+  city.textContent = `City: ${drop.city || 'Unknown'}`;
+  time.textContent = `Timestamp: ${new Date(drop.timestamp).toLocaleString('en-US', { timeZone: 'UTC' })} UTC`;
+  icon.hidden = false;
+  modal.hidden = false;
+}
+
+function hideGoldenDropUI() {
+  const icon = document.getElementById('golden-drop-icon');
+  const modal = document.getElementById('golden-drop-modal');
+  if (icon) icon.hidden = true;
+  if (modal) modal.hidden = true;
+}
+
+function applyMapControl(control) {
+  if (control === 'zoom-in') {
+    goldenMapScale = Math.min(MAX_GOLDEN_MAP_ZOOM, goldenMapScale + GOLDEN_MAP_ZOOM_STEP);
+  } else if (control === 'zoom-out') {
+    goldenMapScale = Math.max(MIN_GOLDEN_MAP_ZOOM, goldenMapScale - GOLDEN_MAP_ZOOM_STEP);
+  } else if (control === 'reset') {
+    goldenMapScale = 1;
+    goldenMapOffsetX = 0;
+    goldenMapOffsetY = 0;
+  } else if (control === 'toggle-lines') {
+    goldenLinesVisible = !goldenLinesVisible;
+    if (goldenMapLineLayer) {
+      goldenMapLineLayer.style.display = goldenLinesVisible ? 'block' : 'none';
+    }
+  }
+  applyGoldenMapTransform();
+}
+
+function attachGoldenUIListeners() {
+  const icon = document.getElementById('golden-drop-icon');
+  const closeDropButton = document.getElementById('close-drop-btn');
+  const claimDropButton = document.getElementById('claim-drop-btn');
+  const closeCityDetailButton = document.getElementById('close-city-detail-btn');
+  const controls = document.getElementById('golden-map-controls');
+
+  if (icon) {
+    icon.addEventListener('click', () => {
+      const modal = document.getElementById('golden-drop-modal');
+      if (modal) modal.hidden = false;
+    });
+  }
+
+  if (closeDropButton) {
+    closeDropButton.addEventListener('click', hideGoldenDropUI);
+  }
+
+  if (claimDropButton) {
+    claimDropButton.addEventListener('click', () => {
+      claimedDropCount += 1;
+      const latestDrop = goldenPath.goldenDrops[goldenPath.goldenDrops.length - 1];
+      const heatCity = latestDrop?.city;
+      if (heatCity && cityHeat[heatCity]) {
+        cityHeat[heatCity].dropsClaimed = (cityHeat[heatCity].dropsClaimed || 0) + 1;
+      }
+      updateUserProfileUI();
+      updateGlobalScoreboard();
+      saveGoldenPath();
+      hideGoldenDropUI();
+    });
+  }
+
+  if (closeCityDetailButton) {
+    closeCityDetailButton.addEventListener('click', () => {
+      const modal = document.getElementById('city-detail-modal');
+      if (modal) modal.hidden = true;
+    });
+  }
+
+  if (controls) {
+    controls.addEventListener('click', (event) => {
+      const button = event.target.closest('button');
+      if (!button) return;
+      applyMapControl(button.dataset.control);
+    });
+  }
+}
+
 function calculatePilgrimScore() {
   goldenPath.pilgrimScore = Math.min(MAX_PILGRIM_SCORE, goldenPath.visitedCities.length * PILGRIM_SCORE_PER_CITY);
-  console.log('Pilgrim Score:', goldenPath.pilgrimScore);
 }
 
 function calculateCityGoldenHeat(city) {
-  if (!cityHeat[city]) {
-    cityHeat[city] = {
+  const cityKey = city?.trim();
+  if (!cityKey) return 0;
+
+  if (!cityHeat[cityKey]) {
+    cityHeat[cityKey] = {
       intersections: 0,
       dropsClaimed: 0,
       explorerVisits: 0,
-      pulseHistory: []
+      pulseHistory: [],
+      pulseTotal: 0,
+      pulseCount: 0,
+      averagePulse: 0
     };
   }
 
-  cityHeat[city].explorerVisits += 1;
-  cityHeat[city].intersections = goldenPath.visitedCities.filter((visitedCity) => visitedCity === city).length;
-  cityHeat[city].pulseHistory.push(latestPulseScore);
-
-  const averagePulseScore = cityHeat[city].pulseHistory.length
-    ? cityHeat[city].pulseHistory.reduce((sum, score) => sum + score, 0) / cityHeat[city].pulseHistory.length
+  cityHeat[cityKey].explorerVisits += 1;
+  const normalizedCityKey = cityKey.toLowerCase();
+  cityHeat[cityKey].intersections = cityVisitCount.get(normalizedCityKey) || 0;
+  cityHeat[cityKey].pulseHistory.push(latestPulseScore);
+  cityHeat[cityKey].pulseTotal += latestPulseScore;
+  cityHeat[cityKey].pulseCount += 1;
+  cityHeat[cityKey].averagePulse = cityHeat[cityKey].pulseCount
+    ? cityHeat[cityKey].pulseTotal / cityHeat[cityKey].pulseCount
     : 0;
+
+  const averagePulseScore = cityHeat[cityKey].averagePulse;
   const heatScore = (
-    cityHeat[city].intersections * 2
-    + cityHeat[city].dropsClaimed * 5
-    + cityHeat[city].explorerVisits
+    cityHeat[cityKey].intersections * 2
+    + cityHeat[cityKey].dropsClaimed * 5
+    + cityHeat[cityKey].explorerVisits
     + averagePulseScore
   );
 
-  cityHeat[city].heatScore = heatScore;
+  cityHeat[cityKey].heatScore = heatScore;
   return heatScore;
 }
 
@@ -551,7 +807,7 @@ function generateGoldenDrops(pulse, coords) {
   };
 
   goldenPath.goldenDrops.push(drop);
-  console.log('Golden Drop generated', drop);
+  saveGoldenPath();
   return drop;
 }
 
@@ -577,6 +833,7 @@ function recordVisit(city, coords) {
   const normalizedCity = city?.trim().toLowerCase();
   if (normalizedCity && !goldenPath.visitedCities.some((savedCity) => savedCity.trim().toLowerCase() === normalizedCity)) {
     goldenPath.visitedCities.push(city);
+    cityVisitCount.set(normalizedCity, (cityVisitCount.get(normalizedCity) || 0) + 1);
     calculatePilgrimScore();
   }
 
@@ -595,8 +852,8 @@ function recordVisit(city, coords) {
   if (goldenPath.unlocked) {
     drawGoldenPath();
   }
-
-  console.log('Golden Path updated:', goldenPath);
+  updateUserProfileUI();
+  saveGoldenPath();
 }
 
 function activateExplorerMode() {
@@ -621,8 +878,7 @@ function activateExplorerMode() {
   }
 
   showGoldenMap();
-
-  console.log('Explorer Mode activated');
+  updateUserProfileUI();
 }
 
 function checkGoldenPathUnlock() {
@@ -632,9 +888,8 @@ function checkGoldenPathUnlock() {
 
   if (goldenPath.visitedCities.length >= 3) {
     goldenPath.unlocked = true;
-    console.log('Golden Path unlocked');
-    console.log('Pilgrim Score at unlock:', goldenPath.pilgrimScore);
     activateExplorerMode();
+    saveGoldenPath();
   }
 }
 
@@ -709,69 +964,70 @@ async function handleCheckinSubmit(event) {
     return;
   }
 
-  let weatherResult = null;
-  let newsResult = null;
-  let sportsResult = null;
-  let eventsResult = null;
-  let tourismResult = null;
-  const checkinData = { city, country, mood, vibe, context };
-  try {
-    weatherResult = await fetchWeather(city, country);
-    console.log('Weather result:', weatherResult);
-    recordVisit(city, weatherResult?.coords);
-    checkGoldenPathUnlock();
-  } catch (error) {
-    console.error('Weather fetch failed:', error);
-  }
-  try {
-    newsResult = await fetchNews(country);
-    console.log('News headlines:', newsResult.headlines);
-  } catch (error) {
-    console.error('News fetch failed:', error);
-  }
-  try {
-    sportsResult = await fetchSports(country);
-    console.log('Sports results:', sportsResult.results);
-  } catch (error) {
-    console.error('Sports fetch failed:', error);
-  }
-  try {
-    eventsResult = await fetchEvents(city);
-    console.log('Events results:', eventsResult.events);
-  } catch (error) {
-    console.error('Events fetch failed:', error);
-  }
-  try {
-    tourismResult = await fetchTourism(city);
-  } catch (error) {
-    console.error('Tourism fetch failed:', error);
-  }
-  console.log('Tourism data:', tourismResult);
-  const allData = { city, country, mood, vibe, context, weather: weatherResult, news: newsResult, sports: sportsResult, events: eventsResult, tourism: tourismResult };
-  console.log('Glotemp check-in:', allData);
+  const submitButton = form.querySelector('button[type="submit"]');
+  if (submitButton) submitButton.disabled = true;
+  if (message) message.textContent = 'Syncing city pulse...';
 
-  try {
-    const synthesizedMood = await synthesizeMood(allData);
-    console.log('Synthesized mood:', synthesizedMood);
-    allData.claude_synthesis = synthesizedMood;
-    const pulseObject = buildPulseObject(allData);
-    latestPulseScore = Number.isFinite(pulseObject?.pulse_score) ? pulseObject.pulse_score : 0;
-    generateGoldenDrops(pulseObject, weatherResult?.coords);
-    const cityHeatScore = calculateCityGoldenHeat(pulseObject.city);
-    console.log(`City Heat updated for ${pulseObject.city}`);
-    console.log('City Heat score:', cityHeatScore);
-    if (goldenPath.unlocked && checkDropEligibility(weatherResult?.coords)) {
-      console.log('Golden Drop nearby');
+  if (checkinTimeoutId) {
+    clearTimeout(checkinTimeoutId);
+  }
+
+  checkinTimeoutId = window.setTimeout(async () => {
+    const allData = { city, country, mood, vibe, context };
+    try {
+      const [weatherResponse, newsResponse, sportsResponse, eventsResponse, tourismResponse] = await Promise.allSettled([
+        fetchWeather(city, country),
+        fetchNews(country),
+        fetchSports(country),
+        fetchEvents(city),
+        fetchTourism(city)
+      ]);
+
+      const weatherResult = weatherResponse.status === 'fulfilled' ? weatherResponse.value : null;
+      const newsResult = newsResponse.status === 'fulfilled' ? newsResponse.value : null;
+      const sportsResult = sportsResponse.status === 'fulfilled' ? sportsResponse.value : null;
+      const eventsResult = eventsResponse.status === 'fulfilled' ? eventsResponse.value : null;
+      const tourismResult = tourismResponse.status === 'fulfilled' ? tourismResponse.value : null;
+
+      allData.weather = weatherResult;
+      allData.news = newsResult;
+      allData.sports = sportsResult;
+      allData.events = eventsResult;
+      allData.tourism = tourismResult;
+
+      recordVisit(city, weatherResult?.coords);
+      checkGoldenPathUnlock();
+
+      const synthesizedMood = await synthesizeMood(allData);
+      allData.claude_synthesis = synthesizedMood;
+      const pulseObject = buildPulseObject(allData);
+      latestPulseScore = Number.isFinite(pulseObject?.pulse_score) ? pulseObject.pulse_score : 0;
+      const generatedDrop = generateGoldenDrops(pulseObject, weatherResult?.coords);
+      const cityHeatScore = calculateCityGoldenHeat(pulseObject.city);
+
+      updateCityCard(pulseObject);
+      updateCityHeatUI(pulseObject.city, cityHeatScore);
+      updateGlobalScoreboard();
+      updateUserProfileUI();
+
+      if (generatedDrop && checkDropEligibility(weatherResult?.coords)) {
+        showGoldenDropUI(generatedDrop);
+      }
+
+      saveGoldenPath();
+
+      if (message) {
+        message.textContent = `Thanks! Your check-in is shaping the Glotemp wave in ${city}.`;
+      }
+    } catch (error) {
+      console.error('Mood synthesis failed:', error);
+      if (message) {
+        message.textContent = 'We could not process your check-in right now. Please try again.';
+      }
+    } finally {
+      if (submitButton) submitButton.disabled = false;
     }
-    console.log('Final pulse object:', pulseObject);
-    updateCityCard(pulseObject);
-  } catch (error) {
-    console.error('Mood synthesis failed:', error);
-  }
-
-  if (message) {
-    message.textContent = `Thanks! Your check-in is shaping the Glotemp wave in ${city}.`;
-  }
+  }, CHECKIN_DEBOUNCE_MS);
 }
 
 function attachFormListeners() {
@@ -780,31 +1036,107 @@ function attachFormListeners() {
   checkinForm.addEventListener('submit', handleCheckinSubmit);
 }
 
-function createMetaParagraph(label, value) {
-  const paragraph = document.createElement('p');
-  const strong = document.createElement('strong');
-  strong.textContent = `${label}:`;
-  paragraph.appendChild(strong);
-  paragraph.append(` ${value}`);
-  return paragraph;
-}
-
-function createPulseIndicator(className, text) {
-  const indicator = document.createElement('small');
-  indicator.className = className;
-  indicator.textContent = text;
-  return indicator;
-}
-
-function appendScoreIfDefined(card, label, value) {
-  if (value !== null && value !== undefined) {
-    card.appendChild(createMetaParagraph(label, value));
-  }
+function attachCityCardListeners() {
+  const cityCards = document.getElementById('city-cards');
+  if (!cityCards) return;
+  cityCards.addEventListener('click', (event) => {
+    const card = event.target.closest('.city-card');
+    if (!card) return;
+    const city = card.querySelector('.city-name')?.textContent;
+    openCityDetail(city);
+  });
 }
 
 function formatMetricValue(value) {
   if (value === null || value === undefined || value === '') return '—';
   return value;
+}
+
+function getAveragePulseScore(heatEntry) {
+  if (Number.isFinite(heatEntry?.averagePulse)) {
+    return Math.round(heatEntry.averagePulse);
+  }
+  if (heatEntry?.pulseHistory?.length) {
+    return Math.round(heatEntry.pulseHistory.reduce((sum, score) => sum + score, 0) / heatEntry.pulseHistory.length);
+  }
+  return 0;
+}
+
+function setMetricWithValueClass(element, label, value, className) {
+  if (!element) return;
+  element.textContent = `${label}: `;
+  const span = document.createElement('span');
+  span.className = className;
+  span.textContent = String(formatMetricValue(value));
+  element.appendChild(span);
+}
+
+function updatePulseUI(pulse) {
+  if (!pulse?.city) return;
+  const cityKey = pulse.city.trim().toLowerCase();
+  const card = document.querySelector(`#city-cards .city-card[data-city="${cityKey}"]`);
+  if (!card) return;
+
+  card.classList.add('updating');
+  window.requestAnimationFrame(() => {
+    const pulseGlow = Math.max(
+      MIN_PULSE_GLOW,
+      Math.min(MAX_PULSE_GLOW, (Number(pulse.pulse_score) || 0) / MAX_PULSE_SCORE_FOR_GLOW)
+    );
+    card.style.boxShadow = `0 0 26px rgba(248, 255, 106, ${pulseGlow * 0.4})`;
+    card.classList.remove('updating');
+  });
+}
+
+function updateCityHeatUI(city, heatScore) {
+  const cityKey = city?.trim().toLowerCase();
+  if (!cityKey) return;
+  const card = document.querySelector(`#city-cards .city-card[data-city="${cityKey}"]`);
+  if (!card) return;
+
+  const heatLabel = card.querySelector('.heat-label');
+  const heatBar = card.querySelector('.heat-bar');
+  if (heatLabel) heatLabel.textContent = `🔥 Heat Score: ${Math.round(heatScore)}`;
+
+  const normalizedHeat = Math.max(0, Math.min(MAX_HEAT_DISPLAY_VALUE, Math.round(heatScore)));
+  if (heatBar) heatBar.style.width = `${normalizedHeat}%`;
+  card.style.borderColor = `rgba(255, 184, 107, ${HEAT_BORDER_BASE_ALPHA + normalizedHeat / HEAT_BORDER_DIVISOR})`;
+  card.style.boxShadow = `0 0 ${HEAT_SHADOW_BASE_SIZE + normalizedHeat / HEAT_SHADOW_SIZE_DIVISOR}px rgba(255, 184, 107, ${HEAT_SHADOW_BASE_ALPHA + normalizedHeat / HEAT_SHADOW_ALPHA_DIVISOR})`;
+}
+
+function openCityDetail(city) {
+  const cityKey = city?.trim().toLowerCase();
+  if (!cityKey) return;
+  const pulse = cityPulseByName.get(cityKey);
+  if (!pulse) return;
+
+  const modal = document.getElementById('city-detail-modal');
+  const title = document.getElementById('city-detail-title');
+  const content = document.getElementById('city-detail-content');
+  if (!modal || !title || !content) return;
+
+  title.textContent = `${pulse.city} Deep Dive`;
+  const moodDistribution = Object.entries(pulse.mood_distribution || {})
+    .map(([mood, value]) => `${mood}: ${value}%`)
+    .join(', ') || '—';
+  const detailItems = [
+    `Mood distribution: ${moodDistribution}`,
+    `Tempo score: ${formatMetricValue(pulse.tempo_score)}`,
+    `Romantic index: ${formatMetricValue(pulse.romantic_index)}`,
+    `Economic vibe: ${formatMetricValue(pulse.economic_vibe)}`,
+    `Cultural heat: ${formatMetricValue(pulse.cultural_heat)}`,
+    `Weather influence: ${formatMetricValue(pulse.weather_influence)}`,
+    `News influence: ${formatMetricValue(pulse.news_influence)}`,
+    `Sports influence: ${formatMetricValue(pulse.sports_influence)}`,
+    `Tourism influence: ${formatMetricValue(pulse.tourism_influence)}`
+  ];
+  const detailNodes = detailItems.map((text) => {
+    const paragraph = document.createElement('p');
+    paragraph.textContent = text;
+    return paragraph;
+  });
+  content.replaceChildren(...detailNodes);
+  modal.hidden = false;
 }
 
 function createCityCard(city) {
@@ -817,6 +1149,8 @@ function createCityCard(city) {
     <p class="pulse-score"></p>
     <p class="summary-text"></p>
     <div class="mood-tags"></div>
+    <p class="heat-label">🔥 Heat Score: --</p>
+    <div class="heat-bar-track"><div class="heat-bar"></div></div>
     <p class="tempo"></p>
     <p class="romance"></p>
     <p class="economic"></p>
@@ -873,14 +1207,20 @@ function updateCityCard(pulse) {
     });
   }
 
-  if (tempo) tempo.textContent = `Tempo score: ${formatMetricValue(pulse.tempo_score)}`;
-  if (romance) romance.textContent = `Romantic index: ${formatMetricValue(pulse.romantic_index)}`;
-  if (economic) economic.textContent = `Economic vibe: ${formatMetricValue(pulse.economic_vibe)}`;
-  if (cultural) cultural.textContent = `Cultural heat: ${formatMetricValue(pulse.cultural_heat)}`;
+  setMetricWithValueClass(tempo, 'Tempo score', pulse.tempo_score, 'value-tempo');
+  setMetricWithValueClass(romance, 'Romantic index', pulse.romantic_index, 'value-romance');
+  setMetricWithValueClass(economic, 'Economic vibe', pulse.economic_vibe, 'value-economic');
+  setMetricWithValueClass(cultural, 'Cultural heat', pulse.cultural_heat, 'value-cultural');
   if (weather) weather.textContent = `Weather influence: ${formatMetricValue(pulse.weather_influence)}`;
   if (news) news.textContent = `News influence: ${formatMetricValue(pulse.news_influence)}`;
   if (sports) sports.textContent = `Sports influence: ${formatMetricValue(pulse.sports_influence)}`;
   if (tourism) tourism.textContent = `Tourism influence: ${formatMetricValue(pulse.tourism_influence)}`;
+
+  cityPulseByName.set(cityKey, pulse);
+
+  const heatScore = cityHeat[pulse.city]?.heatScore || 0;
+  updateCityHeatUI(pulse.city, heatScore);
+  updatePulseUI(pulse);
 }
 
 function renderCityCards() {
@@ -951,12 +1291,20 @@ function renderCityCards() {
 }
 
 function init() {
+  loadGoldenPath();
   renderCategoryButtons(moods, 'mood-buttons', 'mood');
   renderCategoryButtons(vibes, 'vibe-buttons', 'vibe');
   renderCategoryButtons(contexts, 'context-buttons', 'context');
   renderCityCards();
   attachSelectionListeners();
   attachFormListeners();
+  attachCityCardListeners();
+  attachGoldenUIListeners();
+  updateUserProfileUI();
+  updateGlobalScoreboard();
+  if (goldenPath.unlocked) {
+    activateExplorerMode();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);

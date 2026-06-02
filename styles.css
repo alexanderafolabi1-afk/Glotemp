@@ -763,3 +763,239 @@ header > section > div:first-child > div {
     transition-duration:       0.01ms !important;
   }
 }
+
+/* ============================================================
+   24. Golden Layer UI
+   ============================================================ */
+
+#golden-drop-icon {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 200;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(248, 210, 91, 0.8);
+  background: rgba(248, 210, 91, 0.15);
+  color: #ffd96f;
+  box-shadow: 0 0 14px rgba(248, 210, 91, 0.45);
+  animation: goldSoftPulse 2.4s ease-in-out infinite;
+}
+
+.modal[hidden] {
+  display: none;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 180;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(7, 7, 8, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+.modal-panel {
+  width: min(420px, 100%);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(248, 210, 91, 0.35);
+  background: rgba(15, 14, 11, 0.98);
+  box-shadow: 0 0 30px rgba(248, 210, 91, 0.16);
+}
+
+.modal-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+@keyframes goldSoftPulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(248, 210, 91, 0.28), 0 0 22px rgba(248, 210, 91, 0.12);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(248, 210, 91, 0.48), 0 0 46px rgba(248, 210, 91, 0.22);
+  }
+}
+
+/* ============================================================
+   25. Explorer Mode Polish
+   ============================================================ */
+
+#explorer-mode #pilgrim-score-display {
+  position: relative;
+  padding: 0.65rem 1rem;
+  border-radius: 9999px;
+}
+
+#explorer-mode #pilgrim-score-display::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  border: 1px solid rgba(248, 210, 91, 0.55);
+  animation: ringPulse 2.6s ease-in-out infinite;
+}
+
+@keyframes ringPulse {
+  0%, 100% { transform: scale(1); opacity: 0.35; }
+  50% { transform: scale(1.04); opacity: 0.8; }
+}
+
+.constellation-label {
+  margin-top: 1.3rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(248, 210, 91, 0.85);
+}
+
+#golden-map {
+  position: relative;
+}
+
+#golden-map::before {
+  content: '';
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(248, 210, 91, 0.22), transparent 70%);
+  filter: blur(30px);
+  pointer-events: none;
+}
+
+#golden-map-controls {
+  display: inline-flex;
+  gap: 0.45rem;
+  margin-top: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+#golden-map-controls button {
+  padding: 0.3rem 0.7rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(248, 210, 91, 0.38);
+  background: rgba(248, 210, 91, 0.08);
+  color: #f8d25b;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+#visited-cities-list li {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: visitedFadeIn 0.45s ease forwards;
+}
+
+#visited-cities-list li:nth-child(odd) {
+  animation-delay: 0.08s;
+}
+
+@keyframes visitedFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   26. Pulse, Heat, and Scoreboard
+   ============================================================ */
+
+#city-cards .city-card {
+  transition: box-shadow 0.35s ease, border-color 0.35s ease, opacity 0.35s ease;
+}
+
+#city-cards .city-card.updating {
+  opacity: 0.7;
+}
+
+#city-cards .heat-label {
+  color: #ffb870;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+#city-cards .heat-bar-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+#city-cards .heat-bar {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #ff4fd8, #ff9f4f, #f8ff6a);
+  box-shadow: 0 0 10px rgba(255, 125, 81, 0.45);
+  transition: width 0.35s ease;
+}
+
+.value-tempo { color: var(--accent-cyan); }
+.value-romance { color: var(--accent-pink); }
+.value-economic { color: var(--accent-green); }
+.value-cultural { color: var(--accent-orange); }
+
+#global-scoreboard-list {
+  margin-top: 1.2rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.scoreboard-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(77, 242, 255, 0.2);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.scoreboard-heat-bar-track {
+  grid-column: 1 / -1;
+  height: 5px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.scoreboard-heat-bar {
+  height: 100%;
+  width: 0;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #4df2ff, #f8ff6a);
+  transition: width 0.35s ease;
+}
+
+/* ============================================================
+   27. Profile Layer
+   ============================================================ */
+
+.profile-card {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(77, 242, 255, 0.22);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.avatar-placeholder {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(248, 255, 106, 0.4);
+  color: var(--accent-yellow);
+}
