@@ -1263,11 +1263,11 @@ body {
   white-space: nowrap;
 }
 
-.gt-rank-luminary  { background: rgba(255, 215, 0, 0.18); color: var(--gt-gold);   border: 1px solid rgba(255,215,0,0.5); }
-.gt-rank-vanguard  { background: rgba(0, 229, 255, 0.1);  color: var(--gt-accent); border: 1px solid rgba(0,229,255,0.4); }
-.gt-rank-pathfinder{ background: rgba(167,139,250,0.12);  color: #c4b5fd;          border: 1px solid rgba(167,139,250,0.35); }
-.gt-rank-explorer2 { background: rgba(52,211,153,0.1);    color: #6ee7b7;          border: 1px solid rgba(52,211,153,0.3); }
-.gt-rank-explorer  { background: rgba(255,255,255,0.04);  color: var(--gt-text-soft); border: 1px solid rgba(255,255,255,0.1); }
+.gt-rank-luminary   { background: rgba(255, 215, 0, 0.18);  color: var(--gt-gold);      border: 1px solid rgba(255, 215, 0, 0.5); }
+.gt-rank-vanguard   { background: rgba(0, 229, 255, 0.1);   color: var(--gt-accent);    border: 1px solid rgba(0, 229, 255, 0.4); }
+.gt-rank-pathfinder { background: rgba(167, 139, 250, 0.12); color: #c4b5fd;             border: 1px solid rgba(167, 139, 250, 0.35); }
+.gt-rank-explorer2  { background: rgba(52, 211, 153, 0.1);  color: #6ee7b7;             border: 1px solid rgba(52, 211, 153, 0.3); }
+.gt-rank-explorer   { background: rgba(255, 255, 255, 0.04); color: var(--gt-text-soft); border: 1px solid rgba(255, 255, 255, 0.1); }
 
 .gt-rank-threshold {
   font-size: 12px;
