@@ -424,7 +424,7 @@ function drawGoldenPath() {
   goldenMapDotLayer.replaceChildren();
 
   const points = goldenPath.visitedCoords
-    .filter((coord) => Number.isFinite(coord?.latitude) && Number.isFinite(coord?.longitude))
+    .filter((coord) => coord && Number.isFinite(coord.latitude) && Number.isFinite(coord.longitude))
     .map(projectGoldenCoord);
 
   points.forEach((point, index) => {
