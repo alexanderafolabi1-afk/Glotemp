@@ -757,8 +757,8 @@ async function handleCheckinSubmit(event) {
     const pulseObject = buildPulseObject(allData);
     latestPulseScore = Number.isFinite(pulseObject?.pulse_score) ? pulseObject.pulse_score : 0;
     generateGoldenDrops(pulseObject, weatherResult?.coords);
-    const cityHeatScore = calculateCityGoldenHeat(city);
-    console.log(`City Heat updated for ${city}`);
+    const cityHeatScore = calculateCityGoldenHeat(pulseObject.city);
+    console.log(`City Heat updated for ${pulseObject.city}`);
     console.log('City Heat score:', cityHeatScore);
     if (goldenPath.unlocked && checkDropEligibility(weatherResult?.coords)) {
       console.log('Golden Drop nearby');
