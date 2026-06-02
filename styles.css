@@ -612,6 +612,15 @@ body {
   font-size: 13px;
 }
 
+.gt-modal-section-header {
+  grid-column: 1 / -1;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 12px;
+  margin-top: 4px;
+  font-size: 13px;
+  color: #a0a3c4;
+}
+
 .gt-hidden,
 .gt-section-hidden {
   display: none !important;

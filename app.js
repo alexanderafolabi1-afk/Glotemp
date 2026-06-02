@@ -11,166 +11,273 @@ const cityHeat = {};
 let latestPulseByCity = {};
 let deferredPrompt = null;
 
+// ─── Data layer ──────────────────────────────────────────────────────────────
+
+const CITY_INDEX = [
+  {
+    id: "beijing-cn",
+    name: "Beijing",
+    country: "China",
+    lat: 39.9042,
+    lng: 116.4074,
+    tier: "global_economic",
+    tags: ["capital", "political", "economic"]
+  },
+  {
+    id: "frankfurt-de",
+    name: "Frankfurt",
+    country: "Germany",
+    lat: 50.1109,
+    lng: 8.6821,
+    tier: "finance_hub",
+    tags: ["finance", "europe", "weekend_city"]
+  },
+  {
+    id: "london-uk",
+    name: "London",
+    country: "United Kingdom",
+    lat: 51.5074,
+    lng: -0.1278,
+    tier: "global_economic",
+    tags: ["finance", "nightlife", "uni"]
+  },
+  {
+    id: "sao-paulo-br",
+    name: "São Paulo",
+    country: "Brazil",
+    lat: -23.5505,
+    lng: -46.6333,
+    tier: "mega_city",
+    tags: ["nightlife", "street_culture"]
+  },
+  {
+    id: "sunderland-uk",
+    name: "Sunderland",
+    country: "United Kingdom",
+    lat: 54.9069,
+    lng: -1.3838,
+    tier: "uni_club_city",
+    tags: ["uni", "club_scene", "football"]
+  }
+  // extend later with more cities using same structure
+];
+
+const PULSE_DIMENSIONS = {
+  mood: ["calm", "hopeful", "excited", "anxious", "restless"],
+  nightlife: ["club_intensity", "bar_intensity", "street_energy"],
+  economic: ["local_spend", "business_confidence", "footfall"],
+  study: ["uni_activity", "exam_stress", "campus_vibe"],
+  tourism: ["tourist_density", "photo_spots", "weekend_attractiveness"]
+};
+
+// Keyed by city id — populated by seedCityPulses()
+const cityPulseState = {};
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 // Clamp helper used by live simulation
 function clamp(val, min, max) {
   return Math.max(min, Math.min(max, Math.round(val)));
 }
 
-// Seed cities: Sunderland, São Paulo, London
-function seedInitialPulses() {
-  const seed = [
-    {
-      city: "Sunderland",
-      country: "United Kingdom",
-      pulse_score: 64,
-      summary_text:
-        "Wearside grit meets student energy — Sunderland's nightlife quarter hums and the uni scene is on the rise.",
-      mood_distribution: [
-        { label: "Determined", value: 38 },
-        { label: "Hopeful", value: 34 },
-        { label: "Restless", value: 28 }
-      ],
-      tempo_score: 66,
-      romantic_index: 44,
-      economic_vibe: 52,
-      cultural_heat: 4,
-      weather_influence: 8,
-      news_influence: 2,
-      sports_influence: 5,
-      tourism_influence: 2.1,
-      nightlife_index: 72,
-      uni_vibe: 81
-    },
-    {
-      city: "São Paulo",
-      country: "Brazil",
-      pulse_score: 88,
-      summary_text:
-        "A 24-hour megacity that never dims — jazz bars, concrete towers, and electric ambition drive the endless tempo.",
-      mood_distribution: [
-        { label: "Energised", value: 42 },
-        { label: "Creative", value: 33 },
-        { label: "Intense", value: 25 }
-      ],
-      tempo_score: 91,
-      romantic_index: 68,
-      economic_vibe: 74,
-      cultural_heat: 5,
-      weather_influence: 31,
-      news_influence: 4,
-      sports_influence: 4,
-      tourism_influence: 7.8,
-      nightlife_index: 96,
-      uni_vibe: 62
-    },
-    {
-      city: "London",
-      country: "United Kingdom",
-      pulse_score: 74,
-      summary_text:
-        "A rain-softened hum of purpose and creativity — world culture, finance, and late-night electricity in one city.",
-      mood_distribution: [
-        { label: "Ambitious", value: 38 },
-        { label: "Calm", value: 32 },
-        { label: "Curious", value: 30 }
-      ],
-      tempo_score: 73,
-      romantic_index: 55,
-      economic_vibe: 79,
-      cultural_heat: 5,
-      weather_influence: 14,
-      news_influence: 5,
-      sports_influence: 3,
-      tourism_influence: 9.2,
-      nightlife_index: 83,
-      uni_vibe: 87
-    }
-  ];
-  seed.forEach((p) => {
-    pulses.push(p);
-    latestPulseByCity[p.city] = p;
+function avg(arr) {
+  if (!arr.length) return 0;
+  return arr.reduce((a, b) => a + b, 0) / arr.length;
+}
+
+// Tier-based short summaries used by both seedCityPulses and computeCityCardView
+const DEFAULT_CITY_SUMMARY = "A city alive with its own pulse.";
+const TIER_SUMMARIES = {
+  global_economic: "Global powerhouse — economic weight, cultural depth, and round-the-clock energy.",
+  finance_hub: "Finance nerve centre — business confidence high, weekend draw rising.",
+  uni_club_city: "Student energy and late-night intensity define the city's rhythm.",
+  mega_city: "A 24-hour megacity — street culture, nightlife, and raw momentum."
+};
+
+// Tier-based default pulse values
+const TIER_DEFAULTS = {
+  global_economic: {
+    mood:      { calm: 30, hopeful: 35, excited: 20, anxious: 10, restless: 5 },
+    nightlife: { club_intensity: 65, bar_intensity: 68, street_energy: 60 },
+    economic:  { local_spend: 70, business_confidence: 75, footfall: 72 },
+    study:     { uni_activity: 65, exam_stress: 50, campus_vibe: 60 },
+    tourism:   { tourist_density: 70, photo_spots: 72, weekend_attractiveness: 62 }
+  },
+  finance_hub: {
+    mood:      { calm: 35, hopeful: 30, excited: 18, anxious: 12, restless: 5 },
+    nightlife: { club_intensity: 55, bar_intensity: 62, street_energy: 50 },
+    economic:  { local_spend: 72, business_confidence: 82, footfall: 68 },
+    study:     { uni_activity: 55, exam_stress: 45, campus_vibe: 50 },
+    tourism:   { tourist_density: 58, photo_spots: 55, weekend_attractiveness: 72 }
+  },
+  uni_club_city: {
+    mood:      { calm: 20, hopeful: 35, excited: 30, anxious: 10, restless: 5 },
+    nightlife: { club_intensity: 82, bar_intensity: 75, street_energy: 70 },
+    economic:  { local_spend: 50, business_confidence: 48, footfall: 52 },
+    study:     { uni_activity: 85, exam_stress: 65, campus_vibe: 78 },
+    tourism:   { tourist_density: 30, photo_spots: 35, weekend_attractiveness: 45 }
+  },
+  mega_city: {
+    mood:      { calm: 10, hopeful: 28, excited: 42, anxious: 12, restless: 8 },
+    nightlife: { club_intensity: 92, bar_intensity: 88, street_energy: 90 },
+    economic:  { local_spend: 65, business_confidence: 62, footfall: 75 },
+    study:     { uni_activity: 62, exam_stress: 50, campus_vibe: 58 },
+    tourism:   { tourist_density: 78, photo_spots: 80, weekend_attractiveness: 82 }
+  }
+};
+
+function seedCityPulses() {
+  CITY_INDEX.forEach((city) => {
+    const defaults = TIER_DEFAULTS[city.tier];
+    if (!defaults) return;
+
+    cityPulseState[city.id] = {
+      mood:        { ...defaults.mood },
+      nightlife:   { ...defaults.nightlife },
+      economic:    { ...defaults.economic },
+      study:       { ...defaults.study },
+      tourism:     { ...defaults.tourism },
+      lastUpdated: Date.now()
+    };
+
+    // Sync latestPulseByCity for simulation + heat compatibility
+    const s = cityPulseState[city.id];
+    const nightlifeAvg = avg(Object.values(s.nightlife));
+    const economicAvg  = avg(Object.values(s.economic));
+    const studyAvg     = avg(Object.values(s.study));
+    const tourismAvg   = avg(Object.values(s.tourism));
+    const moodAvg      = avg(Object.values(s.mood));
+
+    const entry = {
+      city:               city.name,
+      country:            city.country,
+      pulse_score:        Math.round(avg([nightlifeAvg, economicAvg, tourismAvg, moodAvg])),
+      summary_text:       TIER_SUMMARIES[city.tier] || DEFAULT_CITY_SUMMARY,
+      mood_distribution:  Object.entries(s.mood).map(([label, value]) => ({
+        label: label.charAt(0).toUpperCase() + label.slice(1),
+        value
+      })),
+      tempo_score:        Math.round(avg([s.nightlife.street_energy, s.economic.footfall])),
+      romantic_index:     Math.round((tourismAvg + s.mood.calm) / 2),
+      economic_vibe:      Math.round(economicAvg),
+      cultural_heat:      Math.round(tourismAvg / 20),
+      weather_influence:  10,
+      news_influence:     3,
+      sports_influence:   3,
+      tourism_influence:  Math.round(tourismAvg / 10),
+      nightlife_index:    Math.round(nightlifeAvg),
+      uni_vibe:           Math.round(studyAvg)
+    };
+
+    pulses.push(entry);
+    latestPulseByCity[city.name] = entry;
   });
+}
+
+// Derives the card-view object for a city from its pulse state
+function computeCityCardView(cityId) {
+  const state = cityPulseState[cityId];
+  const city  = CITY_INDEX.find((c) => c.id === cityId);
+  if (!state || !city) return null;
+
+  const nightlifeAvg = avg(Object.values(state.nightlife));
+  const economicAvg  = avg(Object.values(state.economic));
+  const studyAvg     = avg(Object.values(state.study));
+  const tourismAvg   = avg(Object.values(state.tourism));
+  const moodAvg      = avg(Object.values(state.mood));
+
+  const overallPulseScore = Math.round(avg([nightlifeAvg, economicAvg, studyAvg, tourismAvg, moodAvg]));
+
+  const dims = [
+    { label: "Nightlife", val: nightlifeAvg },
+    { label: "Economy",   val: economicAvg },
+    { label: "Study",     val: studyAvg },
+    { label: "Tourism",   val: tourismAvg }
+  ].sort((a, b) => b.val - a.val);
+
+  const keyTags = dims.slice(0, 2).map((d) => {
+    const level = d.val >= 75 ? "strong" : d.val >= 55 ? "steady" : "quiet";
+    return `${d.label} ${level}`;
+  }).join(" · ");
+
+  return {
+    cityId,
+    name:               city.name,
+    country:            city.country,
+    overallPulseScore,
+    shortSummary:       TIER_SUMMARIES[city.tier] || DEFAULT_CITY_SUMMARY,
+    keyTags,
+    nightlifeAvg:       Math.round(nightlifeAvg),
+    economicAvg:        Math.round(economicAvg),
+    studyAvg:           Math.round(studyAvg),
+    tourismAvg:         Math.round(tourismAvg)
+  };
 }
 
 function renderCityCards() {
   const container = document.getElementById("city-cards");
   container.innerHTML = "";
 
-  const list = Object.values(latestPulseByCity);
-  if (!list.length) {
+  if (!CITY_INDEX.length) {
     container.innerHTML =
       '<p class="gt-empty">No cities yet. Check in to start the pulse.</p>';
     return;
   }
 
-  list.forEach((pulse) => {
+  CITY_INDEX.forEach((city) => {
+    const view     = computeCityCardView(city.id);
+    const liveData = latestPulseByCity[city.name] || {};
+    const heatScore = cityHeat[city.name]?.heatScore || 0;
+    if (!view) return;
+
+    const displayPulseScore = liveData.pulse_score ?? view.overallPulseScore;
+
     const card = document.createElement("div");
     card.className = "gt-city-card";
-    card.onclick = () => openCityDetail(pulse.city);
-
-    const moodTags =
-      pulse.mood_distribution
-        ?.map(
-          (m) =>
-            `<span class="gt-tag">${m.label} ${m.value.toFixed
-              ? m.value.toFixed(0)
-              : m.value}%</span>`
-        )
-        .join("") || "";
-
-    const heatScore = cityHeat[pulse.city]?.heatScore || 0;
+    card.onclick = () => openCityDetail(city.name);
 
     card.innerHTML = `
       <div class="gt-city-header">
-        <div class="gt-city-name">${pulse.city}</div>
-        <div class="gt-pulse-score">Pulse ${pulse.pulse_score}</div>
+        <div class="gt-city-name">${city.name}</div>
+        <div class="gt-pulse-score">Pulse ${displayPulseScore}</div>
       </div>
-      <p class="gt-summary-text">${pulse.summary_text}</p>
-      <div class="gt-mood-tags">${moodTags}</div>
+      <p class="gt-summary-text">${view.shortSummary}</p>
+      <div class="gt-mood-tags">${
+        city.tags.map((t) => `<span class="gt-tag">${t.replace(/_/g, " ")}</span>`).join("")
+      }</div>
       <div class="gt-metrics-row">
         <div class="gt-metric">
-          <span class="gt-metric-label">Tempo</span>
-          <span class="gt-metric-value">${pulse.tempo_score}</span>
-        </div>
-        <div class="gt-metric">
-          <span class="gt-metric-label">Romance</span>
-          <span class="gt-metric-value">${pulse.romantic_index}</span>
+          <span class="gt-metric-label">Nightlife</span>
+          <span class="gt-metric-value">${liveData.nightlife_index ?? view.nightlifeAvg}</span>
         </div>
         <div class="gt-metric">
           <span class="gt-metric-label">Economic</span>
-          <span class="gt-metric-value">${pulse.economic_vibe}</span>
+          <span class="gt-metric-value">${liveData.economic_vibe ?? view.economicAvg}</span>
         </div>
         <div class="gt-metric">
-          <span class="gt-metric-label">Cultural</span>
-          <span class="gt-metric-value">${pulse.cultural_heat}</span>
+          <span class="gt-metric-label">Study</span>
+          <span class="gt-metric-value">${liveData.uni_vibe ?? view.studyAvg}</span>
         </div>
         <div class="gt-metric">
-          <span class="gt-metric-label">Weather</span>
-          <span class="gt-metric-value">${pulse.weather_influence}</span>
+          <span class="gt-metric-label">Tourism</span>
+          <span class="gt-metric-value">${view.tourismAvg}</span>
         </div>
-        ${pulse.nightlife_index !== undefined ? `
-        <div class="gt-metric">
-          <span class="gt-metric-label">Nightlife</span>
-          <span class="gt-metric-value">${pulse.nightlife_index}</span>
-        </div>` : ""}
-        ${pulse.uni_vibe !== undefined ? `
-        <div class="gt-metric">
-          <span class="gt-metric-label">Uni</span>
-          <span class="gt-metric-value">${pulse.uni_vibe}</span>
-        </div>` : ""}
       </div>
       <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:11px;color:#a0a3c4;">${view.keyTags}</span>
         <span class="gt-heat-chip">🔥 Heat ${heatScore}</span>
-        <span style="font-size:11px;color:#7f82a4;">Tap for full breakdown</span>
       </div>
     `;
     container.appendChild(card);
   });
 }
 
-function openCityDetail(city) {
-  const pulse = latestPulseByCity[city];
+function openCityDetail(cityName) {
+  const pulse = latestPulseByCity[cityName];
   if (!pulse) return;
+
+  const cityEntry = CITY_INDEX.find((c) => c.name === cityName);
+  const state = cityEntry ? cityPulseState[cityEntry.id] : null;
 
   const modal = document.getElementById("city-modal");
   const body = document.getElementById("city-modal-body");
@@ -180,16 +287,28 @@ function openCityDetail(city) {
     <p class="gt-modal-body-sub">${pulse.summary_text}</p>
     <div class="gt-modal-grid">
       ${metricBlock("Pulse score", pulse.pulse_score)}
+      ${metricBlock("Nightlife index", pulse.nightlife_index)}
+      ${metricBlock("Economic vibe", pulse.economic_vibe)}
+      ${metricBlock("Uni vibe", pulse.uni_vibe)}
+      ${metricBlock("Tourism influence", pulse.tourism_influence)}
       ${metricBlock("Tempo score", pulse.tempo_score)}
       ${metricBlock("Romantic index", pulse.romantic_index)}
-      ${metricBlock("Economic vibe", pulse.economic_vibe)}
       ${metricBlock("Cultural heat", pulse.cultural_heat)}
       ${metricBlock("Weather influence", pulse.weather_influence)}
       ${metricBlock("News influence", pulse.news_influence)}
       ${metricBlock("Sports influence", pulse.sports_influence)}
-      ${metricBlock("Tourism influence", pulse.tourism_influence)}
-      ${pulse.nightlife_index !== undefined ? metricBlock("Nightlife index", pulse.nightlife_index) : ""}
-      ${pulse.uni_vibe !== undefined ? metricBlock("Uni vibe", pulse.uni_vibe) : ""}
+      ${state ? `
+        <div class="gt-modal-section-header">Nightlife breakdown</div>
+        ${Object.entries(state.nightlife).map(([k, v]) => metricBlock(k.replace(/_/g, " "), v)).join("")}
+        <div class="gt-modal-section-header">Economic breakdown</div>
+        ${Object.entries(state.economic).map(([k, v]) => metricBlock(k.replace(/_/g, " "), v)).join("")}
+        <div class="gt-modal-section-header">Study breakdown</div>
+        ${Object.entries(state.study).map(([k, v]) => metricBlock(k.replace(/_/g, " "), v)).join("")}
+        <div class="gt-modal-section-header">Tourism breakdown</div>
+        ${Object.entries(state.tourism).map(([k, v]) => metricBlock(k.replace(/_/g, " "), v)).join("")}
+        <div class="gt-modal-section-header">Mood breakdown</div>
+        ${Object.entries(state.mood).map(([k, v]) => metricBlock(k.charAt(0).toUpperCase() + k.slice(1), v)).join("")}
+      ` : ""}
     </div>
   `;
 
@@ -462,23 +581,32 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js").catch(() => {});
 }
 
-// Simple "check in" stub: cycles through the 3 seeded cities
+// Simple "check in" stub: cycles through all cities in CITY_INDEX
 function setupCheckin() {
   const btn = document.getElementById("checkin-btn");
   if (!btn) return;
   let checkinIndex = 0;
-  const checkinCities = [
-    { city: "London", coords: { lat: 51.5074, lng: -0.1278 } },
-    { city: "Sunderland", coords: { lat: 54.9069, lng: -1.3838 } },
-    { city: "São Paulo", coords: { lat: -23.5505, lng: -46.6333 } }
-  ];
   btn.onclick = () => {
-    const { city, coords } = checkinCities[checkinIndex % checkinCities.length];
+    const city = CITY_INDEX[checkinIndex % CITY_INDEX.length];
     checkinIndex++;
-    recordVisit(city, coords);
-    calculateCityGoldenHeat(city);
+    recordVisit(city.name, { lat: city.lat, lng: city.lng });
+    calculateCityGoldenHeat(city.name);
     drawGoldenPath();
   };
+}
+
+function populateTripSelects() {
+  ["trip-from", "trip-to"].forEach((id) => {
+    const select = document.getElementById(id);
+    if (!select) return;
+    select.innerHTML = '<option value="">Select a city…</option>';
+    CITY_INDEX.forEach((city) => {
+      const opt = document.createElement("option");
+      opt.value = city.id;
+      opt.textContent = `${city.name}, ${city.country}`;
+      select.appendChild(opt);
+    });
+  });
 }
 
 function setupExplore() {
@@ -502,8 +630,9 @@ function setupModalClose() {
 
 // Init
 document.addEventListener("DOMContentLoaded", () => {
-  seedInitialPulses();
+  seedCityPulses();
   renderCityCards();
+  populateTripSelects();
   setupInstallButton();
   setupCheckin();
   setupExplore();
