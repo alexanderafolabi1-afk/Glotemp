@@ -230,7 +230,6 @@ function syncCityDerivedState(cityId) {
   if (!scores) return null;
 
   state.overall = scores.overall;
-  state.overallScore = scores.overall;
   state.moodScore = scores.moodScore;
   state.nightlifeScore = scores.nightlifeScore;
   state.economicScore = scores.economicScore;
@@ -1317,7 +1316,6 @@ function saveUserProfile() {
 function getOverallPulseForCity(cityId) {
   const cityState = cityPulseState[cityId];
   if (typeof cityState?.overall === "number") return cityState.overall;
-  if (typeof cityState?.overallScore === "number") return cityState.overallScore;
   return computeCityPulseScores(cityId)?.overall ?? null;
 }
 
