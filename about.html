@@ -2,237 +2,262 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Glotemp – About</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#000000" />
+  <title>About Glotemp — The Living Atlas of Human Experience</title>
+  <meta name="description" content="Glotemp is the world's first real-time collective mood infrastructure. A living atlas. A decision oracle. A global nervous system built on human check-ins and machine signals.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://www.glotemp.com/about.html">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 38'%3E%3Ccircle cx='19' cy='19' r='17' fill='none' stroke='%23E8B84B' stroke-width='1.5'/%3E%3Cellipse cx='19' cy='19' rx='9' ry='17' fill='none' stroke='%23E8B84B' stroke-width='1' opacity='0.6'/%3E%3Cellipse cx='19' cy='19' rx='17' ry='6' fill='none' stroke='%23E8B84B' stroke-width='0.8' opacity='0.4'/%3E%3Ccircle cx='25' cy='11' r='2.5' fill='%2300D4FF'/%3E%3C/svg%3E">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#030508">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="gt-header">
-    <a class="gt-brand gt-brand-link" href="index.html">
-      <svg class="gt-logo-svg" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="22" cy="22" r="18" fill="none" stroke="currentColor" stroke-width="1.5" />
-        <ellipse cx="22" cy="22" rx="10" ry="18" fill="none" stroke="currentColor" stroke-width="1" opacity="0.65" />
-        <ellipse cx="22" cy="22" rx="18" ry="6.5" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.5" />
-        <line x1="22" y1="4" x2="22" y2="40" stroke="currentColor" stroke-width="0.7" opacity="0.3" />
-        <circle cx="22" cy="22" r="18" fill="none" stroke="currentColor" stroke-width="1.2" class="gt-globe-pulse-ring" />
-        <circle cx="29" cy="14" r="2.5" fill="currentColor" class="gt-globe-marker" />
+
+  <div class="gt-mesh" aria-hidden="true"></div>
+  <div class="gt-grid-lines" aria-hidden="true"></div>
+
+  <!-- HEADER -->
+  <header class="gt-header" id="gt-header" role="banner">
+    <a href="index.html" class="gt-brand gt-brand-link" aria-label="Glotemp home">
+      <svg class="gt-logo-svg-sm" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
+        <circle class="gt-logo-pulse" cx="19" cy="19" r="16" stroke="rgba(232,184,75,0.15)" stroke-width="8"/>
+        <circle cx="19" cy="19" r="14" stroke="#E8B84B" stroke-width="1.2" opacity="0.9"/>
+        <ellipse class="gt-logo-globe-ring" cx="19" cy="19" rx="8" ry="14" stroke="#E8B84B" stroke-width="0.8" opacity="0.55"/>
+        <ellipse class="gt-logo-globe-ring-2" cx="19" cy="19" rx="14" ry="5.5" stroke="#E8B84B" stroke-width="0.7" opacity="0.4"/>
+        <line x1="19" y1="5" x2="19" y2="33" stroke="#E8B84B" stroke-width="0.5" opacity="0.25"/>
+        <circle class="gt-logo-dot" cx="26" cy="12" r="2" fill="#00D4FF"/>
+        <circle cx="13" cy="23" r="1.5" fill="#E8B84B" opacity="0.7"/>
       </svg>
-      <div class="gt-brand-text">
-        <div class="gt-brand-name">Glotemp</div>
-        <div class="gt-brand-sub">Global Mood &amp; Tempo</div>
+      <div>
+        <span class="gt-brand-name">Glotemp</span>
+        <span class="gt-brand-sub">Global Pulse Engine</span>
       </div>
     </a>
-    <nav class="gt-header-nav">
-      <a class="gt-nav-link gt-nav-link-active" href="about.html">About</a>
-      <a class="gt-nav-link" href="investors.html">Investors</a>
-      <a class="gt-nav-link" href="index.html">App</a>
+    <nav class="gt-header-nav" aria-label="Header navigation">
+      <a href="index.html" class="gt-nav-link-sm">App</a>
+      <a href="about.html" class="gt-nav-link-sm gt-nav-link-active">About</a>
+      <a href="investors.html" class="gt-nav-link-sm">Investors</a>
     </nav>
   </header>
 
-  <main class="gt-main gt-page-main">
+  <main class="gt-page-main" role="main">
 
-    <!-- ── HERO ── -->
+    <!-- PAGE HERO -->
     <section class="gt-page-hero">
-      <div class="gt-page-hero-eyebrow">About Glotemp</div>
-      <h1 class="gt-page-hero-title">The world's pulse,<br />decoded in real time.</h1>
+      <div class="gt-page-hero-eyebrow">The Living Atlas</div>
+      <h1 class="gt-page-hero-title">
+        Every city<br>
+        <span style="background:linear-gradient(135deg,var(--gold-bright),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">is a character.</span>
+      </h1>
       <p class="gt-page-hero-sub">
-        Glotemp is a living intelligence layer for the planet — mapping collective mood, energy, and
-        cultural tempo across every city, every moment.
+        Glotemp is not an app. It is a new category. The world's first real-time collective mood infrastructure — a cinematic intelligence layer built at the intersection of human experience, machine signals, and city DNA.
       </p>
     </section>
 
-    <!-- ── MISSION ── -->
-    <section class="gt-about-section" id="mission">
-      <div class="gt-about-card gt-about-card-gold">
-        <div class="gt-about-icon">🌍</div>
-        <h2 class="gt-about-title">Our Mission</h2>
+    <!-- MANIFESTO -->
+    <section class="gt-about-section" id="manifesto">
+      <div class="gt-about-pill gt-about-pill-gold">Manifesto</div>
+      <h2 class="gt-about-section-heading">We believe cities breathe.</h2>
+      <p class="gt-about-section-sub">
+        They have moods. Rhythms. Temperatures. A city on a Friday night in Lagos feels nothing like the same city on a Tuesday morning. Glotemp makes that difference visible — and useful.
+      </p>
+      <div class="gt-about-card">
+        <div class="gt-about-icon">◎</div>
+        <h3 class="gt-about-title">The World's Pulse, Decoded.</h3>
         <p class="gt-about-body">
-          To give every person on earth a truthful, real-time signal about the emotional and energetic
-          state of any city — so they can move smarter, connect deeper, and live more intentionally.
+          We blend real-time machine signals — weather, news sentiment, economic indicators, nightlife listings, sports outcomes, event density — with human check-ins from contributors on the ground. The result is a living, breathing picture of every city's true temperature.
         </p>
         <p class="gt-about-body">
-          We believe collective human emotion is data. When structured and surfaced responsibly, it
-          becomes a utility as fundamental as a weather forecast — informing travel decisions, business
-          timing, creative work, and personal wellbeing at scale.
+          Not what a city was yesterday. Not what it will be next week. What it <em style="-webkit-text-fill-color:var(--gold);color:var(--gold);">is right now.</em>
         </p>
       </div>
     </section>
 
-    <!-- ── PULSE ENGINE ── -->
-    <section class="gt-about-section" id="pulse-engine">
-      <div class="gt-about-pill">Core Technology</div>
-      <h2 class="gt-about-section-heading">The Pulse Engine</h2>
+    <!-- THE SIGNAL SOURCES -->
+    <section class="gt-about-section" id="signals">
+      <div class="gt-about-pill">The Signal Layer</div>
+      <h2 class="gt-about-section-heading">Two kinds of truth.</h2>
       <p class="gt-about-section-sub">
-        A proprietary signal aggregation layer that fuses human check-ins, crowd intensity,
-        scene context, and momentum patterns into a single composite city score.
+        Machine signals give us scale. Human signals give us soul. Together, they produce something neither can alone.
       </p>
       <div class="gt-feature-grid">
-        <div class="gt-feature-card">
-          <div class="gt-feature-icon">⚡</div>
-          <div class="gt-feature-name">Real-time aggregation</div>
-          <div class="gt-feature-desc">Check-ins are weighted by recency, intensity, and scene type to produce a live city score updated continuously.</div>
+        <div class="gt-feature-card gt-reveal">
+          <div class="gt-feature-icon">🌐</div>
+          <div class="gt-feature-name">Weather &amp; Air Quality</div>
+          <div class="gt-feature-desc">Real-time atmospheric conditions and their effect on city mood and footfall patterns.</div>
         </div>
-        <div class="gt-feature-card">
-          <div class="gt-feature-icon">🧠</div>
-          <div class="gt-feature-name">Mood taxonomy</div>
-          <div class="gt-feature-desc">Five core emotional states — Excited, Calm, Stressed, Hopeful, Anxious — mapped against intensity and scene to generate nuanced city narratives.</div>
+        <div class="gt-feature-card gt-reveal">
+          <div class="gt-feature-icon">📰</div>
+          <div class="gt-feature-name">News Sentiment</div>
+          <div class="gt-feature-desc">AI-weighted local news analysis. Political tension, civil events, economic signals — all factored in.</div>
         </div>
-        <div class="gt-feature-card">
-          <div class="gt-feature-icon">📡</div>
-          <div class="gt-feature-name">Momentum signals</div>
-          <div class="gt-feature-desc">Heat delta tracking captures rising and falling city energy, surfacing trend lines that predict short-term cultural momentum.</div>
+        <div class="gt-feature-card gt-reveal">
+          <div class="gt-feature-icon">📈</div>
+          <div class="gt-feature-name">Economic Pulse</div>
+          <div class="gt-feature-desc">Stock market influence, cost index, business confidence, local spend data — the money temperature of a city.</div>
         </div>
-        <div class="gt-feature-card">
-          <div class="gt-feature-icon">🗺️</div>
-          <div class="gt-feature-name">Scene-layer intelligence</div>
-          <div class="gt-feature-desc">Club, University, Work, Tourism, Stadium, Street, and Home scene data are isolated and recombined to give granular context beyond a single headline score.</div>
+        <div class="gt-feature-card gt-reveal">
+          <div class="gt-feature-icon">🏟️</div>
+          <div class="gt-feature-name">Events &amp; Sports</div>
+          <div class="gt-feature-desc">Live sports outcomes, concert density, festival calendars — the energy spikes that change a city's character overnight.</div>
+        </div>
+        <div class="gt-feature-card gt-reveal">
+          <div class="gt-feature-icon">🎓</div>
+          <div class="gt-feature-name">University Calendars</div>
+          <div class="gt-feature-desc">Term times, exam stress cycles, graduation surges — the student population that defines many cities' true pulse.</div>
+        </div>
+        <div class="gt-feature-card gt-reveal">
+          <div class="gt-feature-icon">🧬</div>
+          <div class="gt-feature-name">Human Check-ins</div>
+          <div class="gt-feature-desc">On-the-ground mood signals from real people — scene, intensity, identity — shaping every city's real-time score.</div>
+        </div>
+        <div class="gt-feature-card gt-reveal">
+          <div class="gt-feature-icon">🌙</div>
+          <div class="gt-feature-name">Nightlife Topology</div>
+          <div class="gt-feature-desc">Club listings, bar intensity, street energy, festival cycles — the nocturnal nervous system of every city.</div>
+        </div>
+        <div class="gt-feature-card gt-reveal">
+          <div class="gt-feature-icon">✈️</div>
+          <div class="gt-feature-name">Tourism Density</div>
+          <div class="gt-feature-desc">Tourist flows, photo spot activity, visa and immigration changes — how open and welcoming a city actually is right now.</div>
         </div>
       </div>
     </section>
 
-    <!-- ── STAR ECONOMY ── -->
-    <section class="gt-about-section" id="star-economy">
-      <div class="gt-about-pill gt-about-pill-gold">Incentive Layer</div>
-      <h2 class="gt-about-section-heading">Star Economy</h2>
+    <!-- PULSE DIMENSIONS -->
+    <section class="gt-about-section" id="pulse-dimensions">
+      <div class="gt-about-pill gt-about-pill-cyan">The Pulse Engine</div>
+      <h2 class="gt-about-section-heading">12 dimensions of city intelligence.</h2>
       <p class="gt-about-section-sub">
-        Contributors who power the pulse earn Stars — a reputation currency that unlocks rank,
-        rewards, and a share of platform revenue.
+        Every city gets a unique weighting model based on its DNA. Lagos doesn't pulse like Frankfurt. Tokyo doesn't breathe like Sunderland. The engine knows the difference.
       </p>
-      <div class="gt-rank-ladder">
-        <div class="gt-rank-row">
-          <div class="gt-rank-badge gt-rank-luminary">Luminary</div>
-          <div class="gt-rank-threshold">1,000+ Stars</div>
-          <div class="gt-rank-perk">Revenue share + sponsor spotlight + Luminary badge</div>
+      <div class="gt-feature-grid">
+        <div class="gt-feature-card gt-reveal"><div class="gt-feature-name">◈ Mood Pulse</div><div class="gt-feature-desc">The collective emotional temperature of the city right now.</div></div>
+        <div class="gt-feature-card gt-reveal"><div class="gt-feature-name">⬡ Economic Pulse</div><div class="gt-feature-desc">Business confidence, local spend, footfall and financial momentum.</div></div>
+        <div class="gt-feature-card gt-reveal"><div class="gt-feature-name">🌙 Nightlife Pulse</div><div class="gt-feature-desc">Club intensity, bar energy, street scene — the after-dark temperature.</div></div>
+        <div class="gt-feature-card gt-reveal"><div class="gt-feature-name">🎓 Study Pulse</div><div class="gt-feature-desc">University activity, campus vibe, exam stress cycles.</div></div>
+        <div class="gt-feature-card gt-reveal"><div class="gt-feature-name">✈️ Tourism Pulse</div><div class="gt-feature-desc">Tourist density, photo spot activity, weekend attractiveness score.</div></div>
+        <div class="gt-feature-card gt-reveal"><div class="gt-feature-name">🛡️ Safety Pulse</div><div class="gt-feature-desc">Crisis alerts, political tension index, neighbourhood-level risk signals.</div></div>
+        <div class="gt-feature-card gt-reveal"><div class="gt-feature-name">🌤 Weather Pulse</div><div class="gt-feature-desc">Atmospheric mood — how the climate is shaping behaviour right now.</div></div>
+        <div class="gt-feature-card gt-reveal"><div class="gt-feature-name">⚡ Event Pulse</div><div class="gt-feature-desc">Concert density, sports outcomes, festival calendar — energy spikes.</div></div>
+        <div class="gt-feature-card gt-reveal"><div class="gt-feature-name">📡 Social Buzz</div><div class="gt-feature-desc">Aggregated social signal — what the city is talking about and feeling.</div></div>
+        <div class="gt-feature-card gt-reveal"><div class="gt-feature-name">🏗️ Cultural Pulse</div><div class="gt-feature-desc">Art openings, cultural events, creative scene activation.</div></div>
+        <div class="gt-feature-card gt-reveal"><div class="gt-feature-name">🚨 Crisis Pulse</div><div class="gt-feature-desc">Emergency alerts, political instability, rapid safety signal changes.</div></div>
+        <div class="gt-feature-card gt-reveal"><div class="gt-feature-name">⬢ Local Buzz</div><div class="gt-feature-desc">Neighbourhood-level micro-pulses — the street-by-street temperature.</div></div>
+      </div>
+    </section>
+
+    <!-- CONTRIBUTOR ECONOMY -->
+    <section class="gt-about-section" id="contributor">
+      <div class="gt-about-pill gt-about-pill-gold">The Contributor Economy</div>
+      <h2 class="gt-about-section-heading">You build it. You own it.</h2>
+      <p class="gt-about-section-sub">
+        Every check-in earns Stars. Stars earn revenue. The people who power the signal share in the value it creates. This is the moat.
+      </p>
+
+      <!-- RANK LADDER -->
+      <div class="gt-rank-ladder" role="list" aria-label="Contributor rank tiers">
+        <div class="gt-rank-row gt-reveal" role="listitem">
+          <span class="gt-rank-badge gt-rank-luminary-badge">Luminary</span>
+          <span class="gt-rank-threshold">1,000+ Stars</span>
+          <span class="gt-rank-perk">Maximum revenue share · Exclusive city access · Real-time API · 3× multiplier</span>
         </div>
-        <div class="gt-rank-row">
-          <div class="gt-rank-badge gt-rank-vanguard">Vanguard</div>
-          <div class="gt-rank-threshold">500+ Stars</div>
-          <div class="gt-rank-perk">Priority city placement + Vanguard badge</div>
+        <div class="gt-rank-row gt-reveal" role="listitem">
+          <span class="gt-rank-badge gt-rank-vanguard-badge">Vanguard</span>
+          <span class="gt-rank-threshold">500+ Stars</span>
+          <span class="gt-rank-perk">Enhanced revenue share · Priority city data · Weekly analytics · 2× multiplier</span>
         </div>
-        <div class="gt-rank-row">
-          <div class="gt-rank-badge gt-rank-pathfinder">Pathfinder</div>
-          <div class="gt-rank-threshold">200+ Stars</div>
-          <div class="gt-rank-perk">Extended city unlock + Pathfinder badge</div>
+        <div class="gt-rank-row gt-reveal" role="listitem">
+          <span class="gt-rank-badge gt-rank-pathfinder-badge">Pathfinder</span>
+          <span class="gt-rank-threshold">200+ Stars</span>
+          <span class="gt-rank-perk">Revenue pool participation · Multi-city tracking · Badge visibility</span>
         </div>
-        <div class="gt-rank-row">
-          <div class="gt-rank-badge gt-rank-explorer2">Explorer II</div>
-          <div class="gt-rank-threshold">50+ Stars</div>
-          <div class="gt-rank-perk">Scoreboard visibility + Explorer II badge</div>
+        <div class="gt-rank-row gt-reveal" role="listitem">
+          <span class="gt-rank-badge gt-rank-explorer2-badge">Explorer II</span>
+          <span class="gt-rank-threshold">50+ Stars</span>
+          <span class="gt-rank-perk">Community pool entry · City leaderboard placement · Golden Path unlocked</span>
         </div>
-        <div class="gt-rank-row">
-          <div class="gt-rank-badge gt-rank-explorer">Explorer I</div>
-          <div class="gt-rank-threshold">Starting rank</div>
-          <div class="gt-rank-perk">Full city grid access + check-in rights</div>
+        <div class="gt-rank-row gt-reveal" role="listitem">
+          <span class="gt-rank-badge">Explorer I</span>
+          <span class="gt-rank-threshold">0+ Stars</span>
+          <span class="gt-rank-perk">Base check-ins · Mood tracking · City heat contribution</span>
         </div>
       </div>
     </section>
 
-    <!-- ── REVENUE SHARING ── -->
-    <section class="gt-about-section" id="revenue-sharing">
-      <div class="gt-about-pill gt-about-pill-cyan">Economics</div>
-      <h2 class="gt-about-section-heading">Revenue Sharing</h2>
+    <!-- REVENUE SPLIT -->
+    <section class="gt-about-section" id="revenue">
+      <div class="gt-about-pill">Revenue Architecture</div>
+      <h2 class="gt-about-section-heading">The money is transparent.</h2>
       <p class="gt-about-section-sub">
-        Glotemp is not extractive. A structured portion of every sponsor dollar flows back
-        to the community that creates the signal.
+        Sponsor revenue is split in public. No hidden pools. The community pool is visible in the app, updated monthly, distributed by Stars.
       </p>
       <div class="gt-rev-split-cards">
-        <div class="gt-rev-card">
-          <div class="gt-rev-pct gt-rev-pct-gold">70%</div>
+        <div class="gt-rev-card gt-reveal">
+          <div class="gt-rev-pct gt-rev-pct-gold">95%</div>
           <div class="gt-rev-label">Platform Operations</div>
-          <div class="gt-rev-desc">Infrastructure, data processing, product development, and global expansion.</div>
+          <div class="gt-rev-desc">Infrastructure, engineering, expansion, and growth. The engine that keeps the pulse running.</div>
         </div>
-        <div class="gt-rev-card">
-          <div class="gt-rev-pct gt-rev-pct-cyan">25%</div>
-          <div class="gt-rev-label">Contributor Rewards</div>
-          <div class="gt-rev-desc">Distributed proportionally to active top-rank contributors by Star weight each month.</div>
-        </div>
-        <div class="gt-rev-card">
-          <div class="gt-rev-pct gt-rev-pct-soft">5%</div>
+        <div class="gt-rev-card gt-reveal">
+          <div class="gt-rev-pct gt-rev-pct-cyan">5%</div>
           <div class="gt-rev-label">Community Pool</div>
-          <div class="gt-rev-desc">A shared reserve for community events, city grants, and explorer missions.</div>
+          <div class="gt-rev-desc">Distributed monthly to contributors by Stars. The more you pulse, the more you earn.</div>
+        </div>
+        <div class="gt-rev-card gt-reveal">
+          <div class="gt-rev-pct gt-rev-pct-soft">∞</div>
+          <div class="gt-rev-label">Network Effect</div>
+          <div class="gt-rev-desc">More contributors → richer data → more valuable to sponsors → higher revenue → larger pool. The flywheel compounds.</div>
         </div>
       </div>
     </section>
 
-    <!-- ── SPONSOR ENGINE ── -->
-    <section class="gt-about-section" id="sponsor-engine">
-      <div class="gt-about-pill gt-about-pill-gold">Monetisation</div>
-      <h2 class="gt-about-section-heading">Sponsor Engine</h2>
-      <p class="gt-about-section-sub">
-        Brands connect to the pulse. Sponsors appear contextually inside city cards, check-in
-        moments, and the sponsor wall — never as interruptions.
-      </p>
-      <div class="gt-feature-grid">
-        <div class="gt-feature-card">
-          <div class="gt-feature-icon">🏙️</div>
-          <div class="gt-feature-name">City sponsorships</div>
-          <div class="gt-feature-desc">A brand claims a city, unlocking a sponsored check-in banner and priority placement in city cards for that market.</div>
-        </div>
-        <div class="gt-feature-card">
-          <div class="gt-feature-icon">🎯</div>
-          <div class="gt-feature-name">Scene targeting</div>
-          <div class="gt-feature-desc">Sponsors target specific scenes — clubs, stadiums, universities — aligning brand messaging to the exact emotional context.</div>
-        </div>
-        <div class="gt-feature-card">
-          <div class="gt-feature-icon">🌟</div>
-          <div class="gt-feature-name">Reward amplification</div>
-          <div class="gt-feature-desc">Sponsors can boost the Star multiplier for check-ins in their city, driving data density and brand affinity simultaneously.</div>
-        </div>
-        <div class="gt-feature-card">
-          <div class="gt-feature-icon">📊</div>
-          <div class="gt-feature-name">Pulse analytics</div>
-          <div class="gt-feature-desc">Sponsors receive a private dashboard showing mood trends, scene breakdowns, and momentum signals for their sponsored cities.</div>
-        </div>
+    <!-- CTA -->
+    <section class="gt-contact-section">
+      <div class="gt-contact-card">
+        <div class="gt-contact-eyebrow">Join the Pulse</div>
+        <h2 class="gt-contact-title">Start checking in.<br>Start earning Stars.</h2>
+        <p class="gt-contact-sub">
+          The signal only works if you're in it. Every check-in powers the global pulse and earns you a share of what it creates.
+        </p>
+        <a href="index.html" class="gt-contact-btn">◈ Open the App</a>
       </div>
-    </section>
-
-    <!-- ── GLOBAL CITY GRID ── -->
-    <section class="gt-about-section" id="global-city-grid">
-      <div class="gt-about-pill">Infrastructure</div>
-      <h2 class="gt-about-section-heading">Global City Grid</h2>
-      <p class="gt-about-section-sub">
-        Every city is a node. Together they form a living, breathing intelligence network
-        spanning every continent.
-      </p>
-      <div class="gt-city-stats-row">
-        <div class="gt-city-stat-card">
-          <div class="gt-city-stat-num">50+</div>
-          <div class="gt-city-stat-label">Cities at launch</div>
-        </div>
-        <div class="gt-city-stat-card">
-          <div class="gt-city-stat-num">6</div>
-          <div class="gt-city-stat-label">Continents covered</div>
-        </div>
-        <div class="gt-city-stat-card">
-          <div class="gt-city-stat-num">7</div>
-          <div class="gt-city-stat-label">Scene types tracked</div>
-        </div>
-        <div class="gt-city-stat-card">
-          <div class="gt-city-stat-num">∞</div>
-          <div class="gt-city-stat-label">Scalable nodes</div>
-        </div>
-      </div>
-      <p class="gt-about-body gt-about-body-center">
-        The grid expands organically as contributors check in from new locations. Each new
-        city becomes discoverable on the Global City Grid and unlocks Explorer routes,
-        sponsor opportunities, and regional pulse narratives.
-      </p>
     </section>
 
   </main>
 
-  <footer class="gt-footer gt-footer-page">
-    <div class="gt-footer-left">
-      <span>Glotemp — Global Mood &amp; Tempo.</span>
+  <footer class="gt-footer">
+    <div class="gt-footer-page" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+      <span class="gt-footer-left">Glotemp — Global Mood &amp; Tempo.</span>
+      <nav class="gt-footer-nav">
+        <a class="gt-footer-link" href="about.html">About</a>
+        <a class="gt-footer-link" href="investors.html">Investors</a>
+        <a class="gt-footer-link" href="index.html">App</a>
+        <a class="gt-footer-link" href="mailto:hello@glotemp.com">Contact</a>
+      </nav>
     </div>
-    <nav class="gt-footer-nav">
-      <a class="gt-footer-link" href="about.html">About</a>
-      <a class="gt-footer-link" href="investors.html">Investors</a>
-      <a class="gt-footer-link" href="index.html">App</a>
-      <a class="gt-footer-link" href="mailto:hello@glotemp.com">Contact</a>
-    </nav>
   </footer>
+
+  <script>
+    const header = document.getElementById('gt-header');
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+
+    const revealEls = document.querySelectorAll('.gt-reveal');
+    if ('IntersectionObserver' in window) {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => entry.target.classList.add('gt-visible'), i * 60);
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.06 });
+      revealEls.forEach(el => obs.observe(el));
+    } else {
+      revealEls.forEach(el => el.classList.add('gt-visible'));
+    }
+  </script>
 </body>
 </html>
