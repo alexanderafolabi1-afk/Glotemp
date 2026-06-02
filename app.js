@@ -1014,7 +1014,7 @@ function renderCheckinItem(checkin) {
       ? "Anonymous"
       : identityMode === "nickname"
         ? (nameOrNickname || "Nickname")
-        : "Legal name shared";
+        : "Legal name";
   const identityModeLabel =
     identityMode === "nickname"
       ? "Nickname"
@@ -1158,7 +1158,6 @@ function setupCheckinModal() {
       const nameField = document.getElementById("checkin-name-field");
       const nameLabel = document.getElementById("checkin-name-label");
       const nameInput = document.getElementById("checkin-name");
-      const isAnonymous = btn.dataset.mode === "anonymous";
       nameField.classList.toggle("gt-hidden", btn.dataset.mode === "anonymous");
       if (nameLabel) {
         nameLabel.textContent = btn.dataset.mode === "legalName" ? "Legal name" : "Nickname";
