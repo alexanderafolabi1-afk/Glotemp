@@ -310,22 +310,12 @@
         <h2 id="revenue-pool-title" class="gt-app-section-title">
           <span style="color:var(--cyan)">⬡</span> Revenue Pool
         </h2>
-        <span class="gt-app-section-sub">5% of sponsor revenue distributed to contributors</span>
+        <span class="gt-app-section-sub">5% of all sponsor revenue is distributed monthly to contributors, proportional to Stars earned.</span>
       </div>
-      <div class="gt-revenue-card">
-        <div class="gt-revenue-stat">
-          <div class="gt-revenue-stat-label">Monthly Sponsor Revenue</div>
-          <div class="gt-revenue-stat-value" id="revenue-monthly">$0.00</div>
-        </div>
-        <div class="gt-revenue-stat">
-          <div class="gt-revenue-stat-label">Community Pool (5%)</div>
-          <div class="gt-revenue-stat-value" id="revenue-community" style="color:var(--gold)">$0.00</div>
-        </div>
-        <div class="gt-revenue-stat">
-          <div class="gt-revenue-stat-label">Next Distribution</div>
-          <div class="gt-revenue-stat-value" id="revenue-next-date" style="color:var(--text-2);font-size:1.2rem;">—</div>
-        </div>
-      </div>
+      <!-- Hidden elements kept for JS compatibility -->
+      <div id="revenue-monthly" style="display:none"></div>
+      <div id="revenue-community" style="display:none"></div>
+      <div id="revenue-next-date" style="display:none"></div>
     </section>
 
     <!-- ── SPONSOR WALL ──────────────────────────────────────── -->
