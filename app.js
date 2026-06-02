@@ -42,6 +42,7 @@ let USER_PROFILE = (() => {
     const stored = localStorage.getItem("gt_user_profile");
     if (stored) {
       const parsed = JSON.parse(stored);
+      if (!parsed || typeof parsed !== "object") return baseProfile;
       const storedStars =
         typeof parsed.stars === "number" && Number.isFinite(parsed.stars)
           ? parsed.stars
@@ -228,6 +229,7 @@ function syncCityDerivedState(cityId) {
   const scores = computeCityPulseScores(cityId);
   if (!scores) return null;
 
+  state.overall = scores.overall;
   state.overallScore = scores.overall;
   state.moodScore = scores.moodScore;
   state.nightlifeScore = scores.nightlifeScore;
