@@ -60,15 +60,20 @@
             <option value="">Select a city…</option>
           </select>
 
-          <label class="gt-label" for="trip-vibe">Trip vibe</label>
-          <input class="gt-input" id="trip-vibe" type="text" placeholder="Nightlife, calm, ambitious..." />
+          <label class="gt-label" for="trip-scenario">Scenario</label>
+          <select class="gt-input" id="trip-scenario">
+            <option value="weekend">Weekend trip</option>
+            <option value="sell">Selling / commerce</option>
+            <option value="study">Study abroad</option>
+            <option value="nightlife">Nightlife</option>
+          </select>
 
-          <button class="gt-trip-btn" type="button">Preview route</button>
+          <button class="gt-trip-btn" id="trip-evaluate" type="button">Evaluate trip</button>
         </form>
 
-        <div class="gt-trip-result">
+        <div class="gt-trip-result" id="trip-result">
           <h3>Route Signal</h3>
-          <p>Your check-ins and explorer actions update this pulse lane in real time.</p>
+          <p>Select cities and a scenario, then hit <strong>Evaluate trip</strong>.</p>
           <div class="gt-hero-orbit">
             <div class="gt-orbit-ring"></div>
             <div class="gt-orbit-ring gt-orbit-ring-2"></div>
