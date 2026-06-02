@@ -85,6 +85,217 @@ function avg(arr) {
   return arr.reduce((a, b) => a + b, 0) / arr.length;
 }
 
+// ─── 1. PULSE ENGINE ─────────────────────────────────────────────────────────
+
+// Tier weight maps: { nightlife, economic, study, tourism, mood }
+const TIER_WEIGHTS = {
+  global_economic: { nightlife: 0.20, economic: 0.40, study: 0.10, tourism: 0.20, mood: 0.10 },
+  finance_hub:     { nightlife: 0.10, economic: 0.35, study: 0.05, tourism: 0.35, mood: 0.15 },
+  uni_club_city:   { nightlife: 0.35, economic: 0.05, study: 0.35, tourism: 0.10, mood: 0.15 },
+  mega_city:       { nightlife: 0.35, economic: 0.20, study: 0.05, tourism: 0.30, mood: 0.10 }
+};
+
+function computeCityPulseScores(cityId) {
+  const state = cityPulseState[cityId];
+  const city  = CITY_INDEX.find((c) => c.id === cityId);
+  if (!state || !city) return null;
+
+  const m = state.mood;
+  const moodScore = clamp(
+    avg([m.calm, m.hopeful, m.excited]) * 0.75 + (100 - avg([m.anxious, m.restless])) * 0.25,
+    0, 100
+  );
+
+  const nightlifeScore = clamp(avg(Object.values(state.nightlife)), 0, 100);
+
+  const economicScore  = clamp(avg(Object.values(state.economic)), 0, 100);
+
+  const s = state.study;
+  const studyScore = clamp(
+    avg([s.uni_activity, s.campus_vibe]) * 0.8 + (100 - s.exam_stress) * 0.2,
+    0, 100
+  );
+
+  const tourismScore   = clamp(avg(Object.values(state.tourism)), 0, 100);
+
+  const w = TIER_WEIGHTS[city.tier] || TIER_WEIGHTS.global_economic;
+  const overall = clamp(
+    nightlifeScore * w.nightlife +
+    economicScore  * w.economic  +
+    studyScore     * w.study     +
+    tourismScore   * w.tourism   +
+    moodScore      * w.mood,
+    0, 100
+  );
+
+  return {
+    overall:        Math.round(overall),
+    moodScore:      Math.round(moodScore),
+    nightlifeScore: Math.round(nightlifeScore),
+    economicScore:  Math.round(economicScore),
+    studyScore:     Math.round(studyScore),
+    tourismScore:   Math.round(tourismScore)
+  };
+}
+
+// ─── 2. NARRATIVE ENGINE ─────────────────────────────────────────────────────
+
+function buildCityNarrative(cityId, scores) {
+  const city = CITY_INDEX.find((c) => c.id === cityId);
+  if (!scores || !city) return { headline: "Data loading…", line1: "", line2: "", tags: [] };
+
+  const { nightlifeScore, economicScore, studyScore, tourismScore, moodScore, overall } = scores;
+
+  let headline = "";
+  let line1    = "";
+  let line2    = "";
+
+  if (nightlifeScore >= 75 && tourismScore >= 65) {
+    headline = "The city is running hot tonight.";
+    line1    = "Clubs are alive and tourists are flooding the streets.";
+    line2    = "If you want energy, this is your moment.";
+  } else if (economicScore >= 70 && nightlifeScore < 60) {
+    headline = "Money is moving, but the nights are quiet.";
+    line1    = "Business confidence is strong and spending is high.";
+    line2    = "Come for the deals, not the dance floors.";
+  } else if (studyScore >= 70) {
+    headline = "Campus energy is peaking.";
+    line1    = "University activity is at its highest.";
+    line2    = "Great time to network, learn, and grow.";
+  } else if (tourismScore >= 70 && nightlifeScore < 60) {
+    headline = "A destination moment — sights and scenes await.";
+    line1    = "Tourist spots and photo opportunities are thriving.";
+    line2    = "Perfect for the weekend explorer.";
+  } else if (moodScore >= 70) {
+    headline = "The city has a quiet confidence about it.";
+    line1    = "Calm and hopeful vibes flow through the streets.";
+    line2    = "A good time to arrive and settle in.";
+  } else if (overall >= 60) {
+    headline = "Steady pulse — city is in motion.";
+    line1    = "Energy levels are solid across the board.";
+    line2    = "No extreme highs, but nothing quiet either.";
+  } else {
+    headline = "The city is catching its breath.";
+    line1    = "Things are slower than usual right now.";
+    line2    = "Could be a good time to visit off-peak.";
+  }
+
+  const tags = [];
+  if (nightlifeScore >= 70)       tags.push("Nightlife strong");
+  else if (nightlifeScore >= 50)  tags.push("Nightlife steady");
+  else                             tags.push("Low nightlife");
+
+  if (economicScore >= 70)        tags.push("Economy strong");
+  else if (economicScore >= 50)   tags.push("Economy steady");
+  else                             tags.push("Economy slow");
+
+  if (studyScore >= 70)           tags.push("Campus buzzing");
+  if (tourismScore >= 65)         tags.push("Good for weekend");
+  if (moodScore >= 70)            tags.push("Positive mood");
+  if (overall >= 70)              tags.push("High energy city");
+  else if (overall < 50)          tags.push("Low tempo");
+
+  return { headline, line1, line2, tags };
+}
+
+// ─── 3. TRIP PULSE ENGINE ────────────────────────────────────────────────────
+
+function computeTripPulse(fromCityId, toCityId, scenario) {
+  const fromScores = computeCityPulseScores(fromCityId);
+  const toScores   = computeCityPulseScores(toCityId);
+  if (!fromScores || !toScores) return null;
+
+  const toState = cityPulseState[toCityId];
+
+  let score    = 0;
+  let headline = "";
+  const reasons = [];
+
+  switch (scenario) {
+    case "sell": {
+      // Focus on toCity economicScore, tourismScore, footfall
+      const footfall = toState?.economic?.footfall ?? toScores.economicScore;
+      score = Math.round(toScores.economicScore * 0.45 + toScores.tourismScore * 0.35 + footfall * 0.20);
+      headline = score >= 65
+        ? "Strong commercial conditions at destination."
+        : score >= 45
+          ? "Mixed commercial outlook — proceed with caution."
+          : "Low commercial energy — consider waiting.";
+      reasons.push(toScores.economicScore >= 65 ? "Local spend is strong" : "Local spend is weak");
+      reasons.push(toScores.tourismScore >= 65  ? "Tourist density is high" : "Tourist density is low");
+      reasons.push(footfall >= 65 ? "Footfall is high" : "Footfall is low");
+      break;
+    }
+    case "weekend": {
+      score = Math.round(toScores.nightlifeScore * 0.40 + toScores.tourismScore * 0.40 + toScores.moodScore * 0.20);
+      headline = score >= 65
+        ? "Perfect weekend destination — go now."
+        : score >= 45
+          ? "Decent weekend potential — worth a look."
+          : "Weekend pulse is weak there right now.";
+      reasons.push(toScores.nightlifeScore >= 65 ? "Nightlife is firing" : "Nightlife is quiet");
+      reasons.push(toScores.tourismScore >= 65   ? "Tourism scene is buzzing" : "Tourism is subdued");
+      reasons.push(toScores.moodScore >= 65      ? "City mood is positive" : "City mood is flat");
+      break;
+    }
+    case "study": {
+      score = Math.round(toScores.studyScore * 0.65 + toScores.moodScore * 0.35);
+      headline = score >= 65
+        ? "Great study environment at destination."
+        : score >= 45
+          ? "Acceptable study conditions."
+          : "Study environment is challenging right now.";
+      reasons.push(toScores.studyScore >= 65 ? "Campus activity is strong" : "Campus activity is low");
+      reasons.push(toScores.moodScore >= 65  ? "Mood is calm and focused" : "City mood may be distracting");
+      const examStress = toState?.study?.exam_stress ?? 50;
+      reasons.push(examStress >= 65 ? "High exam stress — intense environment" : "Low exam pressure — relaxed campus");
+      break;
+    }
+    case "nightlife":
+    default: {
+      score = Math.round(toScores.nightlifeScore * 0.75 + toScores.moodScore * 0.25);
+      headline = score >= 70
+        ? "This city goes hard tonight."
+        : score >= 50
+          ? "Decent scene but not peak energy."
+          : "Quiet nights — not the time for this city.";
+      const s = toState?.nightlife;
+      reasons.push(s ? `Club intensity: ${s.club_intensity}` : "Club intensity data loading");
+      reasons.push(s ? `Bar intensity: ${s.bar_intensity}`   : "Bar intensity data loading");
+      reasons.push(s ? `Street energy: ${s.street_energy}`   : "Street energy data loading");
+      break;
+    }
+  }
+
+  score = clamp(score, 0, 100);
+  const verdict = score >= 65 ? "go" : score >= 40 ? "maybe" : "wait";
+
+  return { score, verdict, headline, reasons };
+}
+
+// ─── 4. TRIP RESULT RENDERER ─────────────────────────────────────────────────
+
+function renderTripResult(result) {
+  const container = document.getElementById("trip-result");
+  if (!container) return;
+
+  const verdictLabel = { go: "GO ✓", maybe: "MAYBE ~", wait: "WAIT ✗" };
+  const verdictClass = { go: "gt-verdict-go", maybe: "gt-verdict-maybe", wait: "gt-verdict-wait" };
+
+  container.innerHTML = `
+    <div class="gt-trip-output">
+      <div class="gt-trip-score-big">${result.score}</div>
+      <div class="gt-trip-verdict ${verdictClass[result.verdict]}">${verdictLabel[result.verdict]}</div>
+      <p class="gt-trip-headline">${result.headline}</p>
+      <ul class="gt-trip-reasons">
+        ${result.reasons.map((r) => `<li>${r}</li>`).join("")}
+      </ul>
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 // Tier-based short summaries used by both seedCityPulses and computeCityCardView
 const DEFAULT_CITY_SUMMARY = "A city alive with its own pulse.";
 const TIER_SUMMARIES = {
@@ -226,45 +437,48 @@ function renderCityCards() {
 
   CITY_INDEX.forEach((city) => {
     const view     = computeCityCardView(city.id);
+    const scores   = computeCityPulseScores(city.id);
+    const narrative = buildCityNarrative(city.id, scores);
     const liveData = latestPulseByCity[city.name] || {};
     const heatScore = cityHeat[city.name]?.heatScore || 0;
     if (!view) return;
 
-    const displayPulseScore = liveData.pulse_score ?? view.overallPulseScore;
+    const displayPulseScore = scores ? scores.overall : (liveData.pulse_score ?? view.overallPulseScore);
 
     const card = document.createElement("div");
     card.className = "gt-city-card";
     card.onclick = () => openCityDetail(city.name);
 
+    const displayTags = narrative.tags.slice(0, 3)
+      .map((t) => `<span class="gt-tag">${t}</span>`).join("");
+
     card.innerHTML = `
       <div class="gt-city-header">
-        <div class="gt-city-name">${city.name}</div>
+        <div class="gt-city-name">${city.name} <span style="font-size:11px;color:#7f82a4;">${city.country}</span></div>
         <div class="gt-pulse-score">Pulse ${displayPulseScore}</div>
       </div>
-      <p class="gt-summary-text">${view.shortSummary}</p>
-      <div class="gt-mood-tags">${
-        city.tags.map((t) => `<span class="gt-tag">${t.replace(/_/g, " ")}</span>`).join("")
-      }</div>
+      <p class="gt-narrative-headline">${narrative.headline}</p>
+      <div class="gt-mood-tags">${displayTags}</div>
       <div class="gt-metrics-row">
         <div class="gt-metric">
           <span class="gt-metric-label">Nightlife</span>
-          <span class="gt-metric-value">${liveData.nightlife_index ?? view.nightlifeAvg}</span>
+          <span class="gt-metric-value">${scores ? scores.nightlifeScore : (liveData.nightlife_index ?? view.nightlifeAvg)}</span>
         </div>
         <div class="gt-metric">
           <span class="gt-metric-label">Economic</span>
-          <span class="gt-metric-value">${liveData.economic_vibe ?? view.economicAvg}</span>
+          <span class="gt-metric-value">${scores ? scores.economicScore : (liveData.economic_vibe ?? view.economicAvg)}</span>
         </div>
         <div class="gt-metric">
           <span class="gt-metric-label">Study</span>
-          <span class="gt-metric-value">${liveData.uni_vibe ?? view.studyAvg}</span>
+          <span class="gt-metric-value">${scores ? scores.studyScore : (liveData.uni_vibe ?? view.studyAvg)}</span>
         </div>
         <div class="gt-metric">
           <span class="gt-metric-label">Tourism</span>
-          <span class="gt-metric-value">${view.tourismAvg}</span>
+          <span class="gt-metric-value">${scores ? scores.tourismScore : view.tourismAvg}</span>
         </div>
       </div>
       <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:11px;color:#a0a3c4;">${view.keyTags}</span>
+        <span style="font-size:11px;color:#a0a3c4;">Mood ${scores ? scores.moodScore : "—"}</span>
         <span class="gt-heat-chip">🔥 Heat ${heatScore}</span>
       </div>
     `;
@@ -278,19 +492,35 @@ function openCityDetail(cityName) {
 
   const cityEntry = CITY_INDEX.find((c) => c.name === cityName);
   const state = cityEntry ? cityPulseState[cityEntry.id] : null;
+  const scores = cityEntry ? computeCityPulseScores(cityEntry.id) : null;
+  const narrative = cityEntry ? buildCityNarrative(cityEntry.id, scores) : null;
 
   const modal = document.getElementById("city-modal");
   const body = document.getElementById("city-modal-body");
 
   body.innerHTML = `
     <h2 class="gt-modal-body-title">${pulse.city}</h2>
-    <p class="gt-modal-body-sub">${pulse.summary_text}</p>
+    ${narrative ? `
+      <p class="gt-modal-narrative-headline">${narrative.headline}</p>
+      <p class="gt-modal-narrative-line">${narrative.line1}</p>
+      <p class="gt-modal-narrative-line">${narrative.line2}</p>
+      <div class="gt-mood-tags" style="margin-bottom:14px;">
+        ${narrative.tags.map((t) => `<span class="gt-tag">${t}</span>`).join("")}
+      </div>
+    ` : `<p class="gt-modal-body-sub">${pulse.summary_text}</p>`}
+    ${scores ? `
+      <div class="gt-modal-section-header">Dimensional scores</div>
+      <div class="gt-modal-grid">
+        ${metricBlock("Overall pulse", scores.overall)}
+        ${metricBlock("Mood score", scores.moodScore)}
+        ${metricBlock("Nightlife score", scores.nightlifeScore)}
+        ${metricBlock("Economic score", scores.economicScore)}
+        ${metricBlock("Study score", scores.studyScore)}
+        ${metricBlock("Tourism score", scores.tourismScore)}
+      </div>
+    ` : ""}
     <div class="gt-modal-grid">
       ${metricBlock("Pulse score", pulse.pulse_score)}
-      ${metricBlock("Nightlife index", pulse.nightlife_index)}
-      ${metricBlock("Economic vibe", pulse.economic_vibe)}
-      ${metricBlock("Uni vibe", pulse.uni_vibe)}
-      ${metricBlock("Tourism influence", pulse.tourism_influence)}
       ${metricBlock("Tempo score", pulse.tempo_score)}
       ${metricBlock("Romantic index", pulse.romantic_index)}
       ${metricBlock("Cultural heat", pulse.cultural_heat)}
@@ -334,6 +564,18 @@ function recordVisit(city, coords) {
     goldenPath.visitedCities.push(city);
   }
   goldenPath.visitedCoords.push(coords);
+
+  // Boost tourismScore and nightlifeScore dimensions for visited city
+  const cityEntry = CITY_INDEX.find((c) => c.name === city);
+  if (cityEntry && cityPulseState[cityEntry.id]) {
+    const state = cityPulseState[cityEntry.id];
+    const boost = 2;
+    state.tourism.tourist_density       = clamp(state.tourism.tourist_density + boost, 0, 100);
+    state.tourism.weekend_attractiveness = clamp(state.tourism.weekend_attractiveness + boost, 0, 100);
+    state.nightlife.street_energy       = clamp(state.nightlife.street_energy + boost, 0, 100);
+    state.lastUpdated = Date.now();
+  }
+
   calculatePilgrimScore();
   checkGoldenPathUnlock();
   renderVisitedCities();
@@ -461,15 +703,28 @@ function calculateCityGoldenHeat(city) {
   const entry = cityHeat[city];
   entry.explorerVisits += 1;
   entry.intersections = goldenPath.visitedCities.filter((c) => c === city).length;
-  const latestPulse = latestPulseByCity[city];
-  if (latestPulse) entry.pulseHistory.push(latestPulse.pulse_score);
+
+  const cityEntry = CITY_INDEX.find((c) => c.name === city);
+  const scores    = cityEntry ? computeCityPulseScores(cityEntry.id) : null;
+
+  const nightlifeScore = scores ? scores.nightlifeScore : (latestPulseByCity[city]?.nightlife_index ?? 50);
+  const tourismScore   = scores ? scores.tourismScore   : 50;
+
+  if (scores) entry.pulseHistory.push(scores.overall);
 
   const avgPulse =
     entry.pulseHistory.reduce((a, b) => a + b, 0) /
     (entry.pulseHistory.length || 1);
 
-  entry.heatScore =
-    entry.intersections * 2 + entry.dropsClaimed * 5 + entry.explorerVisits + avgPulse;
+  // heatScore = visits * weight + nightlife + tourism contribution + avg pulse component
+  entry.heatScore = Math.round(
+    entry.intersections * 2 +
+    entry.dropsClaimed * 5 +
+    entry.explorerVisits +
+    nightlifeScore * 0.3 +
+    tourismScore   * 0.3 +
+    avgPulse       * 0.4
+  );
 
   updateGlobalScoreboard();
 }
@@ -609,6 +864,30 @@ function populateTripSelects() {
   });
 }
 
+function setupTripEvaluate() {
+  const btn = document.getElementById("trip-evaluate");
+  if (!btn) return;
+  btn.onclick = () => {
+    const fromId   = document.getElementById("trip-from")?.value;
+    const toId     = document.getElementById("trip-to")?.value;
+    const scenario = document.getElementById("trip-scenario")?.value || "weekend";
+
+    if (!fromId || !toId) {
+      const container = document.getElementById("trip-result");
+      if (container) container.innerHTML = `<p style="color:#f87171;">Please select both a start city and a destination.</p>`;
+      return;
+    }
+    if (fromId === toId) {
+      const container = document.getElementById("trip-result");
+      if (container) container.innerHTML = `<p style="color:#f87171;">Start and destination must be different cities.</p>`;
+      return;
+    }
+
+    const result = computeTripPulse(fromId, toId, scenario);
+    if (result) renderTripResult(result);
+  };
+}
+
 function setupExplore() {
   const btn = document.getElementById("explore-btn");
   if (!btn) return;
@@ -636,6 +915,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupInstallButton();
   setupCheckin();
   setupExplore();
+  setupTripEvaluate();
   setupModalClose();
   simulateLivePulses();
 });

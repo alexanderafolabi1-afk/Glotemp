@@ -646,3 +646,73 @@ body {
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
   }
 }
+
+/* ── Narrative headline on cards ── */
+.gt-narrative-headline {
+  font-size: 12px;
+  color: #c4c7e8;
+  font-style: italic;
+  margin: 4px 0 8px;
+  line-height: 1.4;
+}
+
+/* ── Modal narrative ── */
+.gt-modal-narrative-headline {
+  font-size: 15px;
+  font-weight: 600;
+  color: #e0e2f8;
+  margin: 0 0 6px;
+}
+.gt-modal-narrative-line {
+  font-size: 12px;
+  color: #a0a3c4;
+  margin: 0 0 4px;
+}
+
+/* ── Trip result output ── */
+.gt-trip-output {
+  text-align: center;
+  padding: 16px 8px;
+}
+.gt-trip-score-big {
+  font-size: 64px;
+  font-weight: 800;
+  color: #ffd700;
+  line-height: 1;
+  margin-bottom: 8px;
+  text-shadow: 0 0 20px rgba(255,215,0,0.4);
+}
+.gt-trip-verdict {
+  display: inline-block;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 4px 16px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+.gt-verdict-go    { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #34d39966; }
+.gt-verdict-maybe { background: rgba(251,191,36,0.15);  color: #fbbf24; border: 1px solid #fbbf2466; }
+.gt-verdict-wait  { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid #f8717166; }
+.gt-trip-headline {
+  font-size: 13px;
+  color: #c4c7e8;
+  margin: 0 0 12px;
+  font-style: italic;
+}
+.gt-trip-reasons {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+.gt-trip-reasons li {
+  font-size: 12px;
+  color: #a0a3c4;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.gt-trip-reasons li::before {
+  content: "→ ";
+  color: #ffd700;
+}
