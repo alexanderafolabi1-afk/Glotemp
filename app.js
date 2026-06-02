@@ -20,6 +20,8 @@ const SPORTS_PULSE_CLASS_NAME = 'sports-pulse';
 const EVENTS_PULSE_CLASS_NAME = 'events-pulse';
 const SPORTS_PULSE_LABEL = 'Sports pulse';
 const EVENTS_UPCOMING_LABEL = 'Events';
+const PILGRIM_SCORE_PER_CITY = 5;
+const MAX_PILGRIM_SCORE = 100;
 const GNEWS_SUPPORTED_COUNTRIES = new Set([
   'au', 'br', 'ca', 'cn', 'eg', 'fr', 'de', 'gr', 'hk', 'in', 'ie',
   'il', 'it', 'jp', 'nl', 'no', 'pk', 'pe', 'ph', 'pt', 'ro', 'ru',
@@ -460,7 +462,7 @@ function showGoldenMap() {
 }
 
 function calculatePilgrimScore() {
-  goldenPath.pilgrimScore = Math.min(100, goldenPath.visitedCities.length * 5);
+  goldenPath.pilgrimScore = Math.min(MAX_PILGRIM_SCORE, goldenPath.visitedCities.length * PILGRIM_SCORE_PER_CITY);
   console.log('Pilgrim Score:', goldenPath.pilgrimScore);
 }
 
