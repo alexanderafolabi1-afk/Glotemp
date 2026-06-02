@@ -7,6 +7,30 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <button id="golden-drop-icon" type="button" aria-label="Golden drop nearby" hidden>✦</button>
+    <div id="golden-drop-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="golden-drop-title" hidden>
+      <div class="modal-panel">
+        <h2 id="golden-drop-title">Golden Drop Nearby</h2>
+        <p id="golden-drop-type">Drop type: --</p>
+        <p id="golden-drop-city">City: --</p>
+        <p id="golden-drop-time">Timestamp: --</p>
+        <div class="modal-actions">
+          <button id="claim-drop-btn" type="button" class="btn btn-primary">Claim Drop</button>
+          <button id="close-drop-btn" type="button" class="btn btn-secondary">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="city-detail-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="city-detail-title" hidden>
+      <div class="modal-panel">
+        <h2 id="city-detail-title">City Detail</h2>
+        <div id="city-detail-content"></div>
+        <div class="modal-actions">
+          <button id="close-city-detail-btn" type="button" class="btn btn-secondary">Close</button>
+        </div>
+      </div>
+    </div>
+
     <div id="app">
       <header>
         <section aria-labelledby="hero-title">
@@ -44,7 +68,19 @@
               <p class="tourism">Tourism influence: --</p>
             </article>
           </div>
-          <div id="golden-map" aria-hidden="true"></div>
+        </section>
+
+        <section id="user-profile" aria-labelledby="user-profile-title">
+          <h2 id="user-profile-title">Profile</h2>
+          <div class="profile-card">
+            <div class="avatar-placeholder" aria-hidden="true">◉</div>
+            <div>
+              <p id="profile-username">Username: Explorer</p>
+              <p id="profile-pilgrim-score">Pilgrim Score: 0</p>
+              <p id="profile-visited-count">Visited Cities: 0</p>
+              <p id="profile-drops-claimed">Golden Drops Claimed: 0</p>
+            </div>
+          </div>
         </section>
 
         <section id="checkin" aria-labelledby="checkin-title">
@@ -110,6 +146,20 @@
           <p>You've walked the Golden Path.</p>
           <p id="pilgrim-score-display">Pilgrim Score: --</p>
           <ul id="visited-cities-list" aria-label="Visited cities"></ul>
+          <p class="constellation-label">Your Constellation</p>
+          <div id="golden-map-controls" aria-label="Golden map controls">
+            <button type="button" data-control="zoom-in">+</button>
+            <button type="button" data-control="zoom-out">−</button>
+            <button type="button" data-control="reset">Reset</button>
+            <button type="button" data-control="toggle-lines">Lines</button>
+          </div>
+          <div id="golden-map" aria-hidden="true"></div>
+        </section>
+
+        <section id="global-scoreboard" aria-labelledby="global-scoreboard-title">
+          <h2 id="global-scoreboard-title">Global Scoreboard</h2>
+          <p>Top city heat signatures right now.</p>
+          <div id="global-scoreboard-list"></div>
         </section>
       </main>
 
