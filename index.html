@@ -10,56 +10,74 @@
 </head>
 <body>
   <header class="gt-header">
-    <div class="gt-logo">
-      <svg class="gt-logo-globe" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="22" cy="22" r="18" fill="none" stroke="currentColor" stroke-width="1.5"/>
-        <g class="gt-globe-meridian">
-          <ellipse cx="22" cy="22" rx="10" ry="18" fill="none" stroke="currentColor" stroke-width="1" opacity="0.65"/>
-          <ellipse cx="22" cy="22" rx="18" ry="6.5" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.5"/>
-        </g>
-        <line x1="22" y1="4" x2="22" y2="40" stroke="currentColor" stroke-width="0.7" opacity="0.3"/>
-        <circle cx="22" cy="22" r="18" fill="none" stroke="currentColor" stroke-width="1.2" class="gt-globe-pulse-ring"/>
-        <circle cx="29" cy="14" r="2.5" fill="currentColor" class="gt-globe-marker"/>
+    <div class="gt-brand">
+      <svg class="gt-logo-svg" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="22" cy="22" r="18" fill="none" stroke="currentColor" stroke-width="1.5" />
+        <ellipse cx="22" cy="22" rx="10" ry="18" fill="none" stroke="currentColor" stroke-width="1" opacity="0.65" />
+        <ellipse cx="22" cy="22" rx="18" ry="6.5" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.5" />
+        <line x1="22" y1="4" x2="22" y2="40" stroke="currentColor" stroke-width="0.7" opacity="0.3" />
+        <circle cx="22" cy="22" r="18" fill="none" stroke="currentColor" stroke-width="1.2" class="gt-globe-pulse-ring" />
+        <circle cx="29" cy="14" r="2.5" fill="currentColor" class="gt-globe-marker" />
       </svg>
-      <span>Glotemp</span>
+      <div class="gt-brand-text">
+        <div class="gt-brand-name">Glotemp</div>
+        <div class="gt-brand-sub">Global Mood &amp; Tempo</div>
+      </div>
     </div>
-    <div class="gt-tagline">The world's mood, in motion.</div>
+    <div class="gt-header-right">Live cinematic pulse map</div>
   </header>
 
   <main class="gt-main">
     <section class="gt-hero">
-      <div class="gt-hero-left">
-        <h1>The world's pulse — live.</h1>
-        <p class="gt-hero-text">
-          Live mood, tempo, and cultural heat across cities. Your journey becomes a golden path across the map.
-        </p>
-        <div class="gt-hero-actions">
-          <button id="checkin-btn" class="gt-btn gt-btn-primary">Check in your mood</button>
-          <button id="explore-btn" class="gt-btn gt-btn-outline">Explore live cities</button>
-        </div>
-      </div>
-      <div class="gt-hero-right">
-        <div class="gt-hero-orbit">
-          <div class="gt-orbit-ring"></div>
-          <div class="gt-orbit-ring gt-orbit-ring-2"></div>
-          <div class="gt-orbit-core"></div>
-          <div class="gt-orbit-pulse"></div>
-        </div>
-        <p class="gt-hero-caption">Global pulse updating as people move, feel, and check in.</p>
+      <h1>The world’s pulse, in motion.</h1>
+      <p>
+        Track emotion, energy, and city heat in real time. Move through cities and light up your Golden Path.
+      </p>
+      <div class="gt-hero-actions">
+        <button id="checkin-btn" class="gt-btn gt-btn-primary">Check in your mood</button>
+        <button id="explore-btn" class="gt-btn gt-btn-outline">Explore live cities</button>
       </div>
     </section>
 
-    <section class="gt-section">
-      <h2 class="gt-section-title">Right now <span class="gt-live-dot" aria-label="live"></span></h2>
-      <p class="gt-section-subtitle">Live mood and tempo across cities.</p>
-      <div id="city-cards" class="gt-city-grid">
-        <!-- City cards populated by app.js -->
+    <section class="gt-section" aria-labelledby="city-grid-title">
+      <h2 id="city-grid-title" class="gt-section-title">City Grid <span class="gt-live-dot" aria-label="live"></span></h2>
+      <p class="gt-section-subtitle">Live mood and tempo across global cities.</p>
+      <div id="city-cards" class="gt-city-grid"></div>
+    </section>
+
+    <section class="gt-section" aria-labelledby="trip-pulse-title">
+      <h2 id="trip-pulse-title" class="gt-section-title">Trip Pulse</h2>
+      <p class="gt-section-subtitle">Build your route and preview your movement signal.</p>
+      <div class="gt-trip-grid">
+        <form class="gt-trip-form">
+          <label class="gt-label" for="trip-from">Start city</label>
+          <input class="gt-input" id="trip-from" type="text" placeholder="e.g. London" />
+
+          <label class="gt-label" for="trip-to">Destination city</label>
+          <input class="gt-input" id="trip-to" type="text" placeholder="e.g. São Paulo" />
+
+          <label class="gt-label" for="trip-vibe">Trip vibe</label>
+          <input class="gt-input" id="trip-vibe" type="text" placeholder="Nightlife, calm, ambitious..." />
+
+          <button class="gt-trip-btn" type="button">Preview route</button>
+        </form>
+
+        <div class="gt-trip-result">
+          <h3>Route Signal</h3>
+          <p>Your check-ins and explorer actions update this pulse lane in real time.</p>
+          <div class="gt-hero-orbit">
+            <div class="gt-orbit-ring"></div>
+            <div class="gt-orbit-ring gt-orbit-ring-2"></div>
+            <div class="gt-orbit-core"></div>
+            <div class="gt-orbit-pulse"></div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section id="explorer-mode" class="gt-section gt-section-hidden">
-      <h2 class="gt-section-title">Explorer Mode</h2>
-      <p class="gt-section-subtitle">Your Golden Path, your constellation.</p>
+    <section id="explorer-mode" class="gt-section gt-section-hidden" aria-labelledby="explorer-title">
+      <h2 id="explorer-title" class="gt-section-title">Explorer</h2>
+      <p class="gt-section-subtitle">Your Golden Path and visited constellation.</p>
       <div class="gt-explorer-layout">
         <div class="gt-explorer-left">
           <div class="gt-pilgrim-card">
@@ -81,8 +99,8 @@
       </div>
     </section>
 
-    <section class="gt-section">
-      <h2 class="gt-section-title">Global scoreboard</h2>
+    <section class="gt-section" aria-labelledby="scoreboard-title">
+      <h2 id="scoreboard-title" class="gt-section-title">Scoreboard</h2>
       <p class="gt-section-subtitle">Top city heat signatures right now.</p>
       <div id="global-scoreboard" class="gt-scoreboard">
         <p class="gt-empty">No heat data yet. Check in to start the pulse.</p>
@@ -92,20 +110,18 @@
 
   <footer class="gt-footer">
     <div class="gt-footer-left">
-      <span>Glotemp – Global mood and tempo, in real time.</span>
+      <span>Glotemp — Global Mood & Tempo.</span>
     </div>
     <div class="gt-footer-right">
       <span>Contact: hello@glotemp.com</span>
     </div>
   </footer>
 
-  <!-- Install banner -->
   <div id="install-banner" class="gt-install-banner gt-hidden">
     <span>Add Glotemp to your home screen for a full-screen experience.</span>
     <button id="install-btn" class="gt-btn gt-btn-small gt-btn-primary">Add</button>
   </div>
 
-  <!-- City detail modal -->
   <div id="city-modal" class="gt-modal gt-hidden">
     <div class="gt-modal-backdrop"></div>
     <div class="gt-modal-content">
