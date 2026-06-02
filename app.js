@@ -1245,6 +1245,9 @@ function legacySceneHourWeights(hour) {
   const isTourism   = hour >= 11 && hour < 20;
   const isEvening   = hour >= 17 && hour < 21;
   return {
+    // Weights are independent per-scene; overlapping time windows (e.g. work 08-17
+    // and uni 10-16) both get elevated weights simultaneously so the weighted-random
+    // picker naturally reflects mixed activity during those hours.
     club:    isNightlife ? 25 : 2,
     bar:     isNightlife ? 18 : (isEvening ? 12 : 2),
     street:  isNightlife ? 12 : (isWork || isTourism ? 7 : 4),
@@ -1304,10 +1307,12 @@ function seedLegacyCheckins() {
   const DAY_MS = 86400000;
   const legacyCheckins = [];
 
-  // Generate 30 days of check-ins (days 30→1 days ago) for every city
+  // Generate 30 days of historical check-ins ending yesterday (day 0 = 30 days ago,
+  // day 29 = 1 day ago). Intentionally excludes today so legacy data is strictly
+  // historical and real-time activity from today remains separate.
   CITY_INDEX.forEach((city) => {
     for (let day = 0; day < 30; day++) {
-      const daysAgo          = 30 - day; // 30 days ago → 1 day ago
+      const daysAgo          = 30 - day; // 30 down to 1 days ago
       const checkinsThisDay  = 3 + Math.floor(Math.random() * 5); // 3–7 per city per day
       for (let i = 0; i < checkinsThisDay; i++) {
         const hour         = Math.floor(Math.random() * 24);
@@ -1350,7 +1355,10 @@ function seedLegacyCheckins() {
     });
 
     const get  = (obj, key) => obj[key] || 0;
-    // Cap contribution so 40+ checkins per scene ≈ max ~3.6 pts shift
+    // Cap at 40 checkins per scene so 40 × 0.09 = 3.6 pts max shift per dimension,
+    // keeping legacy data as a gentle baseline rather than dominating live scores.
+    // Mood cap is 30 × 0.07 = 2.1 pts max — moods are more volatile so we use a
+    // tighter cap to avoid locking a city into one emotional state.
     const pts     = (n) => Math.min(n, 40) * 0.09;
     const moodPts = (n) => Math.min(n, 30) * 0.07;
 
@@ -1364,6 +1372,8 @@ function seedLegacyCheckins() {
     state.study.campus_vibe             = clamp(state.study.campus_vibe             + pts(get(sc, "uni")),                                          0, 100);
     state.tourism.tourist_density       = clamp(state.tourism.tourist_density       + pts(get(sc, "tourism")),                                      0, 100);
     state.tourism.photo_spots           = clamp(state.tourism.photo_spots           + pts(get(sc, "tourism")),                                      0, 100);
+    // weekend_attractiveness reflects sustained popularity, so it receives half the
+    // tourism boost — it should rise more slowly than immediate density metrics.
     state.tourism.weekend_attractiveness = clamp(state.tourism.weekend_attractiveness + pts(Math.floor(get(sc, "tourism") / 2)),                    0, 100);
     state.mood.excited  = clamp(state.mood.excited  + moodPts(get(mc, "excited")),                          0, 100);
     state.mood.calm     = clamp(state.mood.calm     + moodPts(get(mc, "calm")),                             0, 100);
