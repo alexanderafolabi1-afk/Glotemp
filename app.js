@@ -1364,7 +1364,7 @@ function formatCurrency(amount) {
 }
 
 function updateRevenuePool(revenue) {
-  const safeRevenue = Number.isFinite(revenue) ? revenue : Number(revenue);
+  const safeRevenue = Number(revenue);
   if (!Number.isFinite(safeRevenue)) return;
   REVENUE_POOL.monthlySponsorRevenue += safeRevenue;
   REVENUE_POOL.communityPool = safeRevenue * 0.05;
