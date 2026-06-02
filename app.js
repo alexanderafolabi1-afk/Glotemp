@@ -87,6 +87,9 @@ function avg(arr) {
 }
 
 function generateUUID() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
     const r = Math.random() * 16 | 0;
     const v = c === "x" ? r : (r & 0x3 | 0x8);
@@ -939,19 +942,26 @@ function applyCheckinToCityState(checkin) {
     const s = state;
     const entry = latestPulseByCity[cityEntry.name];
     if (entry) {
-      entry.pulse_score     = Math.round(avg([avg(Object.values(s.nightlife)), avg(Object.values(s.economic)), avg(Object.values(s.tourism)), avg(Object.values(s.mood))]));
-      entry.nightlife_index = Math.round(avg(Object.values(s.nightlife)));
+      const nightlifeAvg = avg(Object.values(s.nightlife));
+      const economicAvg  = avg(Object.values(s.economic));
+      const tourismAvg   = avg(Object.values(s.tourism));
+      const moodAvg      = avg(Object.values(s.mood));
+      entry.pulse_score     = Math.round(avg([nightlifeAvg, economicAvg, tourismAvg, moodAvg]));
+      entry.nightlife_index = Math.round(nightlifeAvg);
       entry.uni_vibe        = Math.round(avg(Object.values(s.study)));
-      entry.economic_vibe   = Math.round(avg(Object.values(s.economic)));
+      entry.economic_vibe   = Math.round(economicAvg);
     }
   }
 }
 
 function renderCheckinItem(checkin) {
   const timeAgo = formatTimeAgo(checkin.timestamp);
-  const identityLabel = checkin.identityMode === "anonymous"
-    ? "Anonymous"
-    : escapeHtml(checkin.nicknameOrName) || (checkin.identityMode === "nickname" ? "Nickname" : "User");
+  let identityLabel;
+  if (checkin.identityMode === "anonymous") {
+    identityLabel = "Anonymous";
+  } else {
+    identityLabel = escapeHtml(checkin.nicknameOrName) || (checkin.identityMode === "nickname" ? "Nickname" : "User");
+  }
   const emoji = MOOD_EMOJIS[checkin.mood] || "";
   return `
     <div class="gt-checkin-item">
@@ -972,7 +982,10 @@ function openCheckinModal() {
 function closeCheckinModal() {
   document.getElementById("checkin-modal").classList.add("gt-hidden");
   const errEl = document.getElementById("checkin-error");
-  if (errEl) { errEl.classList.add("gt-hidden"); errEl.textContent = ""; }
+  if (errEl) {
+    errEl.classList.add("gt-hidden");
+    errEl.textContent = "";
+  }
 }
 
 function submitHumanCheckin() {
@@ -1014,14 +1027,15 @@ function submitHumanCheckin() {
   // Recompute city pulse & narrative by refreshing cards + scoreboard
   renderCityCards();
 
-  // Golden path — only record if first visit to this city
+  // Update golden path — recordVisit only if this is the first check-in for this city
   const cityEntry = CITY_INDEX.find((c) => c.id === cityId);
   if (cityEntry) {
     const isNew = !goldenPath.visitedCities.includes(cityEntry.name);
     if (isNew) {
       recordVisit(cityEntry.name, { lat: cityEntry.lat, lng: cityEntry.lng });
     }
-    calculateCityGoldenHeat(cityEntry.name); // also calls updateGlobalScoreboard
+    // Always refresh heat score and scoreboard on every check-in
+    calculateCityGoldenHeat(cityEntry.name);
     drawGoldenPath();
   }
 
