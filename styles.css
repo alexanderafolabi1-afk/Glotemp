@@ -838,6 +838,14 @@ body {
   font-size: 18px;
   font-weight: 600;
   color: var(--gt-gold);
+  margin-bottom: 4px;
+}
+ 
+.gt-profile-rank {
+  font-size: 13px;
+  color: var(--gt-text-soft);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   margin-bottom: 14px;
 }
 

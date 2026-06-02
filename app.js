@@ -12,6 +12,20 @@ const HUMAN_CHECKINS = [];
 let latestPulseByCity = {};
 let deferredPrompt = null;
 
+const RANK_TIERS = [
+  { minStars: 1000, label: "Luminary" },
+  { minStars: 500, label: "Vanguard" },
+  { minStars: 200, label: "Pathfinder" },
+  { minStars: 50, label: "Explorer II" },
+  { minStars: 0, label: "Explorer I" }
+];
+
+function getRankForStars(stars) {
+  const safeStars = Number.isFinite(stars) ? stars : 0;
+  const tier = RANK_TIERS.find(({ minStars }) => safeStars >= minStars);
+  return tier ? tier.label : "Explorer I";
+}
+
 // ─── USER PROFILE ─────────────────────────────────────────────────────────────
 let USER_PROFILE = (() => {
   const baseProfile = {
@@ -19,7 +33,8 @@ let USER_PROFILE = (() => {
     identityMode: "anonymous",
     nickname: null,
     legalName: null,
-    points: 0,
+    stars: 0,
+    rank: "Explorer I",
     checkins: 0,
     citiesVisited: []
   };
@@ -27,9 +42,18 @@ let USER_PROFILE = (() => {
     const stored = localStorage.getItem("gt_user_profile");
     if (stored) {
       const parsed = JSON.parse(stored);
+      if (!parsed || typeof parsed !== "object") return baseProfile;
+      const storedStars =
+        typeof parsed.stars === "number" && Number.isFinite(parsed.stars)
+          ? parsed.stars
+          : typeof parsed.points === "number" && Number.isFinite(parsed.points)
+            ? parsed.points
+            : 0;
       return {
         ...baseProfile,
         ...parsed,
+        stars: storedStars,
+        rank: getRankForStars(storedStars),
         identityMode: normalizeIdentityMode(parsed.identityMode),
         nickname: typeof parsed.nickname === "string" ? parsed.nickname : null,
         legalName: typeof parsed.legalName === "string" ? parsed.legalName : null,
@@ -205,7 +229,7 @@ function syncCityDerivedState(cityId) {
   const scores = computeCityPulseScores(cityId);
   if (!scores) return null;
 
-  state.overallScore = scores.overall;
+  state.overall = scores.overall;
   state.moodScore = scores.moodScore;
   state.nightlifeScore = scores.nightlifeScore;
   state.economicScore = scores.economicScore;
@@ -1120,14 +1144,15 @@ function submitHumanCheckin() {
     timestamp:      Date.now()
   };
 
-  // Compute points before pushing (so "first today" check is accurate)
-  const earnedPoints = computeCheckinPoints(checkin);
+  // Compute stars before pushing (so "first today" check is accurate)
+  const earnedStars = computeCheckinStars(checkin);
 
   HUMAN_CHECKINS.push(checkin);
 
   // Update USER_PROFILE
   USER_PROFILE.checkins += 1;
-  USER_PROFILE.points   += earnedPoints;
+  USER_PROFILE.stars += earnedStars;
+  USER_PROFILE.rank = getRankForStars(USER_PROFILE.stars);
   if (!USER_PROFILE.citiesVisited.includes(cityId)) {
     USER_PROFILE.citiesVisited.push(cityId);
   }
@@ -1288,15 +1313,21 @@ function saveUserProfile() {
   } catch (_) {}
 }
 
-function computeCheckinPoints(checkin) {
-  let points = 1; // base
+function getOverallPulseForCity(cityId) {
+  const cityState = cityPulseState[cityId];
+  if (typeof cityState?.overall === "number") return cityState.overall;
+  return computeCityPulseScores(cityId)?.overall ?? null;
+}
 
-  if (!USER_PROFILE.citiesVisited.includes(checkin.cityId)) points += 2;
+function computeCheckinStars(checkin) {
+  let stars = 1; // base
 
-  if (["club", "stadium", "festival"].includes(checkin.scene)) points += 3;
+  if (!USER_PROFILE.citiesVisited.includes(checkin.cityId)) stars += 2;
 
-  const scores = computeCityPulseScores(checkin.cityId);
-  if (scores && scores.overall < LOW_PULSE_THRESHOLD) points += 5;
+  if (["club", "stadium", "festival"].includes(checkin.scene)) stars += 3;
+
+  const overallPulse = getOverallPulseForCity(checkin.cityId);
+  if (typeof overallPulse === "number" && overallPulse < LOW_PULSE_THRESHOLD) stars += 5;
 
   // +10 if this is the first check-in in that city today (checked before push)
   const dayStart = new Date();
@@ -1306,14 +1337,15 @@ function computeCheckinPoints(checkin) {
   const hasCheckinTodayInCity = HUMAN_CHECKINS.some(
     (c) => c.cityId === checkin.cityId && c.timestamp >= dayStartMs && c.timestamp < dayEndMs
   );
-  if (!hasCheckinTodayInCity) points += 10;
+  if (!hasCheckinTodayInCity) stars += 10;
 
-  return points;
+  return stars;
 }
 
 function renderUserProfile() {
   const nicknameEl = document.getElementById("profile-nickname");
-  const pointsEl   = document.getElementById("profile-points");
+  const rankEl     = document.getElementById("profile-rank");
+  const starsEl    = document.getElementById("profile-stars");
   const checkinsEl = document.getElementById("profile-checkins");
   const citiesEl   = document.getElementById("profile-cities");
 
@@ -1326,7 +1358,8 @@ function renderUserProfile() {
           ? (USER_PROFILE.legalName || "Anonymous Explorer")
           : "Anonymous Explorer";
   }
-  if (pointsEl)   pointsEl.textContent   = USER_PROFILE.points;
+  if (rankEl)     rankEl.textContent     = USER_PROFILE.rank;
+  if (starsEl)    starsEl.textContent    = USER_PROFILE.stars;
   if (checkinsEl) checkinsEl.textContent = USER_PROFILE.checkins;
   if (citiesEl)   citiesEl.textContent   = USER_PROFILE.citiesVisited.length;
 }
