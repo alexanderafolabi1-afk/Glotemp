@@ -492,6 +492,32 @@ function recordVisit(city, coords) {
   console.log('Golden Path updated:', goldenPath);
 }
 
+function activateExplorerMode() {
+  const section = document.getElementById('explorer-mode');
+  if (section) {
+    section.hidden = false;
+  }
+
+  const scoreDisplay = document.getElementById('pilgrim-score-display');
+  if (scoreDisplay) {
+    scoreDisplay.textContent = `Pilgrim Score: ${goldenPath.pilgrimScore}`;
+  }
+
+  const citiesList = document.getElementById('visited-cities-list');
+  if (citiesList) {
+    citiesList.replaceChildren();
+    goldenPath.visitedCities.forEach((city) => {
+      const item = document.createElement('li');
+      item.textContent = city;
+      citiesList.appendChild(item);
+    });
+  }
+
+  showGoldenMap();
+
+  console.log('Explorer Mode activated');
+}
+
 function checkGoldenPathUnlock() {
   if (goldenPath.unlocked) {
     return;
@@ -501,7 +527,7 @@ function checkGoldenPathUnlock() {
     goldenPath.unlocked = true;
     console.log('Golden Path unlocked');
     console.log('Pilgrim Score at unlock:', goldenPath.pilgrimScore);
-    showGoldenMap();
+    activateExplorerMode();
   }
 }
 
