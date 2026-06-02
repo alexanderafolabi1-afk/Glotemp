@@ -1314,6 +1314,7 @@ function attachInstallButtonListener() {
     const prompt = window.deferredPrompt;
     if (!prompt) return;
     prompt.prompt();
+    await prompt.userChoice;
     window.deferredPrompt = null;
     installBanner.style.display = 'none';
   };
