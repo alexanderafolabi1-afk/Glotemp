@@ -876,6 +876,37 @@ body {
   color: var(--gt-text-soft);
 }
 
+.gt-revenue-card {
+  background: radial-gradient(circle at top left, rgba(0, 229, 255, 0.12), transparent 55%), var(--gt-card);
+  border: 1px solid var(--gt-border);
+  border-radius: var(--gt-radius);
+  padding: 16px;
+  box-shadow: var(--gt-shadow-soft);
+  display: grid;
+  gap: 12px;
+}
+
+.gt-revenue-stat {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.gt-revenue-stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gt-text-soft);
+  margin-bottom: 4px;
+}
+
+.gt-revenue-stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gt-text);
+}
+
 /* ── Checkin error message ── */
 .gt-checkin-error {
   font-size: 12px;
