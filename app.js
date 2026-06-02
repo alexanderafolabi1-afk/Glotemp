@@ -11,48 +11,79 @@ const cityHeat = {};
 let latestPulseByCity = {};
 let deferredPrompt = null;
 
-// Mock: generate a couple of real-feeling cities (you can replace with API later)
+// Clamp helper used by live simulation
+function clamp(val, min, max) {
+  return Math.max(min, Math.min(max, Math.round(val)));
+}
+
+// Seed cities: Sunderland, São Paulo, London
 function seedInitialPulses() {
   const seed = [
     {
-      city: "London",
+      city: "Sunderland",
       country: "United Kingdom",
-      pulse_score: 58,
+      pulse_score: 64,
       summary_text:
-        "A steady, rain-softened rhythm keeps the city balanced and focused.",
+        "Wearside grit meets student energy — Sunderland's nightlife quarter hums and the uni scene is on the rise.",
       mood_distribution: [
-        { label: "Calm", value: 45 },
-        { label: "Hopeful", value: 30 },
-        { label: "Anxious", value: 25 }
+        { label: "Determined", value: 38 },
+        { label: "Hopeful", value: 34 },
+        { label: "Restless", value: 28 }
       ],
-      tempo_score: 58,
-      romantic_index: 41,
-      economic_vibe: 62,
-      cultural_heat: 2,
-      weather_influence: 12,
-      news_influence: 3,
-      sports_influence: 1,
-      tourism_influence: 4.2
+      tempo_score: 66,
+      romantic_index: 44,
+      economic_vibe: 52,
+      cultural_heat: 4,
+      weather_influence: 8,
+      news_influence: 2,
+      sports_influence: 5,
+      tourism_influence: 2.1,
+      nightlife_index: 72,
+      uni_vibe: 81
     },
     {
-      city: "Lisbon",
-      country: "Portugal",
-      pulse_score: 71,
+      city: "São Paulo",
+      country: "Brazil",
+      pulse_score: 88,
       summary_text:
-        "Warm light, slow streets, and late-night terraces keep the city glowing.",
+        "A 24-hour megacity that never dims — jazz bars, concrete towers, and electric ambition drive the endless tempo.",
       mood_distribution: [
-        { label: "Hopeful", value: 40 },
-        { label: "Calm", value: 35 },
-        { label: "Excited", value: 25 }
+        { label: "Energised", value: 42 },
+        { label: "Creative", value: 33 },
+        { label: "Intense", value: 25 }
       ],
-      tempo_score: 69,
-      romantic_index: 76,
-      economic_vibe: 60,
-      cultural_heat: 3,
-      weather_influence: 26,
-      news_influence: 2,
-      sports_influence: 2,
-      tourism_influence: 6.1
+      tempo_score: 91,
+      romantic_index: 68,
+      economic_vibe: 74,
+      cultural_heat: 5,
+      weather_influence: 31,
+      news_influence: 4,
+      sports_influence: 4,
+      tourism_influence: 7.8,
+      nightlife_index: 96,
+      uni_vibe: 62
+    },
+    {
+      city: "London",
+      country: "United Kingdom",
+      pulse_score: 74,
+      summary_text:
+        "A rain-softened hum of purpose and creativity — world culture, finance, and late-night electricity in one city.",
+      mood_distribution: [
+        { label: "Ambitious", value: 38 },
+        { label: "Calm", value: 32 },
+        { label: "Curious", value: 30 }
+      ],
+      tempo_score: 73,
+      romantic_index: 55,
+      economic_vibe: 79,
+      cultural_heat: 5,
+      weather_influence: 14,
+      news_influence: 5,
+      sports_influence: 3,
+      tourism_influence: 9.2,
+      nightlife_index: 83,
+      uni_vibe: 87
     }
   ];
   seed.forEach((p) => {
@@ -117,6 +148,16 @@ function renderCityCards() {
           <span class="gt-metric-label">Weather</span>
           <span class="gt-metric-value">${pulse.weather_influence}</span>
         </div>
+        ${pulse.nightlife_index !== undefined ? `
+        <div class="gt-metric">
+          <span class="gt-metric-label">Nightlife</span>
+          <span class="gt-metric-value">${pulse.nightlife_index}</span>
+        </div>` : ""}
+        ${pulse.uni_vibe !== undefined ? `
+        <div class="gt-metric">
+          <span class="gt-metric-label">Uni</span>
+          <span class="gt-metric-value">${pulse.uni_vibe}</span>
+        </div>` : ""}
       </div>
       <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
         <span class="gt-heat-chip">🔥 Heat ${heatScore}</span>
@@ -147,6 +188,8 @@ function openCityDetail(city) {
       ${metricBlock("News influence", pulse.news_influence)}
       ${metricBlock("Sports influence", pulse.sports_influence)}
       ${metricBlock("Tourism influence", pulse.tourism_influence)}
+      ${pulse.nightlife_index !== undefined ? metricBlock("Nightlife index", pulse.nightlife_index) : ""}
+      ${pulse.uni_vibe !== undefined ? metricBlock("Uni vibe", pulse.uni_vibe) : ""}
     </div>
   `;
 
@@ -339,6 +382,49 @@ function updateGlobalScoreboard() {
     .join("");
 }
 
+// Simulate live city pulses — nightlife and uni vibes ebb/flow with the hour
+function simulateLivePulses() {
+  setInterval(() => {
+    const utcHour = new Date().getUTCHours();
+
+    Object.values(latestPulseByCity).forEach((pulse) => {
+      // Micro-drift on core scores
+      pulse.pulse_score = clamp(
+        pulse.pulse_score + (Math.random() * 6 - 3), 30, 100
+      );
+      pulse.tempo_score = clamp(
+        pulse.tempo_score + (Math.random() * 4 - 2), 30, 100
+      );
+
+      // Nightlife peaks UTC 21:00–04:00
+      if (pulse.nightlife_index !== undefined) {
+        const isNight = utcHour >= 21 || utcHour <= 4;
+        const nightTarget = isNight ? 88 : 55;
+        pulse.nightlife_index = clamp(
+          pulse.nightlife_index +
+            (nightTarget - pulse.nightlife_index) * 0.08 +
+            (Math.random() * 4 - 2),
+          20, 100
+        );
+      }
+
+      // Uni vibe peaks UTC 08:00–18:00
+      if (pulse.uni_vibe !== undefined) {
+        const isUniHours = utcHour >= 8 && utcHour <= 18;
+        const uniTarget = isUniHours ? 85 : 45;
+        pulse.uni_vibe = clamp(
+          pulse.uni_vibe +
+            (uniTarget - pulse.uni_vibe) * 0.06 +
+            (Math.random() * 3 - 1.5),
+          20, 100
+        );
+      }
+    });
+
+    renderCityCards();
+  }, 4500);
+}
+
 // Install banner
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
@@ -363,14 +449,19 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js").catch(() => {});
 }
 
-// Simple “check in” stub: mark a visit and recalc heat
+// Simple "check in" stub: cycles through the 3 seeded cities
 function setupCheckin() {
   const btn = document.getElementById("checkin-btn");
   if (!btn) return;
+  let checkinIndex = 0;
+  const checkinCities = [
+    { city: "London", coords: { lat: 51.5074, lng: -0.1278 } },
+    { city: "Sunderland", coords: { lat: 54.9069, lng: -1.3838 } },
+    { city: "São Paulo", coords: { lat: -23.5505, lng: -46.6333 } }
+  ];
   btn.onclick = () => {
-    // For now, just simulate a new city visit: London
-    const city = "London";
-    const coords = { lat: 51.5074, lng: -0.1278 };
+    const { city, coords } = checkinCities[checkinIndex % checkinCities.length];
+    checkinIndex++;
     recordVisit(city, coords);
     calculateCityGoldenHeat(city);
     drawGoldenPath();
@@ -404,4 +495,5 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCheckin();
   setupExplore();
   setupModalClose();
+  simulateLivePulses();
 });

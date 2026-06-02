@@ -46,10 +46,61 @@ body {
 }
 
 .gt-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.gt-logo-globe {
+  width: 26px;
+  height: 26px;
+  color: var(--gt-gold);
+  filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.45));
+  flex-shrink: 0;
+}
+
+.gt-globe-meridian {
+  transform-origin: 22px 22px;
+  animation: gt-globe-spin 12s linear infinite;
+}
+
+.gt-globe-pulse-ring {
+  transform-origin: 22px 22px;
+  animation: gt-globe-glow 2.8s ease-out infinite;
+}
+
+.gt-globe-marker {
+  transform-origin: 22px 22px;
+  animation: gt-globe-spin 6s linear infinite;
+}
+
+@keyframes gt-globe-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes gt-globe-glow {
+  0% { opacity: 0.55; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.38); }
+}
+
+.gt-live-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gt-accent);
+  margin-left: 5px;
+  vertical-align: middle;
+  animation: gt-live-blink 1.8s ease-in-out infinite;
+}
+
+@keyframes gt-live-blink {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--gt-accent); }
+  50% { opacity: 0.3; box-shadow: none; }
 }
 
 .gt-tagline {
