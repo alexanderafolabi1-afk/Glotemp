@@ -11,9 +11,11 @@ const DEFAULT_LEAGUE_ID = '4328';
 const MAX_NEWS_HEADLINES = 3;
 const MAX_SPORTS_RESULTS = 3;
 const MAX_EVENTS_RESULTS = 3;
+const DEFAULT_INFLUENCE_SCORE = 3;
 const SENTIMENT_PLACEHOLDER = 'pending';
 const NEWS_PULSE_TEXT = `News pulse: ${MAX_NEWS_HEADLINES} headlines loaded`;
 const DEFAULT_SPORTS_MOOD = 'neutral';
+const DEFAULT_MOOD_TAG_LABEL = 'Mood pending';
 const SPORTS_PULSE_CLASS_NAME = 'sports-pulse';
 const EVENTS_PULSE_CLASS_NAME = 'events-pulse';
 const SPORTS_PULSE_LABEL = 'Sports pulse';
@@ -586,8 +588,8 @@ function updateCityCard(pulse) {
 
   if (moodTags) {
     moodTags.replaceChildren();
-    const entries = Object.entries(pulse.mood_distribution || {}).filter(([, value]) => value !== null && value !== undefined);
-    const labels = entries.length ? entries : [['Mood pending', '']];
+    const entries = Object.entries(pulse.mood_distribution || {}).filter(([_mood, value]) => value !== null && value !== undefined);
+    const labels = entries.length ? entries : [[DEFAULT_MOOD_TAG_LABEL, '']];
     labels.forEach(([mood, value]) => {
       const tag = document.createElement('span');
       tag.textContent = value === '' ? mood : `${mood} ${value}%`;
@@ -618,10 +620,10 @@ function renderCityCards() {
       tempo_score: 73,
       romantic_index: 57,
       economic_vibe: 68,
-      cultural_heat: 3,
+      cultural_heat: DEFAULT_INFLUENCE_SCORE,
       weather_influence: 30,
-      news_influence: 3,
-      sports_influence: 3,
+      news_influence: DEFAULT_INFLUENCE_SCORE,
+      sports_influence: DEFAULT_INFLUENCE_SCORE,
       tourism_influence: 5.5
     },
     {
@@ -632,10 +634,10 @@ function renderCityCards() {
       tempo_score: 58,
       romantic_index: 49,
       economic_vibe: 61,
-      cultural_heat: 3,
+      cultural_heat: DEFAULT_INFLUENCE_SCORE,
       weather_influence: 12,
-      news_influence: 3,
-      sports_influence: 3,
+      news_influence: DEFAULT_INFLUENCE_SCORE,
+      sports_influence: DEFAULT_INFLUENCE_SCORE,
       tourism_influence: 8.3
     },
     {
@@ -646,10 +648,10 @@ function renderCityCards() {
       tempo_score: 66,
       romantic_index: 52,
       economic_vibe: 64,
-      cultural_heat: 3,
+      cultural_heat: DEFAULT_INFLUENCE_SCORE,
       weather_influence: 19,
-      news_influence: 3,
-      sports_influence: 3,
+      news_influence: DEFAULT_INFLUENCE_SCORE,
+      sports_influence: DEFAULT_INFLUENCE_SCORE,
       tourism_influence: 8.7
     },
     {
@@ -660,10 +662,10 @@ function renderCityCards() {
       tempo_score: 70,
       romantic_index: 60,
       economic_vibe: 59,
-      cultural_heat: 3,
+      cultural_heat: DEFAULT_INFLUENCE_SCORE,
       weather_influence: 24,
-      news_influence: 3,
-      sports_influence: 3,
+      news_influence: DEFAULT_INFLUENCE_SCORE,
+      sports_influence: DEFAULT_INFLUENCE_SCORE,
       tourism_influence: 6.4
     }
   ];
