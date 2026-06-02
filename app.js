@@ -1657,15 +1657,17 @@ const LEGACY_SCENE_TIME_WINDOWS = {
   uni:       { start: 10, end: 16 },
   tourism:   { start: 11, end: 20 }
 };
+const LEGACY_INTENSITY_MIN = 20;
+const LEGACY_INTENSITY_MAX = 90;
+const LEGACY_INTENSITY_RANGE = LEGACY_INTENSITY_MAX - LEGACY_INTENSITY_MIN + 1;
 
 function randomHourInWindow(start, end) {
   if (start <= end) {
     return start + Math.floor(Math.random() * (end - start + 1));
   }
-  const overnightHours = [...Array(24 - start).keys()].map((n) => start + n).concat(
-    [...Array(end + 1).keys()]
-  );
-  return overnightHours[Math.floor(Math.random() * overnightHours.length)];
+  const overnightSpan = 24 - start + (end + 1);
+  const offset = Math.floor(Math.random() * overnightSpan);
+  return offset < (24 - start) ? start + offset : offset - (24 - start);
 }
 
 function pickLegacyHourForScene(scene) {
@@ -1712,6 +1714,7 @@ function pickLegacyMood(scene) {
 
 function seedLegacyCheckins() {
   if (hasSeededLegacyCheckins) return;
+  if (HUMAN_CHECKINS.some((checkin) => checkin.legacy)) return;
   hasSeededLegacyCheckins = true;
 
   const todayStart = new Date();
@@ -1731,7 +1734,7 @@ function seedLegacyCheckins() {
         const scene        = pickLegacyScene(undefined, city.tier);
         const hour         = pickLegacyHourForScene(scene);
         const mood         = pickLegacyMood(scene);
-        const intensity    = 20 + Math.floor(Math.random() * (90 - 20 + 1)); // 20–90
+        const intensity    = LEGACY_INTENSITY_MIN + Math.floor(Math.random() * LEGACY_INTENSITY_RANGE); // 20–90
         const minuteJitter = Math.floor(Math.random() * 60) * 60000;
         const dayStartMs   = todayStartMs - daysAgo * DAY_MS;
         const timestamp    = dayStartMs + hour * 3600000 + minuteJitter;
