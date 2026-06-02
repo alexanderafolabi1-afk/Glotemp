@@ -332,6 +332,38 @@ ${JSON.stringify(data, null, 2)}`;
   }
 }
 
+function buildPulseObject(allData) {
+  const {
+    city,
+    country,
+    weather,
+    news,
+    sports,
+    events,
+    tourism,
+    claude_synthesis: claudeSynthesis
+  } = allData;
+
+  const sportsCollection = Array.isArray(sports) ? sports : sports?.results;
+  const eventsCollection = Array.isArray(events) ? events : events?.events;
+
+  return {
+    city,
+    country,
+    pulse_score: claudeSynthesis?.tempo_score ?? null,
+    mood_distribution: claudeSynthesis?.mood_distribution ?? {},
+    tempo_score: claudeSynthesis?.tempo_score ?? null,
+    romantic_index: claudeSynthesis?.romantic_index ?? null,
+    economic_vibe: claudeSynthesis?.economic_vibe ?? null,
+    cultural_heat: eventsCollection?.length ?? 0,
+    weather_influence: weather?.temperature ?? null,
+    news_influence: news?.headlines?.length ?? 0,
+    sports_influence: sportsCollection?.length ?? 0,
+    tourism_influence: tourism?.tourism_score ?? tourism?.tourismScore ?? null,
+    summary_text: claudeSynthesis?.summary_text ?? ''
+  };
+}
+
 const selectionState = {
   mood: '',
   vibe: '',
@@ -451,6 +483,9 @@ async function handleCheckinSubmit(event) {
   try {
     const synthesizedMood = await synthesizeMood(allData);
     console.log('Synthesized mood:', synthesizedMood);
+    allData.claude_synthesis = synthesizedMood;
+    const pulseObject = buildPulseObject(allData);
+    console.log('Final pulse object:', pulseObject);
   } catch (error) {
     console.error('Mood synthesis failed:', error);
   }
