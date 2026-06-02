@@ -8,6 +8,7 @@ const goldenPath = {
 };
 const cityHeat = {};
 const HUMAN_CHECKINS = [];
+let hasSeededLegacyCheckins = false;
 
 let latestPulseByCity = {};
 let deferredPrompt = null;
@@ -776,7 +777,7 @@ function renderCityCards() {
         </div>
       </div>
       <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
-        <span class="gt-live-activity-chip">📍 ${recentCount} active this week</span>
+        <span class="gt-live-activity-chip">📍 Live activity · ${recentCount} this week</span>
         <span style="font-size:11px;color:#a0a3c4;">Mood ${scores ? scores.moodScore : "—"}</span>
       </div>
       <div style="margin-top:4px;display:flex;justify-content:flex-end;">
@@ -801,7 +802,7 @@ function openCityDetail(cityName) {
   const body = document.getElementById("city-modal-body");
 
   const cityCheckins = HUMAN_CHECKINS
-    .filter((c) => c.cityId === (cityEntry && cityEntry.id) && !c.legacy)
+    .filter((c) => c.cityId === (cityEntry && cityEntry.id))
     .slice(-5)
     .reverse();
 
@@ -1650,8 +1651,48 @@ const LEGACY_SCENE_MOODS = {
   stadium: ["excited", "excited", "hopeful",  "anxious"]
 };
 
+const LEGACY_SCENE_TIME_WINDOWS = {
+  nightlife: { start: 21, end: 3 },
+  work:      { start: 8,  end: 17 },
+  uni:       { start: 10, end: 16 },
+  tourism:   { start: 11, end: 20 }
+};
+const LEGACY_INTENSITY_MIN = 20;
+const LEGACY_INTENSITY_MAX = 90;
+const LEGACY_INTENSITY_RANGE = LEGACY_INTENSITY_MAX - LEGACY_INTENSITY_MIN + 1;
+
+function randomHourInWindow(start, end) {
+  if (start <= end) {
+    return start + Math.floor(Math.random() * (end - start + 1));
+  }
+  const overnightSpan = 24 - start + (end + 1);
+  const offset = Math.floor(Math.random() * overnightSpan);
+  return offset < (24 - start) ? start + offset : offset - (24 - start);
+}
+
+function pickLegacyHourForScene(scene) {
+  if (["club", "bar", "street", "stadium", "festival"].includes(scene)) {
+    const { start, end } = LEGACY_SCENE_TIME_WINDOWS.nightlife;
+    return randomHourInWindow(start, end);
+  }
+  if (scene === "work") {
+    const { start, end } = LEGACY_SCENE_TIME_WINDOWS.work;
+    return randomHourInWindow(start, end);
+  }
+  if (scene === "uni") {
+    const { start, end } = LEGACY_SCENE_TIME_WINDOWS.uni;
+    return randomHourInWindow(start, end);
+  }
+  if (scene === "tourism") {
+    const { start, end } = LEGACY_SCENE_TIME_WINDOWS.tourism;
+    return randomHourInWindow(start, end);
+  }
+  return randomHourInWindow(6, 23);
+}
+
 function pickLegacyScene(hour, tier) {
-  const base = legacySceneHourWeights(hour);
+  const effectiveHour = Number.isFinite(hour) ? hour : Math.floor(Math.random() * 24);
+  const base = legacySceneHourWeights(effectiveHour);
   const bias = LEGACY_TIER_SCENE_BIAS[tier] || {};
   const weighted = {};
   for (const scene of Object.keys(base)) {
@@ -1672,9 +1713,13 @@ function pickLegacyMood(scene) {
 }
 
 function seedLegacyCheckins() {
-  if (localStorage.getItem("gt_legacy_seeded")) return;
+  if (hasSeededLegacyCheckins) return;
+  if (HUMAN_CHECKINS.some((checkin) => checkin.legacy)) return;
+  hasSeededLegacyCheckins = true;
 
-  const now    = Date.now();
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const todayStartMs = todayStart.getTime();
   const DAY_MS = 86400000;
   const legacyCheckins = [];
 
@@ -1686,12 +1731,13 @@ function seedLegacyCheckins() {
       const daysAgo          = 30 - day; // 30 down to 1 days ago
       const checkinsThisDay  = 3 + Math.floor(Math.random() * 5); // 3–7 per city per day
       for (let i = 0; i < checkinsThisDay; i++) {
-        const hour         = Math.floor(Math.random() * 24);
-        const scene        = pickLegacyScene(hour, city.tier);
+        const scene        = pickLegacyScene(undefined, city.tier);
+        const hour         = pickLegacyHourForScene(scene);
         const mood         = pickLegacyMood(scene);
-        const intensity    = 40 + Math.floor(Math.random() * 60); // 40–99
+        const intensity    = LEGACY_INTENSITY_MIN + Math.floor(Math.random() * LEGACY_INTENSITY_RANGE); // 20–90
         const minuteJitter = Math.floor(Math.random() * 60) * 60000;
-        const timestamp    = now - daysAgo * DAY_MS + hour * 3600000 + minuteJitter;
+        const dayStartMs   = todayStartMs - daysAgo * DAY_MS;
+        const timestamp    = dayStartMs + hour * 3600000 + minuteJitter;
 
         legacyCheckins.push({
           id:             generateUUID(),
@@ -1759,8 +1805,6 @@ function seedLegacyCheckins() {
   CITY_INDEX.forEach((city) => {
     calculateCityGoldenHeat(city.name);
   });
-
-  localStorage.setItem("gt_legacy_seeded", "1");
 }
 
 // Init
