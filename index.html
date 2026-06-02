@@ -131,6 +131,68 @@
     <button id="install-btn" class="gt-btn gt-btn-small gt-btn-primary">Add</button>
   </div>
 
+  <div id="checkin-modal" class="gt-modal gt-hidden">
+    <div class="gt-modal-backdrop" id="checkin-modal-backdrop"></div>
+    <div class="gt-modal-content gt-modal-content-scroll">
+      <button id="checkin-modal-close" class="gt-modal-close">×</button>
+      <h2 class="gt-modal-body-title">Check In Your Mood</h2>
+
+      <div class="gt-checkin-field">
+        <label class="gt-label" for="checkin-city">City</label>
+        <select class="gt-input" id="checkin-city">
+          <option value="">Select a city…</option>
+        </select>
+      </div>
+
+      <div class="gt-checkin-field">
+        <div class="gt-label">Mood</div>
+        <div class="gt-mood-picker" id="checkin-mood-picker">
+          <button class="gt-mood-btn" data-mood="excited" type="button">😄 Excited</button>
+          <button class="gt-mood-btn" data-mood="calm" type="button">😌 Calm</button>
+          <button class="gt-mood-btn" data-mood="stressed" type="button">😤 Stressed</button>
+          <button class="gt-mood-btn" data-mood="hopeful" type="button">🌟 Hopeful</button>
+          <button class="gt-mood-btn" data-mood="anxious" type="button">😰 Anxious</button>
+        </div>
+      </div>
+
+      <div class="gt-checkin-field">
+        <label class="gt-label" for="checkin-intensity">Intensity &nbsp;<span id="checkin-intensity-val">50</span></label>
+        <input type="range" class="gt-slider" id="checkin-intensity" min="0" max="100" value="50" />
+      </div>
+
+      <div class="gt-checkin-field">
+        <label class="gt-label" for="checkin-scene">Scene</label>
+        <select class="gt-input" id="checkin-scene">
+          <option value="club">Club</option>
+          <option value="uni">University</option>
+          <option value="bar">Bar</option>
+          <option value="work">Work</option>
+          <option value="street">Street</option>
+          <option value="stadium">Stadium</option>
+          <option value="home">Home</option>
+          <option value="tourism">Tourism</option>
+        </select>
+      </div>
+
+      <div class="gt-checkin-field">
+        <div class="gt-label">Identity</div>
+        <div class="gt-identity-picker" id="checkin-identity-picker">
+          <button class="gt-identity-btn gt-identity-btn-active" data-mode="anonymous" type="button">Anonymous</button>
+          <button class="gt-identity-btn" data-mode="nickname" type="button">Nickname</button>
+          <button class="gt-identity-btn" data-mode="legal" type="button">Legal Name</button>
+        </div>
+      </div>
+
+      <div class="gt-checkin-field gt-hidden" id="checkin-name-field">
+        <input type="text" class="gt-input" id="checkin-name" placeholder="Enter your nickname or name…" maxlength="50" />
+      </div>
+
+      <div id="checkin-error" class="gt-checkin-error gt-hidden"></div>
+
+      <button id="checkin-submit" class="gt-btn gt-btn-primary gt-checkin-submit-btn" type="button">Submit Check-In</button>
+    </div>
+  </div>
+
   <div id="city-modal" class="gt-modal gt-hidden">
     <div class="gt-modal-backdrop"></div>
     <div class="gt-modal-content">

@@ -723,3 +723,145 @@ body {
   color: #7f82a4;
   font-weight: 400;
 }
+
+/* ── Check-in modal scrollable content ── */
+.gt-modal-content-scroll {
+  max-height: 90vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 215, 0, 0.3) transparent;
+}
+
+/* ── Check-in form fields ── */
+.gt-checkin-field {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Mood picker ── */
+.gt-mood-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gt-mood-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  color: var(--gt-text);
+  padding: 5px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.gt-mood-btn:hover {
+  border-color: rgba(255, 215, 0, 0.5);
+  background: rgba(255, 215, 0, 0.06);
+}
+
+.gt-mood-btn-active {
+  background: rgba(255, 215, 0, 0.15);
+  border-color: var(--gt-gold);
+  color: var(--gt-gold);
+}
+
+/* ── Intensity slider ── */
+.gt-slider {
+  width: 100%;
+  accent-color: var(--gt-gold);
+  cursor: pointer;
+}
+
+/* ── Identity picker ── */
+.gt-identity-picker {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.gt-identity-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  color: var(--gt-text);
+  padding: 5px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.gt-identity-btn:hover {
+  border-color: rgba(0, 229, 255, 0.5);
+  background: rgba(0, 229, 255, 0.06);
+}
+
+.gt-identity-btn-active {
+  background: rgba(0, 229, 255, 0.12);
+  border-color: var(--gt-accent);
+  color: var(--gt-accent);
+}
+
+/* ── Submit button full-width ── */
+.gt-checkin-submit-btn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+/* ── Checkin error message ── */
+.gt-checkin-error {
+  font-size: 12px;
+  color: #f87171;
+  margin-bottom: 6px;
+}
+
+/* ── Human check-ins section in city modal ── */
+.gt-checkins-section {
+  margin-top: 16px;
+}
+
+.gt-checkins-section-header {
+  font-size: 13px;
+  color: #a0a3c4;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 12px;
+  margin-bottom: 8px;
+}
+
+.gt-checkin-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 7px 10px;
+  margin-bottom: 6px;
+}
+
+.gt-checkin-identity {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gt-text);
+  margin-bottom: 3px;
+}
+
+.gt-checkin-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--gt-text-soft);
+}
+
+.gt-checkin-mood {
+  text-transform: capitalize;
+}
+
+.gt-checkin-time {
+  margin-left: auto;
+  color: rgba(164, 167, 196, 0.6);
+}
