@@ -387,6 +387,7 @@ let goldenMapLineLayer = null;
 let goldenMapDotLayer = null;
 
 function projectGoldenCoord(coord) {
+  // Simple equirectangular projection into the 1000x360 SVG viewBox.
   const x = ((coord.longitude + 180) / 360) * 1000;
   const y = ((90 - coord.latitude) / 180) * 360;
   return { x, y };
@@ -483,13 +484,14 @@ function recordVisit(city, coords) {
 }
 
 function checkGoldenPathUnlock() {
-  const wasUnlocked = goldenPath.unlocked;
-  goldenPath.unlocked = goldenPath.visitedCities.length >= 3;
+  if (goldenPath.unlocked) {
+    return;
+  }
 
-  if (goldenPath.unlocked && !wasUnlocked) {
+  if (goldenPath.visitedCities.length >= 3) {
+    goldenPath.unlocked = true;
     console.log('Golden Path unlocked');
     showGoldenMap();
-    return;
   }
 }
 
