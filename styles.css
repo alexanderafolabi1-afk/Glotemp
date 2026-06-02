@@ -2550,3 +2550,381 @@ body::before {
   .gt-contrib-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   CINEMATIC CITY CARDS v2 — Photo-first, no dots
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── REGION FILTER BAR ───────────────────────────────────────────── */
+.gt-filter-bar-wrap {
+  margin-bottom: 2rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.gt-filter-bar-wrap::-webkit-scrollbar { display: none; }
+
+#city-filter-bar {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--line);
+  width: fit-content;
+  min-width: 100%;
+}
+
+.gt-filter-btn {
+  padding: 0.65rem 1.4rem;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--line);
+  color: var(--text-3);
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.gt-filter-btn:last-child { border-right: none; }
+.gt-filter-btn:hover { color: var(--text-1); background: var(--void-3); }
+.gt-filter-btn.active {
+  color: #000;
+  background: var(--gold);
+  border-color: var(--gold);
+  font-weight: 600;
+}
+
+/* ── CITY GRID v2 ────────────────────────────────────────────────── */
+.gt-city-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+/* ── CARD v2 ─────────────────────────────────────────────────────── */
+.gt-city-card-v2 {
+  background: var(--void-2);
+  cursor: pointer;
+  transition: transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  outline: none;
+  --city-accent: var(--gold);
+}
+
+.gt-city-card-v2:hover {
+  transform: translateY(-4px);
+  z-index: 2;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 0 1px var(--city-accent);
+}
+
+.gt-city-card-v2:focus-visible {
+  box-shadow: 0 0 0 2px var(--city-accent);
+}
+
+/* ── PHOTO HEADER ────────────────────────────────────────────────── */
+.gt-card-photo {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.gt-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s var(--ease-out), filter 0.4s;
+  filter: brightness(0.75) saturate(1.1);
+}
+
+.gt-city-card-v2:hover .gt-card-photo img {
+  transform: scale(1.06);
+  filter: brightness(0.85) saturate(1.2);
+}
+
+.gt-card-photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(3,5,8,0.1) 0%,
+    rgba(3,5,8,0) 40%,
+    rgba(3,5,8,0.75) 100%
+  );
+}
+
+/* Coloured accent bar at bottom of photo using city accent */
+.gt-card-photo::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--city-accent), transparent);
+  opacity: 0.8;
+  transition: opacity 0.3s;
+}
+.gt-city-card-v2:hover .gt-card-photo::after { opacity: 1; }
+
+/* ── SCORE BADGE — floats bottom-right of photo ──────────────────── */
+.gt-card-score-badge {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1;
+}
+
+.gt-card-score-num {
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: var(--city-accent);
+  line-height: 1;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+  filter: drop-shadow(0 0 12px var(--city-accent));
+}
+
+.gt-card-score-tier {
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  margin-top: 2px;
+}
+
+/* ── REGION TAG — top left ───────────────────────────────────────── */
+.gt-card-region-tag {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.8);
+  padding: 0.2rem 0.6rem;
+  background: rgba(3,5,8,0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ── HEAT FLAG — top right ───────────────────────────────────────── */
+.gt-card-heat-flag {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #FF4D2E;
+  padding: 0.2rem 0.6rem;
+  background: rgba(3,5,8,0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,77,46,0.3);
+  letter-spacing: 0.08em;
+}
+
+/* ── CARD BODY ───────────────────────────────────────────────────── */
+.gt-card-body {
+  padding: 1.2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+/* ── IDENTITY ROW ────────────────────────────────────────────────── */
+.gt-card-identity {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.gt-card-city-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  margin-bottom: 0.2rem;
+  color: var(--text-1);
+}
+
+.gt-card-city-country {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+/* ── DOMINANT DIMENSION BADGE ────────────────────────────────────── */
+.gt-card-dominant {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--city-accent);
+  background: rgba(0,0,0,0.3);
+  flex-shrink: 0;
+  min-width: 44px;
+}
+
+.gt-card-dominant-key {
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--city-accent);
+  margin-bottom: 2px;
+}
+
+.gt-card-dominant-val {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--city-accent);
+  line-height: 1;
+}
+
+/* ── SIGNATURE LINE ──────────────────────────────────────────────── */
+.gt-card-signature {
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--text-2);
+  line-height: 1.5;
+  margin: 0;
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--city-accent);
+  opacity: 0.8;
+  transition: opacity 0.3s;
+}
+.gt-city-card-v2:hover .gt-card-signature { opacity: 1; }
+
+/* ── SPONSOR STRIP ───────────────────────────────────────────────── */
+.gt-card-sponsor-strip {
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.3rem 0.7rem;
+  background: var(--gold-dim);
+  border: 1px solid var(--line-gold);
+  width: fit-content;
+}
+
+/* ── DIMENSION BARS — compact ────────────────────────────────────── */
+.gt-card-dims {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.gt-card-dim-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.gt-card-dim-label {
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--text-3);
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.gt-card-dim-track {
+  flex: 1;
+  height: 3px;
+  background: rgba(255,255,255,0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.gt-card-dim-fill {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  transition: width 1.2s var(--ease-out);
+  border-radius: 0;
+}
+
+.gt-card-dim-num {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-2);
+  width: 22px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── CARD FOOTER ─────────────────────────────────────────────────── */
+.gt-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+  margin-top: auto;
+}
+
+.gt-card-activity {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.6rem;
+  color: var(--text-3);
+  letter-spacing: 0.06em;
+}
+
+.gt-card-checkin-btn {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--city-accent);
+  background: none;
+  border: 1px solid var(--city-accent);
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+}
+
+.gt-card-checkin-btn:hover {
+  background: var(--city-accent);
+  color: #000;
+}
+
+/* ── RESPONSIVE GRID ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .gt-city-grid {
+    grid-template-columns: 1fr;
+    gap: 1px;
+  }
+  .gt-card-photo { height: 180px; }
+  .gt-card-score-num { font-size: 2.2rem; }
+}
+
+@media (min-width: 769px) and (max-width: 1200px) {
+  .gt-city-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1201px) {
+  .gt-city-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 1600px) {
+  .gt-city-grid { grid-template-columns: repeat(4, 1fr); }
+}
