@@ -1167,7 +1167,7 @@ function setupCheckinModal() {
         nameInput.placeholder = btn.dataset.mode === "legalName"
           ? "Enter your legal name…"
           : "Enter your nickname…";
-        if (isAnonymous) nameInput.value = "";
+        nameInput.value = "";
       }
     };
   });
