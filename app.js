@@ -176,6 +176,140 @@ function generateUUID() {
   });
 }
 
+const NIGHTLIFE_SCENES = ["club", "bar", "street", "stadium", "festival"];
+const SPONSORSHIPS = [
+  {
+    id: "red-bull-nightlife-scene",
+    type: "scene",
+    target: "nightlife",
+    brand: "Red Bull",
+    rewardMultiplier: 2,
+    bannerText: "Powered by Red Bull"
+  },
+  {
+    id: "visit-dubai-tourism-scene",
+    type: "scene",
+    target: "tourism",
+    brand: "Visit Dubai",
+    rewardMultiplier: 2,
+    bannerText: "Tourism Boost by Visit Dubai"
+  },
+  {
+    id: "citymapper-london-city",
+    type: "city",
+    target: "london-uk",
+    brand: "CityMapper",
+    rewardMultiplier: 2,
+    bannerText: "London Pulse powered by CityMapper"
+  },
+  {
+    id: "qatar-airways-london-sao-paulo-trip",
+    type: "trip",
+    target: "london-uk->sao-paulo-br",
+    brand: "Qatar Airways",
+    rewardMultiplier: 2,
+    bannerText: "Route powered by Qatar Airways"
+  },
+  {
+    id: "airbnb-tourism-checkin",
+    type: "checkin",
+    target: "tourism",
+    brand: "Airbnb",
+    rewardMultiplier: 2,
+    bannerText: "Check-ins boosted by Airbnb"
+  }
+];
+
+function getRouteId(fromCityId, toCityId) {
+  if (!fromCityId || !toCityId) return "";
+  return `${fromCityId}->${toCityId}`;
+}
+
+function matchesSponsorshipTarget(target, context = {}) {
+  const { cityId, scene, routeId, scenario, sceneCategory } = context;
+  if (!target) return false;
+  if (target === cityId) return true;
+  if (target === routeId) return true;
+  if (target === "nightlife") {
+    return NIGHTLIFE_SCENES.includes(scene) || scenario === "nightlife" || sceneCategory === "nightlife";
+  }
+  if (target === "tourism") {
+    const isTripWeekendContext = !scene && !sceneCategory && scenario === "weekend";
+    return scene === "tourism" || sceneCategory === "tourism" || isTripWeekendContext;
+  }
+  return false;
+}
+
+function getMatchingSponsorships(context = {}, allowedTypes = []) {
+  return SPONSORSHIPS.filter((s) => {
+    if (!s || !s.type || !s.target) return false;
+    if (allowedTypes.length && !allowedTypes.includes(s.type)) return false;
+    return matchesSponsorshipTarget(s.target, context);
+  });
+}
+
+function getBestSponsorship(sponsorships = []) {
+  if (!sponsorships.length) return null;
+  return sponsorships.reduce((best, current) =>
+    current.rewardMultiplier > best.rewardMultiplier ? current : best
+  );
+}
+
+function renderSponsorBanner(sponsor, extraClass = "") {
+  if (!sponsor) return "";
+  return `<div class="gt-sponsor-banner ${extraClass}">${escapeHtml(sponsor.bannerText)} · ${escapeHtml(
+    sponsor.brand
+  )} · ${sponsor.rewardMultiplier}x stars</div>`;
+}
+
+function getCitySponsor(city) {
+  const cityContext = { cityId: city.id };
+  const byCity = getMatchingSponsorships(cityContext, ["city"]);
+  if (byCity.length) return getBestSponsorship(byCity);
+
+  const nightlifeTagMatch = city.tags.some((tag) => ["nightlife", "club_scene", "street_culture"].includes(tag));
+  const tourismTagMatch = city.tags.some((tag) => ["tourism", "weekend_city"].includes(tag));
+  let sceneCategory = "";
+  if (nightlifeTagMatch) {
+    sceneCategory = "nightlife";
+  } else if (tourismTagMatch) {
+    sceneCategory = "tourism";
+  } else {
+    const cityScores = computeCityPulseScores(city.id);
+    sceneCategory = (cityScores?.nightlifeScore ?? 0) >= (cityScores?.tourismScore ?? 0) ? "nightlife" : "tourism";
+  }
+  const byScene = getMatchingSponsorships({ cityId: city.id, sceneCategory }, ["scene"]);
+  return getBestSponsorship(byScene);
+}
+
+function renderSponsorWall() {
+  const container = document.getElementById("sponsor-wall-list");
+  if (!container) return;
+  if (!SPONSORSHIPS.length) {
+    container.innerHTML = '<p class="gt-empty">No active sponsors yet.</p>';
+    return;
+  }
+  container.innerHTML = SPONSORSHIPS.map((sponsor) => `
+    <article class="gt-sponsor-card">
+      <div class="gt-sponsor-brand">${escapeHtml(sponsor.brand)}</div>
+      <div class="gt-sponsor-meta">${escapeHtml(sponsor.type)} · ${escapeHtml(sponsor.target)}</div>
+      <div class="gt-sponsor-copy">${escapeHtml(sponsor.bannerText)}</div>
+      <div class="gt-sponsor-reward">${sponsor.rewardMultiplier}x check-in stars</div>
+    </article>
+  `).join("");
+}
+
+function updateCheckinSponsorBanner() {
+  const container = document.getElementById("checkin-sponsor-banner");
+  if (!container) return;
+  const cityId = document.getElementById("checkin-city")?.value || "";
+  const scene = document.getElementById("checkin-scene")?.value || "";
+  const sponsor = getBestSponsorship(
+    getMatchingSponsorships({ cityId, scene }, ["scene", "city", "checkin"])
+  );
+  container.innerHTML = sponsor ? renderSponsorBanner(sponsor) : "";
+}
+
 function formatTimeAgo(timestamp) {
   const diff = Date.now() - timestamp;
   const minutes = Math.floor(diff / 60000);
@@ -433,12 +567,17 @@ function renderTripResult(result) {
 
   const verdictLabel = { go: "GO ✓", maybe: "MAYBE ~", wait: "WAIT ✗" };
   const verdictClass = { go: "gt-verdict-go", maybe: "gt-verdict-maybe", wait: "gt-verdict-wait" };
+  const routeId = getRouteId(result.fromCityId, result.toCityId);
+  const sponsor = getBestSponsorship(
+    getMatchingSponsorships({ routeId, scenario: result.scenario }, ["trip", "scene"])
+  );
 
   container.innerHTML = `
     <div class="gt-trip-output">
       <div class="gt-trip-score-big">${result.score}</div>
       <div class="gt-trip-verdict ${verdictClass[result.verdict]}">${verdictLabel[result.verdict]}</div>
       <p class="gt-trip-headline">${result.headline}</p>
+      ${renderSponsorBanner(sponsor)}
       <ul class="gt-trip-reasons">
         ${result.reasons.map((r) => `<li>${r}</li>`).join("")}
       </ul>
@@ -601,6 +740,8 @@ function renderCityCards() {
 
     const displayPulseScore = scores ? scores.overall : (liveData.pulse_score ?? view.overallPulseScore);
 
+    const citySponsor = getCitySponsor(city);
+
     const card = document.createElement("div");
     card.className = "gt-city-card";
     card.onclick = () => openCityDetail(city.name);
@@ -614,6 +755,7 @@ function renderCityCards() {
         <div class="gt-pulse-score">Pulse ${displayPulseScore}</div>
       </div>
       <p class="gt-narrative-headline">${narrative.headline}</p>
+      ${renderSponsorBanner(citySponsor)}
       <div class="gt-mood-tags">${displayTags}</div>
       <div class="gt-metrics-row">
         <div class="gt-metric">
@@ -653,6 +795,7 @@ function openCityDetail(cityName) {
   const state = cityEntry ? cityPulseState[cityEntry.id] : null;
   const scores = cityEntry ? computeCityPulseScores(cityEntry.id) : null;
   const narrative = cityEntry ? buildCityNarrative(cityEntry.id, scores) : null;
+  const citySponsor = cityEntry ? getCitySponsor(cityEntry) : null;
 
   const modal = document.getElementById("city-modal");
   const body = document.getElementById("city-modal-body");
@@ -664,6 +807,7 @@ function openCityDetail(cityName) {
 
   body.innerHTML = `
     <h2 class="gt-modal-body-title">${pulse.city}</h2>
+    ${renderSponsorBanner(citySponsor)}
     ${narrative ? `
       <p class="gt-modal-narrative-headline">${narrative.headline}</p>
       <p class="gt-modal-narrative-line">${narrative.line1}</p>
@@ -1172,7 +1316,14 @@ function submitHumanCheckin() {
   };
 
   // Compute stars before pushing (so "first today" check is accurate)
-  const earnedStars = computeCheckinStars(checkin);
+  const matchedSponsor = getBestSponsorship(
+    getMatchingSponsorships({ cityId: checkin.cityId, scene: checkin.scene }, ["scene", "city", "checkin"])
+  );
+  const baseStars = computeCheckinStars(checkin);
+  const sponsorMultiplier = matchedSponsor?.rewardMultiplier || 1;
+  const earnedStars = baseStars * sponsorMultiplier;
+  checkin.sponsorId = matchedSponsor?.id || null;
+  checkin.rewardMultiplier = sponsorMultiplier;
 
   HUMAN_CHECKINS.push(checkin);
 
@@ -1255,6 +1406,8 @@ function setupCheckinModal() {
 
   // Submit
   document.getElementById("checkin-submit").onclick = submitHumanCheckin;
+  document.getElementById("checkin-city").onchange = updateCheckinSponsorBanner;
+  document.getElementById("checkin-scene").onchange = updateCheckinSponsorBanner;
 }
 
 function updateIdentityFields(identityMode) {
@@ -1306,7 +1459,7 @@ function setupTripEvaluate() {
     }
 
     const result = computeTripPulse(fromId, toId, scenario);
-    if (result) renderTripResult(result);
+    if (result) renderTripResult({ ...result, fromCityId: fromId, toCityId: toId, scenario });
   };
 }
 
@@ -1615,6 +1768,7 @@ document.addEventListener("DOMContentLoaded", () => {
   seedCityPulses();
   seedLegacyCheckins();
   renderCityCards();
+  renderSponsorWall();
   populateTripSelects();
   populateCheckinCitySelect();
   setupInstallButton();
@@ -1625,6 +1779,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupModalClose();
   renderUserProfile();
   renderRevenuePool();
+  updateCheckinSponsorBanner();
   simulateLivePulses();
 });
 
