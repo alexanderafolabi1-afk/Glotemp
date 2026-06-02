@@ -86,14 +86,329 @@ const REVENUE_POOL = (() => {
   } catch (_) { return basePool; }
 })();
 
-// ─── CITY INDEX ───────────────────────────────────────────────────
+// ─── CITY INDEX — 52 Global Cities ───────────────────────────────
+// Each city carries: coordinates, tier, cultural tags, Unsplash image,
+// a one-line cultural signature used on the card visual.
 const CITY_INDEX = [
-  { id: "beijing-cn",    name: "Beijing",    country: "China",          lat: 39.9042,  lng: 116.4074, tier: "global_economic", tags: ["capital","political","economic"] },
-  { id: "frankfurt-de",  name: "Frankfurt",  country: "Germany",        lat: 50.1109,  lng: 8.6821,   tier: "finance_hub",     tags: ["finance","europe","weekend_city"] },
-  { id: "london-uk",     name: "London",     country: "United Kingdom", lat: 51.5074,  lng: -0.1278,  tier: "global_economic", tags: ["finance","nightlife","uni"] },
-  { id: "sao-paulo-br",  name: "São Paulo",  country: "Brazil",         lat: -23.5505, lng: -46.6333, tier: "mega_city",        tags: ["nightlife","street_culture"] },
-  { id: "sunderland-uk", name: "Sunderland", country: "United Kingdom", lat: 54.9069,  lng: -1.3838,  tier: "uni_club_city",   tags: ["uni","club_scene","football"] }
-];
+  // ── AFRICA ──────────────────────────────────────────────────────
+  {
+    id:"lagos-ng", name:"Lagos", country:"Nigeria", lat:6.5244, lng:3.3792,
+    tier:"mega_city", tags:["nightlife","street_culture","fashion","hustle"],
+    img:"https://images.unsplash.com/photo-1627894966671-2ca2a7ccae4a?w=800&q=75",
+    signature:"The city that never negotiates."
+  },
+  {
+    id:"cairo-eg", name:"Cairo", country:"Egypt", lat:30.0444, lng:31.2357,
+    tier:"global_economic", tags:["heritage","culture","tourism","street_life"],
+    img:"https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=800&q=75",
+    signature:"Five thousand years of civilisation, still breathing."
+  },
+  {
+    id:"nairobi-ke", name:"Nairobi", country:"Kenya", lat:-1.2921, lng:36.8219,
+    tier:"uni_club_city", tags:["tech","nightlife","startup","safari"],
+    img:"https://images.unsplash.com/photo-1611348586804-61bf6c080437?w=800&q=75",
+    signature:"Silicon Savannah — where code meets wilderness."
+  },
+  {
+    id:"johannesburg-za", name:"Johannesburg", country:"South Africa", lat:-26.2041, lng:28.0473,
+    tier:"finance_hub", tags:["finance","art","township","culture"],
+    img:"https://images.unsplash.com/photo-1577948000111-9c970dfe3743?w=800&q=75",
+    signature:"Jozi never sleeps, never settles."
+  },
+  {
+    id:"accra-gh", name:"Accra", country:"Ghana", lat:5.6037, lng:-0.1870,
+    tier:"uni_club_city", tags:["afrobeats","nightlife","youth","culture"],
+    img:"https://images.unsplash.com/photo-1614518921675-b83c80ded05a?w=800&q=75",
+    signature:"The gateway to West Africa's future."
+  },
+  {
+    id:"casablanca-ma", name:"Casablanca", country:"Morocco", lat:33.5731, lng:-7.5898,
+    tier:"finance_hub", tags:["finance","culture","nightlife","architecture"],
+    img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=75",
+    signature:"Elegance meets ambition on the Atlantic shore."
+  },
+  // ── EUROPE ──────────────────────────────────────────────────────
+  {
+    id:"london-uk", name:"London", country:"United Kingdom", lat:51.5074, lng:-0.1278,
+    tier:"global_economic", tags:["finance","nightlife","uni","fashion","theatre"],
+    img:"https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=75",
+    signature:"Every subculture on earth, within one square mile."
+  },
+  {
+    id:"paris-fr", name:"Paris", country:"France", lat:48.8566, lng:2.3522,
+    tier:"global_economic", tags:["fashion","art","romance","gastronomy"],
+    img:"https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=75",
+    signature:"The city that invented desire."
+  },
+  {
+    id:"berlin-de", name:"Berlin", country:"Germany", lat:52.5200, lng:13.4050,
+    tier:"uni_club_city", tags:["techno","art","nightlife","startup","history"],
+    img:"https://images.unsplash.com/photo-1560969184-10fe8719e047?w=800&q=75",
+    signature:"Where the underground outlasted the wall."
+  },
+  {
+    id:"amsterdam-nl", name:"Amsterdam", country:"Netherlands", lat:52.3676, lng:4.9041,
+    tier:"uni_club_city", tags:["nightlife","cycling","culture","canals"],
+    img:"https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=800&q=75",
+    signature:"Liberal, brilliant, and cycling through midnight."
+  },
+  {
+    id:"madrid-es", name:"Madrid", country:"Spain", lat:40.4168, lng:-3.7038,
+    tier:"mega_city", tags:["nightlife","football","art","tapas"],
+    img:"https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800&q=75",
+    signature:"Midnight is just the beginning here."
+  },
+  {
+    id:"milan-it", name:"Milan", country:"Italy", lat:45.4642, lng:9.1900,
+    tier:"finance_hub", tags:["fashion","finance","design","aperitivo"],
+    img:"https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?w=800&q=75",
+    signature:"Where luxury is a standard, not an aspiration."
+  },
+  {
+    id:"istanbul-tr", name:"Istanbul", country:"Turkey", lat:41.0082, lng:28.9784,
+    tier:"mega_city", tags:["culture","history","nightlife","bazaar","bridge"],
+    img:"https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&q=75",
+    signature:"The only city that sits on two continents."
+  },
+  {
+    id:"barcelona-es", name:"Barcelona", country:"Spain", lat:41.3851, lng:2.1734,
+    tier:"uni_club_city", tags:["architecture","nightlife","beach","design"],
+    img:"https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800&q=75",
+    signature:"Gaudí, Barça, and a beach that never closes."
+  },
+  {
+    id:"zurich-ch", name:"Zurich", country:"Switzerland", lat:47.3769, lng:8.5417,
+    tier:"finance_hub", tags:["finance","luxury","clean","banking"],
+    img:"https://images.unsplash.com/photo-1515488764276-beab7607c1e6?w=800&q=75",
+    signature:"The world's wealth, quietly managed."
+  },
+  {
+    id:"moscow-ru", name:"Moscow", country:"Russia", lat:55.7558, lng:37.6173,
+    tier:"global_economic", tags:["power","architecture","nightlife","culture"],
+    img:"https://images.unsplash.com/photo-1513326738677-b964603b136d?w=800&q=75",
+    signature:"Red squares, golden domes, and cold ambition."
+  },
+  {
+    id:"stockholm-se", name:"Stockholm", country:"Sweden", lat:59.3293, lng:18.0686,
+    tier:"uni_club_city", tags:["design","startup","nordic","sustainability"],
+    img:"https://images.unsplash.com/photo-1509356843151-3e7d96241e11?w=800&q=75",
+    signature:"Flat design wasn't just a trend — it's a lifestyle."
+  },
+  // ── MIDDLE EAST ─────────────────────────────────────────────────
+  {
+    id:"dubai-ae", name:"Dubai", country:"UAE", lat:25.2048, lng:55.2708,
+    tier:"mega_city", tags:["luxury","nightlife","tourism","architecture","gold"],
+    img:"https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=75",
+    signature:"The desert dared to dream in glass and gold."
+  },
+  {
+    id:"riyadh-sa", name:"Riyadh", country:"Saudi Arabia", lat:24.7136, lng:46.6753,
+    tier:"global_economic", tags:["capital","oil","transformation","vision2030"],
+    img:"https://images.unsplash.com/photo-1586724237569-f3d0c1dee8c6?w=800&q=75",
+    signature:"A kingdom in metamorphosis."
+  },
+  {
+    id:"tel-aviv-il", name:"Tel Aviv", country:"Israel", lat:32.0853, lng:34.7818,
+    tier:"uni_club_city", tags:["startup","beach","nightlife","tech"],
+    img:"https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?w=800&q=75",
+    signature:"Startup nation by day, Mediterranean by night."
+  },
+  // ── ASIA ─────────────────────────────────────────────────────────
+  {
+    id:"tokyo-jp", name:"Tokyo", country:"Japan", lat:35.6762, lng:139.6503,
+    tier:"mega_city", tags:["technology","fashion","nightlife","anime","precision"],
+    img:"https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=75",
+    signature:"Hyper-organised chaos dressed in neon."
+  },
+  {
+    id:"shanghai-cn", name:"Shanghai", country:"China", lat:31.2304, lng:121.4737,
+    tier:"global_economic", tags:["finance","fashion","skyline","luxury"],
+    img:"https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?w=800&q=75",
+    signature:"The Bund never blinks."
+  },
+  {
+    id:"beijing-cn", name:"Beijing", country:"China", lat:39.9042, lng:116.4074,
+    tier:"global_economic", tags:["capital","political","heritage","power"],
+    img:"https://images.unsplash.com/photo-1599571234909-29ed5d1321d6?w=800&q=75",
+    signature:"Five thousand years of empire, still in session."
+  },
+  {
+    id:"mumbai-in", name:"Mumbai", country:"India", lat:19.0760, lng:72.8777,
+    tier:"mega_city", tags:["bollywood","finance","street_food","hustle","sea"],
+    img:"https://images.unsplash.com/photo-1567157577867-05ccb1388e66?w=800&q=75",
+    signature:"Bollywood, Dalal Street, and the Arabian Sea."
+  },
+  {
+    id:"singapore-sg", name:"Singapore", country:"Singapore", lat:1.3521, lng:103.8198,
+    tier:"finance_hub", tags:["finance","food","clean","port","luxury"],
+    img:"https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=800&q=75",
+    signature:"The city-state that runs on excellence."
+  },
+  {
+    id:"seoul-kr", name:"Seoul", country:"South Korea", lat:37.5665, lng:126.9780,
+    tier:"mega_city", tags:["kpop","technology","beauty","food","nightlife"],
+    img:"https://images.unsplash.com/photo-1538485399081-7191377e8241?w=800&q=75",
+    signature:"K-culture exported to the entire planet."
+  },
+  {
+    id:"bangkok-th", name:"Bangkok", country:"Thailand", lat:13.7563, lng:100.5018,
+    tier:"mega_city", tags:["nightlife","street_food","tourism","temples","hustle"],
+    img:"https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=800&q=75",
+    signature:"Sacred temples beside neon-lit streets."
+  },
+  {
+    id:"hong-kong-hk", name:"Hong Kong", country:"China SAR", lat:22.3193, lng:114.1694,
+    tier:"finance_hub", tags:["finance","skyline","food","harbour","nightlife"],
+    img:"https://images.unsplash.com/photo-1536599018102-9f803c140fc1?w=800&q=75",
+    signature:"The most vertical city on earth."
+  },
+  {
+    id:"kuala-lumpur-my", name:"Kuala Lumpur", country:"Malaysia", lat:3.1390, lng:101.6869,
+    tier:"uni_club_city", tags:["architecture","food","nightlife","multicultural"],
+    img:"https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=800&q=75",
+    signature:"Petronas towers touching clouds above street food."
+  },
+  {
+    id:"jakarta-id", name:"Jakarta", country:"Indonesia", lat:-6.2088, lng:106.8456,
+    tier:"mega_city", tags:["hustle","street_culture","nightlife","traffic","growth"],
+    img:"https://images.unsplash.com/photo-1555899434-94d1368aa7af?w=800&q=75",
+    signature:"10 million stories in permanent motion."
+  },
+  {
+    id:"delhi-in", name:"New Delhi", country:"India", lat:28.6139, lng:77.2090,
+    tier:"global_economic", tags:["capital","heritage","chaos","colour","power"],
+    img:"https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&q=75",
+    signature:"Ancient power and new money in one breath."
+  },
+  {
+    id:"taipei-tw", name:"Taipei", country:"Taiwan", lat:25.0330, lng:121.5654,
+    tier:"uni_club_city", tags:["tech","nightmarket","food","design","nightlife"],
+    img:"https://images.unsplash.com/photo-1470004914212-05527e49370b?w=800&q=75",
+    signature:"Night markets and semiconductors."
+  },
+  // ── AMERICAS ─────────────────────────────────────────────────────
+  {
+    id:"new-york-us", name:"New York", country:"USA", lat:40.7128, lng:-74.0060,
+    tier:"global_economic", tags:["finance","fashion","nightlife","art","hustle"],
+    img:"https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=75",
+    signature:"If you can make it here, the world is yours."
+  },
+  {
+    id:"los-angeles-us", name:"Los Angeles", country:"USA", lat:34.0522, lng:-118.2437,
+    tier:"mega_city", tags:["entertainment","beach","nightlife","film","culture"],
+    img:"https://images.unsplash.com/photo-1534430480872-3498386e7856?w=800&q=75",
+    signature:"Where dreams are manufactured and sold globally."
+  },
+  {
+    id:"miami-us", name:"Miami", country:"USA", lat:25.7617, lng:-80.1918,
+    tier:"uni_club_city", tags:["beach","nightlife","art","latin","luxury"],
+    img:"https://images.unsplash.com/photo-1533106418989-88406c7cc8ca?w=800&q=75",
+    signature:"Art Deco, Cuban coffee, and bass at midnight."
+  },
+  {
+    id:"chicago-us", name:"Chicago", country:"USA", lat:41.8781, lng:-87.6298,
+    tier:"global_economic", tags:["architecture","jazz","finance","food","wind"],
+    img:"https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=75",
+    signature:"Architecture, jazz, and a city that works."
+  },
+  {
+    id:"toronto-ca", name:"Toronto", country:"Canada", lat:43.6510, lng:-79.3470,
+    tier:"global_economic", tags:["multicultural","finance","nightlife","sports"],
+    img:"https://images.unsplash.com/photo-1517090504586-fde19ea6066f?w=800&q=75",
+    signature:"The most multicultural city on the planet."
+  },
+  {
+    id:"mexico-city-mx", name:"Mexico City", country:"Mexico", lat:19.4326, lng:-99.1332,
+    tier:"mega_city", tags:["culture","food","art","nightlife","murals"],
+    img:"https://images.unsplash.com/photo-1585464231875-d9ef1f5ad396?w=800&q=75",
+    signature:"Murals on every wall, tacos on every corner."
+  },
+  {
+    id:"sao-paulo-br", name:"São Paulo", country:"Brazil", lat:-23.5505, lng:-46.6333,
+    tier:"mega_city", tags:["nightlife","street_culture","finance","graffiti"],
+    img:"https://images.unsplash.com/photo-1543059080-f9b1272213d5?w=800&q=75",
+    signature:"The concrete jungle that parties until sunrise."
+  },
+  {
+    id:"rio-br", name:"Rio de Janeiro", country:"Brazil", lat:-22.9068, lng:-43.1729,
+    tier:"mega_city", tags:["carnival","beach","football","samba","tourism"],
+    img:"https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800&q=75",
+    signature:"Christ the Redeemer watches over a city mid-samba."
+  },
+  {
+    id:"buenos-aires-ar", name:"Buenos Aires", country:"Argentina", lat:-34.6037, lng:-58.3816,
+    tier:"uni_club_city", tags:["tango","nightlife","culture","beef","passion"],
+    img:"https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=800&q=75",
+    signature:"Tango, steak, and bookshops open at midnight."
+  },
+  {
+    id:"bogota-co", name:"Bogotá", country:"Colombia", lat:4.7110, lng:-74.0721,
+    tier:"uni_club_city", tags:["culture","coffee","nightlife","altitude","art"],
+    img:"https://images.unsplash.com/photo-1599431953640-3af72a90f3a3?w=800&q=75",
+    signature:"High altitude, higher ambitions."
+  },
+  // ── OCEANIA ──────────────────────────────────────────────────────
+  {
+    id:"sydney-au", name:"Sydney", country:"Australia", lat:-33.8688, lng:151.2093,
+    tier:"global_economic", tags:["harbour","beach","nightlife","finance","lifestyle"],
+    img:"https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=800&q=75",
+    signature:"Opera House mornings, Bondi afternoons."
+  },
+  {
+    id:"melbourne-au", name:"Melbourne", country:"Australia", lat:-37.8136, lng:144.9631,
+    tier:"uni_club_city", tags:["coffee","culture","art","sport","laneways"],
+    img:"https://images.unsplash.com/photo-1514395462725-fb4566210144?w=800&q=75",
+    signature:"The world's most liveable city argues with itself about coffee."
+  },
+  // ── NORTH AFRICA / LEVANT ────────────────────────────────────────
+  {
+    id:"abuja-ng", name:"Abuja", country:"Nigeria", lat:9.0765, lng:7.3986,
+    tier:"finance_hub", tags:["capital","power","diplomacy","architecture"],
+    img:"https://images.unsplash.com/photo-1582234372722-50d7ccc30ebd?w=800&q=75",
+    signature:"Nigeria's seat of power, rising in stone and ambition."
+  },
+  {
+    id:"amsterdam-nl2", name:"Addis Ababa", country:"Ethiopia", lat:9.0320, lng:38.7469,
+    id:"addis-et", name:"Addis Ababa", country:"Ethiopia", lat:9.0320, lng:38.7469,
+    tier:"uni_club_city", tags:["diplomacy","coffee","culture","africa_union"],
+    img:"https://images.unsplash.com/photo-1572797786003-e6c7e0e0a5db?w=800&q=75",
+    signature:"The diplomatic heartbeat of the African continent."
+  },
+  {
+    id:"frankfurt-de", name:"Frankfurt", country:"Germany", lat:50.1109, lng:8.6821,
+    tier:"finance_hub", tags:["finance","banking","europe","skyline"],
+    img:"https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=800&q=75",
+    signature:"Europe's banking nerve centre, compact and formidable."
+  },
+  {
+    id:"cape-town-za", name:"Cape Town", country:"South Africa", lat:-33.9249, lng:18.4241,
+    tier:"uni_club_city", tags:["tourism","wine","beach","mountain","culture"],
+    img:"https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=800&q=75",
+    signature:"Table Mountain over two oceans."
+  },
+  {
+    id:"lisbon-pt", name:"Lisbon", country:"Portugal", lat:38.7169, lng:-9.1395,
+    tier:"uni_club_city", tags:["fado","sunset","culture","startup","nightlife"],
+    img:"https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=75",
+    signature:"Fado drifting from a hillside, tram passing below."
+  },
+  {
+    id:"sunderland-uk", name:"Sunderland", country:"United Kingdom", lat:54.9069, lng:-1.3838,
+    tier:"uni_club_city", tags:["uni","club_scene","football","grit"],
+    img:"https://images.unsplash.com/photo-1529655683826-aba9b3e77383?w=800&q=75",
+    signature:"Raw, real, and fiercely proud of both."
+  },
+  {
+    id:"toronto-ca2", name:"Nairobi", country:"Kenya",
+    id:"abidjan-ci", name:"Abidjan", country:"Côte d'Ivoire", lat:5.3599, lng:-4.0082,
+    tier:"mega_city", tags:["nightlife","afrobeats","finance","coast"],
+    img:"https://images.unsplash.com/photo-1614518921675-b83c80ded05a?w=800&q=75",
+    signature:"West Africa's economic engine on the Atlantic."
+  }
+].filter((city, index, self) =>
+  // Remove any accidentally duplicated ids
+  index === self.findIndex(c => c.id === city.id) && city.id && city.name && city.lat
+);
 
 const PULSE_DIMENSIONS = {
   mood:      ["calm","hopeful","excited","anxious","restless"],
@@ -1125,80 +1440,166 @@ function seedLegacyCheckins() {
 //  These replace the old render functions. Engine untouched above.
 // ═══════════════════════════════════════════════════════════════════
 
+// Active region filter state
+let _activeRegion = "All";
+
+function setupCityFilters() {
+  const bar = document.getElementById("city-filter-bar");
+  if (!bar) return;
+  const regions = ["All", ...new Set(CITY_INDEX.map(c => c.region).filter(Boolean))].sort((a,b) => a === "All" ? -1 : b === "All" ? 1 : a.localeCompare(b));
+  bar.innerHTML = regions.map(r => `
+    <button class="gt-filter-btn${r === _activeRegion ? " active" : ""}" data-region="${escapeHtml(r)}">
+      ${escapeHtml(r)}
+    </button>
+  `).join("");
+  bar.querySelectorAll(".gt-filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      _activeRegion = btn.dataset.region;
+      bar.querySelectorAll(".gt-filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderCityCards();
+    });
+  });
+}
+
 function renderCityCards() {
   const container = document.getElementById("city-cards");
   if (!container) return;
   container.innerHTML = "";
 
-  if (!CITY_INDEX.length) {
-    container.innerHTML = '<p class="gt-empty" style="padding:3rem;grid-column:1/-1;">No cities yet. Check in to start the pulse.</p>';
+  const visible = _activeRegion === "All"
+    ? CITY_INDEX
+    : CITY_INDEX.filter(c => c.region === _activeRegion);
+
+  if (!visible.length) {
+    container.innerHTML = '<p class="gt-empty" style="padding:3rem;grid-column:1/-1;">No cities in this region yet.</p>';
     return;
   }
 
-  CITY_INDEX.forEach((city) => {
-    const scores      = computeCityPulseScores(city.id);
-    const narrative   = buildCityNarrative(city.id, scores);
-    const heatScore   = cityHeat[city.name]?.heatScore || 0;
-    const weekAgo     = Date.now() - 7 * 86400000;
-    const recentCount = HUMAN_CHECKINS.filter(c => c.cityId === city.id && c.timestamp >= weekAgo).length;
-    const citySponsor = getCitySponsor(city);
+  visible.forEach((city) => {
+    const scores       = computeCityPulseScores(city.id);
+    const narrative    = buildCityNarrative(city.id, scores);
+    const heatScore    = cityHeat[city.name]?.heatScore || 0;
+    const weekAgo      = Date.now() - 7 * 86400000;
+    const recentCount  = HUMAN_CHECKINS.filter(c => c.cityId === city.id && c.timestamp >= weekAgo).length;
+    const citySponsor  = getCitySponsor(city);
     const displayScore = scores ? scores.overall : 0;
     const n = scores || { nightlifeScore:0, economicScore:0, studyScore:0, tourismScore:0 };
 
+    // Pulse tier label — replaces generic dot
+    const pulseTier = displayScore >= 75 ? "BLAZING" : displayScore >= 55 ? "LIVE" : displayScore >= 35 ? "STEADY" : "QUIET";
+    const accentColor = city.accent || "var(--gold)";
+
+    // Dominant dimension — what this city is best at right now
+    const dims = [
+      { k: "NL", v: n.nightlifeScore }, { k: "EC", v: n.economicScore },
+      { k: "ST", v: n.studyScore },     { k: "TR", v: n.tourismScore }
+    ].sort((a,b) => b.v - a.v);
+    const dominant = dims[0];
+
+    const sponsorHtml = citySponsor
+      ? `<div class="gt-card-sponsor-strip">★ ${escapeHtml(citySponsor.brand)} · ${citySponsor.rewardMultiplier}× Stars</div>`
+      : "";
+
     const card = document.createElement("article");
-    card.className = "gt-city-card";
+    card.className = "gt-city-card-v2";
     card.setAttribute("role", "listitem");
     card.setAttribute("tabindex", "0");
-    card.setAttribute("aria-label", `${city.name} city pulse`);
+    card.setAttribute("aria-label", `${city.name}, ${city.country} — pulse ${displayScore}`);
+    card.style.setProperty("--city-accent", accentColor);
     card.onclick = () => openCityDetail(city.name);
     card.onkeydown = e => { if (e.key === "Enter" || e.key === " ") openCityDetail(city.name); };
 
-    const tags = (narrative.tags || []).slice(0, 3).map(t => `<span class="gt-tag">${escapeHtml(t)}</span>`).join("");
-    const sponsorHtml = citySponsor ? `<div class="gt-sponsor-banner">★ ${escapeHtml(citySponsor.bannerText)} · ${citySponsor.rewardMultiplier}×</div>` : "";
-
     card.innerHTML = `
-      <div class="gt-city-card-header">
-        <div class="gt-city-name-block">
-          <div class="gt-city-name">${escapeHtml(city.name)}</div>
-          <div class="gt-city-country">${escapeHtml(city.country)}</div>
+      <!-- PHOTO HEADER -->
+      <div class="gt-card-photo" role="img" aria-label="${escapeHtml(city.name)} cityscape">
+        <img
+          src="${city.img || "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&q=75"}"
+          alt="${escapeHtml(city.name)}"
+          loading="lazy"
+          decoding="async"
+        >
+        <!-- Gradient overlay -->
+        <div class="gt-card-photo-overlay"></div>
+
+        <!-- PULSE SCORE — floats over photo -->
+        <div class="gt-card-score-badge">
+          <span class="gt-card-score-num">${displayScore}</span>
+          <span class="gt-card-score-tier">${pulseTier}</span>
         </div>
-        <div class="gt-pulse-score">${displayScore}</div>
+
+        <!-- REGION TAG — top left -->
+        <div class="gt-card-region-tag">${escapeHtml(city.region || "")}</div>
+
+        <!-- HEAT INDICATOR — diagonal slash accent instead of dot -->
+        ${heatScore > 40 ? `<div class="gt-card-heat-flag">🔥 ${Math.round(heatScore)}</div>` : ""}
       </div>
-      <p class="gt-narrative-headline">${escapeHtml(narrative.headline || "Reading the city…")}</p>
-      ${sponsorHtml}
-      <div class="gt-mood-tags">${tags}</div>
-      <div class="gt-dimension-bars">
-        <div class="gt-dim-bar">
-          <div class="gt-dim-bar-header"><span class="gt-dim-bar-label">Nightlife</span><span class="gt-dim-bar-val">${n.nightlifeScore}</span></div>
-          <div class="gt-dim-bar-track"><div class="gt-dim-bar-fill nightlife" style="width:${n.nightlifeScore}%"></div></div>
+
+      <!-- CARD BODY -->
+      <div class="gt-card-body">
+        <div class="gt-card-identity">
+          <div>
+            <div class="gt-card-city-name">${escapeHtml(city.name)}</div>
+            <div class="gt-card-city-country">${escapeHtml(city.country)}</div>
+          </div>
+          <!-- DOMINANT DIMENSION BADGE -->
+          <div class="gt-card-dominant" title="Strongest dimension right now">
+            <span class="gt-card-dominant-key">${dominant.k}</span>
+            <span class="gt-card-dominant-val">${dominant.v}</span>
+          </div>
         </div>
-        <div class="gt-dim-bar">
-          <div class="gt-dim-bar-header"><span class="gt-dim-bar-label">Economic</span><span class="gt-dim-bar-val">${n.economicScore}</span></div>
-          <div class="gt-dim-bar-track"><div class="gt-dim-bar-fill economic" style="width:${n.economicScore}%"></div></div>
+
+        <!-- CITY SIGNATURE LINE -->
+        <p class="gt-card-signature">"${escapeHtml(city.signature || narrative.headline || "")}"</p>
+
+        ${sponsorHtml}
+
+        <!-- DIMENSION BARS — compact horizontal -->
+        <div class="gt-card-dims">
+          <div class="gt-card-dim-row">
+            <span class="gt-card-dim-label">NL</span>
+            <div class="gt-card-dim-track"><div class="gt-card-dim-fill" style="width:${n.nightlifeScore}%;background:linear-gradient(90deg,#FF4D8C,#FF4D2E)"></div></div>
+            <span class="gt-card-dim-num">${n.nightlifeScore}</span>
+          </div>
+          <div class="gt-card-dim-row">
+            <span class="gt-card-dim-label">EC</span>
+            <div class="gt-card-dim-track"><div class="gt-card-dim-fill" style="width:${n.economicScore}%;background:linear-gradient(90deg,#E8B84B,#F5CC6A)"></div></div>
+            <span class="gt-card-dim-num">${n.economicScore}</span>
+          </div>
+          <div class="gt-card-dim-row">
+            <span class="gt-card-dim-label">ST</span>
+            <div class="gt-card-dim-track"><div class="gt-card-dim-fill" style="width:${n.studyScore}%;background:linear-gradient(90deg,#7C6FF7,#00D4FF)"></div></div>
+            <span class="gt-card-dim-num">${n.studyScore}</span>
+          </div>
+          <div class="gt-card-dim-row">
+            <span class="gt-card-dim-label">TR</span>
+            <div class="gt-card-dim-track"><div class="gt-card-dim-fill" style="width:${n.tourismScore}%;background:linear-gradient(90deg,#00E5A0,#00D4FF)"></div></div>
+            <span class="gt-card-dim-num">${n.tourismScore}</span>
+          </div>
         </div>
-        <div class="gt-dim-bar">
-          <div class="gt-dim-bar-header"><span class="gt-dim-bar-label">Study</span><span class="gt-dim-bar-val">${n.studyScore}</span></div>
-          <div class="gt-dim-bar-track"><div class="gt-dim-bar-fill study" style="width:${n.studyScore}%"></div></div>
+
+        <!-- FOOTER -->
+        <div class="gt-card-footer">
+          <span class="gt-card-activity">
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none" style="flex-shrink:0">
+              <circle cx="4" cy="4" r="3" fill="${accentColor}" opacity="0.8"/>
+            </svg>
+            ${recentCount} check-ins this week
+          </span>
+          <button class="gt-card-checkin-btn" onclick="event.stopPropagation();document.getElementById('checkin-btn').click();" aria-label="Check in to ${escapeHtml(city.name)}">
+            + Check In
+          </button>
         </div>
-        <div class="gt-dim-bar">
-          <div class="gt-dim-bar-header"><span class="gt-dim-bar-label">Tourism</span><span class="gt-dim-bar-val">${n.tourismScore}</span></div>
-          <div class="gt-dim-bar-track"><div class="gt-dim-bar-fill tourism" style="width:${n.tourismScore}%"></div></div>
-        </div>
-      </div>
-      <div class="gt-city-card-footer">
-        <span class="gt-live-activity-chip">
-          <span style="width:5px;height:5px;background:var(--green);border-radius:50%;display:inline-block;box-shadow:0 0 4px var(--green);"></span>
-          ${recentCount} this week
-        </span>
-        <span class="gt-heat-chip">🔥 ${heatScore}</span>
       </div>
     `;
     container.appendChild(card);
   });
 
-  // Update hero stat
+  // Update hero stats
   const heroEl = document.getElementById("hero-checkins-count");
   if (heroEl) heroEl.textContent = HUMAN_CHECKINS.filter(c => c.timestamp >= Date.now() - 86400000).length;
+  const heroCitiesEl = document.getElementById("hero-cities-count");
+  if (heroCitiesEl) heroCitiesEl.textContent = CITY_INDEX.length;
 }
 
 function updateGlobalScoreboard() {
@@ -1266,6 +1667,7 @@ function renderRevenuePool() {
 document.addEventListener("DOMContentLoaded", () => {
   seedCityPulses();
   seedLegacyCheckins();
+  setupCityFilters();
   renderCityCards();
   renderSponsorWall();
   populateTripSelects();
