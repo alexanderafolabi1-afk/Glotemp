@@ -185,6 +185,41 @@ function computeCityPulseScores(cityId) {
   };
 }
 
+function syncCityDerivedState(cityId) {
+  const state = cityPulseState[cityId];
+  const city = CITY_INDEX.find((c) => c.id === cityId);
+  if (!state || !city) return null;
+
+  const scores = computeCityPulseScores(cityId);
+  if (!scores) return null;
+
+  state.overallScore = scores.overall;
+  state.moodScore = scores.moodScore;
+  state.nightlifeScore = scores.nightlifeScore;
+  state.economicScore = scores.economicScore;
+  state.studyScore = scores.studyScore;
+  state.tourismScore = scores.tourismScore;
+  state.narrative = buildCityNarrative(cityId, scores);
+
+  const entry = latestPulseByCity[city.name];
+  if (entry) {
+    entry.pulse_score = scores.overall;
+    entry.tempo_score = Math.round(avg([state.nightlife.street_energy, state.economic.footfall]));
+    entry.romantic_index = Math.round(avg([state.tourism.photo_spots, state.mood.calm]));
+    entry.economic_vibe = scores.economicScore;
+    entry.cultural_heat = Math.round(scores.tourismScore / 20);
+    entry.tourism_influence = Math.round(scores.tourismScore / 10);
+    entry.nightlife_index = scores.nightlifeScore;
+    entry.uni_vibe = scores.studyScore;
+    entry.mood_distribution = Object.entries(state.mood).map(([label, value]) => ({
+      label: label.charAt(0).toUpperCase() + label.slice(1),
+      value
+    }));
+  }
+
+  return scores;
+}
+
 // ─── 2. NARRATIVE ENGINE ─────────────────────────────────────────────────────
 
 function buildCityNarrative(cityId, scores) {
@@ -436,6 +471,7 @@ function seedCityPulses() {
 
     pulses.push(entry);
     latestPulseByCity[city.name] = entry;
+    syncCityDerivedState(city.id);
   });
 }
 
@@ -559,7 +595,7 @@ function openCityDetail(cityName) {
   const body = document.getElementById("city-modal-body");
 
   const cityCheckins = HUMAN_CHECKINS
-    .filter((c) => c.cityId === (cityEntry && cityEntry.id))
+    .filter((c) => c.cityId === (cityEntry && cityEntry.id) && !c.legacy)
     .slice(-5)
     .reverse();
 
@@ -645,6 +681,7 @@ function recordVisit(city, coords) {
     state.tourism.weekend_attractiveness = clamp(state.tourism.weekend_attractiveness + boost, 0, 100);
     state.nightlife.street_energy       = clamp(state.nightlife.street_energy + boost, 0, 100);
     state.lastUpdated = Date.now();
+    syncCityDerivedState(cityEntry.id);
   }
 
   calculatePilgrimScore();
@@ -912,6 +949,14 @@ if ("serviceWorker" in navigator) {
 const MOOD_EMOJIS = { excited: "😄", calm: "😌", stressed: "😤", hopeful: "🌟", anxious: "😰" };
 const MOOD_TO_DIM  = { excited: "excited", calm: "calm", hopeful: "hopeful", stressed: "anxious", anxious: "anxious" };
 
+function normalizeIdentityMode(identityMode) {
+  return identityMode === "legal" ? "legalName" : identityMode;
+}
+
+function getCheckinNameOrNickname(checkin) {
+  return checkin.nameOrNickname ?? checkin.nicknameOrName ?? "";
+}
+
 function applyCheckinToCityState(checkin) {
   const state = cityPulseState[checkin.cityId];
   if (!state) return;
@@ -957,37 +1002,32 @@ function applyCheckinToCityState(checkin) {
   }
 
   state.lastUpdated = Date.now();
-
-  // Sync latestPulseByCity averages
-  const cityEntry = CITY_INDEX.find((c) => c.id === checkin.cityId);
-  if (cityEntry) {
-    const s = state;
-    const entry = latestPulseByCity[cityEntry.name];
-    if (entry) {
-      const nightlifeAvg = avg(Object.values(s.nightlife));
-      const economicAvg  = avg(Object.values(s.economic));
-      const tourismAvg   = avg(Object.values(s.tourism));
-      const moodAvg      = avg(Object.values(s.mood));
-      entry.pulse_score     = Math.round(avg([nightlifeAvg, economicAvg, tourismAvg, moodAvg]));
-      entry.nightlife_index = Math.round(nightlifeAvg);
-      entry.uni_vibe        = Math.round(avg(Object.values(s.study)));
-      entry.economic_vibe   = Math.round(economicAvg);
-    }
-  }
+  syncCityDerivedState(checkin.cityId);
 }
 
 function renderCheckinItem(checkin) {
   const timeAgo = formatTimeAgo(checkin.timestamp);
-  let identityLabel;
-  if (checkin.identityMode === "anonymous") {
-    identityLabel = "Anonymous";
-  } else {
-    identityLabel = escapeHtml(checkin.nicknameOrName) || (checkin.identityMode === "nickname" ? "Nickname" : "User");
-  }
+  const identityMode = normalizeIdentityMode(checkin.identityMode);
+  const nameOrNickname = escapeHtml(getCheckinNameOrNickname(checkin));
+  const identityLabel =
+    identityMode === "anonymous"
+      ? "Anonymous"
+      : identityMode === "nickname"
+        ? (nameOrNickname || "Nickname")
+        : "Legal name";
+  const identityModeLabel =
+    identityMode === "nickname"
+      ? "Nickname"
+      : identityMode === "legalName"
+        ? "Legal name"
+        : "Anonymous";
   const emoji = MOOD_EMOJIS[checkin.mood] || "";
   return `
     <div class="gt-checkin-item">
-      <div class="gt-checkin-identity">${identityLabel}</div>
+      <div class="gt-checkin-identity-row">
+        <div class="gt-checkin-identity">${identityLabel}</div>
+        <div class="gt-checkin-mode">${identityModeLabel}</div>
+      </div>
       <div class="gt-checkin-meta">
         <span class="gt-checkin-mood">${emoji} ${checkin.mood}</span>
         <span class="gt-checkin-scene">@ ${checkin.scene}</span>
@@ -1017,7 +1057,7 @@ function submitHumanCheckin() {
   const intensity   = parseInt(document.getElementById("checkin-intensity").value, 10);
   const scene       = document.getElementById("checkin-scene").value;
   const activeIdent = document.querySelector("#checkin-identity-picker .gt-identity-btn-active");
-  const identityMode = activeIdent ? activeIdent.dataset.mode : "anonymous";
+  const identityMode = normalizeIdentityMode(activeIdent ? activeIdent.dataset.mode : "anonymous");
   const nameInput   = document.getElementById("checkin-name").value.trim();
 
   const errEl = document.getElementById("checkin-error");
@@ -1028,7 +1068,7 @@ function submitHumanCheckin() {
   }
   errEl.classList.add("gt-hidden");
 
-  const nicknameOrName = identityMode === "anonymous" ? "" : nameInput;
+  const nameOrNickname = identityMode === "anonymous" ? "" : nameInput;
 
   const checkin = {
     id:             generateUUID(),
@@ -1037,7 +1077,7 @@ function submitHumanCheckin() {
     intensity,
     scene,
     identityMode,
-    nicknameOrName,
+    nameOrNickname,
     timestamp:      Date.now()
   };
 
@@ -1054,7 +1094,7 @@ function submitHumanCheckin() {
   }
   if (identityMode === "nickname" && nameInput) {
     USER_PROFILE.nickname = nameInput;
-  } else if (identityMode === "legal" && nameInput) {
+  } else if (identityMode === "legalName" && nameInput) {
     USER_PROFILE.legalName = nameInput;
   }
   saveUserProfile();
@@ -1062,9 +1102,6 @@ function submitHumanCheckin() {
 
   // Update cityPulseState
   applyCheckinToCityState(checkin);
-
-  // Recompute city pulse & narrative by refreshing cards + scoreboard
-  renderCityCards();
 
   // Update golden path — recordVisit only if this is the first check-in for this city
   const cityEntry = CITY_INDEX.find((c) => c.id === cityId);
@@ -1077,6 +1114,8 @@ function submitHumanCheckin() {
     calculateCityGoldenHeat(cityEntry.name);
     drawGoldenPath();
   }
+
+  renderCityCards();
 
   closeCheckinModal();
 }
@@ -1117,7 +1156,18 @@ function setupCheckinModal() {
       document.querySelectorAll("#checkin-identity-picker .gt-identity-btn").forEach((b) => b.classList.remove("gt-identity-btn-active"));
       btn.classList.add("gt-identity-btn-active");
       const nameField = document.getElementById("checkin-name-field");
+      const nameLabel = document.getElementById("checkin-name-label");
+      const nameInput = document.getElementById("checkin-name");
       nameField.classList.toggle("gt-hidden", btn.dataset.mode === "anonymous");
+      if (nameLabel) {
+        nameLabel.textContent = btn.dataset.mode === "legalName" ? "Legal name" : "Nickname";
+      }
+      if (nameInput) {
+        nameInput.placeholder = btn.dataset.mode === "legalName"
+          ? "Enter your legal name…"
+          : "Enter your nickname…";
+        nameInput.value = "";
+      }
     };
   });
 
@@ -1329,7 +1379,7 @@ function seedLegacyCheckins() {
           intensity,
           scene,
           identityMode:   "anonymous",
-          nicknameOrName: "",
+          nameOrNickname: "",
           timestamp,
           legacy:         true
         });
@@ -1381,20 +1431,7 @@ function seedLegacyCheckins() {
     state.mood.anxious  = clamp(state.mood.anxious  + moodPts(get(mc, "stressed") + get(mc, "anxious")),    0, 100);
     state.mood.restless = clamp(state.mood.restless + moodPts(get(mc, "anxious")),                          0, 100);
     state.lastUpdated   = Date.now();
-
-    // Sync latestPulseByCity averages
-    const s     = state;
-    const entry = latestPulseByCity[city.name];
-    if (entry) {
-      const nightlifeAvg = avg(Object.values(s.nightlife));
-      const economicAvg  = avg(Object.values(s.economic));
-      const tourismAvg   = avg(Object.values(s.tourism));
-      const moodAvg      = avg(Object.values(s.mood));
-      entry.pulse_score     = Math.round(avg([nightlifeAvg, economicAvg, tourismAvg, moodAvg]));
-      entry.nightlife_index = Math.round(nightlifeAvg);
-      entry.uni_vibe        = Math.round(avg(Object.values(s.study)));
-      entry.economic_vibe   = Math.round(economicAvg);
-    }
+    syncCityDerivedState(city.id);
   });
 
   // Bootstrap heat scores so the global scoreboard is populated on first load
