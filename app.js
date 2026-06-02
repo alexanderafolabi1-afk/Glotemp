@@ -11,9 +11,11 @@ const DEFAULT_LEAGUE_ID = '4328';
 const MAX_NEWS_HEADLINES = 3;
 const MAX_SPORTS_RESULTS = 3;
 const MAX_EVENTS_RESULTS = 3;
+const DEFAULT_INFLUENCE_SCORE = 3;
 const SENTIMENT_PLACEHOLDER = 'pending';
 const NEWS_PULSE_TEXT = `News pulse: ${MAX_NEWS_HEADLINES} headlines loaded`;
 const DEFAULT_SPORTS_MOOD = 'neutral';
+const DEFAULT_MOOD_TAG_LABEL = 'Mood pending';
 const SPORTS_PULSE_CLASS_NAME = 'sports-pulse';
 const EVENTS_PULSE_CLASS_NAME = 'events-pulse';
 const SPORTS_PULSE_LABEL = 'Sports pulse';
@@ -486,6 +488,7 @@ async function handleCheckinSubmit(event) {
     allData.claude_synthesis = synthesizedMood;
     const pulseObject = buildPulseObject(allData);
     console.log('Final pulse object:', pulseObject);
+    updateCityCard(pulseObject);
   } catch (error) {
     console.error('Mood synthesis failed:', error);
   }
@@ -523,40 +526,85 @@ function appendScoreIfDefined(card, label, value) {
   }
 }
 
-function createCityCard({
-  city,
-  moodLabel,
-  tempoLabel,
-  tags,
-  temperature,
-  weatherCode,
-  newsPulseText,
-  sportsPulseText,
-  upcomingEvents,
-  tourismScore,
-  nightlifeScore,
-  safetyScore
-}) {
+function formatMetricValue(value) {
+  if (value === null || value === undefined || value === '') return '—';
+  return value;
+}
+
+function createCityCard(city) {
   const card = document.createElement('article');
   card.className = 'city-card';
+  card.dataset.city = city.trim().toLowerCase();
 
-  const title = document.createElement('h3');
-  title.textContent = city;
-
-  card.appendChild(title);
-  card.appendChild(createMetaParagraph('Mood', moodLabel));
-  card.appendChild(createMetaParagraph('Tempo', tempoLabel));
-  card.appendChild(createMetaParagraph('Tags', tags.join(', ')));
-  card.appendChild(createMetaParagraph('Temperature', `${temperature}°C`));
-  card.appendChild(createMetaParagraph('Weather', getWeatherLabel(weatherCode)));
-  card.appendChild(createPulseIndicator('news-pulse', newsPulseText));
-  card.appendChild(createPulseIndicator(SPORTS_PULSE_CLASS_NAME, `${SPORTS_PULSE_LABEL}: ${sportsPulseText}`));
-  card.appendChild(createPulseIndicator(EVENTS_PULSE_CLASS_NAME, `${EVENTS_UPCOMING_LABEL}: ${upcomingEvents} upcoming`));
-  appendScoreIfDefined(card, 'Tourism score', tourismScore);
-  appendScoreIfDefined(card, 'Nightlife', nightlifeScore);
-  appendScoreIfDefined(card, 'Safety', safetyScore);
+  card.innerHTML = `
+    <h3 class="city-name"></h3>
+    <p class="pulse-score"></p>
+    <p class="summary-text"></p>
+    <div class="mood-tags"></div>
+    <p class="tempo"></p>
+    <p class="romance"></p>
+    <p class="economic"></p>
+    <p class="cultural"></p>
+    <p class="weather"></p>
+    <p class="news"></p>
+    <p class="sports"></p>
+    <p class="tourism"></p>
+  `;
 
   return card;
+}
+
+function updateCityCard(pulse) {
+  if (!pulse?.city) return;
+  const cityCards = document.getElementById('city-cards');
+  if (!cityCards) return;
+
+  const cityKey = pulse.city.trim().toLowerCase();
+  let card = [...cityCards.querySelectorAll('.city-card')].find((item) => item.dataset.city === cityKey);
+
+  if (!card) {
+    card = createCityCard(pulse.city);
+    cityCards.appendChild(card);
+  }
+
+  card.dataset.city = cityKey;
+
+  const cityName = card.querySelector('.city-name');
+  const pulseScore = card.querySelector('.pulse-score');
+  const summaryText = card.querySelector('.summary-text');
+  const moodTags = card.querySelector('.mood-tags');
+  const tempo = card.querySelector('.tempo');
+  const romance = card.querySelector('.romance');
+  const economic = card.querySelector('.economic');
+  const cultural = card.querySelector('.cultural');
+  const weather = card.querySelector('.weather');
+  const news = card.querySelector('.news');
+  const sports = card.querySelector('.sports');
+  const tourism = card.querySelector('.tourism');
+
+  if (cityName) cityName.textContent = pulse.city;
+  if (pulseScore) pulseScore.textContent = `Pulse score: ${formatMetricValue(pulse.pulse_score)}`;
+  if (summaryText) summaryText.textContent = pulse.summary_text || 'City pulse summary is updating.';
+
+  if (moodTags) {
+    moodTags.replaceChildren();
+    const entries = Object.entries(pulse.mood_distribution || {}).filter(([_mood, value]) => value !== null && value !== undefined);
+    const labels = entries.length ? entries : [[DEFAULT_MOOD_TAG_LABEL, '']];
+    labels.forEach(([mood, value]) => {
+      const tag = document.createElement('span');
+      tag.textContent = value === '' ? mood : `${mood} ${value}%`;
+      moodTags.appendChild(tag);
+    });
+  }
+
+  if (tempo) tempo.textContent = `Tempo score: ${formatMetricValue(pulse.tempo_score)}`;
+  if (romance) romance.textContent = `Romantic index: ${formatMetricValue(pulse.romantic_index)}`;
+  if (economic) economic.textContent = `Economic vibe: ${formatMetricValue(pulse.economic_vibe)}`;
+  if (cultural) cultural.textContent = `Cultural heat: ${formatMetricValue(pulse.cultural_heat)}`;
+  if (weather) weather.textContent = `Weather influence: ${formatMetricValue(pulse.weather_influence)}`;
+  if (news) news.textContent = `News influence: ${formatMetricValue(pulse.news_influence)}`;
+  if (sports) sports.textContent = `Sports influence: ${formatMetricValue(pulse.sports_influence)}`;
+  if (tourism) tourism.textContent = `Tourism influence: ${formatMetricValue(pulse.tourism_influence)}`;
 }
 
 function renderCityCards() {
@@ -564,14 +612,66 @@ function renderCityCards() {
   if (!cityCards) return;
 
   const placeholderCards = [
-    { city: 'Lagos', temperature: 30, weatherCode: 1, moodLabel: 'Hopeful', tempoLabel: 'Buzzing', tags: ['work rush', 'warm evening', 'street energy'], newsPulseText: NEWS_PULSE_TEXT, sportsPulseText: DEFAULT_SPORTS_MOOD, upcomingEvents: 3, tourismScore: 5.5, nightlifeScore: 6.2, safetyScore: 4.1 },
-    { city: 'London', temperature: 12, weatherCode: 61, moodLabel: 'Calm', tempoLabel: 'Chill', tags: ['light rain', 'after work', 'coffee'], newsPulseText: NEWS_PULSE_TEXT, sportsPulseText: DEFAULT_SPORTS_MOOD, upcomingEvents: 3, tourismScore: 8.3, nightlifeScore: 7.9, safetyScore: 7.0 },
-    { city: 'Tokyo', temperature: 19, weatherCode: 3, moodLabel: 'Anxious', tempoLabel: 'Tense', tags: ['commute', 'late night', 'neon'], newsPulseText: NEWS_PULSE_TEXT, sportsPulseText: DEFAULT_SPORTS_MOOD, upcomingEvents: 3, tourismScore: 8.7, nightlifeScore: 7.5, safetyScore: 8.8 },
-    { city: 'São Paulo', temperature: 24, weatherCode: 0, moodLabel: 'Excited', tempoLabel: 'Chaotic', tags: ['traffic', 'music', 'social pulse'], newsPulseText: NEWS_PULSE_TEXT, sportsPulseText: DEFAULT_SPORTS_MOOD, upcomingEvents: 3, tourismScore: 6.4, nightlifeScore: 8.1, safetyScore: 4.5 }
+    {
+      city: 'Lagos',
+      pulse_score: 73,
+      summary_text: 'Street energy is high with warm-weather optimism and strong social momentum.',
+      mood_distribution: { Hopeful: 42, Excited: 33, Calm: 25 },
+      tempo_score: 73,
+      romantic_index: 57,
+      economic_vibe: 68,
+      cultural_heat: DEFAULT_INFLUENCE_SCORE,
+      weather_influence: 30,
+      news_influence: DEFAULT_INFLUENCE_SCORE,
+      sports_influence: DEFAULT_INFLUENCE_SCORE,
+      tourism_influence: 5.5
+    },
+    {
+      city: 'London',
+      pulse_score: 58,
+      summary_text: 'A steady, rain-softened rhythm keeps the city balanced and focused.',
+      mood_distribution: { Calm: 45, Hopeful: 30, Anxious: 25 },
+      tempo_score: 58,
+      romantic_index: 49,
+      economic_vibe: 61,
+      cultural_heat: DEFAULT_INFLUENCE_SCORE,
+      weather_influence: 12,
+      news_influence: DEFAULT_INFLUENCE_SCORE,
+      sports_influence: DEFAULT_INFLUENCE_SCORE,
+      tourism_influence: 8.3
+    },
+    {
+      city: 'Tokyo',
+      pulse_score: 66,
+      summary_text: 'Neon-night momentum and dense movement keep the city alert and active.',
+      mood_distribution: { Anxious: 38, Excited: 34, Calm: 28 },
+      tempo_score: 66,
+      romantic_index: 52,
+      economic_vibe: 64,
+      cultural_heat: DEFAULT_INFLUENCE_SCORE,
+      weather_influence: 19,
+      news_influence: DEFAULT_INFLUENCE_SCORE,
+      sports_influence: DEFAULT_INFLUENCE_SCORE,
+      tourism_influence: 8.7
+    },
+    {
+      city: 'São Paulo',
+      pulse_score: 70,
+      summary_text: 'Music-driven intensity and social motion make for a vivid city pulse.',
+      mood_distribution: { Excited: 41, Hopeful: 32, Stressed: 27 },
+      tempo_score: 70,
+      romantic_index: 60,
+      economic_vibe: 59,
+      cultural_heat: DEFAULT_INFLUENCE_SCORE,
+      weather_influence: 24,
+      news_influence: DEFAULT_INFLUENCE_SCORE,
+      sports_influence: DEFAULT_INFLUENCE_SCORE,
+      tourism_influence: 6.4
+    }
   ];
 
-  const cardElements = placeholderCards.map(createCityCard);
-  cityCards.replaceChildren(...cardElements);
+  cityCards.replaceChildren();
+  placeholderCards.forEach((pulse) => updateCityCard(pulse));
 }
 
 function init() {

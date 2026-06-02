@@ -199,6 +199,53 @@ header .btn {
   margin-top: 2.5rem;
 }
 
+#city-cards .city-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+#city-cards .city-name {
+  margin-bottom: 0.2rem;
+}
+
+#city-cards .summary-text {
+  opacity: 0.82;
+  font-size: 0.93rem;
+}
+
+#city-cards .mood-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.2rem 0;
+}
+
+#city-cards .mood-tags span {
+  border: 1px solid rgba(77, 242, 255, 0.35);
+  border-radius: 9999px;
+  padding: 0.1rem 0.45rem;
+  font-size: 0.72rem;
+  color: var(--accent-cyan);
+}
+
+#city-cards .pulse-score,
+#city-cards .tempo,
+#city-cards .romance,
+#city-cards .economic {
+  color: var(--accent-yellow);
+  text-shadow: 0 0 10px rgba(248, 255, 106, 0.2);
+}
+
+#city-cards .cultural,
+#city-cards .weather,
+#city-cards .news,
+#city-cards .sports,
+#city-cards .tourism {
+  color: var(--accent-cyan);
+  opacity: 0.92;
+}
+
 /* 10. Card placeholders
    ---------------------------------------------------------- */
 .card,
