@@ -383,6 +383,8 @@ const selectionState = {
   context: ''
 };
 
+const cityHeat = {};
+
 const goldenPath = {
   visitedCities: [],
   visitedCoords: [],
@@ -391,6 +393,7 @@ const goldenPath = {
   pilgrimScore: 0
 };
 
+let latestPulseScore = 0;
 let goldenMapSvg = null;
 let goldenMapLineLayer = null;
 let goldenMapDotLayer = null;
@@ -470,6 +473,34 @@ function showGoldenMap() {
 function calculatePilgrimScore() {
   goldenPath.pilgrimScore = Math.min(MAX_PILGRIM_SCORE, goldenPath.visitedCities.length * PILGRIM_SCORE_PER_CITY);
   console.log('Pilgrim Score:', goldenPath.pilgrimScore);
+}
+
+function calculateCityGoldenHeat(city) {
+  if (!cityHeat[city]) {
+    cityHeat[city] = {
+      intersections: 0,
+      dropsClaimed: 0,
+      explorerVisits: 0,
+      pulseHistory: []
+    };
+  }
+
+  cityHeat[city].explorerVisits += 1;
+  cityHeat[city].intersections = goldenPath.visitedCities.filter((visitedCity) => visitedCity === city).length;
+  cityHeat[city].pulseHistory.push(latestPulseScore);
+
+  const averagePulseScore = cityHeat[city].pulseHistory.length
+    ? cityHeat[city].pulseHistory.reduce((sum, score) => sum + score, 0) / cityHeat[city].pulseHistory.length
+    : 0;
+  const heatScore = (
+    cityHeat[city].intersections * 2
+    + cityHeat[city].dropsClaimed * 5
+    + cityHeat[city].explorerVisits
+    + averagePulseScore
+  );
+
+  cityHeat[city].heatScore = heatScore;
+  return heatScore;
 }
 
 function toRadians(value) {
@@ -724,7 +755,11 @@ async function handleCheckinSubmit(event) {
     console.log('Synthesized mood:', synthesizedMood);
     allData.claude_synthesis = synthesizedMood;
     const pulseObject = buildPulseObject(allData);
+    latestPulseScore = Number.isFinite(pulseObject?.pulse_score) ? pulseObject.pulse_score : 0;
     generateGoldenDrops(pulseObject, weatherResult?.coords);
+    const cityHeatScore = calculateCityGoldenHeat(pulseObject.city);
+    console.log(`City Heat updated for ${pulseObject.city}`);
+    console.log('City Heat score:', cityHeatScore);
     if (goldenPath.unlocked && checkDropEligibility(weatherResult?.coords)) {
       console.log('Golden Drop nearby');
     }
