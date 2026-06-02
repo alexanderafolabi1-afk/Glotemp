@@ -179,7 +179,7 @@ function generateUUID() {
 const NIGHTLIFE_SCENES = ["club", "bar", "street", "stadium", "festival"];
 const SPONSORSHIPS = [
   {
-    id: generateUUID(),
+    id: "red-bull-nightlife-scene",
     type: "scene",
     target: "nightlife",
     brand: "Red Bull",
@@ -187,7 +187,7 @@ const SPONSORSHIPS = [
     bannerText: "Powered by Red Bull"
   },
   {
-    id: generateUUID(),
+    id: "visit-dubai-tourism-scene",
     type: "scene",
     target: "tourism",
     brand: "Visit Dubai",
@@ -195,7 +195,7 @@ const SPONSORSHIPS = [
     bannerText: "Tourism Boost by Visit Dubai"
   },
   {
-    id: generateUUID(),
+    id: "citymapper-london-city",
     type: "city",
     target: "london-uk",
     brand: "CityMapper",
@@ -203,12 +203,20 @@ const SPONSORSHIPS = [
     bannerText: "London Pulse powered by CityMapper"
   },
   {
-    id: generateUUID(),
+    id: "qatar-airways-london-sao-paulo-trip",
     type: "trip",
     target: "london-uk->sao-paulo-br",
     brand: "Qatar Airways",
     rewardMultiplier: 2,
     bannerText: "Route powered by Qatar Airways"
+  },
+  {
+    id: "airbnb-tourism-checkin",
+    type: "checkin",
+    target: "tourism",
+    brand: "Airbnb",
+    rewardMultiplier: 2,
+    bannerText: "Check-ins boosted by Airbnb"
   }
 ];
 
@@ -218,12 +226,17 @@ function getRouteId(fromCityId, toCityId) {
 }
 
 function matchesSponsorshipTarget(target, context = {}) {
-  const { cityId, scene, routeId, scenario } = context;
+  const { cityId, scene, routeId, scenario, sceneCategory } = context;
   if (!target) return false;
   if (target === cityId) return true;
   if (target === routeId) return true;
-  if (target === "nightlife") return NIGHTLIFE_SCENES.includes(scene) || scenario === "nightlife";
-  if (target === "tourism") return scene === "tourism" || scenario === "weekend";
+  if (target === "nightlife") {
+    return NIGHTLIFE_SCENES.includes(scene) || scenario === "nightlife" || sceneCategory === "nightlife";
+  }
+  if (target === "tourism") {
+    const isTripWeekendContext = !scene && !sceneCategory && scenario === "weekend";
+    return scene === "tourism" || sceneCategory === "tourism" || isTripWeekendContext;
+  }
   return false;
 }
 
@@ -254,13 +267,18 @@ function getCitySponsor(city) {
   const byCity = getMatchingSponsorships(cityContext, ["city"]);
   if (byCity.length) return getBestSponsorship(byCity);
 
-  const nightlifeScore = computeCityPulseScores(city.id)?.nightlifeScore ?? 0;
-  const tourismScore = computeCityPulseScores(city.id)?.tourismScore ?? 0;
-  const scene =
-    nightlifeScore >= tourismScore
-      ? NIGHTLIFE_SCENES[0]
-      : "tourism";
-  const byScene = getMatchingSponsorships({ cityId: city.id, scene }, ["scene"]);
+  const nightlifeTagMatch = city.tags.some((tag) => ["nightlife", "club_scene", "street_culture"].includes(tag));
+  const tourismTagMatch = city.tags.some((tag) => ["tourism", "weekend_city"].includes(tag));
+  let sceneCategory = "";
+  if (nightlifeTagMatch) {
+    sceneCategory = "nightlife";
+  } else if (tourismTagMatch) {
+    sceneCategory = "tourism";
+  } else {
+    const cityScores = computeCityPulseScores(city.id);
+    sceneCategory = (cityScores?.nightlifeScore ?? 0) >= (cityScores?.tourismScore ?? 0) ? "nightlife" : "tourism";
+  }
+  const byScene = getMatchingSponsorships({ cityId: city.id, sceneCategory }, ["scene"]);
   return getBestSponsorship(byScene);
 }
 
@@ -1302,11 +1320,10 @@ function submitHumanCheckin() {
     getMatchingSponsorships({ cityId: checkin.cityId, scene: checkin.scene }, ["scene", "city", "checkin"])
   );
   const baseStars = computeCheckinStars(checkin);
-  const earnedStars = Math.max(1, Math.round(baseStars * (matchedSponsor?.rewardMultiplier || 1)));
+  const sponsorMultiplier = matchedSponsor?.rewardMultiplier || 1;
+  const earnedStars = baseStars * sponsorMultiplier;
   checkin.sponsorId = matchedSponsor?.id || null;
-  checkin.sponsorBrand = matchedSponsor?.brand || null;
-  checkin.sponsorBannerText = matchedSponsor?.bannerText || null;
-  checkin.rewardMultiplier = matchedSponsor?.rewardMultiplier || 1;
+  checkin.rewardMultiplier = sponsorMultiplier;
 
   HUMAN_CHECKINS.push(checkin);
 
