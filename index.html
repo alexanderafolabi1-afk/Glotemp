@@ -1,179 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#FFD700" />
-    <title>Glotemp | Global Mood and Tempo Map</title>
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <button id="golden-drop-icon" type="button" aria-label="Golden drop notifications" hidden>✦</button>
-    <div id="golden-drop-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="golden-drop-title" hidden>
-      <div class="modal-panel">
-        <h2 id="golden-drop-title">Golden Drop Nearby</h2>
-        <p id="golden-drop-type">Drop type: --</p>
-        <p id="golden-drop-city">City: --</p>
-        <p id="golden-drop-time">Timestamp: --</p>
-        <div class="modal-actions">
-          <button id="claim-drop-btn" type="button" class="btn btn-primary">Claim Drop</button>
-          <button id="close-drop-btn" type="button" class="btn btn-secondary">Close</button>
+<head>
+  <meta charset="UTF-8" />
+  <title>Glotemp – The World’s Pulse</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#000000" />
+</head>
+<body>
+  <header class="gt-header">
+    <div class="gt-logo">Glotemp</div>
+    <div class="gt-tagline">The world’s mood, in motion.</div>
+  </header>
+
+  <main class="gt-main">
+    <section class="gt-hero">
+      <div class="gt-hero-left">
+        <h1>See the world’s pulse in real time.</h1>
+        <p class="gt-hero-text">
+          Live mood, tempo, and cultural heat across cities. Your journey becomes a golden path across the map.
+        </p>
+        <div class="gt-hero-actions">
+          <button id="checkin-btn" class="gt-btn gt-btn-primary">Check in your mood</button>
+          <button id="explore-btn" class="gt-btn gt-btn-outline">Explore live cities</button>
         </div>
       </div>
-    </div>
+      <div class="gt-hero-right">
+        <div class="gt-hero-orbit">
+          <div class="gt-orbit-ring"></div>
+          <div class="gt-orbit-ring gt-orbit-ring-2"></div>
+          <div class="gt-orbit-core"></div>
+          <div class="gt-orbit-pulse"></div>
+        </div>
+        <p class="gt-hero-caption">Global pulse updating as people move, feel, and check in.</p>
+      </div>
+    </section>
 
-    <div id="city-detail-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="city-detail-title" hidden>
-      <div class="modal-panel">
-        <h2 id="city-detail-title">City Detail</h2>
-        <div id="city-detail-content"></div>
-        <div class="modal-actions">
-          <button id="close-city-detail-btn" type="button" class="btn btn-secondary">Close</button>
+    <section class="gt-section">
+      <h2 class="gt-section-title">Right now</h2>
+      <p class="gt-section-subtitle">Live mood and tempo across cities.</p>
+      <div id="city-cards" class="gt-city-grid">
+        <!-- City cards populated by app.js -->
+      </div>
+    </section>
+
+    <section id="explorer-mode" class="gt-section gt-section-hidden">
+      <h2 class="gt-section-title">Explorer Mode</h2>
+      <p class="gt-section-subtitle">Your Golden Path, your constellation.</p>
+      <div class="gt-explorer-layout">
+        <div class="gt-explorer-left">
+          <div class="gt-pilgrim-card">
+            <div class="gt-pilgrim-ring">
+              <div class="gt-pilgrim-ring-inner"></div>
+              <span id="pilgrim-score-display" class="gt-pilgrim-score">0%</span>
+            </div>
+            <p class="gt-pilgrim-label">World illuminated</p>
+          </div>
+          <div class="gt-visited">
+            <h3>Visited cities</h3>
+            <div id="visited-cities-list" class="gt-visited-list"></div>
+          </div>
+        </div>
+        <div class="gt-explorer-right">
+          <h3>Your Golden Path</h3>
+          <div id="golden-map" class="gt-golden-map"></div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div id="app">
-      <div id="install-banner" class="install-banner">
-        <p>Install Glotemp for a better experience.</p>
-        <button id="install-btn" type="button" class="btn btn-primary">Install App</button>
+    <section class="gt-section">
+      <h2 class="gt-section-title">Global scoreboard</h2>
+      <p class="gt-section-subtitle">Top city heat signatures right now.</p>
+      <div id="global-scoreboard" class="gt-scoreboard">
+        <p class="gt-empty">No heat data yet. Check in to start the pulse.</p>
       </div>
-      <header>
-        <section aria-labelledby="hero-title">
-          <div>
-            <h1 id="hero-title">Glotemp</h1>
-            <p>The world’s mood, in motion.</p>
-            <div>
-              <button type="button" class="btn btn-primary">Check in your mood</button>
-              <button type="button" class="btn btn-secondary">Explore live moods</button>
-            </div>
-          </div>
-          <div id="hero-wave" aria-hidden="true"></div>
-        </section>
-      </header>
+    </section>
+  </main>
 
-      <main>
-        <section id="mood-map" aria-labelledby="mood-map-title">
-          <h2 id="mood-map-title">Right now</h2>
-          <p>Live mood and tempo across cities.</p>
-          <div id="city-cards">
-            <article class="city-card" data-city="sample-city">
-              <h3 class="city-name">City</h3>
-              <p class="pulse-score">Pulse score: --</p>
-              <p class="summary-text">City pulse summary is updating.</p>
-              <div class="mood-tags">
-                <span>Mood pending</span>
-              </div>
-              <p class="tempo">Tempo score: --</p>
-              <p class="romance">Romantic index: --</p>
-              <p class="economic">Economic vibe: --</p>
-              <p class="cultural">Cultural heat: --</p>
-              <p class="weather">Weather influence: --</p>
-              <p class="news">News influence: --</p>
-              <p class="sports">Sports influence: --</p>
-              <p class="tourism">Tourism influence: --</p>
-            </article>
-          </div>
-        </section>
-
-        <section id="user-profile" aria-labelledby="user-profile-title">
-          <h2 id="user-profile-title">Profile</h2>
-          <div class="profile-card">
-            <div class="avatar-placeholder" aria-hidden="true">◉</div>
-            <div>
-              <p id="profile-username">Username: Explorer</p>
-              <p id="profile-pilgrim-score">Pilgrim Score: 0</p>
-              <p id="profile-visited-count">Visited Cities: 0</p>
-              <p id="profile-drops-claimed">Golden Drops Claimed: 0</p>
-            </div>
-          </div>
-        </section>
-
-        <section id="checkin" aria-labelledby="checkin-title">
-          <h2 id="checkin-title">Check in your mood</h2>
-          <form>
-            <div>
-              <label for="city">City</label>
-              <input id="city" name="city" type="text" />
-            </div>
-            <div>
-              <label for="country">Country</label>
-              <input id="country" name="country" type="text" />
-            </div>
-            <div>
-              <h3>Mood</h3>
-              <div id="mood-buttons"></div>
-            </div>
-            <div>
-              <h3>Vibe</h3>
-              <div id="vibe-buttons"></div>
-            </div>
-            <div>
-              <h3>Context</h3>
-              <div id="context-buttons"></div>
-            </div>
-            <button type="submit">Submit</button>
-          </form>
-          <p id="checkin-message"></p>
-        </section>
-
-        <section id="how-it-works" aria-labelledby="how-it-works-title">
-          <h2 id="how-it-works-title">How Glotemp works</h2>
-          <div>
-            <div>
-              <h3>People</h3>
-              <p>Mood check-ins from people on the ground.</p>
-            </div>
-            <div>
-              <h3>Signals</h3>
-              <p>Weather, news, sports, and events shape the live picture.</p>
-            </div>
-            <div>
-              <h3>AI</h3>
-              <p>AI synthesizes mood and tempo into a city snapshot.</p>
-            </div>
-          </div>
-        </section>
-
-        <section id="marketers" aria-labelledby="marketers-title">
-          <h2 id="marketers-title">For brands and decision-makers</h2>
-          <p>Target live emotional context and city energy instead of static demographics.</p>
-          <form>
-            <div>
-              <label for="marketer-email">Email</label>
-              <input id="marketer-email" name="email" type="email" />
-            </div>
-            <button type="submit">Get updates</button>
-            <p id="marketer-message"></p>
-          </form>
-        </section>
-        <section id="explorer-mode" aria-labelledby="explorer-mode-title" hidden>
-          <h2 id="explorer-mode-title">Explorer Mode</h2>
-          <p>You've walked the Golden Path.</p>
-          <p id="pilgrim-score-display">Pilgrim Score: --</p>
-          <ul id="visited-cities-list" aria-label="Visited cities"></ul>
-          <p class="constellation-label">Your Constellation</p>
-          <div id="golden-map-controls" aria-label="Golden map controls">
-            <button type="button" data-control="zoom-in">+</button>
-            <button type="button" data-control="zoom-out">−</button>
-            <button type="button" data-control="reset">Reset</button>
-            <button type="button" data-control="toggle-lines">Lines</button>
-          </div>
-          <div id="golden-map" aria-hidden="true"></div>
-        </section>
-
-        <section id="global-scoreboard" aria-labelledby="global-scoreboard-title">
-          <h2 id="global-scoreboard-title">Global Scoreboard</h2>
-          <p>Top city heat signatures right now.</p>
-          <div id="global-scoreboard-list"></div>
-        </section>
-      </main>
-
-      <footer>
-        <p>Glotemp – Global mood and tempo, in real time.</p>
-        <p>Contact: hello@glotemp.com</p>
-      </footer>
+  <footer class="gt-footer">
+    <div class="gt-footer-left">
+      <span>Glotemp – Global mood and tempo, in real time.</span>
     </div>
-    <script src="app.js"></script>
-  </body>
+    <div class="gt-footer-right">
+      <span>Contact: hello@glotemp.com</span>
+    </div>
+  </footer>
+
+  <!-- Install banner -->
+  <div id="install-banner" class="gt-install-banner gt-hidden">
+    <span>Add Glotemp to your home screen for a full-screen experience.</span>
+    <button id="install-btn" class="gt-btn gt-btn-small gt-btn-primary">Add</button>
+  </div>
+
+  <!-- City detail modal -->
+  <div id="city-modal" class="gt-modal gt-hidden">
+    <div class="gt-modal-backdrop"></div>
+    <div class="gt-modal-content">
+      <button id="city-modal-close" class="gt-modal-close">×</button>
+      <div id="city-modal-body"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
 </html>
