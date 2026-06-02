@@ -424,6 +424,15 @@ body {
   color: #ff7a9a;
 }
 
+.gt-live-activity-chip {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(0, 200, 120, 0.08);
+  border: 1px solid rgba(0, 200, 120, 0.25);
+  color: #4ade80;
+}
+
 .gt-scoreboard {
   background: var(--gt-card);
   border-radius: var(--gt-radius);

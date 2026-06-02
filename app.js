@@ -497,6 +497,9 @@ function renderCityCards() {
     const heatScore = cityHeat[city.name]?.heatScore || 0;
     if (!view) return;
 
+    const weekAgo = Date.now() - 7 * 86400000;
+    const recentCount = HUMAN_CHECKINS.filter((c) => c.cityId === city.id && c.timestamp >= weekAgo).length;
+
     const displayPulseScore = scores ? scores.overall : (liveData.pulse_score ?? view.overallPulseScore);
 
     const card = document.createElement("div");
@@ -532,7 +535,10 @@ function renderCityCards() {
         </div>
       </div>
       <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+        <span class="gt-live-activity-chip">📍 ${recentCount} active this week</span>
         <span style="font-size:11px;color:#a0a3c4;">Mood ${scores ? scores.moodScore : "—"}</span>
+      </div>
+      <div style="margin-top:4px;display:flex;justify-content:flex-end;">
         <span class="gt-heat-chip">🔥 Heat ${heatScore}</span>
       </div>
     `;
@@ -601,7 +607,7 @@ function openCityDetail(cityName) {
     </div>
     ${cityCheckins.length ? `
       <div class="gt-checkins-section">
-        <div class="gt-checkins-section-header">Human Check-ins</div>
+        <div class="gt-checkins-section-header">Recent Check-ins</div>
         ${cityCheckins.map((c) => renderCheckinItem(c)).join("")}
       </div>
     ` : ""}
@@ -1229,9 +1235,170 @@ function renderUserProfile() {
   if (citiesEl)   citiesEl.textContent   = USER_PROFILE.citiesVisited.length;
 }
 
+// ─── LEGACY MODE ─────────────────────────────────────────────────────────────
+
+// Scene probability weights by hour of day
+function legacySceneHourWeights(hour) {
+  const isNightlife = hour >= 21 || hour < 4;
+  const isWork      = hour >= 8  && hour < 17;
+  const isUni       = hour >= 10 && hour < 16;
+  const isTourism   = hour >= 11 && hour < 20;
+  const isEvening   = hour >= 17 && hour < 21;
+  return {
+    club:    isNightlife ? 25 : 2,
+    bar:     isNightlife ? 18 : (isEvening ? 12 : 2),
+    street:  isNightlife ? 12 : (isWork || isTourism ? 7 : 4),
+    work:    isWork  ? 28 : 2,
+    uni:     isUni   ? 22 : 3,
+    tourism: isTourism ? 18 : 4,
+    home:    8,
+    stadium: 3
+  };
+}
+
+// Per-tier bias multipliers so each city type generates realistic scene distributions
+const LEGACY_TIER_SCENE_BIAS = {
+  global_economic: { club: 1.0, bar: 1.0, street: 1.0, work: 1.5, uni: 1.0, tourism: 1.2, home: 1.0, stadium: 1.0 },
+  finance_hub:     { club: 0.7, bar: 1.2, street: 0.8, work: 2.0, uni: 0.7, tourism: 1.3, home: 1.0, stadium: 0.8 },
+  uni_club_city:   { club: 2.0, bar: 1.5, street: 1.0, work: 0.5, uni: 2.5, tourism: 0.7, home: 1.0, stadium: 1.2 },
+  mega_city:       { club: 1.8, bar: 1.3, street: 1.5, work: 1.0, uni: 0.8, tourism: 1.5, home: 0.8, stadium: 1.2 }
+};
+
+// Mood pools weighted by scene type
+const LEGACY_SCENE_MOODS = {
+  club:    ["excited", "excited", "calm",     "anxious"],
+  bar:     ["calm",    "excited", "hopeful",  "calm"],
+  street:  ["excited", "hopeful", "anxious",  "calm"],
+  work:    ["stressed","hopeful", "calm",     "anxious"],
+  uni:     ["stressed","hopeful", "anxious",  "excited"],
+  tourism: ["excited", "hopeful", "excited",  "calm"],
+  home:    ["calm",    "calm",    "hopeful",  "anxious"],
+  stadium: ["excited", "excited", "hopeful",  "anxious"]
+};
+
+function pickLegacyScene(hour, tier) {
+  const base = legacySceneHourWeights(hour);
+  const bias = LEGACY_TIER_SCENE_BIAS[tier] || {};
+  const weighted = {};
+  for (const scene of Object.keys(base)) {
+    weighted[scene] = base[scene] * (bias[scene] || 1);
+  }
+  const total = Object.values(weighted).reduce((a, b) => a + b, 0);
+  let rand = Math.random() * total;
+  for (const [scene, w] of Object.entries(weighted)) {
+    rand -= w;
+    if (rand <= 0) return scene;
+  }
+  return "home";
+}
+
+function pickLegacyMood(scene) {
+  const opts = LEGACY_SCENE_MOODS[scene] || ["calm", "hopeful", "excited", "anxious", "stressed"];
+  return opts[Math.floor(Math.random() * opts.length)];
+}
+
+function seedLegacyCheckins() {
+  if (localStorage.getItem("gt_legacy_seeded")) return;
+
+  const now    = Date.now();
+  const DAY_MS = 86400000;
+  const legacyCheckins = [];
+
+  // Generate 30 days of check-ins (days 30→1 days ago) for every city
+  CITY_INDEX.forEach((city) => {
+    for (let day = 0; day < 30; day++) {
+      const daysAgo          = 30 - day; // 30 days ago → 1 day ago
+      const checkinsThisDay  = 3 + Math.floor(Math.random() * 5); // 3–7 per city per day
+      for (let i = 0; i < checkinsThisDay; i++) {
+        const hour         = Math.floor(Math.random() * 24);
+        const scene        = pickLegacyScene(hour, city.tier);
+        const mood         = pickLegacyMood(scene);
+        const intensity    = 40 + Math.floor(Math.random() * 60); // 40–99
+        const minuteJitter = Math.floor(Math.random() * 60) * 60000;
+        const timestamp    = now - daysAgo * DAY_MS + hour * 3600000 + minuteJitter;
+
+        legacyCheckins.push({
+          id:             generateUUID(),
+          cityId:         city.id,
+          mood,
+          intensity,
+          scene,
+          identityMode:   "anonymous",
+          nicknameOrName: "",
+          timestamp,
+          legacy:         true
+        });
+      }
+    }
+  });
+
+  // Sort chronologically so HUMAN_CHECKINS stays time-ordered
+  legacyCheckins.sort((a, b) => a.timestamp - b.timestamp);
+  HUMAN_CHECKINS.push(...legacyCheckins);
+
+  // Apply aggregate effects to cityPulseState (tiny per-checkin impact to avoid clamping)
+  CITY_INDEX.forEach((city) => {
+    const state = cityPulseState[city.id];
+    if (!state) return;
+
+    const cityCheckins = legacyCheckins.filter((c) => c.cityId === city.id);
+    const sc = {}; // scene counts
+    const mc = {}; // mood counts
+    cityCheckins.forEach((c) => {
+      sc[c.scene] = (sc[c.scene] || 0) + 1;
+      mc[c.mood]  = (mc[c.mood]  || 0) + 1;
+    });
+
+    const get  = (obj, key) => obj[key] || 0;
+    // Cap contribution so 40+ checkins per scene ≈ max ~3.6 pts shift
+    const pts     = (n) => Math.min(n, 40) * 0.09;
+    const moodPts = (n) => Math.min(n, 30) * 0.07;
+
+    state.nightlife.club_intensity      = clamp(state.nightlife.club_intensity      + pts(get(sc, "club")),                                         0, 100);
+    state.nightlife.bar_intensity       = clamp(state.nightlife.bar_intensity       + pts(get(sc, "bar")),                                          0, 100);
+    state.nightlife.street_energy       = clamp(state.nightlife.street_energy       + pts(get(sc, "street") + get(sc, "stadium")),                  0, 100);
+    state.economic.business_confidence  = clamp(state.economic.business_confidence  + pts(get(sc, "work")),                                         0, 100);
+    state.economic.footfall             = clamp(state.economic.footfall             + pts(get(sc, "work")   + get(sc, "tourism")),                  0, 100);
+    state.economic.local_spend          = clamp(state.economic.local_spend          + pts(get(sc, "tourism") + get(sc, "club") + get(sc, "bar")),   0, 100);
+    state.study.uni_activity            = clamp(state.study.uni_activity            + pts(get(sc, "uni")),                                          0, 100);
+    state.study.campus_vibe             = clamp(state.study.campus_vibe             + pts(get(sc, "uni")),                                          0, 100);
+    state.tourism.tourist_density       = clamp(state.tourism.tourist_density       + pts(get(sc, "tourism")),                                      0, 100);
+    state.tourism.photo_spots           = clamp(state.tourism.photo_spots           + pts(get(sc, "tourism")),                                      0, 100);
+    state.tourism.weekend_attractiveness = clamp(state.tourism.weekend_attractiveness + pts(Math.floor(get(sc, "tourism") / 2)),                    0, 100);
+    state.mood.excited  = clamp(state.mood.excited  + moodPts(get(mc, "excited")),                          0, 100);
+    state.mood.calm     = clamp(state.mood.calm     + moodPts(get(mc, "calm")),                             0, 100);
+    state.mood.hopeful  = clamp(state.mood.hopeful  + moodPts(get(mc, "hopeful")),                          0, 100);
+    state.mood.anxious  = clamp(state.mood.anxious  + moodPts(get(mc, "stressed") + get(mc, "anxious")),    0, 100);
+    state.mood.restless = clamp(state.mood.restless + moodPts(get(mc, "anxious")),                          0, 100);
+    state.lastUpdated   = Date.now();
+
+    // Sync latestPulseByCity averages
+    const s     = state;
+    const entry = latestPulseByCity[city.name];
+    if (entry) {
+      const nightlifeAvg = avg(Object.values(s.nightlife));
+      const economicAvg  = avg(Object.values(s.economic));
+      const tourismAvg   = avg(Object.values(s.tourism));
+      const moodAvg      = avg(Object.values(s.mood));
+      entry.pulse_score     = Math.round(avg([nightlifeAvg, economicAvg, tourismAvg, moodAvg]));
+      entry.nightlife_index = Math.round(nightlifeAvg);
+      entry.uni_vibe        = Math.round(avg(Object.values(s.study)));
+      entry.economic_vibe   = Math.round(economicAvg);
+    }
+  });
+
+  // Bootstrap heat scores so the global scoreboard is populated on first load
+  CITY_INDEX.forEach((city) => {
+    calculateCityGoldenHeat(city.name);
+  });
+
+  localStorage.setItem("gt_legacy_seeded", "1");
+}
+
 // Init
 document.addEventListener("DOMContentLoaded", () => {
   seedCityPulses();
+  seedLegacyCheckins();
   renderCityCards();
   populateTripSelects();
   populateCheckinCitySelect();
