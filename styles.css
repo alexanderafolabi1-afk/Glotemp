@@ -786,13 +786,16 @@ body {
 }
 
 /* ── Identity picker ── */
-.gt-identity-picker {
+.gt-identity-radios {
   display: flex;
-  gap: 6px;
   flex-wrap: wrap;
+  gap: 8px;
 }
 
-.gt-identity-btn {
+.gt-identity-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 999px;
@@ -800,18 +803,17 @@ body {
   padding: 5px 12px;
   font-size: 12px;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: border-color 0.15s, background 0.15s;
 }
 
-.gt-identity-btn:hover {
-  border-color: rgba(0, 229, 255, 0.5);
-  background: rgba(0, 229, 255, 0.06);
-}
-
-.gt-identity-btn-active {
-  background: rgba(0, 229, 255, 0.12);
+.gt-identity-radio:has(input:checked) {
   border-color: var(--gt-accent);
+  background: rgba(0, 229, 255, 0.12);
   color: var(--gt-accent);
+}
+
+.gt-identity-radio input {
+  accent-color: var(--gt-accent);
 }
 
 /* ── Submit button full-width ── */

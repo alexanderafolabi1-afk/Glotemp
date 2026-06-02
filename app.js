@@ -14,18 +14,30 @@ let deferredPrompt = null;
 
 // ─── USER PROFILE ─────────────────────────────────────────────────────────────
 let USER_PROFILE = (() => {
-  try {
-    const stored = localStorage.getItem("gt_user_profile");
-    if (stored) return JSON.parse(stored);
-  } catch (_) {}
-  return {
+  const baseProfile = {
     id: generateUUID(),
+    identityMode: "anonymous",
     nickname: null,
     legalName: null,
     points: 0,
     checkins: 0,
     citiesVisited: []
   };
+  try {
+    const stored = localStorage.getItem("gt_user_profile");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return {
+        ...baseProfile,
+        ...parsed,
+        identityMode: normalizeIdentityMode(parsed.identityMode),
+        nickname: typeof parsed.nickname === "string" ? parsed.nickname : null,
+        legalName: typeof parsed.legalName === "string" ? parsed.legalName : null,
+        citiesVisited: Array.isArray(parsed.citiesVisited) ? parsed.citiesVisited : []
+      };
+    }
+  } catch (_) {}
+  return baseProfile;
 })();
 
 // ─── Data layer ──────────────────────────────────────────────────────────────
@@ -950,11 +962,18 @@ const MOOD_EMOJIS = { excited: "😄", calm: "😌", stressed: "😤", hopeful: 
 const MOOD_TO_DIM  = { excited: "excited", calm: "calm", hopeful: "hopeful", stressed: "anxious", anxious: "anxious" };
 
 function normalizeIdentityMode(identityMode) {
-  return identityMode === "legal" ? "legalName" : identityMode;
+  if (identityMode === "nickname") return "nickname";
+  if (identityMode === "legal" || identityMode === "legalName") return "legal";
+  return "anonymous";
 }
 
-function getCheckinNameOrNickname(checkin) {
-  return checkin.nameOrNickname ?? checkin.nicknameOrName ?? "";
+function getCheckinDisplayName(checkin) {
+  const identityMode = normalizeIdentityMode(checkin.identityMode);
+  if (identityMode === "anonymous") return "Anonymous Explorer";
+  if (identityMode === "nickname") {
+    return checkin.nickname || checkin.nameOrNickname || checkin.nicknameOrName || "Anonymous Explorer";
+  }
+  return checkin.legalName || checkin.nameOrNickname || checkin.nicknameOrName || "Anonymous Explorer";
 }
 
 function applyCheckinToCityState(checkin) {
@@ -1008,17 +1027,11 @@ function applyCheckinToCityState(checkin) {
 function renderCheckinItem(checkin) {
   const timeAgo = formatTimeAgo(checkin.timestamp);
   const identityMode = normalizeIdentityMode(checkin.identityMode);
-  const nameOrNickname = escapeHtml(getCheckinNameOrNickname(checkin));
-  const identityLabel =
-    identityMode === "anonymous"
-      ? "Anonymous"
-      : identityMode === "nickname"
-        ? (nameOrNickname || "Nickname")
-        : "Legal name";
+  const identityLabel = escapeHtml(getCheckinDisplayName(checkin));
   const identityModeLabel =
     identityMode === "nickname"
       ? "Nickname"
-      : identityMode === "legalName"
+      : identityMode === "legal"
         ? "Legal name"
         : "Anonymous";
   const emoji = MOOD_EMOJIS[checkin.mood] || "";
@@ -1038,6 +1051,14 @@ function renderCheckinItem(checkin) {
 }
 
 function openCheckinModal() {
+  const identityMode = normalizeIdentityMode(USER_PROFILE.identityMode);
+  const activeRadio = document.querySelector(`input[name="checkin-identity-mode"][value="${identityMode}"]`);
+  if (activeRadio) activeRadio.checked = true;
+  const nicknameInput = document.getElementById("checkin-nickname");
+  const legalNameInput = document.getElementById("checkin-legal-name");
+  if (nicknameInput) nicknameInput.value = USER_PROFILE.nickname || "";
+  if (legalNameInput) legalNameInput.value = USER_PROFILE.legalName || "";
+  updateIdentityFields(identityMode);
   document.getElementById("checkin-modal").classList.remove("gt-hidden");
 }
 
@@ -1056,9 +1077,10 @@ function submitHumanCheckin() {
   const mood        = activeMood ? activeMood.dataset.mood : "";
   const intensity   = parseInt(document.getElementById("checkin-intensity").value, 10);
   const scene       = document.getElementById("checkin-scene").value;
-  const activeIdent = document.querySelector("#checkin-identity-picker .gt-identity-btn-active");
-  const identityMode = normalizeIdentityMode(activeIdent ? activeIdent.dataset.mode : "anonymous");
-  const nameInput   = document.getElementById("checkin-name").value.trim();
+  const activeIdent = document.querySelector('input[name="checkin-identity-mode"]:checked');
+  const identityMode = normalizeIdentityMode(activeIdent ? activeIdent.value : "anonymous");
+  const nicknameInput = document.getElementById("checkin-nickname").value.trim();
+  const legalNameInput = document.getElementById("checkin-legal-name").value.trim();
 
   const errEl = document.getElementById("checkin-error");
   if (!cityId || !mood) {
@@ -1066,9 +1088,24 @@ function submitHumanCheckin() {
     errEl.classList.remove("gt-hidden");
     return;
   }
+  if (identityMode === "nickname" && !nicknameInput) {
+    errEl.textContent = "Please enter your nickname.";
+    errEl.classList.remove("gt-hidden");
+    return;
+  }
+  if (identityMode === "legal" && !legalNameInput) {
+    errEl.textContent = "Please enter your legal name.";
+    errEl.classList.remove("gt-hidden");
+    return;
+  }
   errEl.classList.add("gt-hidden");
 
-  const nameOrNickname = identityMode === "anonymous" ? "" : nameInput;
+  const nameOrNickname =
+    identityMode === "nickname"
+      ? nicknameInput
+      : identityMode === "legal"
+        ? legalNameInput
+        : "";
 
   const checkin = {
     id:             generateUUID(),
@@ -1077,6 +1114,8 @@ function submitHumanCheckin() {
     intensity,
     scene,
     identityMode,
+    nickname:      identityMode === "nickname" ? nicknameInput : "",
+    legalName:     identityMode === "legal" ? legalNameInput : "",
     nameOrNickname,
     timestamp:      Date.now()
   };
@@ -1092,10 +1131,11 @@ function submitHumanCheckin() {
   if (!USER_PROFILE.citiesVisited.includes(cityId)) {
     USER_PROFILE.citiesVisited.push(cityId);
   }
-  if (identityMode === "nickname" && nameInput) {
-    USER_PROFILE.nickname = nameInput;
-  } else if (identityMode === "legalName" && nameInput) {
-    USER_PROFILE.legalName = nameInput;
+  USER_PROFILE.identityMode = identityMode;
+  if (identityMode === "nickname" && nicknameInput) {
+    USER_PROFILE.nickname = nicknameInput;
+  } else if (identityMode === "legal" && legalNameInput) {
+    USER_PROFILE.legalName = legalNameInput;
   }
   saveUserProfile();
   renderUserProfile();
@@ -1151,28 +1191,26 @@ function setupCheckinModal() {
   });
 
   // Identity picker
-  document.querySelectorAll("#checkin-identity-picker .gt-identity-btn").forEach((btn) => {
-    btn.onclick = () => {
-      document.querySelectorAll("#checkin-identity-picker .gt-identity-btn").forEach((b) => b.classList.remove("gt-identity-btn-active"));
-      btn.classList.add("gt-identity-btn-active");
-      const nameField = document.getElementById("checkin-name-field");
-      const nameLabel = document.getElementById("checkin-name-label");
-      const nameInput = document.getElementById("checkin-name");
-      nameField.classList.toggle("gt-hidden", btn.dataset.mode === "anonymous");
-      if (nameLabel) {
-        nameLabel.textContent = btn.dataset.mode === "legalName" ? "Legal name" : "Nickname";
-      }
-      if (nameInput) {
-        nameInput.placeholder = btn.dataset.mode === "legalName"
-          ? "Enter your legal name…"
-          : "Enter your nickname…";
-        nameInput.value = "";
-      }
+  document.querySelectorAll('input[name="checkin-identity-mode"]').forEach((radio) => {
+    radio.onchange = () => {
+      if (!radio.checked) return;
+      const mode = normalizeIdentityMode(radio.value);
+      USER_PROFILE.identityMode = mode;
+      updateIdentityFields(mode);
+      saveUserProfile();
     };
   });
 
   // Submit
   document.getElementById("checkin-submit").onclick = submitHumanCheckin;
+}
+
+function updateIdentityFields(identityMode) {
+  const normalizedMode = normalizeIdentityMode(identityMode);
+  const nicknameField = document.getElementById("checkin-nickname-field");
+  const legalNameField = document.getElementById("checkin-legal-name-field");
+  if (nicknameField) nicknameField.classList.toggle("gt-hidden", normalizedMode !== "nickname");
+  if (legalNameField) legalNameField.classList.toggle("gt-hidden", normalizedMode !== "legal");
 }
 
 // Simple "check in" stub: replaced with modal
@@ -1279,7 +1317,15 @@ function renderUserProfile() {
   const checkinsEl = document.getElementById("profile-checkins");
   const citiesEl   = document.getElementById("profile-cities");
 
-  if (nicknameEl) nicknameEl.textContent = USER_PROFILE.nickname || USER_PROFILE.legalName || "Anonymous Explorer";
+  if (nicknameEl) {
+    const identityMode = normalizeIdentityMode(USER_PROFILE.identityMode);
+    nicknameEl.textContent =
+      identityMode === "nickname"
+        ? (USER_PROFILE.nickname || "Anonymous Explorer")
+        : identityMode === "legal"
+          ? (USER_PROFILE.legalName || "Anonymous Explorer")
+          : "Anonymous Explorer";
+  }
   if (pointsEl)   pointsEl.textContent   = USER_PROFILE.points;
   if (checkinsEl) checkinsEl.textContent = USER_PROFILE.checkins;
   if (citiesEl)   citiesEl.textContent   = USER_PROFILE.citiesVisited.length;

@@ -197,16 +197,30 @@
 
       <div class="gt-checkin-field">
         <div class="gt-label">Identity</div>
-        <div class="gt-identity-picker" id="checkin-identity-picker">
-          <button class="gt-identity-btn gt-identity-btn-active" data-mode="anonymous" type="button">Anonymous</button>
-          <button class="gt-identity-btn" data-mode="nickname" type="button">Nickname</button>
-          <button class="gt-identity-btn" data-mode="legalName" type="button">Legal Name</button>
+        <div class="gt-identity-radios" id="checkin-identity-picker">
+          <label class="gt-identity-radio">
+            <input type="radio" name="checkin-identity-mode" value="anonymous" checked />
+            <span>Anonymous</span>
+          </label>
+          <label class="gt-identity-radio">
+            <input type="radio" name="checkin-identity-mode" value="nickname" />
+            <span>Nickname</span>
+          </label>
+          <label class="gt-identity-radio">
+            <input type="radio" name="checkin-identity-mode" value="legal" />
+            <span>Legal Name</span>
+          </label>
         </div>
       </div>
 
-      <div class="gt-checkin-field gt-hidden" id="checkin-name-field">
-        <label class="gt-label" for="checkin-name" id="checkin-name-label">Name</label>
-        <input type="text" class="gt-input" id="checkin-name" placeholder="Enter your name…" maxlength="50" />
+      <div class="gt-checkin-field gt-hidden" id="checkin-nickname-field">
+        <label class="gt-label" for="checkin-nickname">Nickname</label>
+        <input type="text" class="gt-input" id="checkin-nickname" placeholder="Enter your nickname…" maxlength="50" />
+      </div>
+
+      <div class="gt-checkin-field gt-hidden" id="checkin-legal-name-field">
+        <label class="gt-label" for="checkin-legal-name">Legal Name</label>
+        <input type="text" class="gt-input" id="checkin-legal-name" placeholder="Enter your legal name…" maxlength="50" />
       </div>
 
       <div id="checkin-error" class="gt-checkin-error gt-hidden"></div>
