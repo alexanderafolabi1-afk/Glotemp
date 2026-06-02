@@ -65,7 +65,11 @@ async function fetchWeather(city, country) {
     temperature: currentWeather.temperature,
     weather_code: currentWeather.weathercode,
     windspeed: currentWeather.windspeed,
-    is_day: currentWeather.is_day
+    is_day: currentWeather.is_day,
+    coords: {
+      latitude: location.latitude,
+      longitude: location.longitude
+    }
   };
 }
 
@@ -372,6 +376,42 @@ const selectionState = {
   context: ''
 };
 
+const goldenPath = {
+  visitedCities: [],
+  visitedCoords: [],
+  unlocked: false
+};
+
+function recordVisit(city, coords) {
+  const normalizedCity = city?.trim().toLowerCase();
+  if (normalizedCity && !goldenPath.visitedCities.some((savedCity) => savedCity.trim().toLowerCase() === normalizedCity)) {
+    goldenPath.visitedCities.push(city);
+  }
+
+  const latitude = coords?.latitude;
+  const longitude = coords?.longitude;
+  const hasValidCoords = Number.isFinite(latitude) && Number.isFinite(longitude);
+  if (hasValidCoords) {
+    const alreadyTracked = goldenPath.visitedCoords.some((savedCoords) => (
+      savedCoords.latitude === latitude && savedCoords.longitude === longitude
+    ));
+    if (!alreadyTracked) {
+      goldenPath.visitedCoords.push({ latitude, longitude });
+    }
+  }
+
+  console.log('Golden Path updated:', goldenPath);
+}
+
+function checkGoldenPathUnlock() {
+  if (goldenPath.visitedCities.length >= 3) {
+    goldenPath.unlocked = true;
+    console.log('Golden Path unlocked');
+    return;
+  }
+  goldenPath.unlocked = false;
+}
+
 function createSelectionButton(label, category) {
   const button = document.createElement('button');
   button.type = 'button';
@@ -452,6 +492,8 @@ async function handleCheckinSubmit(event) {
   try {
     weatherResult = await fetchWeather(city, country);
     console.log('Weather result:', weatherResult);
+    recordVisit(city, weatherResult?.coords);
+    checkGoldenPathUnlock();
   } catch (error) {
     console.error('Weather fetch failed:', error);
   }
