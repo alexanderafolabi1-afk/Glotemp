@@ -453,7 +453,61 @@ footer p + p {
 }
 
 /* ============================================================
-   15. Keyframe Animations
+   15. Explorer Mode
+   ============================================================ */
+
+#explorer-mode {
+  background: rgba(6, 5, 2, 0.96);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 1.5rem;
+  box-shadow:
+    0 0 40px rgba(212, 175, 55, 0.10),
+    inset 0 0 60px rgba(212, 175, 55, 0.04);
+}
+
+#explorer-mode h2 {
+  color: #d4af37;
+  text-shadow: 0 0 24px rgba(212, 175, 55, 0.45);
+  letter-spacing: -0.02em;
+}
+
+#explorer-mode > p {
+  color: rgba(212, 175, 55, 0.75);
+  max-width: 52ch;
+}
+
+#pilgrim-score-display {
+  display: inline-block;
+  margin-top: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #d4af37;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 16px rgba(212, 175, 55, 0.5);
+  opacity: 1;
+}
+
+#visited-cities-list {
+  list-style: none;
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+#visited-cities-list li {
+  padding: 0.35rem 1rem;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 9999px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #d4af37;
+  background: rgba(212, 175, 55, 0.06);
+  letter-spacing: 0.02em;
+}
+
+/* ============================================================
+   16. Keyframe Animations
    ============================================================ */
 
 @keyframes waveShift {
@@ -511,7 +565,7 @@ footer p + p {
 }
 
 /* ============================================================
-   16. Hero Wave
+   17. Hero Wave
    ============================================================ */
 
 #hero-wave {
@@ -532,7 +586,7 @@ footer p + p {
 }
 
 /* ============================================================
-   17. Neon Glow Pulses
+   18. Neon Glow Pulses
    ============================================================ */
 
 /* Primary buttons pulse subtly at rest */
@@ -558,7 +612,7 @@ button[type="submit"]:hover {
 }
 
 /* ============================================================
-   18. Card Hover Motion
+   19. Card Hover Motion
    ============================================================ */
 
 .card,
@@ -585,7 +639,7 @@ button[type="submit"]:hover {
 }
 
 /* ============================================================
-   19. Section Load Animations
+   20. Section Load Animations
    ============================================================ */
 
 /* Hero content — staggered fade-up */
@@ -643,7 +697,7 @@ header > section > div:first-child > div {
 }
 
 /* ============================================================
-   20. Mood Color Utilities
+   21. Mood Color Utilities
    ============================================================ */
 
 .mood-happy    { color: var(--accent-yellow); }
@@ -653,7 +707,7 @@ header > section > div:first-child > div {
 .mood-tense    { color: var(--accent-orange); }
 
 /* ============================================================
-   21. Form Container Glassy Treatment
+   22. Form Container Glassy Treatment
    ============================================================ */
 
 #checkin form {
@@ -671,7 +725,7 @@ header > section > div:first-child > div {
 }
 
 /* ============================================================
-   22. Responsive Tuning
+   23. Responsive Tuning
    ============================================================ */
 
 @media (max-width: 768px) {
