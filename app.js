@@ -20,6 +20,8 @@ const SPORTS_PULSE_CLASS_NAME = 'sports-pulse';
 const EVENTS_PULSE_CLASS_NAME = 'events-pulse';
 const SPORTS_PULSE_LABEL = 'Sports pulse';
 const EVENTS_UPCOMING_LABEL = 'Events';
+const PILGRIM_SCORE_PER_CITY = 5;
+const MAX_PILGRIM_SCORE = 100;
 const GNEWS_SUPPORTED_COUNTRIES = new Set([
   'au', 'br', 'ca', 'cn', 'eg', 'fr', 'de', 'gr', 'hk', 'in', 'ie',
   'il', 'it', 'jp', 'nl', 'no', 'pk', 'pe', 'ph', 'pt', 'ro', 'ru',
@@ -379,7 +381,8 @@ const selectionState = {
 const goldenPath = {
   visitedCities: [],
   visitedCoords: [],
-  unlocked: false
+  unlocked: false,
+  pilgrimScore: 0
 };
 
 let goldenMapSvg = null;
@@ -458,10 +461,16 @@ function showGoldenMap() {
   drawGoldenPath();
 }
 
+function calculatePilgrimScore() {
+  goldenPath.pilgrimScore = Math.min(MAX_PILGRIM_SCORE, goldenPath.visitedCities.length * PILGRIM_SCORE_PER_CITY);
+  console.log('Pilgrim Score:', goldenPath.pilgrimScore);
+}
+
 function recordVisit(city, coords) {
   const normalizedCity = city?.trim().toLowerCase();
   if (normalizedCity && !goldenPath.visitedCities.some((savedCity) => savedCity.trim().toLowerCase() === normalizedCity)) {
     goldenPath.visitedCities.push(city);
+    calculatePilgrimScore();
   }
 
   const latitude = coords?.latitude;
@@ -491,6 +500,7 @@ function checkGoldenPathUnlock() {
   if (goldenPath.visitedCities.length >= 3) {
     goldenPath.unlocked = true;
     console.log('Golden Path unlocked');
+    console.log('Pilgrim Score at unlock:', goldenPath.pilgrimScore);
     showGoldenMap();
   }
 }
