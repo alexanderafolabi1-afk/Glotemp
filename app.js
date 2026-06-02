@@ -1185,6 +1185,9 @@ function setupModalClose() {
 
 // ─── USER PROFILE FUNCTIONS ───────────────────────────────────────────────────
 
+// Threshold below which a city's overall pulse is considered "low" (bonus trigger)
+const LOW_PULSE_THRESHOLD = 40;
+
 function saveUserProfile() {
   try {
     localStorage.setItem("gt_user_profile", JSON.stringify(USER_PROFILE));
@@ -1199,12 +1202,15 @@ function computeCheckinPoints(checkin) {
   if (["club", "stadium", "festival"].includes(checkin.scene)) points += 3;
 
   const scores = computeCityPulseScores(checkin.cityId);
-  if (scores && scores.overall < 40) points += 5;
+  if (scores && scores.overall < LOW_PULSE_THRESHOLD) points += 5;
 
   // +10 if this is the first check-in in that city today (checked before push)
-  const today = new Date().toDateString();
+  const dayStart = new Date();
+  dayStart.setHours(0, 0, 0, 0);
+  const dayStartMs = dayStart.getTime();
+  const dayEndMs   = dayStartMs + 86400000;
   const hasCheckinTodayInCity = HUMAN_CHECKINS.some(
-    (c) => c.cityId === checkin.cityId && new Date(c.timestamp).toDateString() === today
+    (c) => c.cityId === checkin.cityId && c.timestamp >= dayStartMs && c.timestamp < dayEndMs
   );
   if (!hasCheckinTodayInCity) points += 10;
 
