@@ -12,6 +12,22 @@ const HUMAN_CHECKINS = [];
 let latestPulseByCity = {};
 let deferredPrompt = null;
 
+// ─── USER PROFILE ─────────────────────────────────────────────────────────────
+let USER_PROFILE = (() => {
+  try {
+    const stored = localStorage.getItem("gt_user_profile");
+    if (stored) return JSON.parse(stored);
+  } catch (_) {}
+  return {
+    id: generateUUID(),
+    nickname: null,
+    legalName: null,
+    points: 0,
+    checkins: 0,
+    citiesVisited: []
+  };
+})();
+
 // ─── Data layer ──────────────────────────────────────────────────────────────
 
 const CITY_INDEX = [
@@ -1019,7 +1035,24 @@ function submitHumanCheckin() {
     timestamp:      Date.now()
   };
 
+  // Compute points before pushing (so "first today" check is accurate)
+  const earnedPoints = computeCheckinPoints(checkin);
+
   HUMAN_CHECKINS.push(checkin);
+
+  // Update USER_PROFILE
+  USER_PROFILE.checkins += 1;
+  USER_PROFILE.points   += earnedPoints;
+  if (!USER_PROFILE.citiesVisited.includes(cityId)) {
+    USER_PROFILE.citiesVisited.push(cityId);
+  }
+  if (identityMode === "nickname" && nameInput) {
+    USER_PROFILE.nickname = nameInput;
+  } else if (identityMode === "legal" && nameInput) {
+    USER_PROFILE.legalName = nameInput;
+  }
+  saveUserProfile();
+  renderUserProfile();
 
   // Update cityPulseState
   applyCheckinToCityState(checkin);
@@ -1150,6 +1183,46 @@ function setupModalClose() {
     });
 }
 
+// ─── USER PROFILE FUNCTIONS ───────────────────────────────────────────────────
+
+function saveUserProfile() {
+  try {
+    localStorage.setItem("gt_user_profile", JSON.stringify(USER_PROFILE));
+  } catch (_) {}
+}
+
+function computeCheckinPoints(checkin) {
+  let points = 1; // base
+
+  if (!USER_PROFILE.citiesVisited.includes(checkin.cityId)) points += 2;
+
+  if (["club", "stadium", "festival"].includes(checkin.scene)) points += 3;
+
+  const scores = computeCityPulseScores(checkin.cityId);
+  if (scores && scores.overall < 40) points += 5;
+
+  // +10 if this is the first check-in in that city today (checked before push)
+  const today = new Date().toDateString();
+  const hasCheckinTodayInCity = HUMAN_CHECKINS.some(
+    (c) => c.cityId === checkin.cityId && new Date(c.timestamp).toDateString() === today
+  );
+  if (!hasCheckinTodayInCity) points += 10;
+
+  return points;
+}
+
+function renderUserProfile() {
+  const nicknameEl = document.getElementById("profile-nickname");
+  const pointsEl   = document.getElementById("profile-points");
+  const checkinsEl = document.getElementById("profile-checkins");
+  const citiesEl   = document.getElementById("profile-cities");
+
+  if (nicknameEl) nicknameEl.textContent = USER_PROFILE.nickname || USER_PROFILE.legalName || "Anonymous Explorer";
+  if (pointsEl)   pointsEl.textContent   = USER_PROFILE.points;
+  if (checkinsEl) checkinsEl.textContent = USER_PROFILE.checkins;
+  if (citiesEl)   citiesEl.textContent   = USER_PROFILE.citiesVisited.length;
+}
+
 // Init
 document.addEventListener("DOMContentLoaded", () => {
   seedCityPulses();
@@ -1162,5 +1235,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupExplore();
   setupTripEvaluate();
   setupModalClose();
+  renderUserProfile();
   simulateLivePulses();
 });
