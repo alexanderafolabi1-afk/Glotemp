@@ -64,6 +64,33 @@ let USER_PROFILE = (() => {
   return baseProfile;
 })();
 
+const REVENUE_POOL = (() => {
+  const basePool = {
+    monthlySponsorRevenue: 0,
+    communityPool: 0,
+    distributionLog: []
+  };
+  try {
+    const stored = localStorage.getItem("gt_revenue_pool");
+    if (!stored) return basePool;
+    const parsed = JSON.parse(stored);
+    if (!parsed || typeof parsed !== "object") return basePool;
+    return {
+      monthlySponsorRevenue:
+        typeof parsed.monthlySponsorRevenue === "number" && Number.isFinite(parsed.monthlySponsorRevenue)
+          ? parsed.monthlySponsorRevenue
+          : 0,
+      communityPool:
+        typeof parsed.communityPool === "number" && Number.isFinite(parsed.communityPool)
+          ? parsed.communityPool
+          : 0,
+      distributionLog: Array.isArray(parsed.distributionLog) ? parsed.distributionLog : []
+    };
+  } catch (_) {
+    return basePool;
+  }
+})();
+
 // ─── Data layer ──────────────────────────────────────────────────────────────
 
 const CITY_INDEX = [
@@ -1313,6 +1340,59 @@ function saveUserProfile() {
   } catch (_) {}
 }
 
+function saveRevenuePool() {
+  try {
+    localStorage.setItem("gt_revenue_pool", JSON.stringify(REVENUE_POOL));
+  } catch (_) {}
+}
+
+function getRevenueParticipants() {
+  if (Array.isArray(window.USER_PROFILES) && window.USER_PROFILES.length) {
+    return window.USER_PROFILES.filter((profile) => Number.isFinite(profile?.stars) && profile.stars > 0);
+  }
+  return Number.isFinite(USER_PROFILE.stars) && USER_PROFILE.stars > 0 ? [USER_PROFILE] : [];
+}
+
+function getNextDistributionDate() {
+  const now = new Date();
+  const next = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  return next.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+function formatCurrency(amount) {
+  return new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(amount || 0);
+}
+
+function updateRevenuePool(revenue) {
+  const safeRevenue = Number.isFinite(revenue) ? revenue : Number(revenue);
+  if (!Number.isFinite(safeRevenue)) return;
+  REVENUE_POOL.monthlySponsorRevenue += safeRevenue;
+  REVENUE_POOL.communityPool = safeRevenue * 0.05;
+  saveRevenuePool();
+  renderRevenuePool();
+}
+
+function distributeCommunityPool() {
+  const participants = getRevenueParticipants();
+  const totalStars = participants.reduce((sum, user) => sum + user.stars, 0);
+  const payouts = participants.map((user) => {
+    const payout = totalStars > 0 ? (user.stars / totalStars) * REVENUE_POOL.communityPool : 0;
+    return {
+      userId: user.id || null,
+      payout
+    };
+  });
+  REVENUE_POOL.distributionLog.push({
+    timestamp: Date.now(),
+    totalStars,
+    communityPool: REVENUE_POOL.communityPool,
+    payouts
+  });
+  saveRevenuePool();
+  renderRevenuePool();
+  return payouts;
+}
+
 function getOverallPulseForCity(cityId) {
   const cityState = cityPulseState[cityId];
   if (typeof cityState?.overall === "number") return cityState.overall;
@@ -1362,6 +1442,15 @@ function renderUserProfile() {
   if (starsEl)    starsEl.textContent    = USER_PROFILE.stars;
   if (checkinsEl) checkinsEl.textContent = USER_PROFILE.checkins;
   if (citiesEl)   citiesEl.textContent   = USER_PROFILE.citiesVisited.length;
+}
+
+function renderRevenuePool() {
+  const monthlyRevenueEl = document.getElementById("revenue-monthly");
+  const communityPoolEl = document.getElementById("revenue-community");
+  const nextDistributionEl = document.getElementById("revenue-next-date");
+  if (monthlyRevenueEl) monthlyRevenueEl.textContent = formatCurrency(REVENUE_POOL.monthlySponsorRevenue);
+  if (communityPoolEl) communityPoolEl.textContent = formatCurrency(REVENUE_POOL.communityPool);
+  if (nextDistributionEl) nextDistributionEl.textContent = getNextDistributionDate();
 }
 
 // ─── LEGACY MODE ─────────────────────────────────────────────────────────────
@@ -1535,5 +1624,9 @@ document.addEventListener("DOMContentLoaded", () => {
   setupTripEvaluate();
   setupModalClose();
   renderUserProfile();
+  renderRevenuePool();
   simulateLivePulses();
 });
+
+window.updateRevenuePool = updateRevenuePool;
+window.distributeCommunityPool = distributeCommunityPool;
