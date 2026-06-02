@@ -2,203 +2,424 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Glotemp – The World’s Pulse</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#000000" />
+
+  <!-- SEO -->
+  <title>Glotemp — The World's Pulse Engine</title>
+  <meta name="description" content="Glotemp is the world's first real-time collective mood infrastructure. Track emotion, energy, and city pulse across the globe. The living atlas of human experience.">
+  <meta name="keywords" content="city pulse, global mood tracker, real-time city data, travel intelligence, nightlife tracker, urban analytics">
+  <meta name="author" content="Glotemp">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://www.glotemp.com/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.glotemp.com/">
+  <meta property="og:title" content="Glotemp — The World's Pulse Engine">
+  <meta property="og:description" content="Real-time collective mood infrastructure. Every city, alive.">
+  <meta property="og:image" content="https://www.glotemp.com/assets/og.jpg">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Glotemp — The World's Pulse Engine">
+  <meta name="twitter:description" content="Track the emotional temperature of every city on earth. In real time.">
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Glotemp",
+    "description": "Real-time global mood and city pulse intelligence platform",
+    "url": "https://www.glotemp.com",
+    "applicationCategory": "LifestyleApplication",
+    "operatingSystem": "All",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+
+  <!-- Favicon: embedded SVG globe -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 38'%3E%3Ccircle cx='19' cy='19' r='17' fill='none' stroke='%23E8B84B' stroke-width='1.5'/%3E%3Cellipse cx='19' cy='19' rx='9' ry='17' fill='none' stroke='%23E8B84B' stroke-width='1' opacity='0.6'/%3E%3Cellipse cx='19' cy='19' rx='17' ry='6' fill='none' stroke='%23E8B84B' stroke-width='0.8' opacity='0.4'/%3E%3Ccircle cx='25' cy='11' r='2.5' fill='%2300D4FF'/%3E%3C/svg%3E">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#030508">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="gt-header">
-    <div class="gt-brand">
-      <svg class="gt-logo-svg" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="22" cy="22" r="18" fill="none" stroke="currentColor" stroke-width="1.5" />
-        <ellipse cx="22" cy="22" rx="10" ry="18" fill="none" stroke="currentColor" stroke-width="1" opacity="0.65" />
-        <ellipse cx="22" cy="22" rx="18" ry="6.5" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.5" />
-        <line x1="22" y1="4" x2="22" y2="40" stroke="currentColor" stroke-width="0.7" opacity="0.3" />
-        <circle cx="22" cy="22" r="18" fill="none" stroke="currentColor" stroke-width="1.2" class="gt-globe-pulse-ring" />
-        <circle cx="29" cy="14" r="2.5" fill="currentColor" class="gt-globe-marker" />
+
+  <!-- BACKGROUND LAYERS -->
+  <div class="gt-mesh" aria-hidden="true"></div>
+  <div class="gt-grid-lines" aria-hidden="true"></div>
+
+  <!-- ══ NAVIGATION ══════════════════════════════════════════════ -->
+  <nav class="gt-nav" id="gt-nav" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="gt-logo" aria-label="Glotemp home">
+      <!-- EMBEDDED SVG GLOBE LOGO -->
+      <svg class="gt-logo-svg" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
+        <!-- Outer glow ring (pulse) -->
+        <circle class="gt-logo-pulse" cx="19" cy="19" r="16" stroke="rgba(232,184,75,0.15)" stroke-width="8" fill="none"/>
+        <!-- Globe body -->
+        <circle cx="19" cy="19" r="14" stroke="#E8B84B" stroke-width="1.2" fill="none" opacity="0.9"/>
+        <!-- Meridian ellipses -->
+        <ellipse class="gt-logo-globe-ring" cx="19" cy="19" rx="8" ry="14" stroke="#E8B84B" stroke-width="0.8" fill="none" opacity="0.55"/>
+        <ellipse class="gt-logo-globe-ring-2" cx="19" cy="19" rx="14" ry="5.5" stroke="#E8B84B" stroke-width="0.7" fill="none" opacity="0.4"/>
+        <!-- Vertical axis -->
+        <line x1="19" y1="5" x2="19" y2="33" stroke="#E8B84B" stroke-width="0.5" opacity="0.25"/>
+        <!-- City dot — orbiting -->
+        <circle class="gt-logo-dot" cx="26" cy="12" r="2" fill="#00D4FF"/>
+        <!-- Second city dot — static -->
+        <circle cx="13" cy="23" r="1.5" fill="#E8B84B" opacity="0.7"/>
+        <!-- Connection line -->
+        <line x1="26" y1="12" x2="13" y2="23" stroke="rgba(232,184,75,0.3)" stroke-width="0.6" stroke-dasharray="2 2"/>
       </svg>
-      <div class="gt-brand-text">
-        <div class="gt-brand-name">Glotemp</div>
-        <div class="gt-brand-sub">Global Mood &amp; Tempo</div>
+      <div class="gt-logo-text">
+        <span class="gt-logo-name">Glotemp</span>
+        <span class="gt-logo-sub">Global Pulse Engine</span>
+      </div>
+    </a>
+
+    <button class="gt-hamburger" id="gt-hamburger" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <ul class="gt-nav-links" id="gt-nav-links" role="list">
+      <li><a href="index.html" class="gt-nav-link active">App</a></li>
+      <li><a href="about.html" class="gt-nav-link">About</a></li>
+      <li><a href="investors.html" class="gt-nav-link">Investors</a></li>
+      <li>
+        <button id="checkin-btn" class="gt-nav-cta" aria-label="Check in your mood">
+          <span>Check In</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- ══ HERO ═════════════════════════════════════════════════════ -->
+  <section class="gt-hero" aria-label="Hero">
+
+    <!-- Background globe -->
+    <svg class="gt-hero-globe" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none">
+      <!-- Outer rings -->
+      <circle cx="350" cy="350" r="320" stroke="#E8B84B" stroke-width="0.5" opacity="0.3"/>
+      <circle cx="350" cy="350" r="290" stroke="#E8B84B" stroke-width="0.3" opacity="0.2"/>
+      <!-- Globe body -->
+      <circle cx="350" cy="350" r="250" stroke="#E8B84B" stroke-width="1" opacity="0.6"/>
+      <!-- Meridians -->
+      <ellipse class="gt-hero-globe-ring-1" cx="350" cy="350" rx="140" ry="250" stroke="#E8B84B" stroke-width="0.6" opacity="0.4"/>
+      <ellipse class="gt-hero-globe-ring-2" cx="350" cy="350" rx="250" ry="90" stroke="#E8B84B" stroke-width="0.5" opacity="0.3"/>
+      <ellipse class="gt-hero-globe-ring-3" cx="350" cy="350" rx="200" ry="250" stroke="#00D4FF" stroke-width="0.4" opacity="0.25"/>
+      <!-- Axes -->
+      <line x1="350" y1="100" x2="350" y2="600" stroke="#E8B84B" stroke-width="0.4" opacity="0.2"/>
+      <line x1="100" y1="350" x2="600" y2="350" stroke="#E8B84B" stroke-width="0.4" opacity="0.15"/>
+      <!-- Pulse ring -->
+      <circle class="gt-hero-globe-pulse" cx="350" cy="350" r="260" stroke="#E8B84B" stroke-width="0.8" opacity="0.2"/>
+      <!-- City marker dots -->
+      <circle cx="440" cy="220" r="4" fill="#00D4FF" opacity="0.8"/>
+      <circle cx="440" cy="220" r="10" stroke="#00D4FF" stroke-width="0.8" opacity="0.3"/>
+      <circle cx="280" cy="310" r="3.5" fill="#E8B84B" opacity="0.8"/>
+      <circle cx="280" cy="310" r="9" stroke="#E8B84B" stroke-width="0.8" opacity="0.3"/>
+      <circle cx="390" cy="400" r="3" fill="#FF4D2E" opacity="0.7"/>
+      <circle cx="390" cy="400" r="8" stroke="#FF4D2E" stroke-width="0.7" opacity="0.25"/>
+      <circle cx="200" cy="260" r="2.5" fill="#00E5A0" opacity="0.6"/>
+      <circle cx="490" cy="380" r="2.5" fill="#E8B84B" opacity="0.5"/>
+      <!-- Connection lines -->
+      <line x1="440" y1="220" x2="280" y2="310" stroke="#E8B84B" stroke-width="0.5" stroke-dasharray="3 4" opacity="0.3"/>
+      <line x1="280" y1="310" x2="390" y2="400" stroke="#00D4FF" stroke-width="0.4" stroke-dasharray="3 4" opacity="0.25"/>
+    </svg>
+
+    <!-- Floating city pulse dots -->
+    <div class="gt-hero-dots" aria-hidden="true">
+      <span class="gt-hero-dot" style="top:22%;left:18%;animation-delay:0s;"></span>
+      <span class="gt-hero-dot" style="top:45%;left:72%;animation-delay:0.8s;background:var(--cyan);box-shadow:0 0 8px var(--cyan-glow);"></span>
+      <span class="gt-hero-dot" style="top:68%;left:35%;animation-delay:1.6s;background:var(--ember);box-shadow:0 0 8px rgba(255,77,46,0.4);"></span>
+      <span class="gt-hero-dot" style="top:30%;left:58%;animation-delay:2.4s;"></span>
+      <span class="gt-hero-dot" style="top:75%;left:62%;animation-delay:1.2s;background:var(--green);box-shadow:0 0 8px rgba(0,229,160,0.4);"></span>
+    </div>
+
+    <!-- Hero Content -->
+    <div class="gt-hero-content">
+      <div class="gt-hero-eyebrow">
+        <span class="gt-hero-eyebrow-line"></span>
+        Real-time · Global · Intelligence
+        <span class="gt-hero-eyebrow-line"></span>
+      </div>
+
+      <h1 class="gt-hero-title">
+        <span class="gt-hero-title-line">The World's</span>
+        <span class="gt-hero-title-line gt-hero-title-gold">Pulse,</span>
+        <span class="gt-hero-title-line gt-hero-title-ghost">In Motion.</span>
+      </h1>
+
+      <p class="gt-hero-sub">
+        A living atlas. A decision oracle. A global nervous system.<br>
+        Track emotion, energy, and city heat — in real time.
+      </p>
+
+      <div class="gt-hero-actions">
+        <button id="checkin-btn-hero" class="gt-btn gt-btn-primary" aria-label="Check in your mood">
+          ◈ Check In Your Mood
+        </button>
+        <button id="explore-btn" class="gt-btn gt-btn-ghost" aria-label="Explore live cities">
+          ↗ Explore Cities
+        </button>
+        <a href="about.html" class="gt-btn gt-btn-cyan">
+          ◎ What is Glotemp
+        </a>
       </div>
     </div>
-    <nav class="gt-header-nav">
-      <a class="gt-nav-link" href="about.html">About</a>
-      <a class="gt-nav-link" href="investors.html">Investors</a>
-      <span class="gt-header-right">Live cinematic pulse map</span>
-    </nav>
-  </header>
 
-  <main class="gt-main">
-    <section class="gt-hero">
-      <h1>The world’s pulse, in motion.</h1>
-      <p>
-        Track emotion, energy, and city heat in real time. Move through cities and light up your Golden Path.
-      </p>
-      <div class="gt-hero-actions">
-        <button id="checkin-btn" class="gt-btn gt-btn-primary">Check in your mood</button>
-        <button id="explore-btn" class="gt-btn gt-btn-outline">Explore live cities</button>
+    <!-- Scroll indicator -->
+    <div class="gt-scroll-indicator" aria-hidden="true">
+      <span>Scroll</span>
+      <div class="gt-scroll-line"></div>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="gt-hero-stats" role="region" aria-label="Live statistics">
+      <div class="gt-hero-stat">
+        <span class="gt-hero-stat-val" id="hero-cities-count">5</span>
+        <span class="gt-hero-stat-lbl">Cities Live</span>
       </div>
-    </section>
+      <div class="gt-hero-stat">
+        <span class="gt-hero-stat-val" id="hero-checkins-count">0</span>
+        <span class="gt-hero-stat-lbl">Check-ins Today</span>
+      </div>
+      <div class="gt-hero-stat">
+        <span class="gt-hero-stat-val">$5%</span>
+        <span class="gt-hero-stat-lbl">Revenue Shared</span>
+      </div>
+      <div class="gt-hero-stat">
+        <span class="gt-hero-stat-val gt-live-badge-inline">
+          <span class="gt-live-dot" style="display:inline-block;width:6px;height:6px;background:var(--cyan);border-radius:50%;box-shadow:0 0 6px var(--cyan);animation:liveBlink 1.6s ease-in-out infinite;margin-right:4px;"></span>
+          Live
+        </span>
+        <span class="gt-hero-stat-lbl">Global Signal</span>
+      </div>
+    </div>
+  </section>
 
-    <section id="user-profile" class="gt-section" aria-labelledby="profile-title">
-      <h2 id="profile-title" class="gt-section-title">Your Profile</h2>
+  <!-- ══ MAIN APP ══════════════════════════════════════════════════ -->
+  <main class="gt-main" role="main">
+
+    <!-- ── YOUR PROFILE ─────────────────────────────────────── -->
+    <section id="user-profile" class="gt-app-section gt-reveal" aria-labelledby="profile-title">
+      <div class="gt-app-section-header">
+        <h2 id="profile-title" class="gt-app-section-title">
+          <span style="color:var(--gold)">◈</span> Your Profile
+        </h2>
+        <span class="gt-app-section-sub">Explorer identity & contribution score</span>
+      </div>
       <div class="gt-profile-card">
-        <div class="gt-profile-nickname" id="profile-nickname">Anonymous Explorer</div>
-        <div class="gt-profile-rank" id="profile-rank">Explorer I</div>
+        <div class="gt-profile-top">
+          <div>
+            <div class="gt-profile-nickname" id="profile-nickname">Anonymous Explorer</div>
+            <div class="gt-profile-rank" id="profile-rank">Explorer I</div>
+          </div>
+        </div>
         <div class="gt-profile-stats">
           <div class="gt-profile-stat">
-            <div class="gt-profile-stat-value" id="profile-stars">0</div>
-            <div class="gt-profile-stat-label">Stars</div>
+            <span class="gt-profile-stat-value" id="profile-stars">0</span>
+            <span class="gt-profile-stat-label">Stars Earned</span>
           </div>
           <div class="gt-profile-stat">
-            <div class="gt-profile-stat-value" id="profile-checkins">0</div>
-            <div class="gt-profile-stat-label">Check-ins</div>
+            <span class="gt-profile-stat-value" id="profile-checkins">0</span>
+            <span class="gt-profile-stat-label">Check-ins</span>
           </div>
           <div class="gt-profile-stat">
-            <div class="gt-profile-stat-value" id="profile-cities">0</div>
-            <div class="gt-profile-stat-label">Cities</div>
+            <span class="gt-profile-stat-value" id="profile-cities">0</span>
+            <span class="gt-profile-stat-label">Cities</span>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="revenue-pool" class="gt-section" aria-labelledby="revenue-pool-title">
-      <h2 id="revenue-pool-title" class="gt-section-title">Revenue Pool</h2>
+    <!-- ── CITY GRID ─────────────────────────────────────────── -->
+    <section class="gt-app-section gt-reveal" aria-labelledby="city-grid-title">
+      <div class="gt-app-section-header">
+        <h2 id="city-grid-title" class="gt-app-section-title">
+          <span class="gt-live-badge" style="font-size:0.58rem;padding:0.2rem 0.6rem;">
+            <span class="gt-live-dot"></span> Live
+          </span>
+          &nbsp;City Grid
+        </h2>
+        <span class="gt-app-section-sub">Global mood and tempo, updated every 4.5 seconds</span>
+      </div>
+      <div id="city-cards" class="gt-city-grid" role="list" aria-label="City pulse cards">
+        <!-- Rendered by app.js -->
+      </div>
+    </section>
+
+    <!-- ── TRIP PULSE ────────────────────────────────────────── -->
+    <section class="gt-app-section gt-reveal" aria-labelledby="trip-pulse-title">
+      <div class="gt-app-section-header">
+        <h2 id="trip-pulse-title" class="gt-app-section-title">
+          <span style="color:var(--cyan)">↗</span> Trip Pulse
+        </h2>
+        <span class="gt-app-section-sub">Route intelligence — should you go?</span>
+      </div>
+      <div class="gt-trip-grid">
+        <div class="gt-trip-form">
+          <div>
+            <label class="gt-label" for="trip-from">Origin City</label>
+            <select class="gt-select gt-input" id="trip-from" aria-label="Select origin city">
+              <option value="">Select a city…</option>
+            </select>
+          </div>
+          <div>
+            <label class="gt-label" for="trip-to">Destination City</label>
+            <select class="gt-select gt-input" id="trip-to" aria-label="Select destination city">
+              <option value="">Select a city…</option>
+            </select>
+          </div>
+          <div>
+            <label class="gt-label" for="trip-scenario">Your Intent</label>
+            <select class="gt-select gt-input" id="trip-scenario" aria-label="Select trip scenario">
+              <option value="weekend">Weekend escape</option>
+              <option value="sell">Commerce &amp; selling</option>
+              <option value="study">Study abroad</option>
+              <option value="nightlife">Nightlife &amp; scene</option>
+            </select>
+          </div>
+          <button class="gt-trip-btn" id="trip-evaluate" type="button" aria-label="Evaluate trip pulse">
+            ◈ Evaluate Trip
+          </button>
+        </div>
+
+        <div class="gt-trip-result" id="trip-result" role="region" aria-label="Trip evaluation result">
+          <div style="text-align:center;">
+            <h3 style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:0.5rem;">Route Signal</h3>
+            <p style="font-size:0.82rem;color:var(--text-3);margin-bottom:1.5rem;">Select cities and intent, then evaluate.</p>
+            <div class="gt-hero-orbit" aria-hidden="true">
+              <div class="gt-orbit-ring"></div>
+              <div class="gt-orbit-ring gt-orbit-ring-2"></div>
+              <div class="gt-orbit-core"></div>
+              <div class="gt-orbit-pulse"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── REVENUE POOL ──────────────────────────────────────── -->
+    <section id="revenue-pool" class="gt-app-section gt-reveal" aria-labelledby="revenue-pool-title">
+      <div class="gt-app-section-header">
+        <h2 id="revenue-pool-title" class="gt-app-section-title">
+          <span style="color:var(--cyan)">⬡</span> Revenue Pool
+        </h2>
+        <span class="gt-app-section-sub">5% of sponsor revenue distributed to contributors</span>
+      </div>
       <div class="gt-revenue-card">
         <div class="gt-revenue-stat">
-          <div class="gt-revenue-stat-label">Monthly sponsor revenue</div>
+          <div class="gt-revenue-stat-label">Monthly Sponsor Revenue</div>
           <div class="gt-revenue-stat-value" id="revenue-monthly">$0.00</div>
         </div>
         <div class="gt-revenue-stat">
-          <div class="gt-revenue-stat-label">Community pool (5%)</div>
-          <div class="gt-revenue-stat-value" id="revenue-community">$0.00</div>
+          <div class="gt-revenue-stat-label">Community Pool (5%)</div>
+          <div class="gt-revenue-stat-value" id="revenue-community" style="color:var(--gold)">$0.00</div>
         </div>
         <div class="gt-revenue-stat">
-          <div class="gt-revenue-stat-label">Next distribution date</div>
-          <div class="gt-revenue-stat-value" id="revenue-next-date">—</div>
+          <div class="gt-revenue-stat-label">Next Distribution</div>
+          <div class="gt-revenue-stat-value" id="revenue-next-date" style="color:var(--text-2);font-size:1.2rem;">—</div>
         </div>
       </div>
     </section>
 
-    <section id="sponsor-wall" class="gt-section" aria-labelledby="sponsor-wall-title">
-      <h2 id="sponsor-wall-title" class="gt-section-title">Sponsor Wall</h2>
-      <p class="gt-section-subtitle">Active partners powering city pulse rewards.</p>
-      <div id="sponsor-wall-list" class="gt-sponsor-wall-list"></div>
-    </section>
-
-    <section class="gt-section" aria-labelledby="city-grid-title">
-      <h2 id="city-grid-title" class="gt-section-title">City Grid <span class="gt-live-dot" aria-label="live"></span></h2>
-      <p class="gt-section-subtitle">Live mood and tempo across global cities.</p>
-      <div id="city-cards" class="gt-city-grid"></div>
-    </section>
-
-    <section class="gt-section" aria-labelledby="trip-pulse-title">
-      <h2 id="trip-pulse-title" class="gt-section-title">Trip Pulse</h2>
-      <p class="gt-section-subtitle">Build your route and preview your movement signal.</p>
-      <div class="gt-trip-grid">
-        <form class="gt-trip-form">
-          <label class="gt-label" for="trip-from">Start city</label>
-          <select class="gt-input" id="trip-from">
-            <option value="">Select a city…</option>
-          </select>
-
-          <label class="gt-label" for="trip-to">Destination city</label>
-          <select class="gt-input" id="trip-to">
-            <option value="">Select a city…</option>
-          </select>
-
-          <label class="gt-label" for="trip-scenario">Scenario</label>
-          <select class="gt-input" id="trip-scenario">
-            <option value="weekend">Weekend trip</option>
-            <option value="sell">Selling / commerce</option>
-            <option value="study">Study abroad</option>
-            <option value="nightlife">Nightlife</option>
-          </select>
-
-          <button class="gt-trip-btn" id="trip-evaluate" type="button">Evaluate trip</button>
-        </form>
-
-        <div class="gt-trip-result" id="trip-result">
-          <h3>Route Signal</h3>
-          <p>Select cities and a scenario, then hit <strong>Evaluate trip</strong>.</p>
-          <div class="gt-hero-orbit">
-            <div class="gt-orbit-ring"></div>
-            <div class="gt-orbit-ring gt-orbit-ring-2"></div>
-            <div class="gt-orbit-core"></div>
-            <div class="gt-orbit-pulse"></div>
-          </div>
-        </div>
+    <!-- ── SPONSOR WALL ──────────────────────────────────────── -->
+    <section id="sponsor-wall" class="gt-app-section gt-reveal" aria-labelledby="sponsor-wall-title">
+      <div class="gt-app-section-header">
+        <h2 id="sponsor-wall-title" class="gt-app-section-title">
+          <span style="color:var(--gold)">★</span> Sponsor Wall
+        </h2>
+        <span class="gt-app-section-sub">Active partners powering city pulse rewards</span>
+      </div>
+      <div id="sponsor-wall-list" class="gt-sponsor-wall-list" role="list" aria-label="Active sponsors">
+        <!-- Rendered by app.js -->
       </div>
     </section>
 
-    <section id="explorer-mode" class="gt-section gt-section-hidden" aria-labelledby="explorer-title">
-      <h2 id="explorer-title" class="gt-section-title">Explorer</h2>
-      <p class="gt-section-subtitle">Your Golden Path and visited constellation.</p>
+    <!-- ── SCOREBOARD ────────────────────────────────────────── -->
+    <section class="gt-app-section gt-reveal" aria-labelledby="scoreboard-title">
+      <div class="gt-app-section-header">
+        <h2 id="scoreboard-title" class="gt-app-section-title">
+          <span style="color:var(--ember)">🔥</span> Heat Scoreboard
+        </h2>
+        <span class="gt-app-section-sub">Top city heat signatures right now</span>
+      </div>
+      <div id="global-scoreboard" class="gt-scoreboard" role="list" aria-label="City heat rankings">
+        <p class="gt-empty">No heat data yet. Check in to start the pulse.</p>
+      </div>
+    </section>
+
+    <!-- ── EXPLORER MODE ─────────────────────────────────────── -->
+    <section id="explorer-mode" class="gt-app-section gt-section-hidden" aria-labelledby="explorer-title">
+      <div class="gt-app-section-header">
+        <h2 id="explorer-title" class="gt-app-section-title">
+          <span style="color:var(--gold)">◎</span> Your Golden Path
+        </h2>
+        <span class="gt-app-section-sub">City constellation and world illumination</span>
+      </div>
       <div class="gt-explorer-layout">
         <div class="gt-explorer-left">
           <div class="gt-pilgrim-card">
             <div class="gt-pilgrim-ring">
-              <div class="gt-pilgrim-ring-inner"></div>
+              <svg viewBox="0 0 110 110" aria-hidden="true" fill="none">
+                <circle cx="55" cy="55" r="48" stroke="rgba(232,184,75,0.15)" stroke-width="8"/>
+                <circle cx="55" cy="55" r="48" stroke="#E8B84B" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.4"/>
+                <circle cx="55" cy="55" r="35" stroke="rgba(232,184,75,0.2)" stroke-width="1"/>
+              </svg>
               <span id="pilgrim-score-display" class="gt-pilgrim-score">0%</span>
             </div>
-            <p class="gt-pilgrim-label">World illuminated</p>
+            <p class="gt-pilgrim-label">World Illuminated</p>
           </div>
           <div class="gt-visited">
-            <h3>Visited cities</h3>
-            <div id="visited-cities-list" class="gt-visited-list"></div>
+            <h3>Visited Cities</h3>
+            <div id="visited-cities-list" class="gt-visited-list">No cities yet. Your constellation awaits.</div>
           </div>
         </div>
         <div class="gt-explorer-right">
-          <h3>Your Golden Path</h3>
-          <div id="golden-map" class="gt-golden-map"></div>
+          <h3 style="font-family:var(--font-display);font-size:0.9rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:1rem;">Your Golden Path</h3>
+          <div id="golden-map" class="gt-golden-map" role="img" aria-label="Golden path map visualization"></div>
         </div>
       </div>
     </section>
 
-    <section class="gt-section" aria-labelledby="scoreboard-title">
-      <h2 id="scoreboard-title" class="gt-section-title">Scoreboard</h2>
-      <p class="gt-section-subtitle">Top city heat signatures right now.</p>
-      <div id="global-scoreboard" class="gt-scoreboard">
-        <p class="gt-empty">No heat data yet. Check in to start the pulse.</p>
-      </div>
-    </section>
   </main>
 
-  <footer class="gt-footer gt-footer-page">
-    <div class="gt-footer-left">
-      <span>Glotemp — Global Mood &amp; Tempo.</span>
-    </div>
-    <nav class="gt-footer-nav">
+  <!-- ══ FOOTER ═══════════════════════════════════════════════════ -->
+  <footer class="gt-footer" role="contentinfo">
+    <span class="gt-footer-left">Glotemp — Global Mood &amp; Tempo · Every city, alive.</span>
+    <nav class="gt-footer-nav" aria-label="Footer navigation">
       <a class="gt-footer-link" href="about.html">About</a>
       <a class="gt-footer-link" href="investors.html">Investors</a>
       <a class="gt-footer-link" href="mailto:hello@glotemp.com">Contact</a>
     </nav>
   </footer>
 
-  <div id="install-banner" class="gt-install-banner gt-hidden">
-    <span>Add Glotemp to your home screen for a full-screen experience.</span>
-    <button id="install-btn" class="gt-btn gt-btn-small gt-btn-primary">Add</button>
+  <!-- ══ INSTALL BANNER ════════════════════════════════════════════ -->
+  <div id="install-banner" class="gt-install-banner gt-hidden" role="complementary">
+    <span>Add Glotemp to your home screen.</span>
+    <button id="install-btn" class="gt-btn gt-btn-primary gt-btn-small">Add</button>
   </div>
 
-  <div id="checkin-modal" class="gt-modal gt-hidden">
+  <!-- ══ CHECK-IN MODAL ════════════════════════════════════════════ -->
+  <div id="checkin-modal" class="gt-modal gt-hidden" role="dialog" aria-modal="true" aria-labelledby="checkin-title">
     <div class="gt-modal-backdrop" id="checkin-modal-backdrop"></div>
     <div class="gt-modal-content gt-modal-content-scroll">
-      <button id="checkin-modal-close" class="gt-modal-close">×</button>
-      <h2 class="gt-modal-body-title">Check In Your Mood</h2>
+      <button id="checkin-modal-close" class="gt-modal-close" aria-label="Close check-in modal">×</button>
+
+      <h2 id="checkin-title" class="gt-modal-body-title">Check In Your Pulse</h2>
+      <p class="gt-modal-body-sub">Signal your city. Earn Stars. Power the global pulse.</p>
 
       <div class="gt-checkin-field">
         <label class="gt-label" for="checkin-city">City</label>
-        <select class="gt-input" id="checkin-city">
+        <select class="gt-select gt-input" id="checkin-city" aria-label="Select your city">
           <option value="">Select a city…</option>
         </select>
       </div>
 
       <div class="gt-checkin-field">
         <div class="gt-label">Mood</div>
-        <div class="gt-mood-picker" id="checkin-mood-picker">
+        <div class="gt-mood-picker" id="checkin-mood-picker" role="group" aria-label="Select your mood">
           <button class="gt-mood-btn" data-mood="excited" type="button">😄 Excited</button>
           <button class="gt-mood-btn" data-mood="calm" type="button">😌 Calm</button>
           <button class="gt-mood-btn" data-mood="stressed" type="button">😤 Stressed</button>
@@ -208,14 +429,15 @@
       </div>
 
       <div class="gt-checkin-field">
-        <label class="gt-label" for="checkin-intensity">Intensity &nbsp;<span id="checkin-intensity-val">50</span></label>
-        <input type="range" class="gt-slider" id="checkin-intensity" min="0" max="100" value="50"
-          aria-describedby="checkin-intensity-val" />
+        <label class="gt-label" for="checkin-intensity">
+          Intensity — <span id="checkin-intensity-val">50</span>
+        </label>
+        <input type="range" class="gt-slider" id="checkin-intensity" min="0" max="100" value="50" aria-describedby="checkin-intensity-val">
       </div>
 
       <div class="gt-checkin-field">
         <label class="gt-label" for="checkin-scene">Scene</label>
-        <select class="gt-input" id="checkin-scene">
+        <select class="gt-select gt-input" id="checkin-scene" aria-label="Select your scene">
           <option value="club">Club</option>
           <option value="uni">University</option>
           <option value="work">Work</option>
@@ -227,18 +449,18 @@
       </div>
 
       <div class="gt-checkin-field">
-        <div class="gt-label">Identity</div>
-        <div class="gt-identity-radios" id="checkin-identity-picker">
+        <div class="gt-label">Identity Mode</div>
+        <div class="gt-identity-radios" id="checkin-identity-picker" role="group" aria-label="Select identity mode">
           <label class="gt-identity-radio">
-            <input type="radio" name="checkin-identity-mode" value="anonymous" checked />
+            <input type="radio" name="checkin-identity-mode" value="anonymous" checked>
             <span>Anonymous</span>
           </label>
           <label class="gt-identity-radio">
-            <input type="radio" name="checkin-identity-mode" value="nickname" />
+            <input type="radio" name="checkin-identity-mode" value="nickname">
             <span>Nickname</span>
           </label>
           <label class="gt-identity-radio">
-            <input type="radio" name="checkin-identity-mode" value="legal" />
+            <input type="radio" name="checkin-identity-mode" value="legal">
             <span>Legal Name</span>
           </label>
         </div>
@@ -246,29 +468,87 @@
 
       <div class="gt-checkin-field gt-hidden" id="checkin-nickname-field">
         <label class="gt-label" for="checkin-nickname">Nickname</label>
-        <input type="text" class="gt-input" id="checkin-nickname" placeholder="Enter your nickname…" maxlength="50" />
+        <input type="text" class="gt-input" id="checkin-nickname" placeholder="Enter your nickname…" maxlength="50" aria-label="Enter your nickname">
       </div>
 
       <div class="gt-checkin-field gt-hidden" id="checkin-legal-name-field">
         <label class="gt-label" for="checkin-legal-name">Legal Name</label>
-        <input type="text" class="gt-input" id="checkin-legal-name" placeholder="Enter your legal name…" maxlength="50" />
+        <input type="text" class="gt-input" id="checkin-legal-name" placeholder="Enter your legal name…" maxlength="50" aria-label="Enter your legal name">
       </div>
 
-      <div id="checkin-error" class="gt-checkin-error gt-hidden"></div>
+      <div id="checkin-error" class="gt-checkin-error gt-hidden" role="alert"></div>
       <div id="checkin-sponsor-banner"></div>
 
-      <button id="checkin-submit" class="gt-btn gt-btn-primary gt-checkin-submit-btn" type="button">Submit Check-In</button>
+      <button id="checkin-submit" class="gt-btn gt-btn-primary gt-checkin-submit-btn" type="button" aria-label="Submit check-in">
+        ◈ Submit Check-In
+      </button>
     </div>
   </div>
 
-  <div id="city-modal" class="gt-modal gt-hidden">
+  <!-- ══ CITY DETAIL MODAL ═════════════════════════════════════════ -->
+  <div id="city-modal" class="gt-modal gt-hidden" role="dialog" aria-modal="true" aria-labelledby="city-modal-title">
     <div class="gt-modal-backdrop"></div>
-    <div class="gt-modal-content">
-      <button id="city-modal-close" class="gt-modal-close">×</button>
+    <div class="gt-modal-content gt-modal-content-scroll">
+      <button id="city-modal-close" class="gt-modal-close" aria-label="Close city modal">×</button>
       <div id="city-modal-body"></div>
     </div>
   </div>
 
+  <script>
+    // ── NAV SCROLL EFFECT ──
+    const nav = document.getElementById('gt-nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+
+    // ── MOBILE HAMBURGER ──
+    const hamburger = document.getElementById('gt-hamburger');
+    const navLinks  = document.getElementById('gt-nav-links');
+    hamburger.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('open');
+      hamburger.setAttribute('aria-expanded', isOpen);
+      const spans = hamburger.querySelectorAll('span');
+      if (isOpen) {
+        spans[0].style.transform = 'rotate(45deg) translate(4px, 4px)';
+        spans[1].style.opacity = '0';
+        spans[2].style.transform = 'rotate(-45deg) translate(4px, -4px)';
+      } else {
+        spans.forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
+      }
+    });
+
+    // ── HERO CHECK-IN BUTTON ALIAS ──
+    document.getElementById('checkin-btn-hero').addEventListener('click', () => {
+      document.getElementById('checkin-btn').click();
+    });
+
+    // ── SCROLL REVEAL ──
+    const revealEls = document.querySelectorAll('.gt-reveal');
+    if ('IntersectionObserver' in window) {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => entry.target.classList.add('gt-visible'), i * 80);
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      revealEls.forEach(el => obs.observe(el));
+    } else {
+      revealEls.forEach(el => el.classList.add('gt-visible'));
+    }
+
+    // ── LIVE COUNTER ANIMATION ──
+    function animateCount(el, target, suffix) {
+      let current = 0;
+      const step = Math.ceil(target / 40);
+      const interval = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = current + (suffix || '');
+        if (current >= target) clearInterval(interval);
+      }, 40);
+    }
+  </script>
   <script src="app.js"></script>
 </body>
 </html>
