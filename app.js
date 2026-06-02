@@ -22,6 +22,7 @@ const SPORTS_PULSE_LABEL = 'Sports pulse';
 const EVENTS_UPCOMING_LABEL = 'Events';
 const PILGRIM_SCORE_PER_CITY = 5;
 const MAX_PILGRIM_SCORE = 100;
+const GOLDEN_DROP_TYPES = ['surge', 'gift', 'event'];
 const GNEWS_SUPPORTED_COUNTRIES = new Set([
   'au', 'br', 'ca', 'cn', 'eg', 'fr', 'de', 'gr', 'hk', 'in', 'ie',
   'il', 'it', 'jp', 'nl', 'no', 'pk', 'pe', 'ph', 'pt', 'ro', 'ru',
@@ -381,6 +382,7 @@ const selectionState = {
 const goldenPath = {
   visitedCities: [],
   visitedCoords: [],
+  goldenDrops: [],
   unlocked: false,
   pilgrimScore: 0
 };
@@ -464,6 +466,74 @@ function showGoldenMap() {
 function calculatePilgrimScore() {
   goldenPath.pilgrimScore = Math.min(MAX_PILGRIM_SCORE, goldenPath.visitedCities.length * PILGRIM_SCORE_PER_CITY);
   console.log('Pilgrim Score:', goldenPath.pilgrimScore);
+}
+
+function toRadians(value) {
+  return (value * Math.PI) / 180;
+}
+
+function calculateDistanceKm(startCoords, endCoords) {
+  const startLatitude = startCoords?.latitude;
+  const startLongitude = startCoords?.longitude;
+  const endLatitude = endCoords?.latitude;
+  const endLongitude = endCoords?.longitude;
+
+  if (![startLatitude, startLongitude, endLatitude, endLongitude].every(Number.isFinite)) {
+    return null;
+  }
+
+  const earthRadiusKm = 6371;
+  const deltaLatitude = toRadians(endLatitude - startLatitude);
+  const deltaLongitude = toRadians(endLongitude - startLongitude);
+  const startLatitudeRadians = toRadians(startLatitude);
+  const endLatitudeRadians = toRadians(endLatitude);
+  const haversineValue = (
+    Math.sin(deltaLatitude / 2) ** 2
+    + Math.cos(startLatitudeRadians) * Math.cos(endLatitudeRadians) * Math.sin(deltaLongitude / 2) ** 2
+  );
+  const arc = 2 * Math.atan2(Math.sqrt(haversineValue), Math.sqrt(1 - haversineValue));
+  return earthRadiusKm * arc;
+}
+
+function generateGoldenDrops(pulse, coords) {
+  const shouldGenerateDrop = pulse?.pulse_score > 70 || pulse?.cultural_heat > 2;
+  if (!shouldGenerateDrop) {
+    return null;
+  }
+
+  const dropType = pulse?.pulse_score > 70 && pulse?.cultural_heat > 2
+    ? GOLDEN_DROP_TYPES[2]
+    : pulse?.pulse_score > 70
+      ? GOLDEN_DROP_TYPES[0]
+      : GOLDEN_DROP_TYPES[1];
+  const drop = {
+    city: pulse.city,
+    coords,
+    type: dropType,
+    timestamp: Date.now()
+  };
+
+  goldenPath.goldenDrops.push(drop);
+  console.log('Golden Drop generated');
+  return drop;
+}
+
+function checkDropEligibility(coords) {
+  if (!goldenPath.unlocked) {
+    return false;
+  }
+
+  const latestDrop = goldenPath.goldenDrops[goldenPath.goldenDrops.length - 1];
+  if (!latestDrop?.coords) {
+    return false;
+  }
+
+  const distanceKm = calculateDistanceKm(coords, latestDrop.coords);
+  if (distanceKm === null) {
+    return false;
+  }
+
+  return distanceKm < 20;
 }
 
 function recordVisit(city, coords) {
@@ -648,6 +718,10 @@ async function handleCheckinSubmit(event) {
     console.log('Synthesized mood:', synthesizedMood);
     allData.claude_synthesis = synthesizedMood;
     const pulseObject = buildPulseObject(allData);
+    generateGoldenDrops(pulseObject, weatherResult?.coords);
+    if (checkDropEligibility(weatherResult?.coords)) {
+      console.log('Golden Drop nearby');
+    }
     console.log('Final pulse object:', pulseObject);
     updateCityCard(pulseObject);
   } catch (error) {
