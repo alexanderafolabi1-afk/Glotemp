@@ -1290,6 +1290,33 @@ function renderCityCards() {
   placeholderCards.forEach((pulse) => updateCityCard(pulse));
 }
 
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  window.deferredPrompt = e;
+  const installBanner = document.getElementById('install-banner');
+  if (installBanner) {
+    installBanner.style.display = 'block';
+  }
+});
+
+function attachInstallButtonListener() {
+  const installButton = document.getElementById('install-btn');
+  const installBanner = document.getElementById('install-banner');
+  if (!installButton || !installBanner) return;
+
+  installButton.onclick = async () => {
+    const prompt = window.deferredPrompt;
+    if (!prompt) return;
+    prompt.prompt();
+    window.deferredPrompt = null;
+    installBanner.style.display = 'none';
+  };
+}
+
 function init() {
   loadGoldenPath();
   renderCategoryButtons(moods, 'mood-buttons', 'mood');
@@ -1302,6 +1329,7 @@ function init() {
   attachGoldenUIListeners();
   updateUserProfileUI();
   updateGlobalScoreboard();
+  attachInstallButtonListener();
   if (goldenPath.unlocked) {
     activateExplorerMode();
   }
