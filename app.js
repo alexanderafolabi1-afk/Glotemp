@@ -489,7 +489,9 @@ function calculateCityGoldenHeat(city) {
   cityHeat[city].intersections = goldenPath.visitedCities.filter((visitedCity) => visitedCity === city).length;
   cityHeat[city].pulseHistory.push(latestPulseScore);
 
-  const averagePulseScore = cityHeat[city].pulseHistory.reduce((sum, score) => sum + score, 0) / cityHeat[city].pulseHistory.length;
+  const averagePulseScore = cityHeat[city].pulseHistory.length
+    ? cityHeat[city].pulseHistory.reduce((sum, score) => sum + score, 0) / cityHeat[city].pulseHistory.length
+    : 0;
   const heatScore = (
     cityHeat[city].intersections * 2
     + cityHeat[city].dropsClaimed * 5
@@ -497,6 +499,7 @@ function calculateCityGoldenHeat(city) {
     + averagePulseScore
   );
 
+  cityHeat[city].heatScore = heatScore;
   return heatScore;
 }
 
@@ -754,8 +757,9 @@ async function handleCheckinSubmit(event) {
     const pulseObject = buildPulseObject(allData);
     latestPulseScore = Number.isFinite(pulseObject?.pulse_score) ? pulseObject.pulse_score : 0;
     generateGoldenDrops(pulseObject, weatherResult?.coords);
-    calculateCityGoldenHeat(city);
+    const cityHeatScore = calculateCityGoldenHeat(city);
     console.log(`City Heat updated for ${city}`);
+    console.log('City Heat score:', cityHeatScore);
     if (goldenPath.unlocked && checkDropEligibility(weatherResult?.coords)) {
       console.log('Golden Drop nearby');
     }
