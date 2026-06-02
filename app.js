@@ -408,8 +408,8 @@ let goldenMapScale = 1;
 let goldenMapOffsetX = 0;
 let goldenMapOffsetY = 0;
 let goldenLinesVisible = true;
-let cityPulses = [];
 const cityPulseByName = new Map();
+const cityVisitCount = new Map();
 let claimedDropCount = 0;
 let checkinTimeoutId = null;
 
@@ -534,12 +534,17 @@ function loadGoldenPath() {
   try {
     const savedCityHeat = JSON.parse(localStorage.getItem(CITY_HEAT_STORAGE_KEY) || '{}');
     Object.keys(cityHeat).forEach((key) => delete cityHeat[key]);
-    Object.entries(savedCityHeat).forEach(([city, value]) => {
-      cityHeat[city] = value;
-    });
+    Object.assign(cityHeat, savedCityHeat);
   } catch {
     Object.keys(cityHeat).forEach((key) => delete cityHeat[key]);
   }
+
+  cityVisitCount.clear();
+  goldenPath.visitedCities.forEach((cityName) => {
+    const key = cityName?.trim().toLowerCase();
+    if (!key) return;
+    cityVisitCount.set(key, (cityVisitCount.get(key) || 0) + 1);
+  });
 }
 
 function updateUserProfileUI() {
@@ -568,9 +573,11 @@ function updateGlobalScoreboard() {
       const row = document.createElement('article');
       row.className = 'scoreboard-row';
       const heatScore = Math.round(entry.heatScore || 0);
-      const pulseScore = entry.pulseHistory?.length
-        ? Math.round(entry.pulseHistory.reduce((sum, score) => sum + score, 0) / entry.pulseHistory.length)
-        : 0;
+      const pulseScore = Number.isFinite(entry.averagePulse)
+        ? Math.round(entry.averagePulse)
+        : entry.pulseHistory?.length
+          ? Math.round(entry.pulseHistory.reduce((sum, score) => sum + score, 0) / entry.pulseHistory.length)
+          : 0;
       row.innerHTML = `
         <strong>${entry.city}</strong>
         <span>Heat ${heatScore}</span>
@@ -602,7 +609,7 @@ function showGoldenDropUI(drop) {
 
   type.textContent = `Drop type: ${drop.type}`;
   city.textContent = `City: ${drop.city || 'Unknown'}`;
-  time.textContent = `Timestamp: ${new Date(drop.timestamp).toLocaleString()}`;
+  time.textContent = `Timestamp: ${new Date(drop.timestamp).toLocaleString('en-US', { timeZone: 'UTC' })} UTC`;
   icon.hidden = false;
   modal.hidden = false;
 }
@@ -694,20 +701,24 @@ function calculateCityGoldenHeat(city) {
       intersections: 0,
       dropsClaimed: 0,
       explorerVisits: 0,
-      pulseHistory: []
+      pulseHistory: [],
+      pulseTotal: 0,
+      pulseCount: 0,
+      averagePulse: 0
     };
   }
 
   cityHeat[cityKey].explorerVisits += 1;
   const normalizedCityKey = cityKey.toLowerCase();
-  cityHeat[cityKey].intersections = goldenPath.visitedCities.filter(
-    (visitedCity) => visitedCity?.trim().toLowerCase() === normalizedCityKey
-  ).length;
+  cityHeat[cityKey].intersections = cityVisitCount.get(normalizedCityKey) || 0;
   cityHeat[cityKey].pulseHistory.push(latestPulseScore);
-
-  const averagePulseScore = cityHeat[cityKey].pulseHistory.length
-    ? cityHeat[cityKey].pulseHistory.reduce((sum, score) => sum + score, 0) / cityHeat[cityKey].pulseHistory.length
+  cityHeat[cityKey].pulseTotal += latestPulseScore;
+  cityHeat[cityKey].pulseCount += 1;
+  cityHeat[cityKey].averagePulse = cityHeat[cityKey].pulseCount
+    ? cityHeat[cityKey].pulseTotal / cityHeat[cityKey].pulseCount
     : 0;
+
+  const averagePulseScore = cityHeat[cityKey].averagePulse;
   const heatScore = (
     cityHeat[cityKey].intersections * 2
     + cityHeat[cityKey].dropsClaimed * 5
@@ -793,6 +804,7 @@ function recordVisit(city, coords) {
   const normalizedCity = city?.trim().toLowerCase();
   if (normalizedCity && !goldenPath.visitedCities.some((savedCity) => savedCity.trim().toLowerCase() === normalizedCity)) {
     goldenPath.visitedCities.push(city);
+    cityVisitCount.set(normalizedCity, (cityVisitCount.get(normalizedCity) || 0) + 1);
     calculatePilgrimScore();
   }
 
@@ -1149,11 +1161,6 @@ function updateCityCard(pulse) {
   if (tourism) tourism.textContent = `Tourism influence: ${formatMetricValue(pulse.tourism_influence)}`;
 
   cityPulseByName.set(cityKey, pulse);
-  if (!cityPulses.some((entry) => entry.city.trim().toLowerCase() === cityKey)) {
-    cityPulses.push(pulse);
-  } else {
-    cityPulses = cityPulses.map((entry) => (entry.city.trim().toLowerCase() === cityKey ? pulse : entry));
-  }
 
   const heatScore = cityHeat[pulse.city]?.heatScore || 0;
   updateCityHeatUI(pulse.city, heatScore);
