@@ -33,6 +33,19 @@ const GOLDEN_PATH_STORAGE_KEY = 'glotemp.goldenPath.v1';
 const CITY_HEAT_STORAGE_KEY = 'glotemp.cityHeat.v1';
 const MAX_SCOREBOARD_ITEMS = 10;
 const EXPLORER_USERNAME = 'Explorer';
+const MAX_HEAT_DISPLAY_VALUE = 100;
+const MAX_PULSE_SCORE_FOR_GLOW = 100;
+const MAX_GOLDEN_MAP_ZOOM = 2.2;
+const MIN_GOLDEN_MAP_ZOOM = 0.8;
+const GOLDEN_MAP_ZOOM_STEP = 0.15;
+const HEAT_BORDER_BASE_ALPHA = 0.25;
+const HEAT_BORDER_DIVISOR = 250;
+const HEAT_SHADOW_BASE_SIZE = 12;
+const HEAT_SHADOW_SIZE_DIVISOR = 4;
+const HEAT_SHADOW_BASE_ALPHA = 0.16;
+const HEAT_SHADOW_ALPHA_DIVISOR = 380;
+const MIN_PULSE_GLOW = 0.1;
+const MAX_PULSE_GLOW = 0.9;
 const GNEWS_SUPPORTED_COUNTRIES = new Set([
   'au', 'br', 'ca', 'cn', 'eg', 'fr', 'de', 'gr', 'hk', 'in', 'ie',
   'il', 'it', 'jp', 'nl', 'no', 'pk', 'pe', 'ph', 'pt', 'ro', 'ru',
@@ -132,6 +145,12 @@ async function fetchNews(country) {
 function toScore(value) {
   const parsedValue = Number(value);
   return Number.isFinite(parsedValue) ? parsedValue : null;
+}
+
+function clearObjectInPlace(objectReference) {
+  Object.keys(objectReference).forEach((key) => {
+    delete objectReference[key];
+  });
 }
 
 function mapMatchOutcome(match) {
@@ -509,8 +528,12 @@ function saveGoldenPath() {
     unlocked: goldenPath.unlocked,
     claimedDropCount
   };
-  localStorage.setItem(GOLDEN_PATH_STORAGE_KEY, JSON.stringify(storagePayload));
-  localStorage.setItem(CITY_HEAT_STORAGE_KEY, JSON.stringify(cityHeat));
+  try {
+    localStorage.setItem(GOLDEN_PATH_STORAGE_KEY, JSON.stringify(storagePayload));
+    localStorage.setItem(CITY_HEAT_STORAGE_KEY, JSON.stringify(cityHeat));
+  } catch (error) {
+    console.error('Unable to persist Golden Path state:', error);
+  }
 }
 
 function loadGoldenPath() {
@@ -521,7 +544,9 @@ function loadGoldenPath() {
     goldenPath.goldenDrops = Array.isArray(savedGoldenPath.goldenDrops) ? savedGoldenPath.goldenDrops : [];
     goldenPath.unlocked = Boolean(savedGoldenPath.unlocked);
     goldenPath.pilgrimScore = Number.isFinite(savedGoldenPath.pilgrimScore) ? savedGoldenPath.pilgrimScore : 0;
-    claimedDropCount = Number.isFinite(savedGoldenPath.claimedDropCount) ? savedGoldenPath.claimedDropCount : 0;
+    claimedDropCount = Number.isFinite(savedGoldenPath.claimedDropCount)
+      ? Math.max(0, savedGoldenPath.claimedDropCount)
+      : 0;
   } catch {
     goldenPath.visitedCities = [];
     goldenPath.visitedCoords = [];
@@ -533,10 +558,10 @@ function loadGoldenPath() {
 
   try {
     const savedCityHeat = JSON.parse(localStorage.getItem(CITY_HEAT_STORAGE_KEY) || '{}');
-    Object.keys(cityHeat).forEach((key) => delete cityHeat[key]);
+    clearObjectInPlace(cityHeat);
     Object.assign(cityHeat, savedCityHeat);
   } catch {
-    Object.keys(cityHeat).forEach((key) => delete cityHeat[key]);
+    clearObjectInPlace(cityHeat);
   }
 
   cityVisitCount.clear();
@@ -573,18 +598,22 @@ function updateGlobalScoreboard() {
       const row = document.createElement('article');
       row.className = 'scoreboard-row';
       const heatScore = Math.round(entry.heatScore || 0);
-      const pulseScore = Number.isFinite(entry.averagePulse)
-        ? Math.round(entry.averagePulse)
-        : entry.pulseHistory?.length
-          ? Math.round(entry.pulseHistory.reduce((sum, score) => sum + score, 0) / entry.pulseHistory.length)
-          : 0;
-      row.innerHTML = `
-        <strong>${entry.city}</strong>
-        <span>Heat ${heatScore}</span>
-        <span>Pulse ${pulseScore}</span>
-        <span>Visits ${entry.explorerVisits || 0}</span>
-        <div class="scoreboard-heat-bar-track"><div class="scoreboard-heat-bar" style="width:${Math.min(100, heatScore)}%"></div></div>
-      `;
+      const pulseScore = getAveragePulseScore(entry);
+      const cityLabel = document.createElement('strong');
+      cityLabel.textContent = entry.city;
+      const heatLabel = document.createElement('span');
+      heatLabel.textContent = `Heat ${heatScore}`;
+      const pulseLabel = document.createElement('span');
+      pulseLabel.textContent = `Pulse ${pulseScore}`;
+      const visitsLabel = document.createElement('span');
+      visitsLabel.textContent = `Visits ${entry.explorerVisits || 0}`;
+      const barTrack = document.createElement('div');
+      barTrack.className = 'scoreboard-heat-bar-track';
+      const bar = document.createElement('div');
+      bar.className = 'scoreboard-heat-bar';
+      bar.style.width = `${Math.min(MAX_HEAT_DISPLAY_VALUE, heatScore)}%`;
+      barTrack.appendChild(bar);
+      row.append(cityLabel, heatLabel, pulseLabel, visitsLabel, barTrack);
       return row;
     });
 
@@ -623,9 +652,9 @@ function hideGoldenDropUI() {
 
 function applyMapControl(control) {
   if (control === 'zoom-in') {
-    goldenMapScale = Math.min(2.2, goldenMapScale + 0.15);
+    goldenMapScale = Math.min(MAX_GOLDEN_MAP_ZOOM, goldenMapScale + GOLDEN_MAP_ZOOM_STEP);
   } else if (control === 'zoom-out') {
-    goldenMapScale = Math.max(0.8, goldenMapScale - 0.15);
+    goldenMapScale = Math.max(MIN_GOLDEN_MAP_ZOOM, goldenMapScale - GOLDEN_MAP_ZOOM_STEP);
   } else if (control === 'reset') {
     goldenMapScale = 1;
     goldenMapOffsetX = 0;
@@ -1023,6 +1052,25 @@ function formatMetricValue(value) {
   return value;
 }
 
+function getAveragePulseScore(heatEntry) {
+  if (Number.isFinite(heatEntry?.averagePulse)) {
+    return Math.round(heatEntry.averagePulse);
+  }
+  if (heatEntry?.pulseHistory?.length) {
+    return Math.round(heatEntry.pulseHistory.reduce((sum, score) => sum + score, 0) / heatEntry.pulseHistory.length);
+  }
+  return 0;
+}
+
+function setMetricWithValueClass(element, label, value, className) {
+  if (!element) return;
+  element.textContent = `${label}: `;
+  const span = document.createElement('span');
+  span.className = className;
+  span.textContent = String(formatMetricValue(value));
+  element.appendChild(span);
+}
+
 function updatePulseUI(pulse) {
   if (!pulse?.city) return;
   const cityKey = pulse.city.trim().toLowerCase();
@@ -1031,7 +1079,10 @@ function updatePulseUI(pulse) {
 
   card.classList.add('updating');
   window.requestAnimationFrame(() => {
-    const pulseGlow = Math.max(0.1, Math.min(0.9, (Number(pulse.pulse_score) || 0) / 100));
+    const pulseGlow = Math.max(
+      MIN_PULSE_GLOW,
+      Math.min(MAX_PULSE_GLOW, (Number(pulse.pulse_score) || 0) / MAX_PULSE_SCORE_FOR_GLOW)
+    );
     card.style.boxShadow = `0 0 26px rgba(248, 255, 106, ${pulseGlow * 0.4})`;
     card.classList.remove('updating');
   });
@@ -1047,10 +1098,10 @@ function updateCityHeatUI(city, heatScore) {
   const heatBar = card.querySelector('.heat-bar');
   if (heatLabel) heatLabel.textContent = `🔥 Heat Score: ${Math.round(heatScore)}`;
 
-  const normalizedHeat = Math.max(0, Math.min(100, Math.round(heatScore)));
+  const normalizedHeat = Math.max(0, Math.min(MAX_HEAT_DISPLAY_VALUE, Math.round(heatScore)));
   if (heatBar) heatBar.style.width = `${normalizedHeat}%`;
-  card.style.borderColor = `rgba(255, 184, 107, ${0.25 + normalizedHeat / 250})`;
-  card.style.boxShadow = `0 0 ${12 + normalizedHeat / 4}px rgba(255, 184, 107, ${0.16 + normalizedHeat / 380})`;
+  card.style.borderColor = `rgba(255, 184, 107, ${HEAT_BORDER_BASE_ALPHA + normalizedHeat / HEAT_BORDER_DIVISOR})`;
+  card.style.boxShadow = `0 0 ${HEAT_SHADOW_BASE_SIZE + normalizedHeat / HEAT_SHADOW_SIZE_DIVISOR}px rgba(255, 184, 107, ${HEAT_SHADOW_BASE_ALPHA + normalizedHeat / HEAT_SHADOW_ALPHA_DIVISOR})`;
 }
 
 function openCityDetail(city) {
@@ -1068,18 +1119,23 @@ function openCityDetail(city) {
   const moodDistribution = Object.entries(pulse.mood_distribution || {})
     .map(([mood, value]) => `${mood}: ${value}%`)
     .join(', ') || '—';
-
-  content.innerHTML = `
-    <p>Mood distribution: ${moodDistribution}</p>
-    <p>Tempo score: ${formatMetricValue(pulse.tempo_score)}</p>
-    <p>Romantic index: ${formatMetricValue(pulse.romantic_index)}</p>
-    <p>Economic vibe: ${formatMetricValue(pulse.economic_vibe)}</p>
-    <p>Cultural heat: ${formatMetricValue(pulse.cultural_heat)}</p>
-    <p>Weather influence: ${formatMetricValue(pulse.weather_influence)}</p>
-    <p>News influence: ${formatMetricValue(pulse.news_influence)}</p>
-    <p>Sports influence: ${formatMetricValue(pulse.sports_influence)}</p>
-    <p>Tourism influence: ${formatMetricValue(pulse.tourism_influence)}</p>
-  `;
+  const detailItems = [
+    `Mood distribution: ${moodDistribution}`,
+    `Tempo score: ${formatMetricValue(pulse.tempo_score)}`,
+    `Romantic index: ${formatMetricValue(pulse.romantic_index)}`,
+    `Economic vibe: ${formatMetricValue(pulse.economic_vibe)}`,
+    `Cultural heat: ${formatMetricValue(pulse.cultural_heat)}`,
+    `Weather influence: ${formatMetricValue(pulse.weather_influence)}`,
+    `News influence: ${formatMetricValue(pulse.news_influence)}`,
+    `Sports influence: ${formatMetricValue(pulse.sports_influence)}`,
+    `Tourism influence: ${formatMetricValue(pulse.tourism_influence)}`
+  ];
+  const detailNodes = detailItems.map((text) => {
+    const paragraph = document.createElement('p');
+    paragraph.textContent = text;
+    return paragraph;
+  });
+  content.replaceChildren(...detailNodes);
   modal.hidden = false;
 }
 
@@ -1151,10 +1207,10 @@ function updateCityCard(pulse) {
     });
   }
 
-  if (tempo) tempo.innerHTML = `Tempo score: <span class="value-tempo">${formatMetricValue(pulse.tempo_score)}</span>`;
-  if (romance) romance.innerHTML = `Romantic index: <span class="value-romance">${formatMetricValue(pulse.romantic_index)}</span>`;
-  if (economic) economic.innerHTML = `Economic vibe: <span class="value-economic">${formatMetricValue(pulse.economic_vibe)}</span>`;
-  if (cultural) cultural.innerHTML = `Cultural heat: <span class="value-cultural">${formatMetricValue(pulse.cultural_heat)}</span>`;
+  setMetricWithValueClass(tempo, 'Tempo score', pulse.tempo_score, 'value-tempo');
+  setMetricWithValueClass(romance, 'Romantic index', pulse.romantic_index, 'value-romance');
+  setMetricWithValueClass(economic, 'Economic vibe', pulse.economic_vibe, 'value-economic');
+  setMetricWithValueClass(cultural, 'Cultural heat', pulse.cultural_heat, 'value-cultural');
   if (weather) weather.textContent = `Weather influence: ${formatMetricValue(pulse.weather_influence)}`;
   if (news) news.textContent = `News influence: ${formatMetricValue(pulse.news_influence)}`;
   if (sports) sports.textContent = `Sports influence: ${formatMetricValue(pulse.sports_influence)}`;
