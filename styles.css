@@ -199,6 +199,39 @@ header .btn {
   margin-top: 2.5rem;
 }
 
+#golden-map {
+  width: 100%;
+  height: 360px;
+  margin-top: 1.5rem;
+  background: rgba(8, 8, 10, 0.95);
+  border: 1px solid rgba(248, 255, 106, 0.22);
+  border-radius: 1rem;
+  display: none;
+  overflow: hidden;
+}
+
+#golden-map svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.golden-line {
+  stroke: gold;
+  stroke-width: 2px;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 6px gold);
+}
+
+.golden-dot {
+  width: 8px;
+  height: 8px;
+  background: gold;
+  border-radius: 50%;
+  fill: gold;
+  filter: drop-shadow(0 0 4px gold);
+}
+
 #city-cards .city-card {
   display: flex;
   flex-direction: column;
