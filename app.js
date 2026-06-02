@@ -497,18 +497,20 @@ function calculateDistanceKm(startCoords, endCoords) {
 }
 
 function generateGoldenDrops(pulse, coords) {
-  const shouldGenerateDrop = pulse?.pulse_score > 70 || pulse?.cultural_heat > 2;
+  const hasHighPulseScore = pulse?.pulse_score > 70;
+  const hasHighCulturalHeat = pulse?.cultural_heat > 2;
+  const shouldGenerateDrop = hasHighPulseScore || hasHighCulturalHeat;
   if (!shouldGenerateDrop) {
     return null;
   }
 
-  const dropType = pulse?.pulse_score > 70 && pulse?.cultural_heat > 2
+  const dropType = hasHighPulseScore && hasHighCulturalHeat
     ? EVENT_GOLDEN_DROP
-    : pulse?.pulse_score > 70
+    : hasHighPulseScore
       ? SURGE_GOLDEN_DROP
       : GIFT_GOLDEN_DROP;
   const drop = {
-    city: pulse.city,
+    city: pulse?.city,
     coords,
     type: dropType,
     timestamp: Date.now()
