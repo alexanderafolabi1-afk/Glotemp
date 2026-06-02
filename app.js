@@ -1314,6 +1314,13 @@ function saveUserProfile() {
   } catch (_) {}
 }
 
+function getOverallPulseForCity(cityId) {
+  const cityState = cityPulseState[cityId];
+  if (typeof cityState?.overall === "number") return cityState.overall;
+  if (typeof cityState?.overallScore === "number") return cityState.overallScore;
+  return computeCityPulseScores(cityId)?.overall ?? null;
+}
+
 function computeCheckinStars(checkin) {
   let stars = 1; // base
 
@@ -1321,13 +1328,7 @@ function computeCheckinStars(checkin) {
 
   if (["club", "stadium", "festival"].includes(checkin.scene)) stars += 3;
 
-  const cityState = cityPulseState[checkin.cityId];
-  const overallPulse =
-    typeof cityState?.overall === "number"
-      ? cityState.overall
-      : typeof cityState?.overallScore === "number"
-        ? cityState.overallScore
-        : computeCityPulseScores(checkin.cityId)?.overall;
+  const overallPulse = getOverallPulseForCity(checkin.cityId);
   if (typeof overallPulse === "number" && overallPulse < LOW_PULSE_THRESHOLD) stars += 5;
 
   // +10 if this is the first check-in in that city today (checked before push)
