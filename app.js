@@ -382,18 +382,31 @@ function updateGlobalScoreboard() {
     .join("");
 }
 
+// Simulation constants
+const LIVE_PULSE_INTERVAL_MS = 4500;
+const PULSE_MIN = 30;
+const PULSE_MAX = 100;
+const PULSE_DRIFT_RANGE = 6;
+const TEMPO_DRIFT_RANGE = 4;
+const NIGHTLIFE_MIN = 20;
+const UNI_MIN = 20;
+
+let livePulseIntervalId = null;
+
 // Simulate live city pulses — nightlife and uni vibes ebb/flow with the hour
 function simulateLivePulses() {
-  setInterval(() => {
+  livePulseIntervalId = setInterval(() => {
     const utcHour = new Date().getUTCHours();
 
     Object.values(latestPulseByCity).forEach((pulse) => {
       // Micro-drift on core scores
       pulse.pulse_score = clamp(
-        pulse.pulse_score + (Math.random() * 6 - 3), 30, 100
+        pulse.pulse_score + (Math.random() * PULSE_DRIFT_RANGE - PULSE_DRIFT_RANGE / 2),
+        PULSE_MIN, PULSE_MAX
       );
       pulse.tempo_score = clamp(
-        pulse.tempo_score + (Math.random() * 4 - 2), 30, 100
+        pulse.tempo_score + (Math.random() * TEMPO_DRIFT_RANGE - TEMPO_DRIFT_RANGE / 2),
+        PULSE_MIN, PULSE_MAX
       );
 
       // Nightlife peaks UTC 21:00–04:00
@@ -404,7 +417,7 @@ function simulateLivePulses() {
           pulse.nightlife_index +
             (nightTarget - pulse.nightlife_index) * 0.08 +
             (Math.random() * 4 - 2),
-          20, 100
+          NIGHTLIFE_MIN, PULSE_MAX
         );
       }
 
@@ -416,13 +429,13 @@ function simulateLivePulses() {
           pulse.uni_vibe +
             (uniTarget - pulse.uni_vibe) * 0.06 +
             (Math.random() * 3 - 1.5),
-          20, 100
+          UNI_MIN, PULSE_MAX
         );
       }
     });
 
     renderCityCards();
-  }, 4500);
+  }, LIVE_PULSE_INTERVAL_MS);
 }
 
 // Install banner
