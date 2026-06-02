@@ -23,6 +23,7 @@ const EVENTS_UPCOMING_LABEL = 'Events';
 const PILGRIM_SCORE_PER_CITY = 5;
 const MAX_PILGRIM_SCORE = 100;
 const GOLDEN_DROP_TYPES = ['surge', 'gift', 'event'];
+const [SURGE_GOLDEN_DROP, GIFT_GOLDEN_DROP, EVENT_GOLDEN_DROP] = GOLDEN_DROP_TYPES;
 const GNEWS_SUPPORTED_COUNTRIES = new Set([
   'au', 'br', 'ca', 'cn', 'eg', 'fr', 'de', 'gr', 'hk', 'in', 'ie',
   'il', 'it', 'jp', 'nl', 'no', 'pk', 'pe', 'ph', 'pt', 'ro', 'ru',
@@ -502,10 +503,10 @@ function generateGoldenDrops(pulse, coords) {
   }
 
   const dropType = pulse?.pulse_score > 70 && pulse?.cultural_heat > 2
-    ? GOLDEN_DROP_TYPES[2]
+    ? EVENT_GOLDEN_DROP
     : pulse?.pulse_score > 70
-      ? GOLDEN_DROP_TYPES[0]
-      : GOLDEN_DROP_TYPES[1];
+      ? SURGE_GOLDEN_DROP
+      : GIFT_GOLDEN_DROP;
   const drop = {
     city: pulse.city,
     coords,
@@ -514,7 +515,7 @@ function generateGoldenDrops(pulse, coords) {
   };
 
   goldenPath.goldenDrops.push(drop);
-  console.log('Golden Drop generated');
+  console.log('Golden Drop generated', drop);
   return drop;
 }
 
