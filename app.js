@@ -382,6 +382,82 @@ const goldenPath = {
   unlocked: false
 };
 
+let goldenMapSvg = null;
+let goldenMapLineLayer = null;
+let goldenMapDotLayer = null;
+
+function projectGoldenCoord(coord) {
+  // Simple equirectangular projection into the 1000x360 SVG viewBox.
+  const x = ((coord.longitude + 180) / 360) * 1000;
+  const y = ((90 - coord.latitude) / 180) * 360;
+  return { x, y };
+}
+
+function initGoldenMap() {
+  const mapContainer = document.getElementById('golden-map');
+  if (!mapContainer) return;
+
+  if (goldenMapSvg && mapContainer.contains(goldenMapSvg)) {
+    return;
+  }
+
+  mapContainer.replaceChildren();
+  goldenMapSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  goldenMapSvg.setAttribute('viewBox', '0 0 1000 360');
+  goldenMapSvg.setAttribute('preserveAspectRatio', 'none');
+  goldenMapSvg.setAttribute('role', 'img');
+  goldenMapSvg.setAttribute('aria-label', 'Golden Path travel map');
+
+  goldenMapLineLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  goldenMapDotLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+  goldenMapSvg.appendChild(goldenMapLineLayer);
+  goldenMapSvg.appendChild(goldenMapDotLayer);
+  mapContainer.appendChild(goldenMapSvg);
+}
+
+function drawGoldenPath() {
+  initGoldenMap();
+  if (!goldenMapLineLayer || !goldenMapDotLayer) return;
+
+  goldenMapLineLayer.replaceChildren();
+  goldenMapDotLayer.replaceChildren();
+
+  const points = goldenPath.visitedCoords
+    .filter((coord) => coord && Number.isFinite(coord.latitude) && Number.isFinite(coord.longitude))
+    .map(projectGoldenCoord);
+
+  points.forEach((point, index) => {
+    if (index > 0) {
+      const previousPoint = points[index - 1];
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', previousPoint.x);
+      line.setAttribute('y1', previousPoint.y);
+      line.setAttribute('x2', point.x);
+      line.setAttribute('y2', point.y);
+      line.setAttribute('class', 'golden-line');
+      goldenMapLineLayer.appendChild(line);
+    }
+
+    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('cx', point.x);
+    dot.setAttribute('cy', point.y);
+    dot.setAttribute('r', '4');
+    dot.setAttribute('class', 'golden-dot');
+    goldenMapDotLayer.appendChild(dot);
+  });
+}
+
+function showGoldenMap() {
+  const mapContainer = document.getElementById('golden-map');
+  if (!mapContainer) return;
+
+  mapContainer.style.display = 'block';
+  mapContainer.setAttribute('aria-hidden', 'false');
+  initGoldenMap();
+  drawGoldenPath();
+}
+
 function recordVisit(city, coords) {
   const normalizedCity = city?.trim().toLowerCase();
   if (normalizedCity && !goldenPath.visitedCities.some((savedCity) => savedCity.trim().toLowerCase() === normalizedCity)) {
@@ -400,16 +476,23 @@ function recordVisit(city, coords) {
     }
   }
 
+  if (goldenPath.unlocked) {
+    drawGoldenPath();
+  }
+
   console.log('Golden Path updated:', goldenPath);
 }
 
 function checkGoldenPathUnlock() {
+  if (goldenPath.unlocked) {
+    return;
+  }
+
   if (goldenPath.visitedCities.length >= 3) {
     goldenPath.unlocked = true;
     console.log('Golden Path unlocked');
-    return;
+    showGoldenMap();
   }
-  goldenPath.unlocked = false;
 }
 
 function createSelectionButton(label, category) {
