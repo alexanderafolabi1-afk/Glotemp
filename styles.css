@@ -814,6 +814,49 @@ body {
   font-size: 14px;
 }
 
+/* ── User profile section ── */
+.gt-profile-card {
+  background: radial-gradient(circle at top left, rgba(255, 215, 0, 0.1), transparent 55%), var(--gt-card);
+  border: 1px solid var(--gt-border);
+  border-radius: var(--gt-radius);
+  padding: 16px;
+  box-shadow: var(--gt-shadow-soft);
+}
+
+.gt-profile-nickname {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--gt-gold);
+  margin-bottom: 14px;
+}
+
+.gt-profile-stats {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.gt-profile-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 60px;
+}
+
+.gt-profile-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--gt-text);
+}
+
+.gt-profile-stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gt-text-soft);
+}
+
 /* ── Checkin error message ── */
 .gt-checkin-error {
   font-size: 12px;
