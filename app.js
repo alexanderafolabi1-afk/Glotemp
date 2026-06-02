@@ -24,6 +24,9 @@ const PILGRIM_SCORE_PER_CITY = 5;
 const MAX_PILGRIM_SCORE = 100;
 const GOLDEN_DROP_TYPES = ['surge', 'gift', 'event'];
 const [SURGE_GOLDEN_DROP, GIFT_GOLDEN_DROP, EVENT_GOLDEN_DROP] = GOLDEN_DROP_TYPES;
+const GOLDEN_DROP_PULSE_SCORE_THRESHOLD = 70;
+const GOLDEN_DROP_CULTURAL_HEAT_THRESHOLD = 2;
+const GOLDEN_DROP_ELIGIBILITY_DISTANCE_KM = 20;
 const GNEWS_SUPPORTED_COUNTRIES = new Set([
   'au', 'br', 'ca', 'cn', 'eg', 'fr', 'de', 'gr', 'hk', 'in', 'ie',
   'il', 'it', 'jp', 'nl', 'no', 'pk', 'pe', 'ph', 'pt', 'ro', 'ru',
@@ -497,8 +500,8 @@ function calculateDistanceKm(startCoords, endCoords) {
 }
 
 function generateGoldenDrops(pulse, coords) {
-  const hasHighPulseScore = pulse?.pulse_score > 70;
-  const hasHighCulturalHeat = pulse?.cultural_heat > 2;
+  const hasHighPulseScore = pulse?.pulse_score > GOLDEN_DROP_PULSE_SCORE_THRESHOLD;
+  const hasHighCulturalHeat = pulse?.cultural_heat > GOLDEN_DROP_CULTURAL_HEAT_THRESHOLD;
   const shouldGenerateDrop = hasHighPulseScore || hasHighCulturalHeat;
   if (!shouldGenerateDrop) {
     return null;
@@ -536,7 +539,7 @@ function checkDropEligibility(coords) {
     return false;
   }
 
-  return distanceKm < 20;
+  return distanceKm < GOLDEN_DROP_ELIGIBILITY_DISTANCE_KM;
 }
 
 function recordVisit(city, coords) {
@@ -722,7 +725,7 @@ async function handleCheckinSubmit(event) {
     allData.claude_synthesis = synthesizedMood;
     const pulseObject = buildPulseObject(allData);
     generateGoldenDrops(pulseObject, weatherResult?.coords);
-    if (checkDropEligibility(weatherResult?.coords)) {
+    if (goldenPath.unlocked && checkDropEligibility(weatherResult?.coords)) {
       console.log('Golden Drop nearby');
     }
     console.log('Final pulse object:', pulseObject);
