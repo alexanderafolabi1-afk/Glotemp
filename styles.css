@@ -716,3 +716,10 @@ body {
   content: "→ ";
   color: #ffd700;
 }
+
+/* ── City country label on cards ── */
+.gt-city-country {
+  font-size: 11px;
+  color: #7f82a4;
+  font-weight: 400;
+}

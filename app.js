@@ -260,9 +260,16 @@ function computeTripPulse(fromCityId, toCityId, scenario) {
           ? "Decent scene but not peak energy."
           : "Quiet nights — not the time for this city.";
       const s = toState?.nightlife;
-      reasons.push(s ? `Club intensity: ${s.club_intensity}` : "Club intensity data loading");
-      reasons.push(s ? `Bar intensity: ${s.bar_intensity}`   : "Bar intensity data loading");
-      reasons.push(s ? `Street energy: ${s.street_energy}`   : "Street energy data loading");
+      const levelLabel = (v) => v >= 70 ? "high" : v >= 50 ? "moderate" : "low";
+      reasons.push(s
+        ? `Club intensity is ${levelLabel(s.club_intensity)} (${s.club_intensity})`
+        : "Club intensity data loading");
+      reasons.push(s
+        ? `Bar intensity is ${levelLabel(s.bar_intensity)} (${s.bar_intensity})`
+        : "Bar intensity data loading");
+      reasons.push(s
+        ? `Street energy is ${levelLabel(s.street_energy)} (${s.street_energy})`
+        : "Street energy data loading");
       break;
     }
   }
@@ -454,7 +461,7 @@ function renderCityCards() {
 
     card.innerHTML = `
       <div class="gt-city-header">
-        <div class="gt-city-name">${city.name} <span style="font-size:11px;color:#7f82a4;">${city.country}</span></div>
+        <div class="gt-city-name">${city.name} <span class="gt-city-country">${city.country}</span></div>
         <div class="gt-pulse-score">Pulse ${displayPulseScore}</div>
       </div>
       <p class="gt-narrative-headline">${narrative.headline}</p>
@@ -708,7 +715,7 @@ function calculateCityGoldenHeat(city) {
   const scores    = cityEntry ? computeCityPulseScores(cityEntry.id) : null;
 
   const nightlifeScore = scores ? scores.nightlifeScore : (latestPulseByCity[city]?.nightlife_index ?? 50);
-  const tourismScore   = scores ? scores.tourismScore   : 50;
+  const tourismScore   = scores ? scores.tourismScore   : (latestPulseByCity[city]?.tourism_influence ?? 50);
 
   if (scores) entry.pulseHistory.push(scores.overall);
 
