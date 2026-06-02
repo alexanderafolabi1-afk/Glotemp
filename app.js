@@ -379,7 +379,8 @@ const selectionState = {
 const goldenPath = {
   visitedCities: [],
   visitedCoords: [],
-  unlocked: false
+  unlocked: false,
+  pilgrimScore: 0
 };
 
 let goldenMapSvg = null;
@@ -458,10 +459,16 @@ function showGoldenMap() {
   drawGoldenPath();
 }
 
+function calculatePilgrimScore() {
+  goldenPath.pilgrimScore = Math.min(100, goldenPath.visitedCities.length * 5);
+  console.log('Pilgrim Score:', goldenPath.pilgrimScore);
+}
+
 function recordVisit(city, coords) {
   const normalizedCity = city?.trim().toLowerCase();
   if (normalizedCity && !goldenPath.visitedCities.some((savedCity) => savedCity.trim().toLowerCase() === normalizedCity)) {
     goldenPath.visitedCities.push(city);
+    calculatePilgrimScore();
   }
 
   const latitude = coords?.latitude;
@@ -491,6 +498,7 @@ function checkGoldenPathUnlock() {
   if (goldenPath.visitedCities.length >= 3) {
     goldenPath.unlocked = true;
     console.log('Golden Path unlocked');
+    console.log('Pilgrim Score at unlock:', goldenPath.pilgrimScore);
     showGoldenMap();
   }
 }
