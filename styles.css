@@ -15,7 +15,7 @@
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #050505;
+  background-color: var(--bg-deep);
   background-image:
     radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.65) 100%),
     repeating-linear-gradient(
@@ -35,7 +35,7 @@ body {
     linear-gradient(
       180deg,
       #0a0a0a 0%,
-      #050505 40%,
+      var(--bg-deep) 40%,
       #030303 100%
     );
   background-size: cover, 6px 6px, 6px 6px, cover;
