@@ -33,10 +33,17 @@ body {
       rgba(30,30,30,0.06) 1px,
       rgba(30,30,30,0.06) 2px
     ),
-    linear-gradient(180deg, #050505 0%, var(--bg-deep) 50%, #010101 100%);
-  background-size: cover, cover, 4px 4px, 5px 5px, cover;
-  background-position: center, center, 0 0, 0 0, center;
-  background-repeat: no-repeat, no-repeat, repeat, repeat, no-repeat;
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 3px,
+      rgba(40,40,40,0.08) 3px,
+      rgba(40,40,40,0.08) 4px
+    ),
+    linear-gradient(180deg, #121212 0%, var(--bg-deep) 45%, #080808 100%);
+  background-size: cover, cover, 5px 5px, 6px 6px, 8px 8px, cover;
+  background-position: center, center, 0 0, 0 0, 0 0, center;
+  background-repeat: no-repeat, no-repeat, repeat, repeat, repeat, no-repeat;
   background-attachment: fixed;
   color: var(--text-primary);
   min-height: 100vh;
