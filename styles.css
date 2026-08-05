@@ -40,7 +40,7 @@ body {
       rgba(40,40,40,0.08) 3px,
       rgba(40,40,40,0.08) 4px
     ),
-    linear-gradient(180deg, #121212 0%, #0a0a0a 45%, #080808 100%);
+    linear-gradient(180deg, #121212 0%, var(--bg-deep) 45%, #080808 100%);
   background-size: cover, cover, 5px 5px, 6px 6px, 8px 8px, cover;
   background-position: center, center, 0 0, 0 0, 0 0, center;
   background-repeat: no-repeat, no-repeat, repeat, repeat, repeat, no-repeat;
