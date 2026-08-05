@@ -472,22 +472,7 @@ body {
 .blog-status-emoji { font-size: 3rem; display: block; margin-bottom: 0.75rem; }
 
 
-.blog-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1rem;
-}
-
-.blog-card {
-  padding: 1.5rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
-}
-.blog-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(0,242,254,0.15), 0 0 1px rgba(255,255,255,0.2);
-}
+/* blog-grid and blog-card are already defined above; avoid redefining them here to preserve existing responsive and interaction behavior. */
 
 .blog-emoji {
   font-size: 3rem;
