@@ -125,10 +125,15 @@
       if (searchInput) searchInput.placeholder = t('search_placeholder');
     }
 
-    function loadPosts() {
-      const sorted = [...STORIES].sort((a, b) => new Date(b.date) - new Date(a.date));
-      renderPosts(sorted);
-    }
+function loadPosts() {
+  try {
+    const stories = (typeof STORIES !== 'undefined' && Array.isArray(STORIES)) ? STORIES : [];
+    const sorted = [...stories].sort((a, b) => new Date(b.date) - new Date(a.date));
+    renderPosts(sorted);
+  } catch (err) {
+    renderPosts([]); // show empty state
+  }
+}
     function renderPosts(posts) {
       const grid = document.getElementById('blog-posts-grid');
       const empty = document.getElementById('blog-empty');
