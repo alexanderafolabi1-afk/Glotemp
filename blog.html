@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0f1a" />
+  <meta name="description" content="Glotemp – City Stories from around the world" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+  <title>Glotemp – City Stories</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="app">
+
+    <!-- Navigation -->
+    <nav class="navbar glass">
+      <div class="nav-brand">
+        <img src="assets/logo.png" alt="Glotemp" class="logo-img" height="40">
+        <span class="pulse-dot"></span>
+      </div>
+      <div class="nav-links">
+        <a href="index.html" data-i18n="nav_pulse">Pulse</a>
+        <a href="about.html" data-i18n="nav_about">About</a>
+        <a href="investors.html" data-i18n="nav_investors">Investors</a>
+        <a href="blog.html" class="active" data-i18n="nav_stories">Stories</a>
+        <button id="lang-switch" class="btn-icon" title="Change language" aria-label="Change language">🌍</button>
+      </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="blog-header">
+      <h1 class="blog-page-title">🌍 <span data-i18n="nav_stories">Stories</span></h1>
+      <p class="blog-page-sub" data-i18n="blog_page_sub">Real stories from cities around the world</p>
+      <div class="blog-search-wrap">
+        <input
+          type="search"
+          id="blog-search"
+          class="blog-search-input glass"
+          autocomplete="off"
+          data-i18n-placeholder="blog_search_placeholder"
+          placeholder="Search by city…"
+          aria-label="Search by city"
+        />
+      </div>
+    </header>
+
+    <!-- Posts Grid -->
+    <section id="blog-grid" class="blog-grid" aria-live="polite">
+      <div id="blog-status" class="blog-status">
+        <span class="blog-status-emoji">🌐</span>
+        <p data-i18n="blog_loading">Loading stories…</p>
+      </div>
+    </section>
+
+    <footer class="footer glass">
+      <p>© 2025 RenviaIT Ltd. All rights reserved.</p>
+      <p class="small-print">
+        <a href="privacy.html" data-i18n="privacy_policy">Privacy Policy</a> |
+        <a href="terms.html" data-i18n="terms_of_service">Terms of Service</a> |
+        <a href="#" id="cookie-settings" data-i18n="cookie_settings">Cookie Settings</a>
+      </p>
+      <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
+    </footer>
+  </div>
+
+  <script>
+    // ---- Inline i18n (mirrors keys from app.js) ----
+    const blogTranslations = {
+      en: {
+        nav_pulse: "Pulse", nav_about: "About", nav_investors: "Investors", nav_stories: "Stories",
+        blog_page_sub: "Real stories from cities around the world",
+        blog_search_placeholder: "Search by city…",
+        blog_all_cities: "All Cities",
+        blog_no_stories: "No stories found",
+        blog_read_full: "Read full story",
+        blog_back: "Back to stories",
+        blog_trivia: "Trivia",
+        blog_history: "History",
+        blog_loading: "Loading stories…",
+        blog_error: "Couldn't load stories. Please try again later.",
+        privacy_policy: "Privacy Policy",
+        terms_of_service: "Terms of Service",
+        cookie_settings: "Cookie Settings"
+      },
+      es: {
+        nav_pulse: "Pulso", nav_about: "Acerca de", nav_investors: "Inversores", nav_stories: "Historias",
+        blog_page_sub: "Historias reales de ciudades de todo el mundo",
+        blog_search_placeholder: "Buscar por ciudad…",
+        blog_all_cities: "Todas las ciudades",
+        blog_no_stories: "No se encontraron historias",
+        blog_read_full: "Leer historia completa",
+        blog_back: "Volver a historias",
+        blog_trivia: "Curiosidades",
+        blog_history: "Historia",
+        blog_loading: "Cargando historias…",
+        blog_error: "No se pudieron cargar las historias. Inténtalo de nuevo.",
+        privacy_policy: "Política de Privacidad",
+        terms_of_service: "Términos de Servicio",
+        cookie_settings: "Configuración de Cookies"
+      },
+      fr: {
+        nav_pulse: "Pouls", nav_about: "À propos", nav_investors: "Investisseurs", nav_stories: "Histoires",
+        blog_page_sub: "Vraies histoires de villes du monde entier",
+        blog_search_placeholder: "Rechercher par ville…",
+        blog_all_cities: "Toutes les villes",
+        blog_no_stories: "Aucune histoire trouvée",
+        blog_read_full: "Lire l'histoire complète",
+        blog_back: "Retour aux histoires",
+        blog_trivia: "Anecdotes",
+        blog_history: "Histoire",
+        blog_loading: "Chargement des histoires…",
+        blog_error: "Impossible de charger les histoires. Veuillez réessayer.",
+        privacy_policy: "Politique de Confidentialité",
+        terms_of_service: "Conditions d'Utilisation",
+        cookie_settings: "Paramètres des Cookies"
+      },
+      de: {
+        nav_pulse: "Puls", nav_about: "Über uns", nav_investors: "Investoren", nav_stories: "Geschichten",
+        blog_page_sub: "Echte Geschichten aus Städten weltweit",
+        blog_search_placeholder: "Nach Stadt suchen…",
+        blog_all_cities: "Alle Städte",
+        blog_no_stories: "Keine Geschichten gefunden",
+        blog_read_full: "Ganze Geschichte lesen",
+        blog_back: "Zurück zu Geschichten",
+        blog_trivia: "Wissenswertes",
+        blog_history: "Geschichte",
+        blog_loading: "Geschichten werden geladen…",
+        blog_error: "Geschichten konnten nicht geladen werden. Bitte versuche es später erneut.",
+        privacy_policy: "Datenschutzrichtlinie",
+        terms_of_service: "Nutzungsbedingungen",
+        cookie_settings: "Cookie-Einstellungen"
+      },
+      pt: {
+        nav_pulse: "Pulso", nav_about: "Sobre", nav_investors: "Investidores", nav_stories: "Histórias",
+        blog_page_sub: "Histórias reais de cidades ao redor do mundo",
+        blog_search_placeholder: "Buscar por cidade…",
+        blog_all_cities: "Todas as cidades",
+        blog_no_stories: "Nenhuma história encontrada",
+        blog_read_full: "Ler história completa",
+        blog_back: "Voltar às histórias",
+        blog_trivia: "Curiosidades",
+        blog_history: "História",
+        blog_loading: "Carregando histórias…",
+        blog_error: "Não foi possível carregar as histórias. Tente novamente.",
+        privacy_policy: "Política de Privacidade",
+        terms_of_service: "Termos de Serviço",
+        cookie_settings: "Configurações de Cookies"
+      },
+      ja: {
+        nav_pulse: "パルス", nav_about: "概要", nav_investors: "投資家", nav_stories: "ストーリー",
+        blog_page_sub: "世界の都市からの本物のストーリー",
+        blog_search_placeholder: "都市名で検索…",
+        blog_all_cities: "すべての都市",
+        blog_no_stories: "ストーリーが見つかりません",
+        blog_read_full: "全文を読む",
+        blog_back: "ストーリーに戻る",
+        blog_trivia: "トリビア",
+        blog_history: "歴史",
+        blog_loading: "ストーリーを読み込み中…",
+        blog_error: "ストーリーを読み込めませんでした。後でもう一度お試しください。",
+        privacy_policy: "プライバシーポリシー",
+        terms_of_service: "利用規約",
+        cookie_settings: "Cookieの設定"
+      }
+    };
+
+    const supportedLangs = Object.keys(blogTranslations);
+    let currentLang = localStorage.getItem('glotemp-lang') || (navigator.language || 'en').split('-')[0];
+    if (!supportedLangs.includes(currentLang)) currentLang = 'en';
+    document.documentElement.lang = currentLang;
+
+    function bt(key) {
+      return blogTranslations[currentLang]?.[key] || blogTranslations.en[key] || key;
+    }
+
+    function applyBlogTranslations() {
+      document.documentElement.lang = currentLang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.textContent = bt(el.dataset.i18n);
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.placeholder = bt(el.dataset.i18nPlaceholder);
+      });
+      const search = document.getElementById('blog-search');
+      if (search) search.setAttribute('aria-label', bt('blog_search_placeholder'));
+    }
+
+    // ---- Supabase config (same values as app.js) ----
+    const SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
+
+    // ---- State ----
+    let allPosts = [];
+
+    // ---- Fetch posts ----
+    async function fetchPosts() {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/blog_posts?select=*&order=date.desc`,
+        {
+          headers: {
+            apikey: SUPABASE_ANON_KEY.trim(),
+            Authorization: `Bearer ${SUPABASE_ANON_KEY.trim()}`
+          }
+        }
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }
+
+    // ---- Render ----
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      try {
+        return new Date(dateStr).toLocaleDateString(currentLang, { year: 'numeric', month: 'long', day: 'numeric' });
+      } catch {
+        return dateStr;
+      }
+    }
+
+    function truncate(str, max) {
+      if (!str) return '';
+      return str.length <= max ? str : str.slice(0, max).trimEnd() + '…';
+    }
+
+    function escHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function createCard(post) {
+      const card = document.createElement('article');
+      card.className = 'blog-card glass-card';
+      card.dataset.city = (post.city || '').toLowerCase();
+
+      const rawExcerpt = post.excerpt || post.content || '';
+      const excerpt = escHtml(truncate(rawExcerpt, 200));
+      const fullContent = escHtml(post.content || post.excerpt || '');
+      const hasFull = fullContent.length > 0;
+      const hasTrivia = !!(post.trivia);
+      const hasHistory = !!(post.history_nugget);
+
+      card.innerHTML = `
+        <div class="blog-card-emoji" aria-hidden="true">${escHtml(post.emoji) || '🌍'}</div>
+        <div class="blog-card-body">
+          <p class="blog-card-city">${escHtml(post.city)}</p>
+          <h2 class="blog-card-title">${escHtml(post.title)}</h2>
+          <p class="blog-card-excerpt">${excerpt}</p>
+          <p class="blog-card-date">${escHtml(formatDate(post.date))}</p>
+          <div class="blog-card-actions">
+            ${hasFull ? `<button class="btn-neon blog-btn-read" aria-expanded="false">${bt('blog_read_full')}</button>` : ''}
+            ${hasTrivia ? `<button class="btn-outline blog-btn-trivia">${bt('blog_trivia')}</button>` : ''}
+            ${hasHistory ? `<button class="btn-outline blog-btn-history">${bt('blog_history')}</button>` : ''}
+          </div>
+          ${hasFull ? `<div class="blog-card-full"><div class="blog-card-full-text">${fullContent}</div><button class="btn-text blog-btn-back">← ${bt('blog_back')}</button></div>` : ''}
+          ${hasTrivia ? `<div class="blog-card-trivia blog-toggle-panel">${escHtml(post.trivia)}</div>` : ''}
+          ${hasHistory ? `<div class="blog-card-history blog-toggle-panel">${escHtml(post.history_nugget)}</div>` : ''}
+        </div>
+      `;
+
+      // Read full story toggle
+      const readBtn = card.querySelector('.blog-btn-read');
+      const fullPanel = card.querySelector('.blog-card-full');
+      const backBtn = card.querySelector('.blog-btn-back');
+      if (readBtn && fullPanel) {
+        readBtn.addEventListener('click', () => {
+          fullPanel.classList.add('blog-panel-open');
+          readBtn.setAttribute('aria-expanded', 'true');
+          readBtn.style.display = 'none';
+        });
+        backBtn.addEventListener('click', () => {
+          fullPanel.classList.remove('blog-panel-open');
+          readBtn.setAttribute('aria-expanded', 'false');
+          readBtn.style.display = '';
+        });
+      }
+
+      // Trivia toggle
+      const triviaBtn = card.querySelector('.blog-btn-trivia');
+      const triviaPanel = card.querySelector('.blog-card-trivia');
+      if (triviaBtn && triviaPanel) {
+        triviaBtn.addEventListener('click', () => {
+          const open = triviaPanel.classList.toggle('blog-panel-open');
+          triviaBtn.classList.toggle('btn-outline-active', open);
+        });
+      }
+
+      // History toggle
+      const historyBtn = card.querySelector('.blog-btn-history');
+      const historyPanel = card.querySelector('.blog-card-history');
+      if (historyBtn && historyPanel) {
+        historyBtn.addEventListener('click', () => {
+          const open = historyPanel.classList.toggle('blog-panel-open');
+          historyBtn.classList.toggle('btn-outline-active', open);
+        });
+      }
+
+      return card;
+    }
+
+    function renderPosts(posts) {
+      const grid = document.getElementById('blog-grid');
+      grid.innerHTML = '';
+
+      if (posts.length === 0) {
+        grid.innerHTML = `
+          <div class="blog-status">
+            <span class="blog-status-emoji">🔍</span>
+            <p>${bt('blog_no_stories')}</p>
+          </div>`;
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      posts.forEach(post => fragment.appendChild(createCard(post)));
+      grid.appendChild(fragment);
+
+      if (window.twemoji) {
+        twemoji.parse(grid, { folder: 'svg', ext: '.svg' });
+      }
+    }
+
+    function filterPosts(query) {
+      const q = query.trim().toLowerCase();
+      if (!q) return allPosts;
+      return allPosts.filter(p => (p.city || '').toLowerCase().includes(q));
+    }
+
+    // ---- Language modal (mirrors app.js) ----
+    (function initLangUI() {
+      const modal = document.createElement('div');
+      modal.className = 'lang-modal';
+      modal.id = 'lang-modal';
+      const list = document.createElement('div');
+      list.className = 'lang-list';
+      const langNames = { en:'English', es:'Español', fr:'Français', de:'Deutsch', pt:'Português', ja:'日本語' };
+      supportedLangs.forEach(code => {
+        const opt = document.createElement('div');
+        opt.className = 'lang-option';
+        opt.textContent = langNames[code];
+        opt.addEventListener('click', () => {
+          currentLang = code;
+          localStorage.setItem('glotemp-lang', code);
+          document.documentElement.lang = code;
+          modal.style.display = 'none';
+          applyBlogTranslations();
+          renderPosts(filterPosts(document.getElementById('blog-search').value));
+        });
+        list.appendChild(opt);
+      });
+      modal.appendChild(list);
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+      document.body.appendChild(modal);
+      document.getElementById('lang-switch').addEventListener('click', () => modal.style.display = 'flex');
+    })();
+
+    // ---- Init ----
+    document.addEventListener('DOMContentLoaded', async () => {
+      applyBlogTranslations();
+
+      const searchInput = document.getElementById('blog-search');
+      searchInput.addEventListener('input', () => {
+        renderPosts(filterPosts(searchInput.value));
+      });
+
+      try {
+        allPosts = await fetchPosts();
+        renderPosts(allPosts);
+      } catch (err) {
+        const grid = document.getElementById('blog-grid');
+        grid.innerHTML = `
+          <div class="blog-status">
+            <span class="blog-status-emoji">😔</span>
+            <p>${bt('blog_error')}</p>
+          </div>`;
+      }
+    });
+  </script>
+  <script src="cookie-consent.js" defer></script>
+</body>
+</html>
