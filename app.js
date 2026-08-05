@@ -1,6 +1,4 @@
-/const SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co'; // e.g. https://abc123.supabase.co
-const SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_
-'; // eyJ... ----- i18n Setup -----
+// ----- i18n Setup -----
 const translations = {
   en: {
     install_title: "Add Glotemp to Home Screen",
@@ -435,52 +433,58 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('install-banner').style.display = 'none';
   });
 });
+function getCurrentFeaturedStory() {
+  const ROTATION_DAYS = 7;
+  let index = parseInt(localStorage.getItem('featuredStoryIndex') || '0', 10);
+  if (isNaN(index) || index < 0 || index >= STORIES.length) index = 0;
+
+  const lastRotation = localStorage.getItem('lastRotationDate') || '';
+  const today = new Date().toISOString().slice(0, 10);
+  const shouldRotate = !lastRotation || ((new Date(today) - new Date(lastRotation)) / 86400000) >= ROTATION_DAYS;
+
+  if (shouldRotate) {
+    index = (index + 1) % STORIES.length;
+    localStorage.setItem('featuredStoryIndex', String(index));
+    localStorage.setItem('lastRotationDate', today);
+  }
+
+  return STORIES[index];
+}
+
 function loadDailyStory() {
   const storySection = document.getElementById('story-content');
   const fallback = document.getElementById('story-fallback');
 
-  fetch(`${SUPABASE_URL}/rest/v1/blog_posts?select=*&featured=eq.true&order=date.desc&limit=1`, {
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+  try {
+    const story = getCurrentFeaturedStory();
+
+    document.getElementById('story-emoji').textContent = story.emoji || '🌍';
+    document.getElementById('story-city').textContent = story.city;
+    document.getElementById('story-title').textContent = story.title;
+    document.getElementById('story-excerpt').textContent = story.excerpt || '';
+
+    document.getElementById('trivia-btn').onclick = () => {
+      const el = document.getElementById('trivia-text');
+      el.textContent = story.trivia || 'No trivia available.';
+      el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    };
+    document.getElementById('history-btn').onclick = () => {
+      const el = document.getElementById('history-text');
+      el.textContent = story.history_nugget || 'No history available.';
+      el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    };
+
+    storySection.style.display = 'block';
+    fallback.style.display = 'none';
+
+    if (window.twemoji) {
+      twemoji.parse(document.getElementById('daily-story'));
     }
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data && data.length > 0) {
-      const story = data[0];
-      document.getElementById('story-emoji').textContent = story.emoji || '🌍';
-      document.getElementById('story-city').textContent = story.city;
-      document.getElementById('story-title').textContent = story.title;
-      document.getElementById('story-excerpt').textContent = story.excerpt || '';
-
-      document.getElementById('trivia-btn').onclick = () => {
-        const el = document.getElementById('trivia-text');
-        el.textContent = story.trivia || 'No trivia available.';
-        el.style.display = el.style.display === 'none' ? 'block' : 'none';
-      };
-      document.getElementById('history-btn').onclick = () => {
-        const el = document.getElementById('history-text');
-        el.textContent = story.history_nugget || 'No history available.';
-        el.style.display = el.style.display === 'none' ? 'block' : 'none';
-      };
-
-      storySection.style.display = 'block';
-      fallback.style.display = 'none';
-
-      if (window.twemoji) {
-        twemoji.parse(document.getElementById('daily-story'));
-      }
-    } else {
-      throw new Error('No featured story');
-    }
-  })
-  .catch(() => {
+  } catch (e) {
     storySection.style.display = 'none';
     fallback.style.display = 'block';
-  });
+  }
 }
-
 document.addEventListener('DOMContentLoaded', () => {
   // ... existing code like applyTranslations, resizeCanvas, etc.
   loadDailyStory(); // add this line

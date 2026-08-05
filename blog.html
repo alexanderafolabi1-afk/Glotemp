@@ -54,11 +54,8 @@
     </footer>
   </div>
 
+  <script src="stories.js"></script>
   <script>
-    // Supabase config – same as app.js, keep in sync
-    const SUPABASE_URL = 'https://abc123.supabase.co'
-    const SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_'
-
     // Minimal i18n for blog page (same translations as app.js but scoped)
     const translationsBlog = {
       en: {
@@ -128,22 +125,10 @@
       if (searchInput) searchInput.placeholder = t('search_placeholder');
     }
 
-    async function fetchPosts() {
-      try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/blog_posts?select=*&order=date.desc`, {
-          headers: {
-            apikey: SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-          }
-        });
-        if (!res.ok) throw new Error('Fetch failed');
-        const posts = await res.json();
-        renderPosts(posts);
-      } catch (err) {
-        renderPosts([]); // show empty state
-      }
+    function loadPosts() {
+      const sorted = [...STORIES].sort((a, b) => new Date(b.date) - new Date(a.date));
+      renderPosts(sorted);
     }
-
     function renderPosts(posts) {
       const grid = document.getElementById('blog-posts-grid');
       const empty = document.getElementById('blog-empty');
@@ -232,7 +217,7 @@
     // Init
     document.addEventListener('DOMContentLoaded', () => {
       applyBlogTranslations();
-      fetchPosts();
+      loadPosts();
     });
   </script>
 </body>
