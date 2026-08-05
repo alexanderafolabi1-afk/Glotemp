@@ -281,3 +281,22 @@ body {
     background-attachment: scroll;
   }
 }
+#daily-story {
+  position: relative;
+  overflow: hidden;
+}
+#daily-story::before {
+  content: '';
+  position: absolute;
+  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple), var(--neon-cyan));
+  border-radius: var(--radius);
+  z-index: -1;
+  animation: border-glow 3s linear infinite;
+  opacity: 0.6;
+}
+@keyframes border-glow {
+  0% { filter: blur(8px); }
+  50% { filter: blur(15px); }
+  100% { filter: blur(8px); }
+}
