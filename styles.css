@@ -219,8 +219,7 @@ body {
 .footer .small-print a { color: inherit; text-decoration: underline; }
 .footer .small-print a:hover { opacity: 1; }
 
-/* Logo image */
-.logo-img { filter: drop-shadow(0 0 8px rgba(0,242,254,0.5)); display: block; }
+.logo-img { filter: drop-shadow(0 0 8px rgba(0,242,254,0.5)); display: inline-block; vertical-align: middle; }
 
 /* Language dropdown (hidden modal) */
 .lang-modal {
