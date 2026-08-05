@@ -435,32 +435,34 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 function getCurrentFeaturedStory() {
   const ROTATION_DAYS = 7;
+  const stories = (typeof STORIES !== 'undefined' && Array.isArray(STORIES)) ? STORIES : [];
 
-  if (typeof STORIES === 'undefined' || !Array.isArray(STORIES) || STORIES.length === 0) {
-    throw new Error('No stories available');
+  if (stories.length === 0) {
+    localStorage.removeItem('featuredStoryIndex');
+    localStorage.removeItem('lastRotationDate');
+    return null;
   }
 
   let index = parseInt(localStorage.getItem('featuredStoryIndex') || '0', 10);
-  if (isNaN(index) || index < 0 || index >= STORIES.length) index = 0;
+  if (isNaN(index) || index < 0 || index >= stories.length) index = 0;
 
   const lastRotation = localStorage.getItem('lastRotationDate') || '';
   const today = new Date().toISOString().slice(0, 10);
   const lastRotationDate = new Date(lastRotation);
 
   if (!lastRotation || isNaN(lastRotationDate.getTime())) {
-    // First visit (or corrupted state): record today, keep current index
     localStorage.setItem('lastRotationDate', today);
     localStorage.setItem('featuredStoryIndex', String(index));
-    return STORIES[index];
+    return stories[index];
   }
 
   if (((new Date(today) - lastRotationDate) / 86400000) >= ROTATION_DAYS) {
-    index = (index + 1) % STORIES.length;
+    index = (index + 1) % stories.length;
     localStorage.setItem('featuredStoryIndex', String(index));
     localStorage.setItem('lastRotationDate', today);
   }
 
-  return STORIES[index];
+  return stories[index];
 }
 
 function loadDailyStory() {
