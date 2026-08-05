@@ -189,7 +189,7 @@
 
     // ---- Supabase config (same values as app.js) ----
     const SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_\n';
+    const SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
 
     // ---- State ----
     let allPosts = [];
@@ -224,32 +224,43 @@
       return str.length <= max ? str : str.slice(0, max).trimEnd() + '…';
     }
 
+    function escHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     function createCard(post) {
       const card = document.createElement('article');
       card.className = 'blog-card glass-card';
       card.dataset.city = (post.city || '').toLowerCase();
 
-      const excerpt = truncate(post.excerpt || post.content || '', 200);
-      const fullContent = post.content || post.excerpt || '';
+      const rawExcerpt = post.excerpt || post.content || '';
+      const excerpt = escHtml(truncate(rawExcerpt, 200));
+      const fullContent = escHtml(post.content || post.excerpt || '');
       const hasFull = fullContent.length > 0;
       const hasTrivia = !!(post.trivia);
       const hasHistory = !!(post.history_nugget);
 
       card.innerHTML = `
-        <div class="blog-card-emoji" aria-hidden="true">${post.emoji || '🌍'}</div>
+        <div class="blog-card-emoji" aria-hidden="true">${escHtml(post.emoji) || '🌍'}</div>
         <div class="blog-card-body">
-          <p class="blog-card-city">${post.city || ''}</p>
-          <h2 class="blog-card-title">${post.title || ''}</h2>
+          <p class="blog-card-city">${escHtml(post.city)}</p>
+          <h2 class="blog-card-title">${escHtml(post.title)}</h2>
           <p class="blog-card-excerpt">${excerpt}</p>
-          <p class="blog-card-date">${formatDate(post.date)}</p>
+          <p class="blog-card-date">${escHtml(formatDate(post.date))}</p>
           <div class="blog-card-actions">
             ${hasFull ? `<button class="btn-neon blog-btn-read" aria-expanded="false">${bt('blog_read_full')}</button>` : ''}
             ${hasTrivia ? `<button class="btn-outline blog-btn-trivia">${bt('blog_trivia')}</button>` : ''}
             ${hasHistory ? `<button class="btn-outline blog-btn-history">${bt('blog_history')}</button>` : ''}
           </div>
           ${hasFull ? `<div class="blog-card-full"><div class="blog-card-full-text">${fullContent}</div><button class="btn-text blog-btn-back">← ${bt('blog_back')}</button></div>` : ''}
-          ${hasTrivia ? `<div class="blog-card-trivia blog-toggle-panel">${post.trivia}</div>` : ''}
-          ${hasHistory ? `<div class="blog-card-history blog-toggle-panel">${post.history_nugget}</div>` : ''}
+          ${hasTrivia ? `<div class="blog-card-trivia blog-toggle-panel">${escHtml(post.trivia)}</div>` : ''}
+          ${hasHistory ? `<div class="blog-card-history blog-toggle-panel">${escHtml(post.history_nugget)}</div>` : ''}
         </div>
       `;
 
