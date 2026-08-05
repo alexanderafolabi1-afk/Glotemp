@@ -14,6 +14,12 @@ const translations = {
     stars: "Stars",
     stars_share: "Top contributors share 5% of sponsorship revenue",
     footer_tagline: "Measuring the world’s heartbeat",
+    privacy_policy: "Privacy Policy",
+    terms_of_service: "Terms of Service",
+    cookie_settings: "Cookie Settings",
+    cookie_banner_text: "We use essential cookies to remember your language preference and mood check-ins. No third-party tracking.",
+    cookie_accept: "Accept All",
+    cookie_settings_btn: "Settings",
     dimensions: ["Mood","Economic","Nightlife","Study","Tourism","Safety","Health","Traffic","Events","Community","Weather","Innovation"]
   },
   es: {
@@ -30,6 +36,12 @@ const translations = {
     stars: "Estrellas",
     stars_share: "Los principales contribuyentes comparten el 5% de los patrocinios",
     footer_tagline: "Midiendo el latido del mundo",
+    privacy_policy: "Política de Privacidad",
+    terms_of_service: "Términos de Servicio",
+    cookie_settings: "Configuración de Cookies",
+    cookie_banner_text: "Usamos cookies esenciales para recordar tu idioma y registros de ánimo. Sin rastreo de terceros.",
+    cookie_accept: "Aceptar todo",
+    cookie_settings_btn: "Configuración",
     dimensions: ["Ánimo","Economía","Vida nocturna","Estudio","Turismo","Seguridad","Salud","Tráfico","Eventos","Comunidad","Clima","Innovación"]
   },
   fr: {
@@ -46,6 +58,12 @@ const translations = {
     stars: "Étoiles",
     stars_share: "Les meilleurs contributeurs partagent 5% des revenus de sponsoring",
     footer_tagline: "Mesurer les battements du cœur du monde",
+    privacy_policy: "Politique de Confidentialité",
+    terms_of_service: "Conditions d'Utilisation",
+    cookie_settings: "Paramètres des Cookies",
+    cookie_banner_text: "Nous utilisons des cookies essentiels pour mémoriser votre langue et vos humeurs. Aucun suivi tiers.",
+    cookie_accept: "Tout accepter",
+    cookie_settings_btn: "Paramètres",
     dimensions: ["Humeur","Économie","Vie nocturne","Étude","Tourisme","Sécurité","Santé","Trafic","Événements","Communauté","Météo","Innovation"]
   },
   de: {
@@ -62,6 +80,12 @@ const translations = {
     stars: "Sterne",
     stars_share: "Top-Beitragende teilen sich 5% der Sponsoring-Einnahmen",
     footer_tagline: "Den Herzschlag der Welt messen",
+    privacy_policy: "Datenschutzrichtlinie",
+    terms_of_service: "Nutzungsbedingungen",
+    cookie_settings: "Cookie-Einstellungen",
+    cookie_banner_text: "Wir verwenden essentielle Cookies, um Ihre Spracheinstellung und Stimmungs-Check-ins zu speichern. Kein Drittanbieter-Tracking.",
+    cookie_accept: "Alle akzeptieren",
+    cookie_settings_btn: "Einstellungen",
     dimensions: ["Stimmung","Wirtschaft","Nachtleben","Studium","Tourismus","Sicherheit","Gesundheit","Verkehr","Events","Gemeinschaft","Wetter","Innovation"]
   },
   pt: {
@@ -78,6 +102,12 @@ const translations = {
     stars: "Estrelas",
     stars_share: "Principais contribuidores dividem 5% da receita de patrocínios",
     footer_tagline: "Medindo o batimento cardíaco do mundo",
+    privacy_policy: "Política de Privacidade",
+    terms_of_service: "Termos de Serviço",
+    cookie_settings: "Configurações de Cookies",
+    cookie_banner_text: "Usamos cookies essenciais para lembrar sua preferência de idioma e registros de humor. Sem rastreamento de terceiros.",
+    cookie_accept: "Aceitar tudo",
+    cookie_settings_btn: "Configurações",
     dimensions: ["Humor","Economia","Vida noturna","Estudo","Turismo","Segurança","Saúde","Tráfego","Eventos","Comunidade","Clima","Inovação"]
   },
   ja: {
@@ -94,6 +124,12 @@ const translations = {
     stars: "スター",
     stars_share: "トップ貢献者がスポンサー収益の5%を共有",
     footer_tagline: "世界の鼓動を測る",
+    privacy_policy: "プライバシーポリシー",
+    terms_of_service: "利用規約",
+    cookie_settings: "Cookieの設定",
+    cookie_banner_text: "言語設定とムードチェックインを記憶するために必須Cookieを使用します。第三者追跡なし。",
+    cookie_accept: "すべて受け入れる",
+    cookie_settings_btn: "設定",
     dimensions: ["気分","経済","ナイトライフ","学習","観光","安全","健康","交通","イベント","コミュニティ","天気","イノベーション"]
   }
 };
