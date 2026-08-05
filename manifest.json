@@ -1,21 +1,23 @@
 {
-  "name": "Glotemp",
+  "name": "Glotemp – City Pulse",
   "short_name": "Glotemp",
-  "description": "Global mood and tempo map.",
-  "start_url": "/",
+  "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#FFD700",
+  "background_color": "#0a0f1a",
+  "theme_color": "#0a0f1a",
+  "description": "Real-time collective mood infrastructure for cities",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "assets/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "assets/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "lang": "en",
+  "categories": ["travel", "social", "lifestyle"]
 }
