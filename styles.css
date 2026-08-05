@@ -1,5 +1,5 @@
 :root {
-  --bg-deep: #0a0f1a;
+  --bg-deep: #050505;
   --glass-bg: rgba(16, 20, 35, 0.65);
   --glass-border: rgba(255, 255, 255, 0.08);
   --neon-cyan: #00f2fe;
@@ -15,7 +15,33 @@
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: radial-gradient(ellipse at 20% 50%, #1a1f3a 0%, var(--bg-deep) 70%);
+  background-color: var(--bg-deep);
+  background-image:
+    radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.65) 100%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(20,20,20,0.15) 2px,
+      rgba(20,20,20,0.15) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(15,15,15,0.12) 2px,
+      rgba(15,15,15,0.12) 4px
+    ),
+    linear-gradient(
+      180deg,
+      #0a0a0a 0%,
+      var(--bg-deep) 40%,
+      #030303 100%
+    );
+  background-size: cover, 6px 6px, 6px 6px, cover;
+  background-position: center, 0 0, 0 0, center;
+  background-repeat: no-repeat, repeat, repeat, no-repeat;
+  background-attachment: fixed;
   color: var(--text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -252,4 +278,10 @@ body {
   .pulse-info { padding: 1rem; }
   .mood-value { font-size: 3rem; }
   .nav-links a { margin-left: 1rem; font-size: 0.9rem; }
+}
+
+@media (max-width: 768px) {
+  body {
+    background-attachment: scroll;
+  }
 }
