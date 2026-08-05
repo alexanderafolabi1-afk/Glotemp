@@ -6,7 +6,9 @@
   <meta name="theme-color" content="#0a0f1a" />
   <meta name="description" content="Glotemp - Real-time collective mood infrastructure for cities worldwide" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <title>Glotemp – Live City Pulse</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -24,7 +26,7 @@
     <!-- Navigation -->
     <nav class="navbar glass">
       <div class="nav-brand">
-        <span class="logo-text">🌐 Glotemp</span>
+        <img src="assets/logo.png" alt="Glotemp" class="logo-img" height="40">
         <span class="pulse-dot"></span>
       </div>
       <div class="nav-links">
@@ -90,10 +92,17 @@
     </section>
 
     <footer class="footer glass">
-      <p>© 2026 Glotemp – <span data-i18n="footer_tagline">Measuring the world’s heartbeat</span></p>
+      <p>© 2025 RenviaIT Ltd. All rights reserved.</p>
+      <p class="small-print">
+        <a href="privacy.html" data-i18n="privacy_policy">Privacy Policy</a> |
+        <a href="terms.html" data-i18n="terms_of_service">Terms of Service</a> |
+        <a href="#" id="cookie-settings" data-i18n="cookie_settings">Cookie Settings</a>
+      </p>
+      <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
     </footer>
   </div>
 
   <script src="app.js" defer></script>
+  <script src="cookie-consent.js" defer></script>
 </body>
 </html>

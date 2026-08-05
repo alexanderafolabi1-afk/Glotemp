@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link rel="stylesheet" href="styles.css" />
   <title>Glotemp – Investors</title>
 </head>
 <body>
   <nav class="navbar glass">
-    <div class="nav-brand"><span class="logo-text">🌐 Glotemp</span></div>
+    <div class="nav-brand"><img src="assets/logo.png" alt="Glotemp" class="logo-img" height="40"></div>
     <div class="nav-links">
       <a href="index.html">Pulse</a>
       <a href="about.html">About</a>
@@ -20,6 +22,15 @@
     <h1 data-i18n="invest_title">Seed Round Open</h1>
     <p data-i18n="invest_text">Targeting a $420M SOM in location intelligence. Deck available on request.</p>
   </main>
+  <footer class="footer glass">
+    <p>© 2025 RenviaIT Ltd. All rights reserved.</p>
+    <p class="small-print">
+      <a href="privacy.html" data-i18n="privacy_policy">Privacy Policy</a> |
+      <a href="terms.html" data-i18n="terms_of_service">Terms of Service</a> |
+      <a href="#" id="cookie-settings" data-i18n="cookie_settings">Cookie Settings</a>
+    </p>
+    <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
+  </footer>
   <script>
     const translationsInv = {
       en: { invest_title: "Seed Round Open", invest_text: "Targeting a $420M SOM in location intelligence. Deck available on request." },
@@ -31,5 +42,6 @@
       el.textContent = translationsInv[lang]?.[el.dataset.i18n] || el.textContent;
     });
   </script>
+  <script src="cookie-consent.js" defer></script>
 </body>
 </html>

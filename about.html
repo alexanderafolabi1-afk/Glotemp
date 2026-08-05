@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link rel="stylesheet" href="styles.css" />
   <title>Glotemp – About</title>
 </head>
 <body>
   <nav class="navbar glass">
-    <div class="nav-brand"><span class="logo-text">🌐 Glotemp</span></div>
+    <div class="nav-brand"><img src="assets/logo.png" alt="Glotemp" class="logo-img" height="40"></div>
     <div class="nav-links">
       <a href="index.html">Pulse</a>
       <a href="about.html" class="active">About</a>
@@ -20,11 +22,20 @@
     <h1 data-i18n="about_title">About Glotemp</h1>
     <p data-i18n="about_text">We are building the world’s first real-time mood infrastructure, turning city feelings into actionable intelligence for travelers, businesses, and communities.</p>
   </main>
+  <footer class="footer glass">
+    <p>© 2025 RenviaIT Ltd. All rights reserved.</p>
+    <p class="small-print">
+      <a href="privacy.html" data-i18n="privacy_policy">Privacy Policy</a> |
+      <a href="terms.html" data-i18n="terms_of_service">Terms of Service</a> |
+      <a href="#" id="cookie-settings" data-i18n="cookie_settings">Cookie Settings</a>
+    </p>
+    <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
+  </footer>
   <script>
     // minimal i18n inject
     const translationsAbout = {
-      en: { about_title: "About Glotemp", about_text: "We are building the world’s first real-time mood infrastructure..." },
-      es: { about_title: "Acerca de Glotemp", about_text: "Construimos la primera infraestructura de humor en tiempo real..." },
+      en: { about_title: "About Glotemp", about_text: "We are building the world's first real-time mood infrastructure...", privacy_policy: "Privacy Policy", terms_of_service: "Terms of Service", cookie_settings: "Cookie Settings" },
+      es: { about_title: "Acerca de Glotemp", about_text: "Construimos la primera infraestructura de humor en tiempo real...", privacy_policy: "Política de Privacidad", terms_of_service: "Términos de Servicio", cookie_settings: "Configuración de Cookies" },
       // add others if needed
     };
     const lang = localStorage.getItem('glotemp-lang') || 'en';
@@ -33,5 +44,6 @@
       el.textContent = translationsAbout[lang]?.[el.dataset.i18n] || el.textContent;
     });
   </script>
+  <script src="cookie-consent.js" defer></script>
 </body>
 </html>
