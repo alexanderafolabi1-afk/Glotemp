@@ -1,2 +1,43 @@
-self.addEventListener("install", e => e.waitUntil(self.skipWaiting()));
-self.addEventListener("activate", e => e.waitUntil(clients.claim()));
+const CACHE_NAME = 'glotemp-v2';
+const ASSETS = [
+  '/',
+  '/index.html',
+  '/about.html',
+  '/investors.html',
+  '/styles.css',
+  '/app.js',
+  '/manifest.json',
+  '/assets/icon-192.png',
+  '/assets/icon-512.png'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))
+    )
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request).then(cached => {
+      const fetchPromise = fetch(event.request).then(response => {
+        if (response && response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseClone));
+        }
+        return response;
+      }).catch(() => cached);
+      return cached || fetchPromise;
+    })
+  );
+});
