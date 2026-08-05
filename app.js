@@ -440,9 +440,12 @@ function getCurrentFeaturedStory() {
 
   const lastRotation = localStorage.getItem('lastRotationDate') || '';
   const today = new Date().toISOString().slice(0, 10);
-  const shouldRotate = !lastRotation || ((new Date(today) - new Date(lastRotation)) / 86400000) >= ROTATION_DAYS;
 
-  if (shouldRotate) {
+  if (!lastRotation) {
+    // First visit: record today, keep index at 0
+    localStorage.setItem('lastRotationDate', today);
+    localStorage.setItem('featuredStoryIndex', '0');
+  } else if (((new Date(today) - new Date(lastRotation)) / 86400000) >= ROTATION_DAYS) {
     index = (index + 1) % STORIES.length;
     localStorage.setItem('featuredStoryIndex', String(index));
     localStorage.setItem('lastRotationDate', today);
