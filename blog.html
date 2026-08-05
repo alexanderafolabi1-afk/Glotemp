@@ -203,7 +203,7 @@
         {
           headers: {
             apikey: SUPABASE_ANON_KEY.trim(),
-            Authorization: `******
+            Authorization: `Bearer ${SUPABASE_ANON_KEY.trim()}`
           }
         }
       );
