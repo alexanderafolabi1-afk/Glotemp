@@ -3,6 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="About Glotemp — the world's first real-time mood infrastructure, turning the collective feeling of cities into living intelligence for travellers, businesses and communities." />
+  <meta name="keywords" content="about Glotemp, city mood infrastructure, urban intelligence, collective feeling" />
+  <meta property="og:title" content="About Glotemp" />
+  <meta property="og:description" content="About Glotemp — the world's first real-time mood infrastructure, turning the collective feeling of cities into living intelligence for travellers, businesses and communities." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://glotemp.com/about.html" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="About Glotemp" />
+  <meta name="twitter:description" content="About Glotemp — the world's first real-time mood infrastructure, turning the collective feeling of cities into living intelligence for travellers, businesses and communities." />
+  <link rel="canonical" href="https://glotemp.com/about.html" />
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
@@ -21,7 +31,7 @@
   </nav>
   <main class="glass-card" style="padding:2rem; max-width:800px; margin:2rem auto;">
     <h1 data-i18n="about_title">About Glotemp</h1>
-    <p data-i18n="about_text">We are building the world’s first real-time mood infrastructure, turning city feelings into actionable intelligence for travelers, businesses, and communities.</p>
+    <p data-i18n="about_text">We measure what cannot be seen on a map — the collective feeling of a city. Glotemp is the world's first real-time mood infrastructure. It turns the silent emotional current of urban life into clear, living intelligence for travellers, businesses and communities. Every check-in adds a heartbeat. Every city gains a voice.</p>
   </main>
   <footer class="footer glass">
     <p>© 2025 RenviaIT Ltd. All rights reserved.</p>
@@ -35,14 +45,41 @@
   <script>
     // minimal i18n inject
     const translationsAbout = {
-      en: { about_title: "About Glotemp", about_text: "We are building the world's first real-time mood infrastructure...", privacy_policy: "Privacy Policy", terms_of_service: "Terms of Service", cookie_settings: "Cookie Settings" },
-      es: { about_title: "Acerca de Glotemp", about_text: "Construimos la primera infraestructura de humor en tiempo real...", privacy_policy: "Política de Privacidad", terms_of_service: "Términos de Servicio", cookie_settings: "Configuración de Cookies" },
-      // add others if needed
+      en: {
+        about_title: "About Glotemp",
+        about_text: "We measure what cannot be seen on a map — the collective feeling of a city. Glotemp is the world's first real-time mood infrastructure. It turns the silent emotional current of urban life into clear, living intelligence for travellers, businesses and communities. Every check-in adds a heartbeat. Every city gains a voice.",
+        privacy_policy: "Privacy Policy", terms_of_service: "Terms of Service", cookie_settings: "Cookie Settings"
+      },
+      es: {
+        about_title: "Acerca de Glotemp",
+        about_text: "Medimos lo que no se ve en un mapa: el sentimiento colectivo de una ciudad. Glotemp es la primera infraestructura de ánimo en tiempo real del mundo. Convierte la corriente emocional silenciosa de la vida urbana en inteligencia clara y viva para viajeros, empresas y comunidades. Cada registro añade un latido. Cada ciudad gana una voz.",
+        privacy_policy: "Política de Privacidad", terms_of_service: "Términos de Servicio", cookie_settings: "Configuración de Cookies"
+      },
+      fr: {
+        about_title: "À propos de Glotemp",
+        about_text: "Nous mesurons ce qui ne figure sur aucune carte — le sentiment collectif d'une ville. Glotemp est la première infrastructure d'humeur en temps réel au monde. Elle transforme le courant émotionnel silencieux de la vie urbaine en intelligence claire et vivante pour les voyageurs, les entreprises et les communautés. Chaque contribution ajoute un battement. Chaque ville trouve une voix.",
+        privacy_policy: "Politique de Confidentialité", terms_of_service: "Conditions d'Utilisation", cookie_settings: "Paramètres des Cookies"
+      },
+      de: {
+        about_title: "Über Glotemp",
+        about_text: "Wir messen, was auf keiner Karte zu sehen ist — das kollektive Gefühl einer Stadt. Glotemp ist die weltweit erste Echtzeit-Stimmungsinfrastruktur. Sie verwandelt den stillen emotionalen Strom des urbanen Lebens in klare, lebendige Intelligenz für Reisende, Unternehmen und Gemeinschaften. Jeder Check-in fügt einen Herzschlag hinzu. Jede Stadt erhält eine Stimme.",
+        privacy_policy: "Datenschutzrichtlinie", terms_of_service: "Nutzungsbedingungen", cookie_settings: "Cookie-Einstellungen"
+      },
+      pt: {
+        about_title: "Sobre o Glotemp",
+        about_text: "Medimos o que não aparece em nenhum mapa — o sentimento coletivo de uma cidade. O Glotemp é a primeira infraestrutura de humor em tempo real do mundo. Transforma a corrente emocional silenciosa da vida urbana em inteligência clara e viva para viajantes, empresas e comunidades. Cada check-in adiciona um batimento. Cada cidade ganha uma voz.",
+        privacy_policy: "Política de Privacidade", terms_of_service: "Termos de Serviço", cookie_settings: "Configurações de Cookies"
+      },
+      ja: {
+        about_title: "Glotempについて",
+        about_text: "地図には見えないもの — 都市の集合的な感情を測ります。Glotempは世界初のリアルタイム・ムード・インフラです。都市生活の静かな感情の流れを、旅行者、企業、コミュニティのための明確で生きたインテリジェンスに変えます。一つ一つのチェックインが心拍を加え、すべての都市に声を与えます。",
+        privacy_policy: "プライバシーポリシー", terms_of_service: "利用規約", cookie_settings: "Cookieの設定"
+      }
     };
     const lang = localStorage.getItem('glotemp-lang') || 'en';
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-i18n]').forEach(el => {
-      el.textContent = translationsAbout[lang]?.[el.dataset.i18n] || el.textContent;
+      el.textContent = translationsAbout[lang]?.[el.dataset.i18n] || translationsAbout.en[el.dataset.i18n] || el.textContent;
     });
   </script>
   <script src="cookie-consent.js" defer></script>
