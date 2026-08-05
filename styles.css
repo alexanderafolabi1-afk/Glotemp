@@ -471,3 +471,41 @@ body {
 }
 .blog-status-emoji { font-size: 3rem; display: block; margin-bottom: 0.75rem; }
 
+
+/* blog-grid and blog-card are already defined above; avoid redefining them here to preserve existing responsive and interaction behavior. */
+
+.blog-emoji {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+.blog-city {
+  font-size: 1.1rem;
+  color: var(--neon-cyan);
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+.blog-title {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+.blog-excerpt {
+  opacity: 0.8;
+  font-size: 0.95rem;
+  margin-bottom: 0.8rem;
+}
+.blog-date {
+  font-size: 0.8rem;
+  opacity: 0.5;
+  margin-bottom: 1rem;
+}
+.blog-full-content {
+  margin-top: 1rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 1rem;
+}
+.blog-toggles {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
