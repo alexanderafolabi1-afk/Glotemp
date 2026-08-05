@@ -448,15 +448,16 @@ function getCurrentFeaturedStory() {
 
   const lastRotation = localStorage.getItem('lastRotationDate') || '';
   const today = new Date().toISOString().slice(0, 10);
-  const lastRotationDate = new Date(lastRotation);
+  const isValidRotationDate = /^\d{4}-\d{2}-\d{2}$/.test(lastRotation);
+  const lastRotationDate = isValidRotationDate ? new Date(`${lastRotation}T00:00:00Z`) : null;
 
-  if (!lastRotation || isNaN(lastRotationDate.getTime())) {
+  if (!lastRotationDate || isNaN(lastRotationDate.getTime())) {
     localStorage.setItem('lastRotationDate', today);
     localStorage.setItem('featuredStoryIndex', String(index));
     return stories[index];
   }
 
-  if (((new Date(today) - lastRotationDate) / 86400000) >= ROTATION_DAYS) {
+  if (((new Date(`${today}T00:00:00Z`) - lastRotationDate) / 86400000) >= ROTATION_DAYS) {
     index = (index + 1) % stories.length;
     localStorage.setItem('featuredStoryIndex', String(index));
     localStorage.setItem('lastRotationDate', today);
