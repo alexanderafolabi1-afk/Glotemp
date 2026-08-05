@@ -471,6 +471,7 @@ function loadDailyStory() {
 
   try {
     const story = getCurrentFeaturedStory();
+    if (!story) throw new Error('No story available');
 
     document.getElementById('story-emoji').textContent = story.emoji || '🌍';
     document.getElementById('story-city').textContent = story.city;
