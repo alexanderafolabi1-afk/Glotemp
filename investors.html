@@ -3,6 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Glotemp Seed Round — we are building the emotional layer of the internet of cities. A new category of location intelligence based on collective human energy." />
+  <meta name="keywords" content="Glotemp investors, seed round, location intelligence, city mood investment, urban intelligence startup" />
+  <meta property="og:title" content="Glotemp – Seed Round Open" />
+  <meta property="og:description" content="Glotemp Seed Round — we are building the emotional layer of the internet of cities. A new category of location intelligence based on collective human energy." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://glotemp.com/investors.html" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Glotemp – Seed Round Open" />
+  <meta name="twitter:description" content="Glotemp Seed Round — we are building the emotional layer of the internet of cities. A new category of location intelligence based on collective human energy." />
+  <link rel="canonical" href="https://glotemp.com/investors.html" />
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
@@ -21,7 +31,7 @@
   </nav>
   <main class="glass-card" style="padding:2rem; max-width:800px; margin:2rem auto;">
     <h1 data-i18n="invest_title">Seed Round Open</h1>
-    <p data-i18n="invest_text">Targeting a $420M SOM in location intelligence. Deck available on request.</p>
+    <p data-i18n="invest_text">We are building the emotional layer of the internet of cities. A new category of location intelligence is forming — one based on collective human energy rather than static data. Early partners will help define it. Deck available on request.</p>
   </main>
   <footer class="footer glass">
     <p>© 2025 RenviaIT Ltd. All rights reserved.</p>
@@ -34,13 +44,41 @@
   </footer>
   <script>
     const translationsInv = {
-      en: { invest_title: "Seed Round Open", invest_text: "Targeting a $420M SOM in location intelligence. Deck available on request.", privacy_policy: "Privacy Policy", terms_of_service: "Terms of Service", cookie_settings: "Cookie Settings" },
-      es: { invest_title: "Ronda Semilla Abierta", invest_text: "Apuntando a un SOM de $420M en inteligencia de ubicación.", privacy_policy: "Política de Privacidad", terms_of_service: "Términos de Servicio", cookie_settings: "Configuración de Cookies" }
+      en: {
+        invest_title: "Seed Round Open",
+        invest_text: "We are building the emotional layer of the internet of cities. A new category of location intelligence is forming — one based on collective human energy rather than static data. Early partners will help define it. Deck available on request.",
+        privacy_policy: "Privacy Policy", terms_of_service: "Terms of Service", cookie_settings: "Cookie Settings"
+      },
+      es: {
+        invest_title: "Ronda Semilla Abierta",
+        invest_text: "Estamos construyendo la capa emocional del internet de las ciudades. Está surgiendo una nueva categoría de inteligencia de ubicación basada en la energía humana colectiva. Los primeros socios ayudarán a definirla. Deck disponible bajo petición.",
+        privacy_policy: "Política de Privacidad", terms_of_service: "Términos de Servicio", cookie_settings: "Configuración de Cookies"
+      },
+      fr: {
+        invest_title: "Tour de Table Ouvert",
+        invest_text: "Nous construisons la couche émotionnelle de l'internet des villes. Une nouvelle catégorie d'intelligence de localisation émerge, fondée sur l'énergie humaine collective. Les premiers partenaires aideront à la définir. Deck disponible sur demande.",
+        privacy_policy: "Politique de Confidentialité", terms_of_service: "Conditions d'Utilisation", cookie_settings: "Paramètres des Cookies"
+      },
+      de: {
+        invest_title: "Seed-Runde Offen",
+        invest_text: "Wir bauen die emotionale Schicht des Internets der Städte. Eine neue Kategorie von Standortintelligenz entsteht — basierend auf kollektiver menschlicher Energie statt statischer Daten. Frühe Partner werden sie mitgestalten. Deck auf Anfrage verfügbar.",
+        privacy_policy: "Datenschutzrichtlinie", terms_of_service: "Nutzungsbedingungen", cookie_settings: "Cookie-Einstellungen"
+      },
+      pt: {
+        invest_title: "Rodada Semente Aberta",
+        invest_text: "Estamos construindo a camada emocional da internet das cidades. Uma nova categoria de inteligência de localização está se formando — baseada na energia humana coletiva em vez de dados estáticos. Os primeiros parceiros ajudarão a defini-la. Deck disponível sob solicitação.",
+        privacy_policy: "Política de Privacidade", terms_of_service: "Termos de Serviço", cookie_settings: "Configurações de Cookies"
+      },
+      ja: {
+        invest_title: "シードラウンド募集中",
+        invest_text: "私たちは都市のインターネットの感情レイヤーを構築しています。静的データではなく集合的な人間のエネルギーに基づく、新しい位置情報インテリジェンスのカテゴリーが生まれつつあります。初期パートナーがその定義を助けます。デックはリクエストに応じて提供します。",
+        privacy_policy: "プライバシーポリシー", terms_of_service: "利用規約", cookie_settings: "Cookieの設定"
+      }
     };
     const lang = localStorage.getItem('glotemp-lang') || 'en';
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-i18n]').forEach(el => {
-      el.textContent = translationsInv[lang]?.[el.dataset.i18n] || el.textContent;
+      el.textContent = translationsInv[lang]?.[el.dataset.i18n] || translationsInv.en[el.dataset.i18n] || el.textContent;
     });
   </script>
   <script src="cookie-consent.js" defer></script>
