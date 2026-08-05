@@ -1,4 +1,6 @@
-// ----- i18n Setup -----
+/const SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co'; // e.g. https://abc123.supabase.co
+const SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_
+'; // eyJ... ----- i18n Setup -----
 const translations = {
   en: {
     install_title: "Add Glotemp to Home Screen",
