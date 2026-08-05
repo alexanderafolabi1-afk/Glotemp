@@ -81,8 +81,8 @@
     var banner = document.createElement('div');
     banner.id = 'cookie-consent-banner';
     banner.setAttribute('role', 'dialog');
+    banner.setAttribute('aria-label', 'Cookie consent');
     banner.setAttribute('aria-live', 'polite');
-
     var p = document.createElement('p');
     p.setAttribute('data-i18n', 'cookie_banner_text');
     p.textContent = getMsg('text');
