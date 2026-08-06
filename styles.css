@@ -930,3 +930,210 @@ body {
     align-items: flex-start;
   }
 }
+
+/* ===== TEMPO ECONOMY STYLES ===== */
+
+/* Affiliate Links */
+.affiliate-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 1.5rem 0;
+}
+
+.affiliate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(178,36,239,0.12);
+  border: 1px solid rgba(178,36,239,0.4);
+  border-radius: 20px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all var(--transition);
+  cursor: pointer;
+}
+
+.affiliate-btn:hover {
+  background: rgba(178,36,239,0.25);
+  border-color: var(--neon-purple);
+  transform: translateY(-2px);
+}
+
+/* Comment Section */
+.comment-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.comment-input-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.comment-input {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  color: var(--text-primary);
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  transition: all var(--transition);
+  line-height: 1.5;
+  min-height: 80px;
+}
+
+.comment-input:focus {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(0,242,254,0.5);
+  box-shadow: 0 0 0 3px rgba(0,242,254,0.1);
+}
+
+.comment-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.mood-picker {
+  display: flex;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.mood-emoji {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: all var(--transition);
+  font-size: 1.5rem;
+  padding: 0.5rem;
+}
+
+.mood-emoji:hover, .mood-emoji[style*="opacity: 1"] {
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+.comment-submit {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+/* Comment List */
+.comment-list {
+  margin-top: 1.5rem;
+  max-height: 400px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.comment-item {
+  padding: 1rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  transition: all var(--transition);
+}
+
+.comment-item:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.15);
+}
+
+.comment-item p {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  margin: 0 0 0.25rem 0;
+  word-wrap: break-word;
+}
+
+.comment-item small {
+  color: var(--text-tertiary);
+  font-size: 0.8rem;
+}
+
+/* Leaderboard Card */
+.leaderboard-card {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+}
+
+.leaderboard-card h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.leaderboard-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.leaderboard-rank {
+  font-weight: 700;
+  color: var(--neon-cyan);
+  min-width: 30px;
+}
+
+.leaderboard-user {
+  flex: 1;
+  margin-left: 1rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.leaderboard-stars {
+  font-weight: 600;
+  color: var(--neon-purple);
+  margin-left: 1rem;
+}
+
+/* Sponsored Card */
+.sponsored-card {
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(255,77,166,0.1), rgba(178,36,239,0.1));
+  border: 1px solid rgba(255,77,166,0.2);
+  border-radius: 12px;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.sponsored-card::before {
+  content: 'Ad';
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 0.7rem;
+  color: var(--neon-pink);
+  font-weight: 700;
+  letter-spacing: 1px;
+  opacity: 0.6;
+}

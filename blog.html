@@ -178,6 +178,7 @@ function loadPosts() {
               <button class="btn-text history-toggle">${t('history')}</button>
               <div class="history-content" style="display:none; white-space:pre-line;">${post.history_nugget || ''}</div>
             </div>
+            <div class="comment-section" data-city="${post.city_slug || post.city.toLowerCase()}"></div>
           </div>
         `;
 
@@ -188,6 +189,9 @@ function loadPosts() {
           const isOpen = fullContent.style.display === 'block';
           fullContent.style.display = isOpen ? 'none' : 'block';
           readBtn.textContent = isOpen ? t('read_full') : t('close');
+          if (fullContent.style.display === 'block' && fullContent.querySelector('.comment-section').innerHTML === '') {
+            initCommentSection(fullContent.querySelector('.comment-section'));
+          }
         });
 
         // Trivia toggle
@@ -230,11 +234,100 @@ function loadPosts() {
       location.reload(); // quick refresh for demo; later you can make it dynamic
     });
 
+    // Comment section initialization
+    function initCommentSection(container) {
+      const citySlug = container.dataset.city;
+      container.innerHTML = `
+        <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid rgba(255,255,255,0.1);">
+          <h4 style="margin-bottom:1rem;">💬 City Pulse Comments</h4>
+          <div class="comment-input-wrap">
+            <textarea class="comment-input" placeholder="Share the vibe (max 280 chars)..." maxlength="280" style="resize:none;"></textarea>
+            <div class="mood-picker">
+              <button class="mood-emoji" data-mood="🔥" title="Energized" style="font-size:1.5rem; padding:0.5rem; margin-right:0.5rem;">🔥</button>
+              <button class="mood-emoji" data-mood="😊" title="Good" style="font-size:1.5rem; padding:0.5rem; margin-right:0.5rem;">😊</button>
+              <button class="mood-emoji" data-mood="😐" title="Neutral" style="font-size:1.5rem; padding:0.5rem; margin-right:0.5rem;">😐</button>
+              <button class="mood-emoji" data-mood="😞" title="Low" style="font-size:1.5rem; padding:0.5rem; margin-right:0.5rem;">😞</button>
+              <button class="mood-emoji" data-mood="😡" title="Cautious" style="font-size:1.5rem; padding:0.5rem;">😡</button>
+            </div>
+            <button class="btn-neon comment-submit" style="width:100%; margin-top:0.5rem;">Post Comment</button>
+          </div>
+          <div class="comment-list" style="margin-top:1.5rem; max-height:400px; overflow-y:auto;"></div>
+        </div>
+      `;
+
+      let selectedMood = '😐';
+      const moodBtns = container.querySelectorAll('.mood-emoji');
+      const textarea = container.querySelector('.comment-input');
+      const submitBtn = container.querySelector('.comment-submit');
+      const commentList = container.querySelector('.comment-list');
+
+      moodBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          moodBtns.forEach(b => b.style.opacity = '0.5');
+          btn.style.opacity = '1';
+          selectedMood = btn.dataset.mood;
+        });
+        if (btn.dataset.mood === selectedMood) btn.style.opacity = '1';
+        else btn.style.opacity = '0.5';
+      });
+
+      submitBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const text = textarea.value.trim();
+        if (!text) return;
+
+        try {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Posting...';
+          await submitComment(citySlug, text, selectedMood);
+          textarea.value = '';
+          selectedMood = '😐';
+          moodBtns.forEach(b => { b.style.opacity = b.dataset.mood === '😐' ? '1' : '0.5'; });
+          loadComments(citySlug, commentList);
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Post Comment';
+        } catch (err) {
+          console.error('Error submitting comment:', err);
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Post Comment';
+        }
+      });
+
+      loadComments(citySlug, commentList);
+    }
+
+    function loadComments(citySlug, container) {
+      getComments(citySlug).then(comments => {
+        container.innerHTML = '';
+        if (comments.length === 0) {
+          container.innerHTML = '<p style="color:var(--text-secondary); text-align:center;">No comments yet. Be first to share!</p>';
+          return;
+        }
+        comments.slice(0, 10).forEach(comment => {
+          const time = new Date(comment.created_at).toLocaleString(currentLang, { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+          const item = document.createElement('div');
+          item.className = 'comment-item';
+          item.innerHTML = `
+            <div style="display:flex; gap:0.5rem; align-items:flex-start;">
+              <div style="font-size:1.5rem; flex-shrink:0;">${comment.mood_emoji}</div>
+              <div style="flex:1; min-width:0;">
+                <p style="word-wrap:break-word; margin:0 0 0.25rem 0;">${comment.text}</p>
+                <small style="color:var(--text-tertiary);">${time}</small>
+              </div>
+            </div>
+          `;
+          container.appendChild(item);
+        });
+      });
+    }
+
     // Init
     document.addEventListener('DOMContentLoaded', () => {
       applyBlogTranslations();
       loadPosts();
     });
   </script>
+  <script src="tempo-economy.js" defer></script>
 </body>
 </html>

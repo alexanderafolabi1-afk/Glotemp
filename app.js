@@ -678,6 +678,112 @@ const translations = {
   }
 };
 
+// ===== TEMPO ECONOMY TRANSLATIONS =====
+// Add these to each language
+const tempoEconomyStrings = {
+  en: {
+    comment_title: "Comments & Pulse",
+    comment_placeholder: "Share what you're feeling about this city (max 280 chars)",
+    submit_comment: "Submit Comment",
+    top_reporters: "🏆 Top Reporters",
+    reporter_rank: "Rank",
+    your_stars: "Your Stars",
+    book_hotel: "Book a Hotel",
+    find_flights: "Find Flights",
+    travel_insurance: "Get Insurance",
+    sponsored: "Sponsored",
+    discover_local: "Discover local experiences in",
+    city_mood_updated: "City mood updated",
+    no_comments: "No comments yet. Be the first to share!",
+    timestamp: "just now"
+  },
+  es: {
+    comment_title: "Comentarios y Pulso",
+    comment_placeholder: "Comparte lo que sientes sobre esta ciudad (máx 280 caracteres)",
+    submit_comment: "Enviar Comentario",
+    top_reporters: "🏆 Reporteros Principales",
+    reporter_rank: "Rango",
+    your_stars: "Tus Estrellas",
+    book_hotel: "Reservar Hotel",
+    find_flights: "Encontrar Vuelos",
+    travel_insurance: "Obtener Seguro",
+    sponsored: "Patrocinado",
+    discover_local: "Descubre experiencias locales en",
+    city_mood_updated: "Estado de ánimo de la ciudad actualizado",
+    no_comments: "Sin comentarios aún. ¡Sé el primero en compartir!",
+    timestamp: "hace poco"
+  },
+  fr: {
+    comment_title: "Commentaires et Pouls",
+    comment_placeholder: "Partagez ce que vous ressentez à propos de cette ville (max 280 caractères)",
+    submit_comment: "Soumettre un Commentaire",
+    top_reporters: "🏆 Meilleurs Reporters",
+    reporter_rank: "Rang",
+    your_stars: "Vos Étoiles",
+    book_hotel: "Réserver un Hôtel",
+    find_flights: "Trouver des Vols",
+    travel_insurance: "Obtenir une Assurance",
+    sponsored: "Sponsorisé",
+    discover_local: "Découvrez les expériences locales à",
+    city_mood_updated: "Humeur de la ville mise à jour",
+    no_comments: "Pas encore de commentaires. Soyez le premier à partager!",
+    timestamp: "à l'instant"
+  },
+  de: {
+    comment_title: "Kommentare und Puls",
+    comment_placeholder: "Teilen Sie, was Sie in dieser Stadt fühlen (max 280 Zeichen)",
+    submit_comment: "Kommentar Einreichen",
+    top_reporters: "🏆 Top-Reporter",
+    reporter_rank: "Rang",
+    your_stars: "Ihre Sterne",
+    book_hotel: "Hotel Buchen",
+    find_flights: "Flüge Finden",
+    travel_insurance: "Versicherung Erhalten",
+    sponsored: "Gesponsert",
+    discover_local: "Entdecken Sie lokale Erlebnisse in",
+    city_mood_updated: "Stimmung der Stadt aktualisiert",
+    no_comments: "Noch keine Kommentare. Seien Sie der Erste, der teilt!",
+    timestamp: "gerade eben"
+  },
+  pt: {
+    comment_title: "Comentários e Pulso",
+    comment_placeholder: "Compartilhe o que você sente sobre esta cidade (máx 280 caracteres)",
+    submit_comment: "Enviar Comentário",
+    top_reporters: "🏆 Melhores Repórteres",
+    reporter_rank: "Classificação",
+    your_stars: "Suas Estrelas",
+    book_hotel: "Reservar Hotel",
+    find_flights: "Encontrar Voos",
+    travel_insurance: "Obter Seguro",
+    sponsored: "Patrocinado",
+    discover_local: "Descubra experiências locais em",
+    city_mood_updated: "Humor da cidade atualizado",
+    no_comments: "Ainda sem comentários. Seja o primeiro a compartilhar!",
+    timestamp: "agora mesmo"
+  },
+  ja: {
+    comment_title: "コメントとパルス",
+    comment_placeholder: "この都市についてどう感じているか共有してください（最大280文字）",
+    submit_comment: "コメント送信",
+    top_reporters: "🏆 トップレポーター",
+    reporter_rank: "ランク",
+    your_stars: "あなたのスター",
+    book_hotel: "ホテルを予約",
+    find_flights: "フライトを検索",
+    travel_insurance: "保険を取得",
+    sponsored: "スポンサー付き",
+    discover_local: "の地元体験を発見",
+    city_mood_updated: "都市の気分が更新されました",
+    no_comments: "まだコメントなし。最初に共有してください！",
+    timestamp: "たった今"
+  }
+};
+
+// Merge tempo economy strings into translations
+Object.keys(tempoEconomyStrings).forEach(lang => {
+  translations[lang] = { ...translations[lang], ...tempoEconomyStrings[lang] };
+});
+
 const supportedLangs = Object.keys(translations);
 let currentLang = (navigator.language || 'en').split('-')[0];
 if (!supportedLangs.includes(currentLang)) currentLang = 'en';
@@ -1342,6 +1448,10 @@ function updateCity(selected) {
     verdictEl.textContent = 'WAIT';
     verdictEl.className = 'verdict verdict-wait';
     reasonEl.textContent = t('trip_wait_reason');
+  }
+  // Update affiliate links with city name
+  if (typeof updateAffiliateLinks === 'function') {
+    updateAffiliateLinks(city.name);
   }
 }
 
