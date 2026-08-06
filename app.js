@@ -92,7 +92,16 @@ const translations = {
     automated_traffic_excluded: "Automated traffic excluded",
     select_mood_first: "Select a mood first.",
     social_login_feedback: "Social sign-in noted for this prototype. Complete the claim form to preserve your badge.",
-    wall_default_note: "Quietly observing the movement of a city."
+    wall_default_note: "Quietly observing the movement of a city.",
+    signal_human_confidence: "Human confidence score: {score}/{max}",
+    signal_context_attached: "Recent note depth: Context attached",
+    signal_signal_only: "Recent note depth: Signal only",
+    signal_archive: "Observation archive: {count} recent entries saved locally",
+    signal_geo_breadth_one: "Geographic breadth: {count} city lens observed",
+    signal_geo_breadth_many: "Geographic breadth: {count} city lenses observed",
+    signal_supporter_ready: "Supporter path: Observatory Circle ready",
+    signal_supporter_progress: "Supporter path: Continue observing to unlock observatory circles",
+    signal_badge_archive: "Badge archive: {count} constellation titles claimed"
   },
   es: {
     install_title: "Añadir Glotemp a inicio",
@@ -182,7 +191,16 @@ const translations = {
     automated_traffic_excluded: "Tráfico automatizado excluido",
     select_mood_first: "Selecciona un estado de ánimo primero.",
     social_login_feedback: "El acceso social se ha registrado para este prototipo. Completa el formulario para guardar tu insignia.",
-    wall_default_note: "Observando en silencio el movimiento de una ciudad."
+    wall_default_note: "Observando en silencio el movimiento de una ciudad.",
+    signal_human_confidence: "Nivel de confianza humana: {score}/{max}",
+    signal_context_attached: "Profundidad reciente: contexto añadido",
+    signal_signal_only: "Profundidad reciente: solo señal",
+    signal_archive: "Archivo de observaciones: {count} entradas recientes guardadas localmente",
+    signal_geo_breadth_one: "Amplitud geográfica: {count} lente de ciudad observada",
+    signal_geo_breadth_many: "Amplitud geográfica: {count} lentes de ciudad observadas",
+    signal_supporter_ready: "Ruta de apoyo: Círculo del Observatorio listo",
+    signal_supporter_progress: "Ruta de apoyo: sigue observando para desbloquear los círculos del observatorio",
+    signal_badge_archive: "Archivo de insignias: {count} títulos de constelación reclamados"
   },
   fr: {
     install_title: "Ajouter Glotemp à l'écran d'accueil",
@@ -272,7 +290,16 @@ const translations = {
     automated_traffic_excluded: "Trafic automatisé exclu",
     select_mood_first: "Sélectionnez d'abord une humeur.",
     social_login_feedback: "La connexion sociale a été notée pour ce prototype. Complétez le formulaire pour conserver votre insigne.",
-    wall_default_note: "Observer en silence le mouvement d'une ville."
+    wall_default_note: "Observer en silence le mouvement d'une ville.",
+    signal_human_confidence: "Niveau de confiance humaine : {score}/{max}",
+    signal_context_attached: "Profondeur récente : contexte ajouté",
+    signal_signal_only: "Profondeur récente : signal seul",
+    signal_archive: "Archive d'observations : {count} entrées récentes enregistrées localement",
+    signal_geo_breadth_one: "Amplitude géographique : {count} regard urbain observé",
+    signal_geo_breadth_many: "Amplitude géographique : {count} regards urbains observés",
+    signal_supporter_ready: "Parcours soutien : Cercle de l'Observatoire prêt",
+    signal_supporter_progress: "Parcours soutien : poursuivez pour débloquer les cercles de l'observatoire",
+    signal_badge_archive: "Archive d'insignes : {count} titres de constellation réclamés"
   },
   de: {
     install_title: "Glotemp zum Startbildschirm hinzufügen",
@@ -362,7 +389,16 @@ const translations = {
     automated_traffic_excluded: "Automatisierter Traffic ausgeschlossen",
     select_mood_first: "Bitte zuerst eine Stimmung wählen.",
     social_login_feedback: "Soziale Anmeldung für diesen Prototyp vermerkt. Fülle das Formular aus, um dein Abzeichen zu sichern.",
-    wall_default_note: "Beobachtet still die Bewegung einer Stadt."
+    wall_default_note: "Beobachtet still die Bewegung einer Stadt.",
+    signal_human_confidence: "Menschliche Vertrauenswertung: {score}/{max}",
+    signal_context_attached: "Jüngste Notizentiefe: Kontext hinzugefügt",
+    signal_signal_only: "Jüngste Notizentiefe: Nur Signal",
+    signal_archive: "Beobachtungsarchiv: {count} aktuelle Einträge lokal gespeichert",
+    signal_geo_breadth_one: "Geografische Breite: {count} Stadtlinse beobachtet",
+    signal_geo_breadth_many: "Geografische Breite: {count} Stadtlinsen beobachtet",
+    signal_supporter_ready: "Unterstützerpfad: Observatoriumskreis bereit",
+    signal_supporter_progress: "Unterstützerpfad: Weiter beobachten, um Observatoriumskreise freizuschalten",
+    signal_badge_archive: "Abzeichenarchiv: {count} Konstellationstitel beansprucht"
   },
   pt: {
     install_title: "Adicionar Glotemp à tela inicial",
@@ -452,7 +488,16 @@ const translations = {
     automated_traffic_excluded: "Tráfego automatizado excluído",
     select_mood_first: "Selecione primeiro um humor.",
     social_login_feedback: "O login social foi registado para este protótipo. Complete o formulário para guardar a sua insígnia.",
-    wall_default_note: "Observando em silêncio o movimento de uma cidade."
+    wall_default_note: "Observando em silêncio o movimento de uma cidade.",
+    signal_human_confidence: "Nível de confiança humana: {score}/{max}",
+    signal_context_attached: "Profundidade recente: contexto adicionado",
+    signal_signal_only: "Profundidade recente: apenas sinal",
+    signal_archive: "Arquivo de observações: {count} entradas recentes guardadas localmente",
+    signal_geo_breadth_one: "Amplitude geográfica: {count} lente urbana observada",
+    signal_geo_breadth_many: "Amplitude geográfica: {count} lentes urbanas observadas",
+    signal_supporter_ready: "Caminho de apoio: Círculo do Observatório pronto",
+    signal_supporter_progress: "Caminho de apoio: continue a observar para desbloquear os círculos do observatório",
+    signal_badge_archive: "Arquivo de insígnias: {count} títulos de constelação reivindicados"
   },
   ja: {
     install_title: "Glotempをホーム画面に追加",
@@ -542,7 +587,16 @@ const translations = {
     automated_traffic_excluded: "自動トラフィックを除外しました",
     select_mood_first: "先にムードを選んでください。",
     social_login_feedback: "このプロトタイプではソーシャルサインインを記録しました。バッジを残すにはフォームを完了してください。",
-    wall_default_note: "都市の動きを静かに見つめています。"
+    wall_default_note: "都市の動きを静かに見つめています。",
+    signal_human_confidence: "人間シグナル信頼度: {score}/{max}",
+    signal_context_attached: "直近のメモ深度: 文脈あり",
+    signal_signal_only: "直近のメモ深度: シグナルのみ",
+    signal_archive: "観測アーカイブ: 最近の{count}件をローカル保存",
+    signal_geo_breadth_one: "地理的広がり: {count}都市レンズを観測",
+    signal_geo_breadth_many: "地理的広がり: {count}都市レンズを観測",
+    signal_supporter_ready: "支援経路: 観測所サークルの準備完了",
+    signal_supporter_progress: "支援経路: 観測を続けて観測所サークルを解放",
+    signal_badge_archive: "バッジ記録: {count}件の星座称号を取得"
   }
 };
 
@@ -606,7 +660,8 @@ document.documentElement.lang = currentLang;
 const OBSERVATORY_STORAGE_KEY = 'glotemp-observatory';
 const BOT_UA_PATTERN = /(bot|crawler|spider|scrapy|headless|phantom|playwright|selenium|puppeteer|curl|wget|python|java|go-http-client|facebookexternalhit|slurp|preview|discordbot|whatsapp|skypeuripreview|monitor|uptime|scan|fetch|httpclient)/i;
 const BADGE_MILESTONES = [1000, 2500, 5000, 10000, 25000, 50000, 100000];
-const HUMAN_CONFIDENCE_MAX = 16;
+const HUMAN_CONFIDENCE_MAX = 15;
+const DEFAULT_HUMAN_COUNT = 0;
 const MILESTONE_META = {
   1000: { metal: 'rose-gold', title: 'Founding Observer – 1k', line: 'The first quiet thousand taught the instrument to listen.' },
   2500: { metal: 'silver', title: 'Founding Observer – 2.5k', line: 'A wider ring of cities began to glow in sympathy.' },
@@ -635,7 +690,7 @@ function getStoredObservatory() {
   try {
     const parsed = JSON.parse(localStorage.getItem(OBSERVATORY_STORAGE_KEY) || '{}');
     return {
-      humanCount: parsed.humanCount || 987,
+      humanCount: typeof parsed.humanCount === 'number' ? parsed.humanCount : DEFAULT_HUMAN_COUNT,
       sessionTracked: Boolean(parsed.sessionTracked),
       claimedMilestones: parsed.claimedMilestones || {},
       profiles: parsed.profiles || [],
@@ -644,7 +699,7 @@ function getStoredObservatory() {
       humanConfidence: typeof parsed.humanConfidence === 'number' ? parsed.humanConfidence : 0
     };
   } catch (error) {
-    return { humanCount: 987, sessionTracked: false, claimedMilestones: {}, profiles: [], pendingMoment: null, observations: [], humanConfidence: 0 };
+    return { humanCount: DEFAULT_HUMAN_COUNT, sessionTracked: false, claimedMilestones: {}, profiles: [], pendingMoment: null, observations: [], humanConfidence: 0 };
   }
 }
 
@@ -973,18 +1028,18 @@ function renderSignalPanels() {
   if (quality) {
     const last = observatoryState.observations[0];
     const items = [
-      `Human confidence score: ${observatoryState.humanConfidence}/${HUMAN_CONFIDENCE_MAX}`,
-      `Recent note depth: ${last?.note ? 'Context attached' : 'Signal only'}`,
-      `Observation archive: ${observatoryState.observations.length} recent entries saved locally`
+      t('signal_human_confidence').replace('{score}', observatoryState.humanConfidence).replace('{max}', HUMAN_CONFIDENCE_MAX),
+      last?.note ? t('signal_context_attached') : t('signal_signal_only'),
+      t('signal_archive').replace('{count}', observatoryState.observations.length)
     ];
     quality.innerHTML = items.map(item => `<li>${item}</li>`).join('');
   }
   if (cadence) {
     const uniqueCities = new Set(observatoryState.observations.map(item => item.city)).size;
     const items = [
-      `Geographic breadth: ${uniqueCities || 1} city lens${uniqueCities === 1 ? '' : 'es'} observed`,
-      `Supporter path: ${observatoryState.observations.length >= 5 ? 'Observatory Circle ready' : 'Continue observing to unlock observatory circles'}`,
-      `Badge archive: ${Object.keys(observatoryState.claimedMilestones).length} constellation titles claimed`
+      t(uniqueCities === 1 ? 'signal_geo_breadth_one' : 'signal_geo_breadth_many').replace('{count}', uniqueCities || 1),
+      observatoryState.observations.length >= 5 ? t('signal_supporter_ready') : t('signal_supporter_progress'),
+      t('signal_badge_archive').replace('{count}', Object.keys(observatoryState.claimedMilestones).length)
     ];
     cadence.innerHTML = items.map(item => `<li>${item}</li>`).join('');
   }
