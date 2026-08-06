@@ -3,8 +3,8 @@
   "short_name": "Glotemp",
   "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#0a0f1a",
-  "theme_color": "#0a0f1a",
+  "background_color": "#06060A",
+  "theme_color": "#06060A",
   "description": "Real-time collective mood infrastructure for cities",
   "icons": [
     {
