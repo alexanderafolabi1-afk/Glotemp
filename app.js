@@ -1527,6 +1527,39 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('dismiss-install').addEventListener('click', () => {
     document.getElementById('install-banner').style.display = 'none';
   });
+
+  // Service worker registration and update handling
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+      .then(registration => {
+        let updateCheckNeeded = true;
+
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller && updateCheckNeeded) {
+              updateCheckNeeded = false;
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
+
+              // Reload page once to activate new service worker
+              let reloadScheduled = false;
+              navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!reloadScheduled) {
+                  reloadScheduled = true;
+                  window.location.reload();
+                }
+              });
+            }
+          });
+        });
+
+        // Check for updates periodically (every 10 seconds)
+        setInterval(() => {
+          registration.update();
+        }, 10000);
+      })
+      .catch(error => console.error('ServiceWorker registration failed:', error));
+  }
 });
 function getCurrentFeaturedStory() {
   const ROTATION_DAYS = 7;
