@@ -90,7 +90,9 @@ const translations = {
     social_caption_prefix: "I claimed the {title} badge on @Glotemp — a quiet record of how cities feel in motion.",
     share_copied: "Caption copied for sharing.",
     automated_traffic_excluded: "Automated traffic excluded",
-    select_mood_first: "Select a mood first."
+    select_mood_first: "Select a mood first.",
+    social_login_feedback: "Social sign-in noted for this prototype. Complete the claim form to preserve your badge.",
+    wall_default_note: "Quietly observing the movement of a city."
   },
   es: {
     install_title: "Añadir Glotemp a inicio",
@@ -178,7 +180,9 @@ const translations = {
     social_caption_prefix: "Reclamé la insignia {title} en @Glotemp: un registro sereno de cómo se sienten las ciudades en movimiento.",
     share_copied: "Texto copiado para compartir.",
     automated_traffic_excluded: "Tráfico automatizado excluido",
-    select_mood_first: "Selecciona un estado de ánimo primero."
+    select_mood_first: "Selecciona un estado de ánimo primero.",
+    social_login_feedback: "El acceso social se ha registrado para este prototipo. Completa el formulario para guardar tu insignia.",
+    wall_default_note: "Observando en silencio el movimiento de una ciudad."
   },
   fr: {
     install_title: "Ajouter Glotemp à l'écran d'accueil",
@@ -266,7 +270,9 @@ const translations = {
     social_caption_prefix: "J'ai réclamé l'insigne {title} sur @Glotemp — un relevé discret de la manière dont les villes se sentent en mouvement.",
     share_copied: "Texte copié pour le partage.",
     automated_traffic_excluded: "Trafic automatisé exclu",
-    select_mood_first: "Sélectionnez d'abord une humeur."
+    select_mood_first: "Sélectionnez d'abord une humeur.",
+    social_login_feedback: "La connexion sociale a été notée pour ce prototype. Complétez le formulaire pour conserver votre insigne.",
+    wall_default_note: "Observer en silence le mouvement d'une ville."
   },
   de: {
     install_title: "Glotemp zum Startbildschirm hinzufügen",
@@ -354,7 +360,9 @@ const translations = {
     social_caption_prefix: "Ich habe das Abzeichen {title} auf @Glotemp beansprucht — ein leiser Nachweis dafür, wie sich Städte in Bewegung anfühlen.",
     share_copied: "Text zum Teilen kopiert.",
     automated_traffic_excluded: "Automatisierter Traffic ausgeschlossen",
-    select_mood_first: "Bitte zuerst eine Stimmung wählen."
+    select_mood_first: "Bitte zuerst eine Stimmung wählen.",
+    social_login_feedback: "Soziale Anmeldung für diesen Prototyp vermerkt. Fülle das Formular aus, um dein Abzeichen zu sichern.",
+    wall_default_note: "Beobachtet still die Bewegung einer Stadt."
   },
   pt: {
     install_title: "Adicionar Glotemp à tela inicial",
@@ -442,7 +450,9 @@ const translations = {
     social_caption_prefix: "Reivindiquei a insígnia {title} no @Glotemp — um registo sereno de como as cidades se sentem em movimento.",
     share_copied: "Texto copiado para partilha.",
     automated_traffic_excluded: "Tráfego automatizado excluído",
-    select_mood_first: "Selecione primeiro um humor."
+    select_mood_first: "Selecione primeiro um humor.",
+    social_login_feedback: "O login social foi registado para este protótipo. Complete o formulário para guardar a sua insígnia.",
+    wall_default_note: "Observando em silêncio o movimento de uma cidade."
   },
   ja: {
     install_title: "Glotempをホーム画面に追加",
@@ -530,7 +540,9 @@ const translations = {
     social_caption_prefix: "@Glotempで{title}バッジを受け取りました。都市が動きの中でどう感じられるかを静かに記録するしるしです。",
     share_copied: "共有用の文面をコピーしました。",
     automated_traffic_excluded: "自動トラフィックを除外しました",
-    select_mood_first: "先にムードを選んでください。"
+    select_mood_first: "先にムードを選んでください。",
+    social_login_feedback: "このプロトタイプではソーシャルサインインを記録しました。バッジを残すにはフォームを完了してください。",
+    wall_default_note: "都市の動きを静かに見つめています。"
   }
 };
 
@@ -594,6 +606,7 @@ document.documentElement.lang = currentLang;
 const OBSERVATORY_STORAGE_KEY = 'glotemp-observatory';
 const BOT_UA_PATTERN = /(bot|crawler|spider|scrapy|headless|phantom|playwright|selenium|puppeteer|curl|wget|python|java|go-http-client|facebookexternalhit|slurp|preview|discordbot|whatsapp|skypeuripreview|monitor|uptime|scan|fetch|httpclient)/i;
 const BADGE_MILESTONES = [1000, 2500, 5000, 10000, 25000, 50000, 100000];
+const HUMAN_CONFIDENCE_MAX = 16;
 const MILESTONE_META = {
   1000: { metal: 'rose-gold', title: 'Founding Observer – 1k', line: 'The first quiet thousand taught the instrument to listen.' },
   2500: { metal: 'silver', title: 'Founding Observer – 2.5k', line: 'A wider ring of cities began to glow in sympathy.' },
@@ -760,7 +773,7 @@ function ensureModal() {
   document.getElementById('download-badge').addEventListener('click', downloadBadge);
   document.getElementById('share-badge').addEventListener('click', shareBadge);
   document.querySelectorAll('.social-token').forEach(btn => btn.addEventListener('click', () => {
-    document.getElementById('badge-feedback').textContent = `${btn.dataset.provider} ${t('observation_saved')}`;
+    document.getElementById('badge-feedback').textContent = `${btn.dataset.provider}: ${t('social_login_feedback')}`;
   }));
   document.getElementById('badge-claim-form').addEventListener('submit', claimBadge);
 }
@@ -943,7 +956,7 @@ function renderConstellationWall() {
     city.textContent = profile.city;
     const note = document.createElement('p');
     note.className = 'wall-note';
-    note.textContent = profile.note || 'Quietly observing the movement of a city.';
+    note.textContent = profile.note || t('wall_default_note');
     const date = document.createElement('span');
     date.className = 'wall-date';
     date.textContent = new Date(profile.claimedAt).toLocaleDateString();
@@ -960,7 +973,7 @@ function renderSignalPanels() {
   if (quality) {
     const last = observatoryState.observations[0];
     const items = [
-      `Human confidence score: ${observatoryState.humanConfidence}/14`,
+      `Human confidence score: ${observatoryState.humanConfidence}/${HUMAN_CONFIDENCE_MAX}`,
       `Recent note depth: ${last?.note ? 'Context attached' : 'Signal only'}`,
       `Observation archive: ${observatoryState.observations.length} recent entries saved locally`
     ];
@@ -994,7 +1007,7 @@ function recordObservation(event) {
     lens: document.getElementById('language-lens').value,
     cadence: document.getElementById('cadence-select').value,
     note,
-    city: cities[document.getElementById('city-select').value].name,
+    city: cities[document.getElementById('city-select')?.value || 'nyc']?.name || 'New York',
     createdAt: new Date().toISOString()
   };
   observatoryState.observations.unshift(observation);
