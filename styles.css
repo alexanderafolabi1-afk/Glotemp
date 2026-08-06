@@ -1,7 +1,7 @@
 :root {
-  --bg-deep: #020202;
-  --glass-bg: rgba(16, 20, 35, 0.65);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --bg-deep: #0f1419;
+  --glass-bg: rgba(20, 25, 45, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
   --neon-cyan: #00f2fe;
   --neon-purple: #b224ef;
   --neon-pink: #ff4da6;
@@ -37,10 +37,10 @@ body {
       0deg,
       transparent 0px,
       transparent 3px,
-      rgba(40,40,40,0.08) 3px,
-      rgba(40,40,40,0.08) 4px
+      rgba(50,50,50,0.06) 3px,
+      rgba(50,50,50,0.06) 4px
     ),
-    linear-gradient(180deg, #121212 0%, var(--bg-deep) 45%, #080808 100%);
+    linear-gradient(180deg, #1a2332 0%, var(--bg-deep) 45%, #0d1015 100%);
   background-size: cover, cover, 5px 5px, 6px 6px, 8px 8px, cover;
   background-position: center, center, 0 0, 0 0, 0 0, center;
   background-repeat: no-repeat, no-repeat, repeat, repeat, repeat, no-repeat;
