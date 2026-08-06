@@ -21,18 +21,6 @@ const CACHE_FIRST_ASSETS = [
   '/assets/apple-touch-icon.png'
 ];
 
-// HTML pages to cache (cache-first for offline only, never precache)
-const HTML_PAGES = [
-  '/index.html',
-  '/about.html',
-  '/explore.html',
-  '/blog.html',
-  '/admin.html',
-  '/privacy.html',
-  '/terms.html',
-  '/investors.html'
-];
-
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_VERSION).then(cache => {
@@ -45,11 +33,11 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
   event.waitUntil(
-    // Clean up old cache versions
+    // Clean up old cache versions (delete only Glotemp caches that aren't current)
     caches.keys().then(keys =>
       Promise.all(
         keys
-          .filter(key => !key.startsWith(CACHE_VERSION))
+          .filter(key => key.startsWith('glotemp-') && key !== CACHE_VERSION)
           .map(key => caches.delete(key))
       )
     ).then(() => {
@@ -87,8 +75,16 @@ self.addEventListener('fetch', event => {
           return response;
         })
         .catch(() => {
-          // Fall back to cache only if network fails
-          return caches.match(event.request);
+          // Fall back to cache if network fails
+          return caches.match(event.request).then(cached => {
+            if (cached) return cached;
+            // Return offline page if both network and cache fail
+            return new Response('Offline - please check your connection', {
+              status: 503,
+              statusText: 'Service Unavailable',
+              headers: new Headers({ 'Content-Type': 'text/plain' })
+            });
+          });
         })
     );
     return;
@@ -108,7 +104,9 @@ self.addEventListener('fetch', event => {
           return response;
         })
         .catch(() => {
-          return caches.match(event.request);
+          return caches.match(event.request).then(cached => {
+            return cached || new Response('', { status: 503 });
+          });
         })
     );
     return;
