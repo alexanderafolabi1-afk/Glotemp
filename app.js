@@ -38,7 +38,56 @@ const translations = {
     daily_story: "Daily Pulse",
     trivia: "Trivia",
     history: "History",
-    read_more: "Read more"
+    read_more: "Read more",
+    checkin_eyebrow: "Observation intake",
+    checkin_intro: "Offer a quiet signal from where you stand. Richer observations deepen the atlas while keeping the ritual gentle.",
+    intensity_label: "Intensity",
+    scene_label: "Scene",
+    language_label: "Language lens",
+    cadence_label: "Contribution cadence",
+    context_label: "Optional local note",
+    context_placeholder: "A small observation, event note, or mood context.",
+    record_observation: "Record observation",
+    human_signal_verified: "Human signal verified",
+    contribution_quality_title: "Quality of signal",
+    contribution_quality_copy: "Subtle context, repeat observations, and cross-language notes increase the scientific value of each entry.",
+    return_title: "Return pathway",
+    return_copy: "Repeated, geographically diverse observations gradually unlock supporter recognition, deeper archives, and curated invitations.",
+    systems_eyebrow: "Observatory systems",
+    systems_title: "Global participation, value, and patronage",
+    systems_intro: "Designed as a private instrument: respectful onboarding, richer emotional climate signals, and revenue paths that preserve trust.",
+    system_global_title: "Worldwide resonance",
+    system_global_copy: "Language-sensitive prompts, cultural scenes, and local contribution rhythms make participation feel native from Lagos to Tokyo.",
+    system_data_title: "Ethical climate data",
+    system_data_copy: "Prepare anonymised research feeds, city climate reports, and institutional node partnerships with explicit guardrails and consent language.",
+    system_membership_title: "Supporter patronage",
+    system_membership_copy: "Quiet supporter tiers, observatory circles, and archival access reward care without turning the product into a game.",
+    data_products_eyebrow: "Data products",
+    data_products_title: "Prepared revenue architecture",
+    geo_eyebrow: "Geographic depth",
+    geo_title: "Participation incentives by region",
+    wall_eyebrow: "Constellation wall",
+    wall_title: "Selected observations from the observatory",
+    wall_intro: "A curated wall of badge holders whose notes illuminate how cities felt in specific moments.",
+    share_note_upgraded: "Those who contribute thoughtfully help the atlas become more precise, trusted, and global.",
+    observation_saved: "Observation recorded.",
+    observation_claim_prompt: "Your constellation badge is ready to be claimed.",
+    badge_claim_cta: "Claim your badge",
+    badge_download: "Download badge",
+    badge_share: "Share quietly",
+    badge_note_label: "Public note",
+    badge_note_placeholder: "A short line for the wall, if you wish.",
+    badge_email_label: "Email",
+    badge_name_label: "Display name",
+    badge_social_label: "Or continue with",
+    badge_story_invite: "Would you like the observatory to consider this note for the Constellation Wall?",
+    premium_title: "Observatory circles",
+    premium_copy: "Supporter tiers unlock archives, early briefings, private badges, and invitations to city reports.",
+    wall_empty: "The wall is waiting for its next quiet story.",
+    observatory_moment_title: "A new constellation has formed.",
+    observatory_moment_subtitle: "We have reached {milestone} observers. The sky has changed.",
+    observatory_moment_claimed: "Badge claimed. Welcome to the wall.",
+    social_caption_prefix: "I claimed the {title} badge on @Glotemp — a quiet record of how cities feel in motion."
   },
   es: {
     install_title: "Añadir Glotemp a inicio",
@@ -275,6 +324,393 @@ const savedLang = localStorage.getItem('glotemp-lang');
 if (savedLang && supportedLangs.includes(savedLang)) currentLang = savedLang;
 document.documentElement.lang = currentLang;
 
+// ----- Observatory System -----
+const OBSERVATORY_STORAGE_KEY = 'glotemp-observatory';
+const BOT_UA_PATTERN = /(bot|crawler|spider|scrapy|headless|phantom|playwright|selenium|puppeteer|curl|wget|python|java|go-http-client|facebookexternalhit|slurp|preview|discordbot|whatsapp|skypeuripreview|monitor|uptime|scan|fetch|httpclient)/i;
+const BADGE_MILESTONES = [1000, 2500, 5000, 10000, 25000, 50000, 100000];
+const MILESTONE_META = {
+  1000: { metal: 'rose-gold', title: 'Founding Observer – 1k', line: 'The first quiet thousand taught the instrument to listen.' },
+  2500: { metal: 'silver', title: 'Founding Observer – 2.5k', line: 'A wider ring of cities began to glow in sympathy.' },
+  5000: { metal: 'rose-gold', title: 'Founding Observer – 5k', line: 'The atlas learned to hold many evenings at once.' },
+  10000: { metal: 'platinum', title: 'Founding Observer – 10k', line: 'A new constellation formed in the disciplined dark.' },
+  25000: { metal: 'silver', title: 'Founding Observer – 25k', line: 'The observatory acquired a true planetary hum.' },
+  50000: { metal: 'platinum', title: 'Founding Observer – 50k', line: 'Half a hundred thousand witnesses refined the signal.' },
+  100000: { metal: 'platinum', title: 'Centenary Observer – 100k', line: 'One hundred thousand observers taught the sky a new geometry.' }
+};
+const DATA_PRODUCTS = [
+  'Anonymous emotional climate feeds for researchers, cities, and cultural institutions',
+  'Premium observatory archives with deeper historical city pulse windows',
+  'Licensed City Climate Reports for tourism boards, hospitality groups, and transport planners',
+  'Official node partnerships for cities, universities, and museums',
+  'Native sponsorship foundations for refined constellation moments and observatory circles'
+];
+const REGION_INCENTIVES = [
+  'Africa & Middle East — event-aware prompts and multilingual context capture for rapidly shifting city scenes',
+  'Europe — archive access and cultural season reports for repeat contributors across borders',
+  'Asia-Pacific — local rhythm presets tuned for commuting, nightlife, campus, and festival cadence',
+  'North America — city comparison briefs and premium observatory views for frequent travelers',
+  'Latin America — neighbourhood storytelling and public wall invitations for culturally rich observations'
+];
+
+function getStoredObservatory() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(OBSERVATORY_STORAGE_KEY) || '{}');
+    return {
+      humanCount: parsed.humanCount || 987,
+      sessionTracked: Boolean(parsed.sessionTracked),
+      claimedMilestones: parsed.claimedMilestones || {},
+      profiles: parsed.profiles || [],
+      pendingMoment: parsed.pendingMoment || null,
+      observations: parsed.observations || [],
+      humanConfidence: typeof parsed.humanConfidence === 'number' ? parsed.humanConfidence : 0
+    };
+  } catch (error) {
+    return { humanCount: 987, sessionTracked: false, claimedMilestones: {}, profiles: [], pendingMoment: null, observations: [], humanConfidence: 0 };
+  }
+}
+
+let observatoryState = getStoredObservatory();
+
+function saveObservatory() {
+  localStorage.setItem(OBSERVATORY_STORAGE_KEY, JSON.stringify(observatoryState));
+}
+
+function assessHumanVisitor() {
+  const ua = navigator.userAgent || '';
+  const languages = navigator.languages || [];
+  const hasTouch = navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
+  const webdriver = navigator.webdriver;
+  const plugins = navigator.plugins ? navigator.plugins.length : 0;
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const width = window.innerWidth || screen.width || 0;
+  const signals = [];
+  let score = 0;
+
+  if (BOT_UA_PATTERN.test(ua)) signals.push('ua'); else score += 4;
+  if (!webdriver) score += 3; else signals.push('webdriver');
+  if (plugins > 0) score += 2; else signals.push('plugins');
+  if (languages.length > 0) score += 2; else signals.push('languages');
+  if (timezone) score += 1;
+  if (width >= 360) score += 1;
+  if (document.visibilityState === 'visible') score += 1;
+  if (hasTouch || matchMedia('(pointer:fine)').matches) score += 1;
+
+  const human = score >= 9 && signals.length < 2;
+  observatoryState.humanConfidence = score;
+  saveObservatory();
+  return { human, score, signals };
+}
+
+function chooseMilestone(count) {
+  return BADGE_MILESTONES.find(m => m === count) || null;
+}
+
+function maybeTrackHumanVisit() {
+  const assessment = assessHumanVisitor();
+  const pill = document.getElementById('human-signal-pill');
+  if (pill) {
+    pill.textContent = assessment.human ? t('human_signal_verified') : 'Automated traffic excluded';
+    pill.classList.toggle('inactive', !assessment.human);
+  }
+
+  if (!assessment.human || observatoryState.sessionTracked) return;
+  observatoryState.sessionTracked = true;
+  observatoryState.humanCount += 1;
+  const milestone = chooseMilestone(observatoryState.humanCount);
+  if (milestone && !observatoryState.claimedMilestones[milestone]) {
+    observatoryState.pendingMoment = milestone;
+  }
+  saveObservatory();
+}
+
+function buildBadgeData(milestone, profile = {}) {
+  const meta = MILESTONE_META[milestone];
+  return {
+    milestone,
+    metal: meta.metal,
+    title: meta.title,
+    line: meta.line,
+    name: profile.name || 'Observer',
+    note: profile.note || '',
+    city: cities[document.getElementById('city-select')?.value || 'nyc']?.name || 'New York',
+    date: new Date().toLocaleDateString()
+  };
+}
+
+function ensureModal() {
+  if (document.getElementById('constellation-modal')) return;
+  const modal = document.createElement('div');
+  modal.id = 'constellation-modal';
+  modal.className = 'constellation-modal';
+  modal.innerHTML = `
+    <div class="constellation-dialog glass-card">
+      <button id="constellation-close" class="btn-text constellation-close" aria-label="Close">×</button>
+      <p class="eyebrow">Constellation Moment</p>
+      <h2 id="constellation-title"></h2>
+      <p id="constellation-copy" class="section-copy"></p>
+      <canvas id="badge-canvas" width="1400" height="1800" aria-label="Generated constellation badge"></canvas>
+      <div class="badge-actions">
+        <button id="download-badge" class="btn-neon" type="button"></button>
+        <button id="share-badge" class="btn-text subtle-button" type="button"></button>
+      </div>
+      <form id="badge-claim-form" class="badge-form">
+        <label>
+          <span>${t('badge_name_label')}</span>
+          <input id="badge-name" type="text" maxlength="48" required />
+        </label>
+        <label>
+          <span>${t('badge_email_label')}</span>
+          <input id="badge-email" type="email" maxlength="120" required />
+        </label>
+        <label>
+          <span>${t('badge_note_label')}</span>
+          <textarea id="badge-note" maxlength="180" rows="3" placeholder="${t('badge_note_placeholder')}"></textarea>
+        </label>
+        <label class="checkbox-row">
+          <input id="wall-opt-in" type="checkbox" />
+          <span>${t('badge_story_invite')}</span>
+        </label>
+        <div class="social-login-row">
+          <span>${t('badge_social_label')}</span>
+          <div>
+            <button type="button" class="btn-text social-token" data-provider="Google">Google</button>
+            <button type="button" class="btn-text social-token" data-provider="Apple">Apple</button>
+          </div>
+        </div>
+        <button id="claim-badge" class="btn-neon" type="submit">${t('badge_claim_cta')}</button>
+        <p id="badge-feedback" class="inline-feedback" aria-live="polite"></p>
+      </form>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', (event) => {
+    if (event.target === modal) modal.classList.remove('active');
+  });
+  document.getElementById('constellation-close').addEventListener('click', () => modal.classList.remove('active'));
+  document.getElementById('download-badge').addEventListener('click', downloadBadge);
+  document.getElementById('share-badge').addEventListener('click', shareBadge);
+  document.querySelectorAll('.social-token').forEach(btn => btn.addEventListener('click', () => {
+    document.getElementById('badge-feedback').textContent = `${btn.dataset.provider} ${t('observation_saved')}`;
+  }));
+  document.getElementById('badge-claim-form').addEventListener('submit', claimBadge);
+}
+
+function drawBadge(data) {
+  const canvas = document.getElementById('badge-canvas');
+  if (!canvas) return;
+  const context = canvas.getContext('2d');
+  const metalMap = {
+    'rose-gold': ['#432126', '#d9a2a5'],
+    silver: ['#26323d', '#dfe5ed'],
+    platinum: ['#1d252f', '#f2f5fb']
+  };
+  const [edge, glow] = metalMap[data.metal] || metalMap.silver;
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  const gradient = context.createLinearGradient(0, 0, canvas.width, canvas.height);
+  gradient.addColorStop(0, '#090c11');
+  gradient.addColorStop(1, '#151c24');
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.strokeStyle = glow;
+  context.lineWidth = 12;
+  context.strokeRect(80, 80, canvas.width - 160, canvas.height - 160);
+  context.strokeStyle = edge;
+  context.lineWidth = 2;
+  context.strokeRect(120, 120, canvas.width - 240, canvas.height - 240);
+  context.fillStyle = 'rgba(255,255,255,0.7)';
+  context.font = '42px Georgia, serif';
+  context.fillText('Glotemp Observatory', 150, 220);
+  context.fillStyle = glow;
+  context.font = '88px Georgia, serif';
+  context.fillText(data.title, 150, 360, canvas.width - 300);
+  context.fillStyle = '#d8dee8';
+  context.font = '46px Georgia, serif';
+  wrapCanvasText(context, data.line, 150, 470, canvas.width - 300, 60);
+  context.font = '38px Arial';
+  context.fillText(`Observer: ${data.name}`, 150, 680);
+  context.fillText(`City witness: ${data.city}`, 150, 750);
+  context.fillText(`Date: ${data.date}`, 150, 820);
+  if (data.note) wrapCanvasText(context, `“${data.note}”`, 150, 980, canvas.width - 300, 58);
+  drawConstellationGlyph(context, canvas.width / 2, 1320, glow);
+}
+
+function wrapCanvasText(context, text, x, y, maxWidth, lineHeight) {
+  const words = text.split(' ');
+  let line = '';
+  words.forEach((word) => {
+    const test = `${line}${word} `;
+    if (context.measureText(test).width > maxWidth && line) {
+      context.fillText(line.trim(), x, y);
+      line = `${word} `;
+      y += lineHeight;
+    } else {
+      line = test;
+    }
+  });
+  if (line) context.fillText(line.trim(), x, y);
+}
+
+function drawConstellationGlyph(context, centerX, centerY, color) {
+  const points = [
+    [centerX - 180, centerY + 60],
+    [centerX - 70, centerY - 90],
+    [centerX + 30, centerY - 30],
+    [centerX + 180, centerY - 120],
+    [centerX + 240, centerY + 40],
+    [centerX + 40, centerY + 140],
+    [centerX - 120, centerY + 180]
+  ];
+  context.strokeStyle = 'rgba(255,255,255,0.25)';
+  context.lineWidth = 3;
+  context.beginPath();
+  points.forEach(([x, y], idx) => {
+    if (!idx) context.moveTo(x, y); else context.lineTo(x, y);
+  });
+  context.closePath();
+  context.stroke();
+  points.forEach(([x, y], idx) => {
+    context.beginPath();
+    context.fillStyle = idx % 2 ? color : '#f3f5fb';
+    context.arc(x, y, idx % 2 ? 12 : 9, 0, Math.PI * 2);
+    context.fill();
+  });
+}
+
+function openConstellationMoment(milestone) {
+  ensureModal();
+  const modal = document.getElementById('constellation-modal');
+  const title = document.getElementById('constellation-title');
+  const copy = document.getElementById('constellation-copy');
+  const badge = buildBadgeData(milestone);
+  title.textContent = t('observatory_moment_title');
+  copy.textContent = t('observatory_moment_subtitle').replace('{milestone}', milestone.toLocaleString()) + ' ' + badge.line;
+  document.getElementById('download-badge').textContent = t('badge_download');
+  document.getElementById('share-badge').textContent = t('badge_share');
+  document.getElementById('badge-feedback').textContent = t('observation_claim_prompt');
+  document.getElementById('badge-claim-form').dataset.milestone = String(milestone);
+  drawBadge(badge);
+  modal.classList.add('active');
+}
+
+function downloadBadge() {
+  const canvas = document.getElementById('badge-canvas');
+  if (!canvas) return;
+  const link = document.createElement('a');
+  link.href = canvas.toDataURL('image/png');
+  link.download = 'glotemp-constellation-badge.png';
+  link.click();
+}
+
+async function shareBadge() {
+  const form = document.getElementById('badge-claim-form');
+  const milestone = Number(form?.dataset.milestone || 0);
+  const meta = MILESTONE_META[milestone];
+  const title = meta?.title || 'Glotemp observer';
+  const text = t('social_caption_prefix').replace('{title}', title);
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'Glotemp Observatory', text, url: window.location.href + '#constellation-wall' });
+      return;
+    } catch (error) {}
+  }
+  await navigator.clipboard?.writeText(text);
+  document.getElementById('badge-feedback').textContent = 'Caption copied for sharing.';
+}
+
+function claimBadge(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const milestone = Number(form.dataset.milestone || 0);
+  const meta = MILESTONE_META[milestone];
+  if (!meta) return;
+  const profile = {
+    milestone,
+    email: document.getElementById('badge-email').value.trim(),
+    name: document.getElementById('badge-name').value.trim(),
+    note: document.getElementById('badge-note').value.trim(),
+    title: meta.title,
+    city: cities[document.getElementById('city-select')?.value || 'nyc']?.name || 'New York',
+    optedIn: document.getElementById('wall-opt-in').checked,
+    claimedAt: new Date().toISOString()
+  };
+  observatoryState.claimedMilestones[milestone] = true;
+  observatoryState.pendingMoment = null;
+  observatoryState.profiles = [profile, ...observatoryState.profiles.filter(item => item.milestone !== milestone)].slice(0, 18);
+  saveObservatory();
+  drawBadge(buildBadgeData(milestone, profile));
+  renderConstellationWall();
+  loadStars();
+  document.getElementById('badge-feedback').textContent = t('observatory_moment_claimed');
+}
+
+function renderConstellationWall() {
+  const wall = document.getElementById('constellation-wall-grid');
+  if (!wall) return;
+  const visibleProfiles = observatoryState.profiles.filter(profile => profile.optedIn || profile.note);
+  if (!visibleProfiles.length) {
+    wall.innerHTML = `<p class="wall-empty">${t('wall_empty')}</p>`;
+    return;
+  }
+  wall.innerHTML = visibleProfiles.map(profile => `
+    <article class="wall-card">
+      <p class="eyebrow">${profile.title}</p>
+      <h3>${profile.name}</h3>
+      <p class="wall-city">${profile.city}</p>
+      <p class="wall-note">${profile.note || 'Quietly observing the movement of a city.'}</p>
+      <span class="wall-date">${new Date(profile.claimedAt).toLocaleDateString()}</span>
+    </article>
+  `).join('');
+}
+
+function renderSignalPanels() {
+  const quality = document.getElementById('quality-indicators');
+  const cadence = document.getElementById('cadence-indicators');
+  const products = document.getElementById('product-list');
+  const regions = document.getElementById('region-list');
+  if (quality) {
+    const last = observatoryState.observations[0];
+    const items = [
+      `Human confidence score: ${observatoryState.humanConfidence}/14`,
+      `Recent note depth: ${last?.note ? 'Context attached' : 'Signal only'}`,
+      `Observation archive: ${observatoryState.observations.length} recent entries saved locally`
+    ];
+    quality.innerHTML = items.map(item => `<li>${item}</li>`).join('');
+  }
+  if (cadence) {
+    const uniqueCities = new Set(observatoryState.observations.map(item => item.city)).size;
+    const items = [
+      `Geographic breadth: ${uniqueCities || 1} city lens${uniqueCities === 1 ? '' : 'es'} observed`,
+      `Supporter path: ${observatoryState.observations.length >= 5 ? 'Observatory Circle ready' : 'Continue observing to unlock observatory circles'}`,
+      `Badge archive: ${Object.keys(observatoryState.claimedMilestones).length} constellation titles claimed`
+    ];
+    cadence.innerHTML = items.map(item => `<li>${item}</li>`).join('');
+  }
+  if (products) products.innerHTML = DATA_PRODUCTS.map(item => `<li>${item}</li>`).join('');
+  if (regions) regions.innerHTML = REGION_INCENTIVES.map(item => `<li>${item}</li>`).join('');
+}
+
+function recordObservation(event) {
+  event.preventDefault();
+  const selectedMood = document.querySelector('.mood-btn.active')?.dataset.label || 'Neutral';
+  const note = document.getElementById('context-note').value.trim();
+  const observation = {
+    mood: selectedMood,
+    intensity: Number(document.getElementById('intensity-range').value),
+    scene: document.getElementById('scene-select').value,
+    lens: document.getElementById('language-lens').value,
+    cadence: document.getElementById('cadence-select').value,
+    note,
+    city: cities[document.getElementById('city-select').value].name,
+    createdAt: new Date().toISOString()
+  };
+  observatoryState.observations.unshift(observation);
+  observatoryState.observations = observatoryState.observations.slice(0, 24);
+  saveObservatory();
+  addStars(note ? 18 : 12);
+  renderSignalPanels();
+  document.getElementById('observation-feedback').textContent = t('observation_saved');
+  if (observatoryState.pendingMoment) openConstellationMoment(observatoryState.pendingMoment);
+}
+
 // ----- Pulse Simulation & Canvas -----
 const canvas = document.getElementById('pulse-canvas');
 const ctx = canvas.getContext('2d');
@@ -478,7 +914,8 @@ function loadStars() {
   const stars = parseInt(localStorage.getItem('glotemp-stars') || '0');
   document.getElementById('stars-count').textContent = stars;
   const rankEl = document.getElementById('user-rank');
-  if (stars > 200) rankEl.textContent = 'Luminary ✨';
+  if (stars > 500) rankEl.textContent = 'Founding Luminary';
+  else if (stars > 200) rankEl.textContent = 'Observatory Circle';
   else if (stars > 50) rankEl.textContent = 'Pathfinder';
   else rankEl.textContent = 'Explorer';
 }
@@ -501,21 +938,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('city-select').addEventListener('change', (e) => updateCity(e.target.value));
   loadStars();
+  maybeTrackHumanVisit();
+  renderConstellationWall();
+  renderSignalPanels();
+  if (observatoryState.pendingMoment) setTimeout(() => openConstellationMoment(observatoryState.pendingMoment), 800);
+
+  const intensityRange = document.getElementById('intensity-range');
+  const intensityValue = document.getElementById('intensity-value');
+  intensityRange?.addEventListener('input', () => { intensityValue.textContent = intensityRange.value; });
+  document.getElementById('observation-form')?.addEventListener('submit', recordObservation);
 
   // Mood check-in buttons with pulse animation
   document.querySelectorAll('.mood-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      addStars(10);
+      document.querySelectorAll('.mood-btn').forEach(node => node.classList.remove('active'));
+      btn.classList.add('active');
 
-      // Trigger soft pulse animation on barometer
       const chamber = document.getElementById('barometer-chamber');
       if (chamber) {
         chamber.classList.remove('pulse');
-        void chamber.offsetWidth; // Trigger reflow
+        void chamber.offsetWidth;
         chamber.classList.add('pulse');
       }
-
-      alert(`${t('stars')} +10!`);
     });
   });
 

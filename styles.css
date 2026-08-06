@@ -722,3 +722,211 @@ body {
   flex-direction: column;
   gap: 0.5rem;
 }
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin-bottom: 0.45rem;
+}
+
+.section-copy {
+  color: var(--text-secondary);
+  max-width: 540px;
+  line-height: 1.7;
+}
+
+.observation-form, .badge-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-grid, .systems-grid, .products-grid, .contribution-panels, .wall-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.observation-form label, .badge-form label {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--text-secondary);
+}
+
+.observation-form input,
+.observation-form select,
+.observation-form textarea,
+.badge-form input,
+.badge-form textarea {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 16px;
+  color: var(--text-primary);
+  padding: 0.85rem 1rem;
+  font: inherit;
+}
+
+.observation-form textarea, .badge-form textarea {
+  resize: vertical;
+}
+
+.form-actions, .badge-actions, .social-login-row, .observatory-status {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.inline-feedback {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.human-signal-pill {
+  border: 1px solid rgba(173, 216, 230, 0.25);
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.8rem;
+  color: #dff5ff;
+  background: rgba(125, 185, 215, 0.08);
+}
+
+.human-signal-pill.inactive {
+  opacity: 0.55;
+}
+
+.mini-panel, .system-card {
+  padding: 1.2rem;
+}
+
+.contribution-panels, .systems-grid, .products-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.signal-list {
+  list-style: none;
+  display: grid;
+  gap: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.signal-list li {
+  position: relative;
+  padding-left: 1rem;
+  line-height: 1.6;
+}
+
+.signal-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--neon-cyan);
+}
+
+.product-card {
+  padding: 1.4rem;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 22px;
+  background: rgba(255,255,255,0.03);
+}
+
+.constellation-wall, .observatory-systems {
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.wall-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.wall-card {
+  padding: 1.2rem;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.wall-city, .wall-date, .wall-empty {
+  color: var(--text-secondary);
+}
+
+.wall-note {
+  line-height: 1.7;
+  margin: 0.75rem 0;
+}
+
+.constellation-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 4, 10, 0.82);
+  backdrop-filter: blur(12px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  padding: 1rem;
+}
+
+.constellation-modal.active {
+  display: flex;
+}
+
+.constellation-dialog {
+  width: min(920px, 100%);
+  padding: 1.5rem;
+  position: relative;
+  background: linear-gradient(180deg, rgba(16,20,28,0.95), rgba(8,10,16,0.98));
+}
+
+.constellation-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+#badge-canvas {
+  width: 100%;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: #090c11;
+}
+
+.subtle-button, .social-token {
+  color: var(--text-secondary);
+}
+
+.checkbox-row {
+  grid-template-columns: auto 1fr;
+  align-items: start;
+}
+
+.mood-btn.active {
+  background: rgba(0,242,254,0.18);
+  border-color: rgba(0,242,254,0.45);
+  transform: scale(1.06);
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 720px) {
+  .section-heading, .form-actions, .badge-actions, .social-login-row, .observatory-status {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
