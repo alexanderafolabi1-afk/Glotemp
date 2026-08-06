@@ -673,8 +673,7 @@ function chooseMilestone(count) {
 
 function maybeTrackHumanVisit() {
   const assessment = assessHumanVisitor();
-  const minute = new Date().getMinutes();
-  const movementBonus = (window.scrollY > 0 || minute % 2 === 0) ? 1 : 0;
+  const movementBonus = window.scrollY > 0 ? 1 : 0;
   if (movementBonus) {
     assessment.score += 1;
     observatoryState.humanConfidence = assessment.score;
@@ -884,8 +883,12 @@ async function shareBadge() {
       return;
     } catch (error) {}
   }
-  await navigator.clipboard?.writeText(text);
-  document.getElementById('badge-feedback').textContent = t('share_copied');
+  try {
+    await navigator.clipboard.writeText(text);
+    document.getElementById('badge-feedback').textContent = t('share_copied');
+  } catch (error) {
+    document.getElementById('badge-feedback').textContent = text;
+  }
 }
 
 function claimBadge(event) {
@@ -917,20 +920,36 @@ function claimBadge(event) {
 function renderConstellationWall() {
   const wall = document.getElementById('constellation-wall-grid');
   if (!wall) return;
-  const visibleProfiles = observatoryState.profiles.filter(profile => profile.optedIn || profile.note);
+  const visibleProfiles = observatoryState.profiles.filter(profile => profile.optedIn);
   if (!visibleProfiles.length) {
-    wall.innerHTML = `<p class="wall-empty">${t('wall_empty')}</p>`;
+    wall.innerHTML = '';
+    const empty = document.createElement('p');
+    empty.className = 'wall-empty';
+    empty.textContent = t('wall_empty');
+    wall.appendChild(empty);
     return;
   }
-  wall.innerHTML = visibleProfiles.map(profile => `
-    <article class="wall-card">
-      <p class="eyebrow">${profile.title}</p>
-      <h3>${profile.name}</h3>
-      <p class="wall-city">${profile.city}</p>
-      <p class="wall-note">${profile.note || 'Quietly observing the movement of a city.'}</p>
-      <span class="wall-date">${new Date(profile.claimedAt).toLocaleDateString()}</span>
-    </article>
-  `).join('');
+  wall.innerHTML = '';
+  visibleProfiles.forEach((profile) => {
+    const card = document.createElement('article');
+    card.className = 'wall-card';
+    const eyebrow = document.createElement('p');
+    eyebrow.className = 'eyebrow';
+    eyebrow.textContent = profile.title;
+    const heading = document.createElement('h3');
+    heading.textContent = profile.name;
+    const city = document.createElement('p');
+    city.className = 'wall-city';
+    city.textContent = profile.city;
+    const note = document.createElement('p');
+    note.className = 'wall-note';
+    note.textContent = profile.note || 'Quietly observing the movement of a city.';
+    const date = document.createElement('span');
+    date.className = 'wall-date';
+    date.textContent = new Date(profile.claimedAt).toLocaleDateString();
+    card.append(eyebrow, heading, city, note, date);
+    wall.appendChild(card);
+  });
 }
 
 function renderSignalPanels() {
