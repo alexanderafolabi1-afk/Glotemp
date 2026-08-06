@@ -43,7 +43,38 @@ const translations = {
     checkin_intro: "Offer a quiet signal from where you stand. Richer observations deepen the atlas while keeping the ritual gentle.",
     intensity_label: "Intensity",
     scene_label: "Scene",
+    scene_street: "Street",
+    scene_work: "Work",
+    scene_campus: "Campus",
+    scene_cafe: "Café",
+    scene_nightlife: "Nightlife",
+    scene_transit: "Transit",
+    scene_home: "Home",
     language_label: "Language lens",
+    data_product_1: "Anonymous emotional climate feeds for researchers, cities, and cultural institutions",
+    data_product_2: "Premium observatory archives with deeper historical city pulse windows",
+    data_product_3: "Licensed City Climate Reports for tourism boards, hospitality groups, and transport planners",
+    data_product_4: "Official node partnerships for cities, universities, and museums",
+    data_product_5: "Native sponsorship foundations for refined constellation moments and observatory circles",
+    region_incentive_1: "Africa & Middle East — event-aware prompts and multilingual context capture for rapidly shifting city scenes",
+    region_incentive_2: "Europe — archive access and cultural season reports for repeat contributors across borders",
+    region_incentive_3: "Asia-Pacific — local rhythm presets tuned for commuting, nightlife, campus, and festival cadence",
+    region_incentive_4: "North America — city comparison briefs and premium observatory views for frequent travelers",
+    region_incentive_5: "Latin America — neighbourhood storytelling and public wall invitations for culturally rich observations",
+    milestone_title_1000: "Founding Observer – 1k",
+    milestone_line_1000: "The first quiet thousand taught the instrument to listen.",
+    milestone_title_2500: "Founding Observer – 2.5k",
+    milestone_line_2500: "A wider ring of cities began to glow in sympathy.",
+    milestone_title_5000: "Founding Observer – 5k",
+    milestone_line_5000: "The atlas learned to hold many evenings at once.",
+    milestone_title_10000: "Founding Observer – 10k",
+    milestone_line_10000: "A new constellation formed in the disciplined dark.",
+    milestone_title_25000: "Founding Observer – 25k",
+    milestone_line_25000: "The observatory acquired a true planetary hum.",
+    milestone_title_50000: "Founding Observer – 50k",
+    milestone_line_50000: "Half a hundred thousand witnesses refined the signal.",
+    milestone_title_100000: "Centenary Observer – 100k",
+    milestone_line_100000: "One hundred thousand observers taught the sky a new geometry.",
     cadence_label: "Contribution cadence",
     context_label: "Optional local note",
     context_placeholder: "A small observation, event note, or mood context.",
@@ -144,6 +175,13 @@ const translations = {
     checkin_intro: "Ofrece una señal discreta desde donde estás. Las observaciones más ricas profundizan el atlas sin romper el ritual.",
     intensity_label: "Intensidad",
     scene_label: "Escena",
+    scene_street: "Calle",
+    scene_work: "Trabajo",
+    scene_campus: "Campus",
+    scene_cafe: "Café",
+    scene_nightlife: "Vida nocturna",
+    scene_transit: "Tránsito",
+    scene_home: "Casa",
     language_label: "Lente lingüística",
     cadence_label: "Cadencia de contribución",
     context_label: "Nota local opcional",
@@ -245,6 +283,13 @@ const translations = {
     checkin_intro: "Offrez un signal discret depuis votre position. Des observations plus riches approfondissent l'atlas sans rompre le rituel.",
     intensity_label: "Intensité",
     scene_label: "Scène",
+    scene_street: "Rue",
+    scene_work: "Travail",
+    scene_campus: "Campus",
+    scene_cafe: "Café",
+    scene_nightlife: "Vie nocturne",
+    scene_transit: "Transit",
+    scene_home: "Domicile",
     language_label: "Perspective linguistique",
     cadence_label: "Cadence de contribution",
     context_label: "Note locale facultative",
@@ -346,6 +391,13 @@ const translations = {
     checkin_intro: "Sende ein leises Signal von deinem Standort. Reichere Beobachtungen vertiefen den Atlas, ohne das Ritual zu stören.",
     intensity_label: "Intensität",
     scene_label: "Szene",
+    scene_street: "Straße",
+    scene_work: "Arbeit",
+    scene_campus: "Campus",
+    scene_cafe: "Café",
+    scene_nightlife: "Nachtleben",
+    scene_transit: "Transit",
+    scene_home: "Zuhause",
     language_label: "Sprachperspektive",
     cadence_label: "Beitragsrhythmus",
     context_label: "Optionale lokale Notiz",
@@ -447,6 +499,13 @@ const translations = {
     checkin_intro: "Ofereça um sinal discreto de onde você está. Observações mais ricas aprofundam o atlas sem quebrar o ritual.",
     intensity_label: "Intensidade",
     scene_label: "Cena",
+    scene_street: "Rua",
+    scene_work: "Trabalho",
+    scene_campus: "Campus",
+    scene_cafe: "Café",
+    scene_nightlife: "Vida noturna",
+    scene_transit: "Trânsito",
+    scene_home: "Casa",
     language_label: "Lente linguística",
     cadence_label: "Cadência de contribuição",
     context_label: "Nota local opcional",
@@ -548,6 +607,13 @@ const translations = {
     checkin_intro: "今いる場所から静かなシグナルを届けてください。より豊かな観測は儀式を壊さずにアトラスを深めます。",
     intensity_label: "強度",
     scene_label: "シーン",
+    scene_street: "街頭",
+    scene_work: "職場",
+    scene_campus: "キャンパス",
+    scene_cafe: "カフェ",
+    scene_nightlife: "ナイトライフ",
+    scene_transit: "交通機関",
+    scene_home: "自宅",
     language_label: "言語レンズ",
     cadence_label: "投稿リズム",
     context_label: "任意のローカルメモ",
@@ -675,28 +741,20 @@ const BADGE_MILESTONES = [1000, 2500, 5000, 10000, 25000, 50000, 100000];
 const HUMAN_CONFIDENCE_MAX = 15;
 const DEFAULT_HUMAN_COUNT = 0;
 const MILESTONE_META = {
-  1000: { metal: 'rose-gold', title: 'Founding Observer – 1k', line: 'The first quiet thousand taught the instrument to listen.' },
-  2500: { metal: 'silver', title: 'Founding Observer – 2.5k', line: 'A wider ring of cities began to glow in sympathy.' },
-  5000: { metal: 'rose-gold', title: 'Founding Observer – 5k', line: 'The atlas learned to hold many evenings at once.' },
-  10000: { metal: 'platinum', title: 'Founding Observer – 10k', line: 'A new constellation formed in the disciplined dark.' },
-  25000: { metal: 'silver', title: 'Founding Observer – 25k', line: 'The observatory acquired a true planetary hum.' },
-  50000: { metal: 'platinum', title: 'Founding Observer – 50k', line: 'Half a hundred thousand witnesses refined the signal.' },
-  100000: { metal: 'platinum', title: 'Centenary Observer – 100k', line: 'One hundred thousand observers taught the sky a new geometry.' }
+  1000: { metal: 'rose-gold', titleKey: 'milestone_title_1000', lineKey: 'milestone_line_1000' },
+  2500: { metal: 'silver', titleKey: 'milestone_title_2500', lineKey: 'milestone_line_2500' },
+  5000: { metal: 'rose-gold', titleKey: 'milestone_title_5000', lineKey: 'milestone_line_5000' },
+  10000: { metal: 'platinum', titleKey: 'milestone_title_10000', lineKey: 'milestone_line_10000' },
+  25000: { metal: 'silver', titleKey: 'milestone_title_25000', lineKey: 'milestone_line_25000' },
+  50000: { metal: 'platinum', titleKey: 'milestone_title_50000', lineKey: 'milestone_line_50000' },
+  100000: { metal: 'platinum', titleKey: 'milestone_title_100000', lineKey: 'milestone_line_100000' }
 };
-const DATA_PRODUCTS = [
-  'Anonymous emotional climate feeds for researchers, cities, and cultural institutions',
-  'Premium observatory archives with deeper historical city pulse windows',
-  'Licensed City Climate Reports for tourism boards, hospitality groups, and transport planners',
-  'Official node partnerships for cities, universities, and museums',
-  'Native sponsorship foundations for refined constellation moments and observatory circles'
-];
-const REGION_INCENTIVES = [
-  'Africa & Middle East — event-aware prompts and multilingual context capture for rapidly shifting city scenes',
-  'Europe — archive access and cultural season reports for repeat contributors across borders',
-  'Asia-Pacific — local rhythm presets tuned for commuting, nightlife, campus, and festival cadence',
-  'North America — city comparison briefs and premium observatory views for frequent travelers',
-  'Latin America — neighbourhood storytelling and public wall invitations for culturally rich observations'
-];
+function getDataProducts() {
+  return [1, 2, 3, 4, 5].map(n => t(`data_product_${n}`));
+}
+function getRegionIncentives() {
+  return [1, 2, 3, 4, 5].map(n => t(`region_incentive_${n}`));
+}
 
 function getStoredObservatory() {
   try {
@@ -741,7 +799,7 @@ function assessHumanVisitor() {
   if (document.visibilityState === 'visible') score += 1;
   if (hasTouch || matchMedia('(pointer:fine)').matches) score += 1;
 
-  const human = score >= 9 && signals.length < 2;
+  const human = score >= 9 && signals.length < 2 && !signals.includes('ua');
   observatoryState.humanConfidence = score;
   saveObservatory();
   return { human, score, signals };
@@ -775,8 +833,8 @@ function buildBadgeData(milestone, profile = {}) {
   return {
     milestone,
     metal: meta.metal,
-    title: meta.title,
-    line: meta.line,
+    title: t(meta.titleKey),
+    line: t(meta.lineKey),
     name: profile.name || 'Observer',
     note: profile.note || '',
     city: cities[document.getElementById('city-select')?.value || 'nyc']?.name || 'New York',
@@ -953,7 +1011,7 @@ async function shareBadge() {
   const form = document.getElementById('badge-claim-form');
   const milestone = Number(form?.dataset.milestone || 0);
   const meta = MILESTONE_META[milestone];
-  const title = meta?.title || 'Glotemp observer';
+  const title = meta ? t(meta.titleKey) : 'Glotemp observer';
   const text = t('social_caption_prefix').replace('{title}', title);
   if (navigator.share) {
     try {
@@ -984,7 +1042,7 @@ function claimBadge(event) {
     email: document.getElementById('badge-email').value.trim(),
     name: document.getElementById('badge-name').value.trim(),
     note: document.getElementById('badge-note').value.trim(),
-    title: meta.title,
+    title: t(meta.titleKey),
     city: cities[document.getElementById('city-select')?.value || 'nyc']?.name || 'New York',
     optedIn: document.getElementById('wall-opt-in').checked,
     claimedAt: new Date().toISOString()
@@ -1051,14 +1109,14 @@ function renderSignalPanels() {
   if (cadence) {
     const uniqueCities = new Set(observatoryState.observations.map(item => item.city)).size;
     const items = [
-      t(uniqueCities === 1 ? 'signal_geo_breadth_one' : 'signal_geo_breadth_many').replace('{count}', uniqueCities || 1),
+      t(uniqueCities === 1 ? 'signal_geo_breadth_one' : 'signal_geo_breadth_many').replace('{count}', uniqueCities),
       observatoryState.observations.length >= 5 ? t('signal_supporter_ready') : t('signal_supporter_progress'),
       t('signal_badge_archive').replace('{count}', Object.keys(observatoryState.claimedMilestones).length)
     ];
     cadence.innerHTML = items.map(item => `<li>${item}</li>`).join('');
   }
-  if (products) products.innerHTML = DATA_PRODUCTS.map(item => `<li>${item}</li>`).join('');
-  if (regions) regions.innerHTML = REGION_INCENTIVES.map(item => `<li>${item}</li>`).join('');
+  if (products) products.innerHTML = getDataProducts().map(item => `<li>${item}</li>`).join('');
+  if (regions) regions.innerHTML = getRegionIncentives().map(item => `<li>${item}</li>`).join('');
 }
 
 function recordObservation(event) {
