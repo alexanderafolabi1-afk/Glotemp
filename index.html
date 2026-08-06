@@ -29,22 +29,23 @@
       <div class="flex-between">
         <span data-i18n="install_title">Get the app</span>
         <button id="install-btn" class="btn-neon" data-i18n="install_btn">Install</button>
-        <button id="dismiss-install" class="btn-text" data-i18n="dismiss">✕</button>
+        <button id="dismiss-install" class="btn-text" data-i18n="dismiss" style="font-size:1.2rem;">×</button>
       </div>
     </div>
 
     <!-- Navigation -->
     <nav class="navbar glass">
       <div class="nav-brand">
-        <img src="assets/logo.png" alt="Glotemp" class="logo-img" height="40">
+        <img src="assets/logo.png" alt="Glotemp" class="nav-logo">
+        <span class="logo-text">Glotemp</span>
         <span class="pulse-dot"></span>
       </div>
       <div class="nav-links">
         <a href="index.html" class="active">Pulse</a>
         <a href="about.html">About</a>
-        <a href="investors.html">Investors</a>
+        <a href="explore.html">Explore</a>
         <a href="blog.html">Stories</a>
-        <button id="lang-switch" class="btn-icon" title="Change language">🌍</button>
+        <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
       </div>
     </nav>
 
@@ -117,11 +118,11 @@
     <section class="check-in glass-card">
       <h2 data-i18n="checkin_title">Share the pulse</h2>
       <div class="mood-buttons">
-        <button class="mood-btn" data-mood="🔥" data-label="Hyped">🔥</button>
-        <button class="mood-btn" data-mood="😊" data-label="Good">😊</button>
-        <button class="mood-btn" data-mood="😐" data-label="Meh">😐</button>
-        <button class="mood-btn" data-mood="😞" data-label="Low">😞</button>
-        <button class="mood-btn" data-mood="😡" data-label="Frustrated">😡</button>
+        <button class="mood-btn" data-mood="▲" data-label="Energized" title="Energized">▲</button>
+        <button class="mood-btn" data-mood="◆" data-label="Good" title="Good">◆</button>
+        <button class="mood-btn" data-mood="●" data-label="Neutral" title="Neutral">●</button>
+        <button class="mood-btn" data-mood="▼" data-label="Low" title="Low">▼</button>
+        <button class="mood-btn" data-mood="◇" data-label="Cautious" title="Cautious">◇</button>
       </div>
       <div class="stars-display">
         <span data-i18n="stars">Stars</span>: <span id="stars-count">0</span>
