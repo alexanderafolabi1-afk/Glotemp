@@ -78,6 +78,18 @@ body {
   z-index: 10;
 }
 .logo-text { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; }
+.nav-logo {
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+}
 .pulse-dot {
   width: 10px; height: 10px;
   background: var(--neon-cyan);
