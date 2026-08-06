@@ -1,47 +1,75 @@
 :root {
-  --bg-deep: #020202;
-  --glass-bg: rgba(16, 20, 35, 0.65);
+  --bg-deep: #0a0d12;
+  --bg-charcoal: #0f1318;
+  --glass-bg: rgba(18, 22, 35, 0.75);
   --glass-border: rgba(255, 255, 255, 0.08);
+  --metal-light: rgba(255, 255, 255, 0.04);
+  --metal-dark: rgba(0, 0, 0, 0.3);
   --neon-cyan: #00f2fe;
   --neon-purple: #b224ef;
   --neon-pink: #ff4da6;
   --text-primary: #eef5ff;
-  --text-secondary: #b0c4de;
+  --text-secondary: #9fb0c4;
+  --text-tertiary: #7a8598;
   --radius: 24px;
   --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --smooth-transition: 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* Barometer color palette */
+  --barometer-cool: #2d5f9f;
+  --barometer-warm: #c9a76a;
+  --barometer-charged: #d66b99;
+  --barometer-silver: #b0b8c4;
+
+  /* Time-based ambient */
+  --ambient-morning: 0deg, 40%, 55%;
+  --ambient-day: 200deg, 30%, 45%;
+  --ambient-evening: 20deg, 35%, 50%;
+  --ambient-night: 240deg, 20%, 35%;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Segoe UI', 'Trebuchet MS', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.3px;
   background-color: var(--bg-deep);
   background-image:
-    radial-gradient(ellipse at 30% 20%, rgba(25,25,25,0.4) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 80%, rgba(18,18,18,0.35) 0%, transparent 50%),
+    radial-gradient(ellipse at 30% 20%, rgba(20,25,40,0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(15,18,30,0.25) 0%, transparent 50%),
     repeating-linear-gradient(
       115deg,
       transparent 0px,
       transparent 1px,
-      rgba(40,40,40,0.08) 1px,
-      rgba(40,40,40,0.08) 2px
+      rgba(45,50,60,0.05) 1px,
+      rgba(45,50,60,0.05) 2px
     ),
     repeating-linear-gradient(
       25deg,
       transparent 0px,
       transparent 1px,
-      rgba(30,30,30,0.06) 1px,
-      rgba(30,30,30,0.06) 2px
+      rgba(40,45,55,0.04) 1px,
+      rgba(40,45,55,0.04) 2px
     ),
-    linear-gradient(180deg, #050505 0%, var(--bg-deep) 50%, #010101 100%);
-  background-size: cover, cover, 4px 4px, 5px 5px, cover;
-  background-position: center, center, 0 0, 0 0, center;
-  background-repeat: no-repeat, no-repeat, repeat, repeat, no-repeat;
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 3px,
+      rgba(50,55,65,0.04) 3px,
+      rgba(50,55,65,0.04) 4px
+    ),
+    linear-gradient(180deg, #111622 0%, var(--bg-charcoal) 50%, #090a0f 100%);
+  background-size: cover, cover, 5px 5px, 6px 6px, 8px 8px, cover;
+  background-position: center, center, 0 0, 0 0, 0 0, center;
+  background-repeat: no-repeat, no-repeat, repeat, repeat, repeat, no-repeat;
   background-attachment: fixed;
   color: var(--text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  -webkit-text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  transition: background-color var(--smooth-transition);
 }
 
 #app {
@@ -57,7 +85,194 @@ body {
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.1);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.08), inset 1px 1px 0 rgba(255,255,255,0.04);
+}
+
+/* ===== LIVING BAROMETER ===== */
+.barometer-chamber {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  border-radius: calc(var(--radius) * 1.5);
+  background: linear-gradient(135deg, rgba(15, 18, 30, 0.8) 0%, rgba(20, 25, 40, 0.6) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.06),
+    inset -1px -1px 1px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  transition: all var(--smooth-transition);
+}
+
+.barometer-chamber.ascending {
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(210, 107, 153, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.06),
+    inset -1px -1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.barometer-fluid {
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 60%;
+  border-radius: 16px 16px 0 0;
+  background: linear-gradient(180deg, #4a7ba7 0%, #2d5f9f 100%);
+  opacity: 0.85;
+  transition: height var(--smooth-transition), background var(--smooth-transition);
+  box-shadow:
+    inset 0 2px 8px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.barometer-fluid.warm {
+  background: linear-gradient(180deg, #d9aa5a 0%, #c9a76a 100%);
+}
+
+.barometer-fluid.charged {
+  background: linear-gradient(180deg, #e08ba9 0%, #d66b99 100%);
+}
+
+.barometer-fluid.restrained {
+  background: linear-gradient(180deg, #c0c8d4 0%, #b0b8c4 100%);
+}
+
+.barometer-needle {
+  position: absolute;
+  left: 50%;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transform: translateX(-50%);
+  bottom: 0;
+  transition: opacity var(--smooth-transition);
+}
+
+.barometer-needle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(255,255,255,0.3);
+}
+
+.barometer-shimmer {
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 8px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  border-radius: 50%;
+  animation: shimmer-pulse 3s ease-in-out infinite;
+}
+
+@keyframes shimmer-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+.barometer-label {
+  position: absolute;
+  bottom: -2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.barometer-chamber:hover .barometer-label {
+  opacity: 1;
+}
+
+.barometer-temperature {
+  position: absolute;
+  top: 1rem;
+  left: 1.5rem;
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.barometer-value {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  font-size: 1.8rem;
+  font-weight: 300;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.barometer-pressure-graph {
+  display: none;
+  position: absolute;
+  bottom: -1.5rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  height: 40px;
+  margin-top: 2rem;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.barometer-chamber:hover .barometer-pressure-graph {
+  display: block;
+  opacity: 1;
+}
+
+/* Barometer pulse animation for mood check-ins */
+@keyframes barometer-pulse {
+  0% {
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      0 0 20px rgba(210, 107, 153, 0.1),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.1),
+      inset -1px -1px 1px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      0 0 40px rgba(210, 107, 153, 0.25),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.15),
+      inset -1px -1px 1px rgba(0, 0, 0, 0.3);
+  }
+  100% {
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      0 0 20px rgba(210, 107, 153, 0.1),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.1),
+      inset -1px -1px 1px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.barometer-chamber.pulse {
+  animation: barometer-pulse 0.6s ease-out;
+}
+
+/* Mood ring now incorporates barometer display */
+.mood-ring {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 0;
 }
 
 /* Navigation */

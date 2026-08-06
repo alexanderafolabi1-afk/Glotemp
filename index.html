@@ -64,11 +64,20 @@
         <canvas id="pulse-canvas"></canvas>
         <div class="pulse-info">
           <h1 id="city-name">New York</h1>
-          <div class="mood-ring">
-            <span class="mood-label" data-i18n="mood">Mood</span>
 
-            <span class="mood-value" id="mood-score">7.8</span>
+          <!-- Living Barometer -->
+          <div class="barometer-chamber" id="barometer-chamber">
+            <div class="barometer-temperature" data-i18n="mood">MOOD</div>
+            <div class="barometer-value" id="barometer-value">7.8</div>
+            <div class="barometer-fluid" id="barometer-fluid" style="height: 78%"></div>
+            <div class="barometer-needle" id="barometer-needle"></div>
+            <div class="barometer-shimmer" id="barometer-shimmer"></div>
+            <div class="barometer-label" id="barometer-label">Equilibrium</div>
+            <svg class="barometer-pressure-graph" id="barometer-graph" viewBox="0 0 240 40">
+              <polyline id="pressure-line" points="" fill="none" stroke="rgba(45,95,159,0.4)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+            </svg>
           </div>
+
           <div class="dimensions-grid" id="dimensions-grid">
             <!-- Filled by JS -->
           </div>

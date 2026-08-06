@@ -349,11 +349,102 @@ const cities = {
   paris: { name: "Paris", mood: 7.5, dims: [7.6,7.0,7.9,7.4,8.5,7.2,7.3,5.5,8.0,7.5,7.2,7.8] }
 };
 
+// Multi-source Emotional Climate Engine
+function synthesizeEmotionalTemperature(cityData) {
+  // Fuse multiple sources into a single living temperature:
+  // - Direct mood reports (40%)
+  // - Conversational temperature (25%)
+  // - Event signals (20%)
+  // - Cross-city resonance (15%)
+  const directMood = cityData.mood;
+  const conversational = (cityData.dims[0] + cityData.dims[9]) / 2; // Mood + Community averages
+  const eventSignal = cityData.dims[8]; // Events dimension
+  const crossCityResonance = 7.3; // Global avg for now
+
+  return (directMood * 0.4) + (conversational * 0.25) + (eventSignal * 0.2) + (crossCityResonance * 0.15);
+}
+
+// Barometer color based on mood temperature
+function getBarometerState(mood) {
+  if (mood >= 8.0) return { class: 'charged', label: 'Surging Energy', temp: 'Hot' };
+  if (mood >= 7.2) return { class: 'warm', label: 'Expansive', temp: 'Warm' };
+  if (mood >= 6.0) return { class: '', label: 'Equilibrium', temp: 'Balanced' };
+  return { class: 'restrained', label: 'Reserved', temp: 'Cool' };
+}
+
+// Render the Living Barometer
+function renderBarometer(mood, label) {
+  const chamber = document.getElementById('barometer-chamber');
+  const fluid = document.getElementById('barometer-fluid');
+  const needle = document.getElementById('barometer-needle');
+  const value = document.getElementById('barometer-value');
+  const labelEl = document.getElementById('barometer-label');
+  const state = getBarometerState(mood);
+
+  // Update fluid height and color
+  const height = Math.min(95, Math.max(10, mood * 12));
+  fluid.style.height = height + '%';
+
+  // Remove previous state classes
+  fluid.className = 'barometer-fluid';
+  if (state.class) fluid.classList.add(state.class);
+
+  // Update chamber glow if ascending
+  chamber.classList.remove('ascending');
+  if (mood > 7.5) {
+    setTimeout(() => chamber.classList.add('ascending'), 10);
+  }
+
+  // Update displays
+  value.textContent = mood.toFixed(1);
+  labelEl.textContent = state.label;
+
+  // Animate needle
+  needle.style.opacity = mood > 7.0 ? 1 : 0.4;
+  needle.style.transform = `translateX(-50%) scaleY(${0.8 + (mood / 10) * 0.3})`;
+
+  // Pressure graph (24-hour simulation)
+  updatePressureGraph(mood);
+}
+
+function updatePressureGraph(currentMood) {
+  const graph = document.getElementById('barometer-graph');
+  if (!graph || graph.style.display === 'none') return;
+
+  let points = (localStorage.getItem('pressure-history') || '').split(',').map(Number).filter(n => !isNaN(n));
+  points.push(currentMood);
+  if (points.length > 24) points = points.slice(-24);
+  localStorage.setItem('pressure-history', points.join(','));
+
+  const line = document.getElementById('pressure-line');
+  const pointsStr = points.map((p, i) => `${(i/24)*240},${40 - (p/10)*40}`).join(' ');
+  line.setAttribute('points', pointsStr);
+}
+
+// Time-based ambient lighting
+function updateAmbientLighting() {
+  const hour = new Date().getHours();
+  let ambientClass = 'ambient-day';
+  if (hour < 6) ambientClass = 'ambient-night';
+  else if (hour < 12) ambientClass = 'ambient-morning';
+  else if (hour < 17) ambientClass = 'ambient-day';
+  else if (hour < 21) ambientClass = 'ambient-evening';
+  else ambientClass = 'ambient-night';
+
+  document.body.className = ambientClass;
+}
+
 function updateCity(selected) {
   const city = cities[selected];
+
+  // Synthesize emotional temperature from multiple sources
+  const synthesizedMood = synthesizeEmotionalTemperature(city);
+
   document.getElementById('city-name').textContent = city.name;
-  document.getElementById('mood-score').textContent = city.mood.toFixed(1);
   document.getElementById('trip-city').textContent = city.name;
+
+  // Render the Living Barometer
+  renderBarometer(synthesizedMood, city.name);
   // dimensions
   const dimNames = t('dimensions');
   const grid = document.getElementById('dimensions-grid');
@@ -364,14 +455,14 @@ function updateCity(selected) {
     badge.innerHTML = `<span>${dimNames[idx] || idx}</span> <strong>${val.toFixed(1)}</strong>`;
     grid.appendChild(badge);
   });
-  // Trip verdict
+  // Trip verdict using synthesized mood
   const verdictEl = document.getElementById('trip-verdict');
   const reasonEl = document.getElementById('trip-reason');
-  if (city.mood >= 7.8) {
+  if (synthesizedMood >= 7.8) {
     verdictEl.textContent = 'GO';
     verdictEl.className = 'verdict verdict-go';
     reasonEl.textContent = t('trip_go_reason');
-  } else if (city.mood >= 6.5) {
+  } else if (synthesizedMood >= 6.5) {
     verdictEl.textContent = 'MAYBE';
     verdictEl.className = 'verdict verdict-maybe';
     reasonEl.textContent = t('trip_maybe_reason');
@@ -403,13 +494,27 @@ document.addEventListener('DOMContentLoaded', () => {
   resizeCanvas();
   drawPulse();
   updateCity('nyc');
+  updateAmbientLighting();
+
+  // Update ambient lighting periodically (every hour)
+  setInterval(updateAmbientLighting, 3600000);
+
   document.getElementById('city-select').addEventListener('change', (e) => updateCity(e.target.value));
   loadStars();
 
-  // Mood check-in buttons
+  // Mood check-in buttons with pulse animation
   document.querySelectorAll('.mood-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       addStars(10);
+
+      // Trigger soft pulse animation on barometer
+      const chamber = document.getElementById('barometer-chamber');
+      if (chamber) {
+        chamber.classList.remove('pulse');
+        void chamber.offsetWidth; // Trigger reflow
+        chamber.classList.add('pulse');
+      }
+
       alert(`${t('stars')} +10!`);
     });
   });
