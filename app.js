@@ -101,7 +101,9 @@ const translations = {
     signal_geo_breadth_many: "Geographic breadth: {count} city lenses observed",
     signal_supporter_ready: "Supporter path: Observatory Circle ready",
     signal_supporter_progress: "Supporter path: Continue observing to unlock observatory circles",
-    signal_badge_archive: "Badge archive: {count} constellation titles claimed"
+    signal_badge_archive: "Badge archive: {count} constellation titles claimed",
+    constellation_moment_eyebrow: "Constellation Moment",
+    prototype_counter_notice: "Prototype note: observatory counts and badge thresholds are local to this device until a server-backed verification layer is introduced."
   },
   es: {
     install_title: "Añadir Glotemp a inicio",
@@ -200,7 +202,9 @@ const translations = {
     signal_geo_breadth_many: "Amplitud geográfica: {count} lentes de ciudad observadas",
     signal_supporter_ready: "Ruta de apoyo: Círculo del Observatorio listo",
     signal_supporter_progress: "Ruta de apoyo: sigue observando para desbloquear los círculos del observatorio",
-    signal_badge_archive: "Archivo de insignias: {count} títulos de constelación reclamados"
+    signal_badge_archive: "Archivo de insignias: {count} títulos de constelación reclamados",
+    constellation_moment_eyebrow: "Momento de constelación",
+    prototype_counter_notice: "Nota del prototipo: los recuentos del observatorio y los hitos de insignias son locales a este dispositivo hasta que exista verificación en servidor."
   },
   fr: {
     install_title: "Ajouter Glotemp à l'écran d'accueil",
@@ -299,7 +303,9 @@ const translations = {
     signal_geo_breadth_many: "Amplitude géographique : {count} regards urbains observés",
     signal_supporter_ready: "Parcours soutien : Cercle de l'Observatoire prêt",
     signal_supporter_progress: "Parcours soutien : poursuivez pour débloquer les cercles de l'observatoire",
-    signal_badge_archive: "Archive d'insignes : {count} titres de constellation réclamés"
+    signal_badge_archive: "Archive d'insignes : {count} titres de constellation réclamés",
+    constellation_moment_eyebrow: "Moment Constellation",
+    prototype_counter_notice: "Note prototype : les comptages et paliers d'insignes restent locaux à cet appareil jusqu'à l'arrivée d'une vérification serveur."
   },
   de: {
     install_title: "Glotemp zum Startbildschirm hinzufügen",
@@ -398,7 +404,9 @@ const translations = {
     signal_geo_breadth_many: "Geografische Breite: {count} Stadtlinsen beobachtet",
     signal_supporter_ready: "Unterstützerpfad: Observatoriumskreis bereit",
     signal_supporter_progress: "Unterstützerpfad: Weiter beobachten, um Observatoriumskreise freizuschalten",
-    signal_badge_archive: "Abzeichenarchiv: {count} Konstellationstitel beansprucht"
+    signal_badge_archive: "Abzeichenarchiv: {count} Konstellationstitel beansprucht",
+    constellation_moment_eyebrow: "Konstellationsmoment",
+    prototype_counter_notice: "Prototyp-Hinweis: Observatoriumszähler und Abzeichen-Schwellen gelten lokal auf diesem Gerät, bis eine serverseitige Verifizierung ergänzt wird."
   },
   pt: {
     install_title: "Adicionar Glotemp à tela inicial",
@@ -497,7 +505,9 @@ const translations = {
     signal_geo_breadth_many: "Amplitude geográfica: {count} lentes urbanas observadas",
     signal_supporter_ready: "Caminho de apoio: Círculo do Observatório pronto",
     signal_supporter_progress: "Caminho de apoio: continue a observar para desbloquear os círculos do observatório",
-    signal_badge_archive: "Arquivo de insígnias: {count} títulos de constelação reivindicados"
+    signal_badge_archive: "Arquivo de insígnias: {count} títulos de constelação reivindicados",
+    constellation_moment_eyebrow: "Momento de Constelação",
+    prototype_counter_notice: "Nota do protótipo: as contagens do observatório e os marcos de insígnias são locais neste dispositivo até existir verificação no servidor."
   },
   ja: {
     install_title: "Glotempをホーム画面に追加",
@@ -596,7 +606,9 @@ const translations = {
     signal_geo_breadth_many: "地理的広がり: {count}都市レンズを観測",
     signal_supporter_ready: "支援経路: 観測所サークルの準備完了",
     signal_supporter_progress: "支援経路: 観測を続けて観測所サークルを解放",
-    signal_badge_archive: "バッジ記録: {count}件の星座称号を取得"
+    signal_badge_archive: "バッジ記録: {count}件の星座称号を取得",
+    constellation_moment_eyebrow: "コンステレーション・モーメント",
+    prototype_counter_notice: "プロトタイプ注記: 観測数とバッジ到達条件は、サーバー検証層が導入されるまでこの端末内だけで管理されます。"
   }
 };
 
@@ -741,11 +753,7 @@ function chooseMilestone(count) {
 
 function maybeTrackHumanVisit() {
   const assessment = assessHumanVisitor();
-  const movementBonus = window.scrollY > 0 ? 1 : 0;
-  if (movementBonus) {
-    assessment.score += 1;
-    observatoryState.humanConfidence = assessment.score;
-  }
+  observatoryState.humanConfidence = assessment.score;
   const pill = document.getElementById('human-signal-pill');
   if (pill) {
     pill.textContent = assessment.human ? t('human_signal_verified') : t('automated_traffic_excluded');
@@ -784,9 +792,10 @@ function ensureModal() {
   modal.innerHTML = `
     <div class="constellation-dialog glass-card">
       <button id="constellation-close" class="btn-text constellation-close" aria-label="Close">×</button>
-      <p class="eyebrow">Constellation Moment</p>
+      <p class="eyebrow">${t('constellation_moment_eyebrow')}</p>
       <h2 id="constellation-title"></h2>
       <p id="constellation-copy" class="section-copy"></p>
+      <p id="prototype-counter-note" class="small-print section-copy"></p>
       <canvas id="badge-canvas" width="1400" height="1800" aria-label="Generated constellation badge"></canvas>
       <div class="badge-actions">
         <button id="download-badge" class="btn-neon" type="button"></button>
@@ -922,6 +931,7 @@ function openConstellationMoment(milestone) {
   const badge = buildBadgeData(milestone);
   title.textContent = t('observatory_moment_title');
   copy.textContent = t('observatory_moment_subtitle').replace('{milestone}', milestone.toLocaleString()) + ' ' + badge.line;
+  document.getElementById('prototype-counter-note').textContent = t('prototype_counter_notice');
   document.getElementById('download-badge').textContent = t('badge_download');
   document.getElementById('share-badge').textContent = t('badge_share');
   document.getElementById('badge-feedback').textContent = t('observation_claim_prompt');
@@ -949,7 +959,11 @@ async function shareBadge() {
     try {
       await navigator.share({ title: 'Glotemp Observatory', text, url: window.location.href + '#constellation-wall' });
       return;
-    } catch (error) {}
+    } catch (error) {
+      if (error?.name && error.name !== 'AbortError') {
+        console.warn('Share failed, falling back to clipboard.', error);
+      }
+    }
   }
   try {
     await navigator.clipboard.writeText(text);
@@ -1049,12 +1063,13 @@ function renderSignalPanels() {
 
 function recordObservation(event) {
   event.preventDefault();
-  const selectedMood = document.querySelector('.mood-btn.active')?.dataset.label || 'Neutral';
-  if (!document.querySelector('.mood-btn.active')) {
+  const activeMood = document.querySelector('.mood-btn.active');
+  if (!activeMood) {
     document.getElementById('observation-feedback').textContent = t('select_mood_first');
     return;
   }
   const note = document.getElementById('context-note').value.trim();
+  const selectedMood = activeMood.dataset.label;
   const observation = {
     mood: selectedMood,
     intensity: Number(document.getElementById('intensity-range').value),
