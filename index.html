@@ -116,19 +116,133 @@
       </div>
     </section>    <!-- Check-in & Contributor Economy -->
     <section class="check-in glass-card">
-      <h2 data-i18n="checkin_title">Share the pulse</h2>
-      <div class="mood-buttons">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow" data-i18n="checkin_eyebrow">Observation intake</p>
+          <h2 data-i18n="checkin_title">Share the pulse</h2>
+        </div>
+        <p class="section-copy" data-i18n="checkin_intro">Offer a quiet signal from where you stand. Richer observations deepen the atlas while keeping the ritual gentle.</p>
+      </div>
+      <div class="mood-buttons" role="group" aria-label="Mood choices">
         <button class="mood-btn" data-mood="▲" data-label="Energized" title="Energized">▲</button>
         <button class="mood-btn" data-mood="◆" data-label="Good" title="Good">◆</button>
         <button class="mood-btn" data-mood="●" data-label="Neutral" title="Neutral">●</button>
         <button class="mood-btn" data-mood="▼" data-label="Low" title="Low">▼</button>
         <button class="mood-btn" data-mood="◇" data-label="Cautious" title="Cautious">◇</button>
       </div>
-      <div class="stars-display">
-        <span data-i18n="stars">Stars</span>: <span id="stars-count">0</span>
-        <span class="rank" id="user-rank">Explorer</span>
+      <form id="observation-form" class="observation-form">
+        <div class="form-grid">
+          <label>
+            <span data-i18n="intensity_label">Intensity</span>
+            <input id="intensity-range" type="range" min="10" max="100" step="5" value="65" />
+            <strong id="intensity-value">65</strong>
+          </label>
+          <label>
+            <span data-i18n="scene_label">Scene</span>
+            <select id="scene-select">
+              <option value="street" data-i18n="scene_street">Street</option>
+              <option value="work" data-i18n="scene_work">Work</option>
+              <option value="campus" data-i18n="scene_campus">Campus</option>
+              <option value="cafe" data-i18n="scene_cafe">Café</option>
+              <option value="nightlife" data-i18n="scene_nightlife">Nightlife</option>
+              <option value="transit" data-i18n="scene_transit">Transit</option>
+              <option value="home" data-i18n="scene_home">Home</option>
+            </select>
+          </label>
+          <label>
+            <span data-i18n="language_label">Language lens</span>
+            <select id="language-lens">
+              <option value="global">Global</option>
+              <option value="local">Local</option>
+              <option value="diaspora">Diaspora</option>
+              <option value="visitor">Visitor</option>
+            </select>
+          </label>
+          <label>
+            <span data-i18n="cadence_label">Contribution cadence</span>
+            <select id="cadence-select">
+              <option value="first-light">First light</option>
+              <option value="midday">Midday</option>
+              <option value="twilight">Twilight</option>
+              <option value="late-hours">Late hours</option>
+            </select>
+          </label>
+        </div>
+        <label class="full-width">
+          <span data-i18n="context_label">Optional local note</span>
+          <textarea id="context-note" rows="3" maxlength="240" data-i18n-placeholder="context_placeholder" placeholder="A small observation, event note, or mood context."></textarea>
+        </label>
+        <div class="form-actions">
+          <button id="record-observation" type="submit" class="btn-neon" data-i18n="record_observation">Record observation</button>
+          <p id="observation-feedback" class="inline-feedback" aria-live="polite"></p>
+        </div>
+      </form>
+      <div class="stars-display observatory-status">
+        <div>
+          <span data-i18n="stars">Stars</span>: <span id="stars-count">0</span>
+          <span class="rank" id="user-rank">Explorer</span>
+        </div>
+        <div class="human-signal-pill" id="human-signal-pill" data-i18n="human_signal_verified">Human signal verified</div>
       </div>
-      <p class="share-note" data-i18n="stars_share">Those who contribute most share in the city's reward.</p>
+      <div class="contribution-panels">
+        <article class="mini-panel glass-card">
+          <h3 data-i18n="contribution_quality_title">Quality of signal</h3>
+          <p data-i18n="contribution_quality_copy">Subtle context, repeat observations, and cross-language notes increase the scientific value of each entry.</p>
+          <ul id="quality-indicators" class="signal-list"></ul>
+        </article>
+        <article class="mini-panel glass-card">
+          <h3 data-i18n="return_title">Return pathway</h3>
+          <p data-i18n="return_copy">Repeated, geographically diverse observations gradually unlock supporter recognition, deeper archives, and curated invitations.</p>
+          <ul id="cadence-indicators" class="signal-list"></ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="observatory-systems glass-card">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow" data-i18n="systems_eyebrow">Observatory systems</p>
+          <h2 data-i18n="systems_title">Global participation, value, and patronage</h2>
+        </div>
+        <p class="section-copy" data-i18n="systems_intro">Designed as a private instrument: respectful onboarding, richer emotional climate signals, and revenue paths that preserve trust.</p>
+      </div>
+      <div class="systems-grid">
+        <article class="system-card glass-card">
+          <h3 data-i18n="system_global_title">Worldwide resonance</h3>
+          <p data-i18n="system_global_copy">Language-sensitive prompts, cultural scenes, and local contribution rhythms make participation feel native from Lagos to Tokyo.</p>
+        </article>
+        <article class="system-card glass-card">
+          <h3 data-i18n="system_data_title">Ethical climate data</h3>
+          <p data-i18n="system_data_copy">Prepare anonymised research feeds, city climate reports, and institutional node partnerships with explicit guardrails and consent language.</p>
+        </article>
+        <article class="system-card glass-card">
+          <h3 data-i18n="system_membership_title">Supporter patronage</h3>
+          <p data-i18n="system_membership_copy">Quiet supporter tiers, observatory circles, and archival access reward care without turning the product into a game.</p>
+        </article>
+      </div>
+      <div class="products-grid">
+        <article class="product-card">
+          <p class="eyebrow" data-i18n="data_products_eyebrow">Data products</p>
+          <h3 data-i18n="data_products_title">Prepared revenue architecture</h3>
+          <ul class="signal-list" id="product-list"></ul>
+        </article>
+        <article class="product-card">
+          <p class="eyebrow" data-i18n="geo_eyebrow">Geographic depth</p>
+          <h3 data-i18n="geo_title">Participation incentives by region</h3>
+          <ul class="signal-list" id="region-list"></ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="constellation-wall" class="glass-card constellation-wall">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow" data-i18n="wall_eyebrow">Constellation wall</p>
+          <h2 data-i18n="wall_title">Selected observations from the observatory</h2>
+        </div>
+        <p class="section-copy" data-i18n="wall_intro">A curated wall of badge holders whose notes illuminate how cities felt in specific moments.</p>
+      </div>
+      <div id="constellation-wall-grid" class="wall-grid"></div>
     </section>
 
     <footer class="footer glass">
