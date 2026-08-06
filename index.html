@@ -267,15 +267,11 @@
   <script src="tempo-economy.js" defer></script>
   <script src="cookie-consent.js" defer></script>
   <script defer>
-    // Update affiliate links when city changes
     function updateAffiliateLinks(cityName) {
       const encodedCity = encodeURIComponent(cityName);
-      // Booking.com link with encoded city
       document.getElementById('book-hotel-btn').href = `https://booking.com/searchresults?ss=${encodedCity}`;
-      // Skyscanner link with URL-encoded city name for safety
       const skycannerCity = encodeURIComponent(cityName.replace(/\s+/g, ''));
       document.getElementById('find-flights-btn').href = `https://www.skyscanner.com/transport/flights/${skycannerCity}/`;
-      // Travel insurance - also update with city context
       document.getElementById('travel-insurance-btn').href = `https://www.insuremytrip.com/search?location=${encodedCity}`;
     }
   </script>

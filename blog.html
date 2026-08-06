@@ -40,16 +40,16 @@
     </nav>
 
     <main class="blog-main" style="max-width:1200px; margin:0 auto; padding:2rem 1rem;">
-      <div class="blog-header glass-card" style="padding:1.5rem; margin-bottom:2rem;">
+      <div class="blog-header glass-card">
         <h1 data-i18n="blog_title">City Stories</h1>
-        <input type="text" id="blog-search" class="city-dropdown" style="width:100%; margin-top:1rem; padding:0.8rem; border-radius:40px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); color:white; font-size:1rem;" data-i18n-placeholder="search_placeholder" placeholder="Search city...">
+        <input type="text" id="blog-search" class="city-dropdown blog-search-input" data-i18n-placeholder="search_placeholder" placeholder="Search city...">
       </div>
 
       <div id="blog-posts-grid" class="blog-grid">
         <!-- Cards injected here -->
       </div>
-      <div id="blog-empty" class="glass-card" style="display:none; padding:3rem; text-align:center;">
-        <p style="font-size:3rem;">📝</p>
+      <div id="blog-empty" class="blog-status">
+        <p class="blog-status-emoji">📝</p>
         <p data-i18n="no_stories">No stories found. Check back soon!</p>
       </div>
     </main>
@@ -170,13 +170,13 @@ function loadPosts() {
           <p class="blog-excerpt">${(post.excerpt || post.content || '').substring(0, 200)}</p>
           <div class="blog-date">${new Date(post.date).toLocaleDateString(currentLang, { year:'numeric', month:'long', day:'numeric' })}</div>
           <button class="btn-neon blog-read-btn">${t('read_full')}</button>
-          <div class="blog-full-content" style="display:none; margin-top:1rem;">
+          <div class="blog-full-content">
             <p>${post.content}</p>
             <div class="blog-toggles">
               <button class="btn-text trivia-toggle">${t('trivia')}</button>
-              <div class="trivia-content" style="display:none; white-space:pre-line;">${post.trivia || ''}</div>
+              <div class="trivia-content" style="white-space:pre-line;">${post.trivia || ''}</div>
               <button class="btn-text history-toggle">${t('history')}</button>
-              <div class="history-content" style="display:none; white-space:pre-line;">${post.history_nugget || ''}</div>
+              <div class="history-content" style="white-space:pre-line;">${post.history_nugget || ''}</div>
             </div>
             <div class="comment-section" data-city="${post.city_slug || post.city.toLowerCase()}"></div>
           </div>
@@ -234,24 +234,23 @@ function loadPosts() {
       location.reload(); // quick refresh for demo; later you can make it dynamic
     });
 
-    // Comment section initialization
     function initCommentSection(container) {
       const citySlug = container.dataset.city;
       container.innerHTML = `
-        <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid rgba(255,255,255,0.1);">
-          <h4 style="margin-bottom:1rem;">💬 City Pulse Comments</h4>
+        <div class="comment-section">
+          <h4>💬 City Pulse Comments</h4>
           <div class="comment-input-wrap">
-            <textarea class="comment-input" placeholder="Share the vibe (max 280 chars)..." maxlength="280" style="resize:none;"></textarea>
+            <textarea class="comment-input" placeholder="Share the vibe (max 280 chars)..." maxlength="280"></textarea>
             <div class="mood-picker">
-              <button class="mood-emoji" data-mood="🔥" title="Energized" style="font-size:1.5rem; padding:0.5rem; margin-right:0.5rem;">🔥</button>
-              <button class="mood-emoji" data-mood="😊" title="Good" style="font-size:1.5rem; padding:0.5rem; margin-right:0.5rem;">😊</button>
-              <button class="mood-emoji" data-mood="😐" title="Neutral" style="font-size:1.5rem; padding:0.5rem; margin-right:0.5rem;">😐</button>
-              <button class="mood-emoji" data-mood="😞" title="Low" style="font-size:1.5rem; padding:0.5rem; margin-right:0.5rem;">😞</button>
-              <button class="mood-emoji" data-mood="😡" title="Cautious" style="font-size:1.5rem; padding:0.5rem;">😡</button>
+              <button class="mood-emoji" data-mood="🔥" title="Energized">🔥</button>
+              <button class="mood-emoji" data-mood="😊" title="Good">😊</button>
+              <button class="mood-emoji" data-mood="😐" title="Neutral">😐</button>
+              <button class="mood-emoji" data-mood="😞" title="Low">😞</button>
+              <button class="mood-emoji" data-mood="😡" title="Cautious">😡</button>
             </div>
-            <button class="btn-neon comment-submit" style="width:100%; margin-top:0.5rem;">Post Comment</button>
+            <button class="btn-neon comment-submit">Post Comment</button>
           </div>
-          <div class="comment-list" style="margin-top:1.5rem; max-height:400px; overflow-y:auto;"></div>
+          <div class="comment-list"></div>
         </div>
       `;
 
@@ -302,8 +301,7 @@ function loadPosts() {
         container.innerHTML = '';
         if (comments.length === 0) {
           const emptyMsg = document.createElement('p');
-          emptyMsg.style.color = 'var(--text-secondary)';
-          emptyMsg.style.textAlign = 'center';
+          emptyMsg.className = 'inline-feedback';
           emptyMsg.textContent = 'No comments yet. Be first to share!';
           container.appendChild(emptyMsg);
           return;
@@ -312,17 +310,31 @@ function loadPosts() {
           const time = new Date(comment.created_at).toLocaleString(currentLang, { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
           const item = document.createElement('div');
           item.className = 'comment-item';
-          item.innerHTML = `
-            <div style="display:flex; gap:0.5rem; align-items:flex-start;">
-              <div style="font-size:1.5rem; flex-shrink:0;">${comment.mood_emoji}</div>
-              <div style="flex:1; min-width:0;">
-                <p style="word-wrap:break-word; margin:0 0 0.25rem 0;"></p>
-                <small style="color:var(--text-tertiary);"></small>
-              </div>
-            </div>
-          `;
-          item.querySelector('p').textContent = comment.text;
-          item.querySelector('small').textContent = time;
+          const flexDiv = document.createElement('div');
+          flexDiv.style.display = 'flex';
+          flexDiv.style.gap = '0.5rem';
+          flexDiv.style.alignItems = 'flex-start';
+
+          const moodDiv = document.createElement('div');
+          moodDiv.style.fontSize = '1.5rem';
+          moodDiv.style.flexShrink = '0';
+          moodDiv.textContent = comment.mood_emoji;
+
+          const contentDiv = document.createElement('div');
+          contentDiv.style.flex = '1';
+          contentDiv.style.minWidth = '0';
+
+          const p = document.createElement('p');
+          p.textContent = comment.text;
+
+          const small = document.createElement('small');
+          small.textContent = time;
+
+          contentDiv.appendChild(p);
+          contentDiv.appendChild(small);
+          flexDiv.appendChild(moodDiv);
+          flexDiv.appendChild(contentDiv);
+          item.appendChild(flexDiv);
           container.appendChild(item);
         });
       });
