@@ -87,7 +87,10 @@ const translations = {
     observatory_moment_title: "A new constellation has formed.",
     observatory_moment_subtitle: "We have reached {milestone} observers. The sky has changed.",
     observatory_moment_claimed: "Badge claimed. Welcome to the wall.",
-    social_caption_prefix: "I claimed the {title} badge on @Glotemp — a quiet record of how cities feel in motion."
+    social_caption_prefix: "I claimed the {title} badge on @Glotemp — a quiet record of how cities feel in motion.",
+    share_copied: "Caption copied for sharing.",
+    automated_traffic_excluded: "Automated traffic excluded",
+    select_mood_first: "Select a mood first."
   },
   es: {
     install_title: "Añadir Glotemp a inicio",
@@ -123,7 +126,59 @@ const translations = {
     daily_story: "Pulso del Día",
     trivia: "Curiosidades",
     history: "Historia",
-    read_more: "Leer más"
+    read_more: "Leer más",
+    checkin_eyebrow: "Ingreso de observación",
+    checkin_intro: "Ofrece una señal discreta desde donde estás. Las observaciones más ricas profundizan el atlas sin romper el ritual.",
+    intensity_label: "Intensidad",
+    scene_label: "Escena",
+    language_label: "Lente lingüística",
+    cadence_label: "Cadencia de contribución",
+    context_label: "Nota local opcional",
+    context_placeholder: "Una observación breve, nota de evento o contexto emocional.",
+    record_observation: "Registrar observación",
+    human_signal_verified: "Señal humana verificada",
+    contribution_quality_title: "Calidad de la señal",
+    contribution_quality_copy: "El contexto sutil, la constancia y las notas multilingües aumentan el valor científico de cada entrada.",
+    return_title: "Ruta de retorno",
+    return_copy: "Las observaciones repetidas y diversas desbloquean reconocimiento, archivos más profundos e invitaciones curadas.",
+    systems_eyebrow: "Sistemas del observatorio",
+    systems_title: "Participación global, valor y patronazgo",
+    systems_intro: "Diseñado como un instrumento privado: incorporación respetuosa, señales más ricas y vías de ingresos que preservan la confianza.",
+    system_global_title: "Resonancia mundial",
+    system_global_copy: "Los avisos sensibles al idioma, las escenas culturales y los ritmos locales hacen que participar se sienta nativo.",
+    system_data_title: "Datos climáticos éticos",
+    system_data_copy: "Prepara flujos anónimos para investigación, informes urbanos y alianzas institucionales con límites claros.",
+    system_membership_title: "Patronazgo sereno",
+    system_membership_copy: "Los círculos de apoyo y el acceso al archivo recompensan el cuidado sin convertir el producto en un juego.",
+    data_products_eyebrow: "Productos de datos",
+    data_products_title: "Arquitectura de ingresos preparada",
+    geo_eyebrow: "Profundidad geográfica",
+    geo_title: "Incentivos de participación por región",
+    wall_eyebrow: "Muro de constelaciones",
+    wall_title: "Observaciones seleccionadas del observatorio",
+    wall_intro: "Un muro curado de portadores de insignias cuyas notas iluminan cómo se sentían las ciudades.",
+    share_note_upgraded: "Quienes aportan con cuidado ayudan a que el atlas sea más preciso y confiable.",
+    observation_saved: "Observación registrada.",
+    observation_claim_prompt: "Tu insignia de constelación está lista para reclamarse.",
+    badge_claim_cta: "Reclamar insignia",
+    badge_download: "Descargar insignia",
+    badge_share: "Compartir con discreción",
+    badge_note_label: "Nota pública",
+    badge_note_placeholder: "Una breve línea para el muro, si lo deseas.",
+    badge_email_label: "Correo electrónico",
+    badge_name_label: "Nombre visible",
+    badge_social_label: "O continúa con",
+    badge_story_invite: "¿Quieres que el observatorio considere esta nota para el Muro de Constelaciones?",
+    premium_title: "Círculos del observatorio",
+    premium_copy: "Los niveles de apoyo desbloquean archivos, informes anticipados, insignias privadas e invitaciones.",
+    wall_empty: "El muro espera su próxima historia silenciosa.",
+    observatory_moment_title: "Se ha formado una nueva constelación.",
+    observatory_moment_subtitle: "Hemos alcanzado {milestone} observadores. El cielo ha cambiado.",
+    observatory_moment_claimed: "Insignia reclamada. Bienvenido al muro.",
+    social_caption_prefix: "Reclamé la insignia {title} en @Glotemp: un registro sereno de cómo se sienten las ciudades en movimiento.",
+    share_copied: "Texto copiado para compartir.",
+    automated_traffic_excluded: "Tráfico automatizado excluido",
+    select_mood_first: "Selecciona un estado de ánimo primero."
   },
   fr: {
     install_title: "Ajouter Glotemp à l'écran d'accueil",
@@ -159,7 +214,59 @@ const translations = {
     daily_story: "Pouls du Jour",
     trivia: "Anecdotes",
     history: "Histoire",
-    read_more: "En savoir plus"
+    read_more: "En savoir plus",
+    checkin_eyebrow: "Prise d'observation",
+    checkin_intro: "Offrez un signal discret depuis votre position. Des observations plus riches approfondissent l'atlas sans rompre le rituel.",
+    intensity_label: "Intensité",
+    scene_label: "Scène",
+    language_label: "Perspective linguistique",
+    cadence_label: "Cadence de contribution",
+    context_label: "Note locale facultative",
+    context_placeholder: "Une brève observation, une note d'événement ou un contexte émotionnel.",
+    record_observation: "Enregistrer l'observation",
+    human_signal_verified: "Signal humain vérifié",
+    contribution_quality_title: "Qualité du signal",
+    contribution_quality_copy: "Le contexte subtil, la régularité et les notes multilingues augmentent la valeur scientifique de chaque entrée.",
+    return_title: "Parcours de retour",
+    return_copy: "Les observations répétées et diversifiées débloquent reconnaissance, archives approfondies et invitations choisies.",
+    systems_eyebrow: "Systèmes de l'observatoire",
+    systems_title: "Participation mondiale, valeur et mécénat",
+    systems_intro: "Conçu comme un instrument privé : intégration respectueuse, signaux plus riches et revenus qui préservent la confiance.",
+    system_global_title: "Résonance mondiale",
+    system_global_copy: "Les invites sensibles à la langue, les scènes culturelles et les rythmes locaux rendent la participation naturelle.",
+    system_data_title: "Données climatiques éthiques",
+    system_data_copy: "Préparez des flux anonymisés pour la recherche, des rapports urbains et des partenariats institutionnels avec des garde-fous clairs.",
+    system_membership_title: "Mécénat discret",
+    system_membership_copy: "Les cercles de soutien et l'accès aux archives récompensent l'attention sans gamifier l'expérience.",
+    data_products_eyebrow: "Produits de données",
+    data_products_title: "Architecture de revenus préparée",
+    geo_eyebrow: "Profondeur géographique",
+    geo_title: "Incitations par région",
+    wall_eyebrow: "Mur des constellations",
+    wall_title: "Observations choisies de l'observatoire",
+    wall_intro: "Un mur raffiné de porteurs d'insignes dont les notes éclairent l'humeur des villes.",
+    share_note_upgraded: "Les contributions attentives rendent l'atlas plus précis et digne de confiance.",
+    observation_saved: "Observation enregistrée.",
+    observation_claim_prompt: "Votre insigne de constellation est prêt à être réclamé.",
+    badge_claim_cta: "Réclamer l'insigne",
+    badge_download: "Télécharger l'insigne",
+    badge_share: "Partager discrètement",
+    badge_note_label: "Note publique",
+    badge_note_placeholder: "Une courte phrase pour le mur, si vous le souhaitez.",
+    badge_email_label: "E-mail",
+    badge_name_label: "Nom affiché",
+    badge_social_label: "Ou continuer avec",
+    badge_story_invite: "Souhaitez-vous que l'observatoire étudie cette note pour le Mur des Constellations ?",
+    premium_title: "Cercles de l'observatoire",
+    premium_copy: "Les niveaux de soutien ouvrent les archives, les briefings anticipés, les insignes privés et les invitations.",
+    wall_empty: "Le mur attend sa prochaine histoire silencieuse.",
+    observatory_moment_title: "Une nouvelle constellation s'est formée.",
+    observatory_moment_subtitle: "Nous avons atteint {milestone} observateurs. Le ciel a changé.",
+    observatory_moment_claimed: "Insigne réclamé. Bienvenue sur le mur.",
+    social_caption_prefix: "J'ai réclamé l'insigne {title} sur @Glotemp — un relevé discret de la manière dont les villes se sentent en mouvement.",
+    share_copied: "Texte copié pour le partage.",
+    automated_traffic_excluded: "Trafic automatisé exclu",
+    select_mood_first: "Sélectionnez d'abord une humeur."
   },
   de: {
     install_title: "Glotemp zum Startbildschirm hinzufügen",
@@ -195,7 +302,59 @@ const translations = {
     daily_story: "Täglicher Puls",
     trivia: "Wissenswertes",
     history: "Geschichte",
-    read_more: "Mehr lesen"
+    read_more: "Mehr lesen",
+    checkin_eyebrow: "Beobachtungseingang",
+    checkin_intro: "Sende ein leises Signal von deinem Standort. Reichere Beobachtungen vertiefen den Atlas, ohne das Ritual zu stören.",
+    intensity_label: "Intensität",
+    scene_label: "Szene",
+    language_label: "Sprachperspektive",
+    cadence_label: "Beitragsrhythmus",
+    context_label: "Optionale lokale Notiz",
+    context_placeholder: "Eine kurze Beobachtung, Ereignisnotiz oder Stimmungskontext.",
+    record_observation: "Beobachtung speichern",
+    human_signal_verified: "Menschliches Signal verifiziert",
+    contribution_quality_title: "Signalqualität",
+    contribution_quality_copy: "Subtiler Kontext, Wiederholung und mehrsprachige Notizen erhöhen den wissenschaftlichen Wert jeder Eingabe.",
+    return_title: "Rückkehrpfad",
+    return_copy: "Wiederholte und geografisch vielfältige Beobachtungen eröffnen Anerkennung, tiefere Archive und kuratierte Einladungen.",
+    systems_eyebrow: "Observatoriumssysteme",
+    systems_title: "Globale Teilnahme, Wert und Patronage",
+    systems_intro: "Wie ein privates Instrument gestaltet: respektvolle Teilnahme, reichere Signale und Erlöswege, die Vertrauen bewahren.",
+    system_global_title: "Weltweite Resonanz",
+    system_global_copy: "Sprachsensible Hinweise, kulturelle Szenen und lokale Rhythmen lassen Teilnahme überall natürlich wirken.",
+    system_data_title: "Ethische Klimadaten",
+    system_data_copy: "Anonymisierte Forschungsfeeds, Stadtberichte und institutionelle Partnerschaften mit klaren Leitplanken vorbereiten.",
+    system_membership_title: "Stille Patronage",
+    system_membership_copy: "Unterstützerkreise und Archivzugang belohnen Sorgfalt, ohne das Produkt zu gamifizieren.",
+    data_products_eyebrow: "Datenprodukte",
+    data_products_title: "Vorbereitete Erlösarchitektur",
+    geo_eyebrow: "Geografische Tiefe",
+    geo_title: "Teilnahmeanreize nach Region",
+    wall_eyebrow: "Konstellationswand",
+    wall_title: "Ausgewählte Beobachtungen des Observatoriums",
+    wall_intro: "Eine kuratierte Wand von Abzeichen-Trägern, deren Notizen zeigen, wie sich Städte anfühlten.",
+    share_note_upgraded: "Wer sorgfältig beiträgt, macht den Atlas präziser und vertrauenswürdiger.",
+    observation_saved: "Beobachtung gespeichert.",
+    observation_claim_prompt: "Dein Konstellationsabzeichen ist bereit zur Beanspruchung.",
+    badge_claim_cta: "Abzeichen beanspruchen",
+    badge_download: "Abzeichen herunterladen",
+    badge_share: "Still teilen",
+    badge_note_label: "Öffentliche Notiz",
+    badge_note_placeholder: "Eine kurze Zeile für die Wand, falls du möchtest.",
+    badge_email_label: "E-Mail",
+    badge_name_label: "Anzeigename",
+    badge_social_label: "Oder fortfahren mit",
+    badge_story_invite: "Soll das Observatorium diese Notiz für die Konstellationswand prüfen?",
+    premium_title: "Observatoriumskreise",
+    premium_copy: "Unterstützerstufen öffnen Archive, Frühbriefings, private Abzeichen und Einladungen.",
+    wall_empty: "Die Wand wartet auf ihre nächste stille Geschichte.",
+    observatory_moment_title: "Eine neue Konstellation hat sich gebildet.",
+    observatory_moment_subtitle: "Wir haben {milestone} Beobachter erreicht. Der Himmel hat sich verändert.",
+    observatory_moment_claimed: "Abzeichen beansprucht. Willkommen an der Wand.",
+    social_caption_prefix: "Ich habe das Abzeichen {title} auf @Glotemp beansprucht — ein leiser Nachweis dafür, wie sich Städte in Bewegung anfühlen.",
+    share_copied: "Text zum Teilen kopiert.",
+    automated_traffic_excluded: "Automatisierter Traffic ausgeschlossen",
+    select_mood_first: "Bitte zuerst eine Stimmung wählen."
   },
   pt: {
     install_title: "Adicionar Glotemp à tela inicial",
@@ -231,7 +390,59 @@ const translations = {
     daily_story: "Pulso do Dia",
     trivia: "Curiosidades",
     history: "História",
-    read_more: "Ler mais"
+    read_more: "Ler mais",
+    checkin_eyebrow: "Entrada de observação",
+    checkin_intro: "Ofereça um sinal discreto de onde você está. Observações mais ricas aprofundam o atlas sem quebrar o ritual.",
+    intensity_label: "Intensidade",
+    scene_label: "Cena",
+    language_label: "Lente linguística",
+    cadence_label: "Cadência de contribuição",
+    context_label: "Nota local opcional",
+    context_placeholder: "Uma breve observação, nota de evento ou contexto emocional.",
+    record_observation: "Registrar observação",
+    human_signal_verified: "Sinal humano verificado",
+    contribution_quality_title: "Qualidade do sinal",
+    contribution_quality_copy: "Contexto sutil, constância e notas multilíngues aumentam o valor científico de cada entrada.",
+    return_title: "Caminho de retorno",
+    return_copy: "Observações repetidas e geograficamente diversas desbloqueiam reconhecimento, arquivos mais profundos e convites curados.",
+    systems_eyebrow: "Sistemas do observatório",
+    systems_title: "Participação global, valor e patronato",
+    systems_intro: "Projetado como um instrumento privado: entrada respeitosa, sinais mais ricos e receitas que preservam a confiança.",
+    system_global_title: "Ressonância mundial",
+    system_global_copy: "Prompts sensíveis ao idioma, cenas culturais e ritmos locais fazem a participação parecer nativa.",
+    system_data_title: "Dados climáticos éticos",
+    system_data_copy: "Prepare fluxos anónimos para pesquisa, relatórios urbanos e parcerias institucionais com salvaguardas claras.",
+    system_membership_title: "Patronato discreto",
+    system_membership_copy: "Círculos de apoio e acesso ao arquivo recompensam o cuidado sem gamificar o produto.",
+    data_products_eyebrow: "Produtos de dados",
+    data_products_title: "Arquitetura de receita preparada",
+    geo_eyebrow: "Profundidade geográfica",
+    geo_title: "Incentivos por região",
+    wall_eyebrow: "Mural de constelações",
+    wall_title: "Observações selecionadas do observatório",
+    wall_intro: "Um mural curado de portadores de insígnias cujas notas iluminam como as cidades se sentiam.",
+    share_note_upgraded: "Quem contribui com cuidado ajuda o atlas a tornar-se mais preciso e confiável.",
+    observation_saved: "Observação registrada.",
+    observation_claim_prompt: "Sua insígnia de constelação está pronta para ser reivindicada.",
+    badge_claim_cta: "Reivindicar insígnia",
+    badge_download: "Baixar insígnia",
+    badge_share: "Compartilhar discretamente",
+    badge_note_label: "Nota pública",
+    badge_note_placeholder: "Uma linha breve para o mural, se desejar.",
+    badge_email_label: "E-mail",
+    badge_name_label: "Nome de exibição",
+    badge_social_label: "Ou continue com",
+    badge_story_invite: "Deseja que o observatório considere esta nota para o Mural de Constelações?",
+    premium_title: "Círculos do observatório",
+    premium_copy: "Níveis de apoio desbloqueiam arquivos, briefings antecipados, insígnias privadas e convites.",
+    wall_empty: "O mural aguarda sua próxima história silenciosa.",
+    observatory_moment_title: "Uma nova constelação se formou.",
+    observatory_moment_subtitle: "Alcançámos {milestone} observadores. O céu mudou.",
+    observatory_moment_claimed: "Insígnia reivindicada. Bem-vindo ao mural.",
+    social_caption_prefix: "Reivindiquei a insígnia {title} no @Glotemp — um registo sereno de como as cidades se sentem em movimento.",
+    share_copied: "Texto copiado para partilha.",
+    automated_traffic_excluded: "Tráfego automatizado excluído",
+    select_mood_first: "Selecione primeiro um humor."
   },
   ja: {
     install_title: "Glotempをホーム画面に追加",
@@ -267,7 +478,59 @@ const translations = {
     daily_story: "デイリーパルス",
     trivia: "トリビア",
     history: "歴史",
-    read_more: "続きを読む"
+    read_more: "続きを読む",
+    checkin_eyebrow: "観測入力",
+    checkin_intro: "今いる場所から静かなシグナルを届けてください。より豊かな観測は儀式を壊さずにアトラスを深めます。",
+    intensity_label: "強度",
+    scene_label: "シーン",
+    language_label: "言語レンズ",
+    cadence_label: "投稿リズム",
+    context_label: "任意のローカルメモ",
+    context_placeholder: "短い観測、イベントメモ、または感情の背景。",
+    record_observation: "観測を記録",
+    human_signal_verified: "人間のシグナルを確認",
+    contribution_quality_title: "シグナルの質",
+    contribution_quality_copy: "繊細な文脈、継続性、多言語メモが各入力の科学的価値を高めます。",
+    return_title: "継続への道",
+    return_copy: "反復的で地理的に多様な観測は、認知、より深いアーカイブ、選ばれた招待につながります。",
+    systems_eyebrow: "観測所システム",
+    systems_title: "世界参加・価値・支援",
+    systems_intro: "信頼を守る私的な計器として設計。丁寧な参加導線、豊かなシグナル、倫理的な収益経路を備えます。",
+    system_global_title: "世界的な共鳴",
+    system_global_copy: "言語に配慮した案内、文化的シーン、地域リズムにより、どこでも自然に参加できます。",
+    system_data_title: "倫理的な気候データ",
+    system_data_copy: "匿名研究フィード、都市レポート、制度的ノード提携のための基盤を明確なガードレール付きで準備します。",
+    system_membership_title: "静かな支援",
+    system_membership_copy: "サポーターサークルとアーカイブアクセスは、製品をゲーム化せずに配慮を報います。",
+    data_products_eyebrow: "データプロダクト",
+    data_products_title: "準備された収益アーキテクチャ",
+    geo_eyebrow: "地理的な深度",
+    geo_title: "地域別の参加インセンティブ",
+    wall_eyebrow: "コンステレーション・ウォール",
+    wall_title: "観測所が選んだ観測記録",
+    wall_intro: "都市がどう感じられたかを照らす、バッジ保持者のノートを集めた洗練された壁です。",
+    share_note_upgraded: "丁寧な投稿は、アトラスをより正確で信頼できるものにします。",
+    observation_saved: "観測を記録しました。",
+    observation_claim_prompt: "あなたのコンステレーション・バッジを受け取れます。",
+    badge_claim_cta: "バッジを受け取る",
+    badge_download: "バッジをダウンロード",
+    badge_share: "静かに共有",
+    badge_note_label: "公開ノート",
+    badge_note_placeholder: "希望する場合は壁に添える短い一文。",
+    badge_email_label: "メール",
+    badge_name_label: "表示名",
+    badge_social_label: "または次で続行",
+    badge_story_invite: "このノートをコンステレーション・ウォール候補として観測所に送りますか？",
+    premium_title: "観測所サークル",
+    premium_copy: "支援レベルにより、アーカイブ、先行ブリーフィング、限定バッジ、招待が解放されます。",
+    wall_empty: "壁は次の静かな物語を待っています。",
+    observatory_moment_title: "新しい星座が生まれました。",
+    observatory_moment_subtitle: "{milestone}人の観測者に到達しました。空の形が変わりました。",
+    observatory_moment_claimed: "バッジを受け取りました。ウォールへようこそ。",
+    social_caption_prefix: "@Glotempで{title}バッジを受け取りました。都市が動きの中でどう感じられるかを静かに記録するしるしです。",
+    share_copied: "共有用の文面をコピーしました。",
+    automated_traffic_excluded: "自動トラフィックを除外しました",
+    select_mood_first: "先にムードを選んでください。"
   }
 };
 
@@ -290,11 +553,14 @@ function applyTranslations() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
     if (key === 'trip_question') {
-      // special handling because it contains <strong>
       el.innerHTML = t(key).replace('<strong></strong>', `<strong>${document.getElementById('trip-city')?.textContent || ''}</strong>`);
     } else {
       el.textContent = t(key);
     }
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    el.setAttribute('placeholder', t(key));
   });
 }
 
@@ -407,9 +673,15 @@ function chooseMilestone(count) {
 
 function maybeTrackHumanVisit() {
   const assessment = assessHumanVisitor();
+  const minute = new Date().getMinutes();
+  const movementBonus = (window.scrollY > 0 || minute % 2 === 0) ? 1 : 0;
+  if (movementBonus) {
+    assessment.score += 1;
+    observatoryState.humanConfidence = assessment.score;
+  }
   const pill = document.getElementById('human-signal-pill');
   if (pill) {
-    pill.textContent = assessment.human ? t('human_signal_verified') : 'Automated traffic excluded';
+    pill.textContent = assessment.human ? t('human_signal_verified') : t('automated_traffic_excluded');
     pill.classList.toggle('inactive', !assessment.human);
   }
 
@@ -613,7 +885,7 @@ async function shareBadge() {
     } catch (error) {}
   }
   await navigator.clipboard?.writeText(text);
-  document.getElementById('badge-feedback').textContent = 'Caption copied for sharing.';
+  document.getElementById('badge-feedback').textContent = t('share_copied');
 }
 
 function claimBadge(event) {
@@ -691,6 +963,10 @@ function renderSignalPanels() {
 function recordObservation(event) {
   event.preventDefault();
   const selectedMood = document.querySelector('.mood-btn.active')?.dataset.label || 'Neutral';
+  if (!document.querySelector('.mood-btn.active')) {
+    document.getElementById('observation-feedback').textContent = t('select_mood_first');
+    return;
+  }
   const note = document.getElementById('context-note').value.trim();
   const observation = {
     mood: selectedMood,
