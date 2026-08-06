@@ -212,12 +212,28 @@
         recentComments.forEach(comment => {
           const row = document.createElement('tr');
           const time = new Date(comment.created_at).toLocaleString();
-          row.innerHTML = `
-            <td>${comment.city_slug}</td>
-            <td>${comment.mood_emoji}</td>
-            <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">${comment.text}</td>
-            <td style="font-size: 0.8rem; color: var(--text-secondary);">${time}</td>
-          `;
+
+          const cityCell = document.createElement('td');
+          cityCell.textContent = comment.city_slug;
+
+          const moodCell = document.createElement('td');
+          moodCell.textContent = comment.mood_emoji;
+
+          const textCell = document.createElement('td');
+          textCell.style.maxWidth = '300px';
+          textCell.style.overflow = 'hidden';
+          textCell.style.textOverflow = 'ellipsis';
+          textCell.textContent = comment.text;
+
+          const timeCell = document.createElement('td');
+          timeCell.style.fontSize = '0.8rem';
+          timeCell.style.color = 'var(--text-secondary)';
+          timeCell.textContent = time;
+
+          row.appendChild(cityCell);
+          row.appendChild(moodCell);
+          row.appendChild(textCell);
+          row.appendChild(timeCell);
           recentCommentsBody.appendChild(row);
         });
 

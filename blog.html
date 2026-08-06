@@ -301,7 +301,11 @@ function loadPosts() {
       getComments(citySlug).then(comments => {
         container.innerHTML = '';
         if (comments.length === 0) {
-          container.innerHTML = '<p style="color:var(--text-secondary); text-align:center;">No comments yet. Be first to share!</p>';
+          const emptyMsg = document.createElement('p');
+          emptyMsg.style.color = 'var(--text-secondary)';
+          emptyMsg.style.textAlign = 'center';
+          emptyMsg.textContent = 'No comments yet. Be first to share!';
+          container.appendChild(emptyMsg);
           return;
         }
         comments.slice(0, 10).forEach(comment => {
@@ -319,6 +323,7 @@ function loadPosts() {
           `;
           item.querySelector('p').textContent = comment.text;
           item.querySelector('small').textContent = time;
+          container.appendChild(item);
         });
       });
     }

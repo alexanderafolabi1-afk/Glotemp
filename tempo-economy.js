@@ -21,7 +21,12 @@ const supabaseClient = {
     if (!response.ok) {
       throw new Error(`Supabase error: ${response.status}`);
     }
-    return response.json();
+    // Handle empty response bodies from write endpoints (204, empty 201s)
+    if (response.status === 204 || response.headers.get('content-length') === '0') {
+      return null;
+    }
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
   }
 };
 
@@ -29,7 +34,18 @@ const supabaseClient = {
 function getUserId() {
   let userId = localStorage.getItem('glotemp-user-id');
   if (!userId) {
-    userId = 'user_' + Math.random().toString(36).substr(2, 9);
+    // Use crypto.randomUUID() if available, with secure fallbacks
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      userId = crypto.randomUUID();
+    } else if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      // Fallback: use crypto.getRandomValues for better entropy
+      const arr = new Uint8Array(12);
+      crypto.getRandomValues(arr);
+      userId = Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
+    } else {
+      // Last resort: timestamp + random (better than pure random)
+      userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
     localStorage.setItem('glotemp-user-id', userId);
   }
   return userId;
@@ -59,13 +75,13 @@ async function submitComment(citySlug, text, moodEmoji) {
   const userId = getUserId();
 
   try {
-    // Insert comment
+    // Insert comment with stars_awarded set to 10
     const comment = await supabaseClient.request('POST', '/city_comments', {
       city_slug: citySlug,
       text,
       mood_emoji: moodEmoji,
       user_id: userId,
-      stars_awarded: 0
+      stars_awarded: 10
     });
 
     // Award 10 stars to reporter
@@ -193,11 +209,22 @@ function updateLocalStars() {
 // ===== ADMIN FUNCTIONS =====
 async function getAdminStats() {
   try {
-    const comments = await supabaseClient.request('GET', '/city_comments');
-    const reporters = await supabaseClient.request('GET', '/reporters');
+    // Fetch only top reporters for performance, use limit instead of full table
+    const reporters = await supabaseClient.request(
+      'GET',
+      '/reporters?order=total_stars.desc&limit=10'
+    );
 
-    const totalComments = comments.length;
+    // Calculate total stars from fetched reporters
     const totalStars = reporters.reduce((sum, r) => sum + r.total_stars, 0);
+
+    // Estimate comment count by fetching recent comments (limit 1000 for performance)
+    const recentComments = await supabaseClient.request(
+      'GET',
+      '/city_comments?limit=1000&select=id'
+    );
+    const totalComments = (recentComments && recentComments.length > 0) ?
+      Math.max(recentComments.length, 1000) : 0;
 
     return { totalComments, totalStars, reporters };
   } catch (error) {

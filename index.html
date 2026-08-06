@@ -96,9 +96,9 @@
       </div>
       <!-- Affiliate Links -->
       <div class="affiliate-links">
-        <a id="book-hotel-btn" href="https://booking.com/searchresults?ss=New%20York" target="_blank" class="affiliate-btn">🏨 <span data-i18n="book_hotel">Book a Hotel</span></a>
-        <a id="find-flights-btn" href="https://www.skyscanner.com/transport/flights/" target="_blank" class="affiliate-btn">✈️ <span data-i18n="find_flights">Find Flights</span></a>
-        <a id="travel-insurance-btn" href="https://www.insuremytrip.com/" target="_blank" class="affiliate-btn">🛡️ <span data-i18n="travel_insurance">Get Insurance</span></a>
+        <a id="book-hotel-btn" href="https://booking.com/searchresults?ss=New%20York" target="_blank" rel="noopener noreferrer" class="affiliate-btn">🏨 <span data-i18n="book_hotel">Book a Hotel</span></a>
+        <a id="find-flights-btn" href="https://www.skyscanner.com/transport/flights/" target="_blank" rel="noopener noreferrer" class="affiliate-btn">✈️ <span data-i18n="find_flights">Find Flights</span></a>
+        <a id="travel-insurance-btn" href="https://www.insuremytrip.com/" target="_blank" rel="noopener noreferrer" class="affiliate-btn">🛡️ <span data-i18n="travel_insurance">Get Insurance</span></a>
       </div>
     </section>
 <!-- Daily Story -->
@@ -270,8 +270,13 @@
     // Update affiliate links when city changes
     function updateAffiliateLinks(cityName) {
       const encodedCity = encodeURIComponent(cityName);
+      // Booking.com link with encoded city
       document.getElementById('book-hotel-btn').href = `https://booking.com/searchresults?ss=${encodedCity}`;
-      document.getElementById('find-flights-btn').href = `https://www.skyscanner.com/transport/flights/${cityName.replace(/\s+/g, '')}/`;
+      // Skyscanner link with URL-encoded city name for safety
+      const skycannerCity = encodeURIComponent(cityName.replace(/\s+/g, ''));
+      document.getElementById('find-flights-btn').href = `https://www.skyscanner.com/transport/flights/${skycannerCity}/`;
+      // Travel insurance - also update with city context
+      document.getElementById('travel-insurance-btn').href = `https://www.insuremytrip.com/search?location=${encodedCity}`;
     }
   </script>
 </body>
