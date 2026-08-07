@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..500&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=3" />
+  <link rel="stylesheet" href="/styles.css?v=4" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
@@ -60,13 +60,8 @@
     <!-- Hero City Pulse -->
     <section class="hero-section">
       <div class="city-selector glass-card">
-        <select id="city-select" class="city-dropdown">
-          <option value="nyc">New York</option>
-          <option value="london">London</option>
-          <option value="tokyo">Tokyo</option>
-          <option value="berlin">Berlin</option>
-          <option value="sao-paulo">São Paulo</option>
-          <option value="paris">Paris</option>
+        <select id="city-select" class="city-dropdown" aria-label="Select city">
+          <!-- Dynamically populated by app.js -->
         </select>
       </div>
       <div class="pulse-container" id="pulse-container">
@@ -260,6 +255,20 @@
         <p class="section-copy" data-i18n="wall_intro">A curated wall of badge holders whose notes illuminate how cities felt in specific moments.</p>
       </div>
       <div id="constellation-wall-grid" class="wall-grid"></div>
+    </section>
+
+    <!-- Recent Observations / Comments Section -->
+    <section id="observations-section" class="glass-card">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow" data-i18n="obs_eyebrow">Live observations</p>
+          <h2 data-i18n="obs_title">Recent pulse from <span id="obs-city-name">New York</span></h2>
+        </div>
+        <p class="section-copy" data-i18n="obs_intro">See what fellow observers are feeling right now in this city. Each note shapes the collective mood.</p>
+      </div>
+      <div id="observations-grid" class="observations-grid">
+        <div class="obs-empty" data-i18n="obs_empty">No observations yet. Be the first to share the pulse.</div>
+      </div>
     </section>
 
     <footer class="footer glass">

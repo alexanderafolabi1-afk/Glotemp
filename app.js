@@ -134,7 +134,11 @@ const translations = {
     signal_supporter_progress: "Supporter path: Continue observing to unlock observatory circles",
     signal_badge_archive: "Badge archive: {count} constellation titles claimed",
     constellation_moment_eyebrow: "Constellation Moment",
-    prototype_counter_notice: "Prototype note: observatory counts and badge thresholds are local to this device until a server-backed verification layer is introduced."
+    prototype_counter_notice: "Prototype note: observatory counts and badge thresholds are local to this device until a server-backed verification layer is introduced.",
+    obs_eyebrow: "Live observations",
+    obs_title: "Recent pulse from {city}",
+    obs_intro: "See what fellow observers are feeling right now in this city. Each note shapes the collective mood.",
+    obs_empty: "No observations yet. Be the first to share the pulse."
   },
   es: {
     install_title: "Añadir Glotemp a inicio",
@@ -242,7 +246,11 @@ const translations = {
     signal_supporter_progress: "Ruta de apoyo: sigue observando para desbloquear los círculos del observatorio",
     signal_badge_archive: "Archivo de insignias: {count} títulos de constelación reclamados",
     constellation_moment_eyebrow: "Momento de constelación",
-    prototype_counter_notice: "Nota del prototipo: los recuentos del observatorio y los hitos de insignias son locales a este dispositivo hasta que exista verificación en servidor."
+    prototype_counter_notice: "Nota del prototipo: los recuentos del observatorio y los hitos de insignias son locales a este dispositivo hasta que exista verificación en servidor.",
+    obs_eyebrow: "Observaciones en vivo",
+    obs_title: "Pulso reciente de {city}",
+    obs_intro: "Mira lo que sienten otros observadores en esta ciudad. Cada nota forma el ánimo colectivo.",
+    obs_empty: "Sin observaciones aún. Sé el primero en compartir el pulso."
   },
   fr: {
     install_title: "Ajouter Glotemp à l'écran d'accueil",
@@ -350,7 +358,11 @@ const translations = {
     signal_supporter_progress: "Parcours soutien : poursuivez pour débloquer les cercles de l'observatoire",
     signal_badge_archive: "Archive d'insignes : {count} titres de constellation réclamés",
     constellation_moment_eyebrow: "Moment Constellation",
-    prototype_counter_notice: "Note prototype : les comptages et paliers d'insignes restent locaux à cet appareil jusqu'à l'arrivée d'une vérification serveur."
+    prototype_counter_notice: "Note prototype : les comptages et paliers d'insignes restent locaux à cet appareil jusqu'à l'arrivée d'une vérification serveur.",
+    obs_eyebrow: "Observations en direct",
+    obs_title: "Pouls récent de {city}",
+    obs_intro: "Voyez ce que ressentent les autres observateurs dans cette ville. Chaque note façonne l'humeur collective.",
+    obs_empty: "Pas encore d'observations. Soyez le premier à partager le pouls."
   },
   de: {
     install_title: "Glotemp zum Startbildschirm hinzufügen",
@@ -458,7 +470,11 @@ const translations = {
     signal_supporter_progress: "Unterstützerpfad: Weiter beobachten, um Observatoriumskreise freizuschalten",
     signal_badge_archive: "Abzeichenarchiv: {count} Konstellationstitel beansprucht",
     constellation_moment_eyebrow: "Konstellationsmoment",
-    prototype_counter_notice: "Prototyp-Hinweis: Observatoriumszähler und Abzeichen-Schwellen gelten lokal auf diesem Gerät, bis eine serverseitige Verifizierung ergänzt wird."
+    prototype_counter_notice: "Prototyp-Hinweis: Observatoriumszähler und Abzeichen-Schwellen gelten lokal auf diesem Gerät, bis eine serverseitige Verifizierung ergänzt wird.",
+    obs_eyebrow: "Live-Beobachtungen",
+    obs_title: "Aktueller Puls von {city}",
+    obs_intro: "Sehen Sie, was andere Beobachter gerade in dieser Stadt fühlen. Jede Notiz prägt die kollektive Stimmung.",
+    obs_empty: "Noch keine Beobachtungen. Teilen Sie als Erste den Puls."
   },
   pt: {
     install_title: "Adicionar Glotemp à tela inicial",
@@ -566,7 +582,11 @@ const translations = {
     signal_supporter_progress: "Caminho de apoio: continue a observar para desbloquear os círculos do observatório",
     signal_badge_archive: "Arquivo de insígnias: {count} títulos de constelação reivindicados",
     constellation_moment_eyebrow: "Momento de Constelação",
-    prototype_counter_notice: "Nota do protótipo: as contagens do observatório e os marcos de insígnias são locais neste dispositivo até existir verificação no servidor."
+    prototype_counter_notice: "Nota do protótipo: as contagens do observatório e os marcos de insígnias são locais neste dispositivo até existir verificação no servidor.",
+    obs_eyebrow: "Observações ao vivo",
+    obs_title: "Pulso recente de {city}",
+    obs_intro: "Veja o que outros observadores estão sentindo nesta cidade. Cada nota molda o humor coletivo.",
+    obs_empty: "Sem observações ainda. Seja o primeiro a compartilhar o pulso."
   },
   ja: {
     install_title: "Glotempをホーム画面に追加",
@@ -674,7 +694,11 @@ const translations = {
     signal_supporter_progress: "支援経路: 観測を続けて観測所サークルを解放",
     signal_badge_archive: "バッジ記録: {count}件の星座称号を取得",
     constellation_moment_eyebrow: "コンステレーション・モーメント",
-    prototype_counter_notice: "プロトタイプ注記: 観測数とバッジ到達条件は、サーバー検証層が導入されるまでこの端末内だけで管理されます。"
+    prototype_counter_notice: "プロトタイプ注記: 観測数とバッジ到達条件は、サーバー検証層が導入されるまでこの端末内だけで管理されます。",
+    obs_eyebrow: "ライブ観測",
+    obs_title: "{city}の最近のパルス",
+    obs_intro: "この都市の他の観測者たちが今何を感じているか見てみましょう。各ノートが集合的なムードを形成します。",
+    obs_empty: "観測はまだありません。最初にパルスを共有してください。"
   }
 };
 
@@ -1318,14 +1342,38 @@ function drawPulse() {
 }
 
 // City data simulation
-const cities = {
-  nyc: { name: "New York", mood: 7.8, dims: [8.2,7.1,9.0,7.5,8.8,6.9,7.0,5.2,9.3,8.0,7.4,8.1] },
-  london: { name: "London", mood: 6.9, dims: [7.0,6.8,7.5,7.2,8.0,7.1,6.5,5.8,7.8,7.3,6.9,7.6] },
-  tokyo: { name: "Tokyo", mood: 8.4, dims: [8.5,8.0,8.8,8.2,8.9,9.2,8.1,7.5,9.0,8.4,7.9,9.1] },
-  berlin: { name: "Berlin", mood: 7.2, dims: [7.3,6.5,8.2,7.0,7.8,7.5,7.2,6.0,8.5,7.6,7.0,7.9] },
-  "sao-paulo": { name: "São Paulo", mood: 7.0, dims: [7.1,6.2,7.8,6.8,7.0,5.9,6.4,4.8,7.2,6.9,7.3,6.5] },
-  paris: { name: "Paris", mood: 7.5, dims: [7.6,7.0,7.9,7.4,8.5,7.2,7.3,5.5,8.0,7.5,7.2,7.8] }
-};
+let cities = {}; // Will be populated from data/cities.json
+
+// Load cities data from JSON file
+async function loadCitiesData() {
+  try {
+    const response = await fetch('/data/cities.json');
+    const data = await response.json();
+
+    // Convert to format expected by existing code
+    data.cities.forEach(city => {
+      cities[city.slug] = {
+        name: city.name,
+        mood: city.baselineMood,
+        dims: city.dimensions
+      };
+    });
+
+    return cities;
+  } catch (error) {
+    console.error('Failed to load cities data:', error);
+    // Fallback to basic cities if file not available
+    cities = {
+      nyc: { name: "New York", mood: 7.8, dims: [8.2,7.1,9.0,7.5,8.8,6.9,7.0,5.2,9.3,8.0,7.4,8.1] },
+      london: { name: "London", mood: 6.9, dims: [7.0,6.8,7.5,7.2,8.0,7.1,6.5,5.8,7.8,7.3,6.9,7.6] },
+      tokyo: { name: "Tokyo", mood: 8.4, dims: [8.5,8.0,8.8,8.2,8.9,9.2,8.1,7.5,9.0,8.4,7.9,9.1] },
+      berlin: { name: "Berlin", mood: 7.2, dims: [7.3,6.5,8.2,7.0,7.8,7.5,7.2,6.0,8.5,7.6,7.0,7.9] },
+      "sao-paulo": { name: "São Paulo", mood: 7.0, dims: [7.1,6.2,7.8,6.8,7.0,5.9,6.4,4.8,7.2,6.9,7.3,6.5] },
+      paris: { name: "Paris", mood: 7.5, dims: [7.6,7.0,7.9,7.4,8.5,7.2,7.3,5.5,8.0,7.5,7.2,7.8] }
+    };
+    return cities;
+  }
+}
 
 // Multi-source Emotional Climate Engine
 function synthesizeEmotionalTemperature(cityData) {
@@ -1418,6 +1466,17 @@ function updateCity(selected) {
   // Synthesize emotional temperature from multiple sources
   const synthesizedMood = synthesizeEmotionalTemperature(city);
 
+  // Apply mood-responsive background tinting (0-10 scale)
+  // Cool mood (0-5): shift towards blue, desaturate
+  // Neutral (5-7.5): minimal tint
+  // Warm mood (7.5-10): shift towards orange/red, increase saturation
+  const moodNormalized = synthesizedMood / 10; // 0-1 scale
+  const hueShift = (moodNormalized - 0.5) * 120; // -60 to +60 degrees
+  const saturation = 0.8 + (Math.abs(moodNormalized - 0.5) * 0.6); // 0.8-1.1 based on distance from neutral
+
+  document.documentElement.style.setProperty('--mood-hue', `${hueShift}deg`);
+  document.documentElement.style.setProperty('--mood-saturation', saturation.toFixed(2));
+
   document.getElementById('city-name').textContent = city.name;
   document.getElementById('trip-city').textContent = city.name;
 
@@ -1453,6 +1512,91 @@ function updateCity(selected) {
   if (typeof updateAffiliateLinks === 'function') {
     updateAffiliateLinks(city.name);
   }
+
+  // Update observations section with loading state
+  const obsCityName = document.getElementById('obs-city-name');
+  if (obsCityName) {
+    obsCityName.textContent = city.name;
+  }
+
+  // Show loading state while fetching
+  renderObservations(selected, true);
+
+  // Simulate API call (would be real in production)
+  setTimeout(() => {
+    renderObservations(selected, false);
+  }, 300);
+}
+
+// Observations / Comments
+const mockObservations = {
+  nyc: [
+    { sentiment: 0.8, text: "Streets are alive tonight", intensity: 8, created_at: "2 hours ago" },
+    { sentiment: 0.6, text: "Good energy in the financial district", intensity: 7, created_at: "1 hour ago" },
+    { sentiment: 0.9, text: "The city never sleeps and it shows", intensity: 9, created_at: "30 min ago" }
+  ],
+  london: [
+    { sentiment: 0.5, text: "Rainy but the pubs are warm", intensity: 6, created_at: "3 hours ago" },
+    { sentiment: 0.7, text: "West End buzz is real", intensity: 7, created_at: "1 hour ago" }
+  ],
+  tokyo: [
+    { sentiment: 0.95, text: "Shibuya crossing at peak energy", intensity: 9, created_at: "just now" },
+    { sentiment: 0.8, text: "Precision and motion", intensity: 8, created_at: "20 min ago" }
+  ],
+  berlin: [
+    { sentiment: 0.7, text: "Creative atmosphere everywhere", intensity: 7, created_at: "2 hours ago" }
+  ],
+  "sao-paulo": [
+    { sentiment: 0.65, text: "Bustling markets and music", intensity: 7, created_at: "1 hour ago" }
+  ],
+  paris: [
+    { sentiment: 0.75, text: "Café culture in full bloom", intensity: 7, created_at: "30 min ago" }
+  ]
+};
+
+function getSentimentLabel(sentiment) {
+  if (sentiment > 0.3) return "positive";
+  if (sentiment < -0.3) return "negative";
+  return "neutral";
+}
+
+function formatTimeAgo(timestamp) {
+  return timestamp;
+}
+
+function renderObservations(citySlug, loading = false) {
+  const grid = document.getElementById('observations-grid');
+
+  if (!grid) return;
+
+  if (loading) {
+    grid.innerHTML = '<div class="obs-loading"></div><div class="obs-loading"></div><div class="obs-loading"></div>';
+    return;
+  }
+
+  const observations = mockObservations[citySlug] || [];
+
+  if (observations.length === 0) {
+    grid.innerHTML = `<div class="obs-empty" data-i18n="obs_empty">${t('obs_empty')}</div>`;
+    return;
+  }
+
+  grid.innerHTML = observations.map((obs, idx) => {
+    const sentiment = getSentimentLabel(obs.sentiment);
+    const intensity = obs.intensity || 5;
+    return `
+      <div class="obs-card">
+        <div class="obs-sentiment ${sentiment}" data-i18n="sentiment_${sentiment}">
+          ${sentiment.toUpperCase()}
+        </div>
+        <div class="obs-text">${obs.text}</div>
+        <div class="obs-meta">
+          <span class="obs-time">${formatTimeAgo(obs.created_at)}</span>
+          <span class="obs-intensity">Intensity: ${intensity}/10</span>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 // Check-in & Stars
@@ -1471,9 +1615,49 @@ function addStars(amount) {
   loadStars();
 }
 
+// Load cities from data file and populate selector
+async function loadCitiesIntoSelector() {
+  try {
+    const response = await fetch('/data/cities.json');
+    const data = await response.json();
+    const select = document.getElementById('city-select');
+
+    if (!select) return;
+
+    // Group cities by region
+    const byRegion = {};
+    data.cities.forEach(city => {
+      if (!byRegion[city.region]) byRegion[city.region] = [];
+      byRegion[city.region].push(city);
+    });
+
+    // Add options grouped by region
+    Object.keys(byRegion).sort().forEach(region => {
+      const optgroup = document.createElement('optgroup');
+      optgroup.label = region;
+
+      byRegion[region].forEach(city => {
+        const option = document.createElement('option');
+        option.value = city.slug;
+        option.textContent = `${city.name}, ${city.country}`;
+        optgroup.appendChild(option);
+      });
+
+      select.appendChild(optgroup);
+    });
+
+    // Set NYC as default
+    select.value = 'nyc';
+  } catch (error) {
+    console.error('Failed to load cities:', error);
+  }
+}
+
 // Initialize everything
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   applyTranslations();
+  await loadCitiesData();
+  loadCitiesIntoSelector();
   resizeCanvas();
   drawPulse();
   updateCity('nyc');
