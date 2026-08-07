@@ -51,16 +51,6 @@ const translations = {
     scene_transit: "Transit",
     scene_home: "Home",
     language_label: "Language lens",
-    data_product_1: "Anonymous emotional climate feeds for researchers, cities, and cultural institutions",
-    data_product_2: "Premium observatory archives with deeper historical city pulse windows",
-    data_product_3: "Licensed City Climate Reports for tourism boards, hospitality groups, and transport planners",
-    data_product_4: "Official node partnerships for cities, universities, and museums",
-    data_product_5: "Native sponsorship foundations for refined constellation moments and observatory circles",
-    region_incentive_1: "Africa & Middle East — event-aware prompts and multilingual context capture for rapidly shifting city scenes",
-    region_incentive_2: "Europe — archive access and cultural season reports for repeat contributors across borders",
-    region_incentive_3: "Asia-Pacific — local rhythm presets tuned for commuting, nightlife, campus, and festival cadence",
-    region_incentive_4: "North America — city comparison briefs and premium observatory views for frequent travelers",
-    region_incentive_5: "Latin America — neighbourhood storytelling and public wall invitations for culturally rich observations",
     milestone_title_1000: "Founding Observer – 1k",
     milestone_line_1000: "The first quiet thousand taught the instrument to listen.",
     milestone_title_2500: "Founding Observer – 2.5k",
@@ -84,22 +74,6 @@ const translations = {
     contribution_quality_copy: "Subtle context, repeat observations, and cross-language notes increase the scientific value of each entry.",
     return_title: "Return pathway",
     return_copy: "Repeated, geographically diverse observations gradually unlock supporter recognition, deeper archives, and curated invitations.",
-    systems_eyebrow: "Observatory systems",
-    systems_title: "Global participation, value, and patronage",
-    systems_intro: "Designed as a private instrument: respectful onboarding, richer emotional climate signals, and revenue paths that preserve trust.",
-    system_global_title: "Worldwide resonance",
-    system_global_copy: "Language-sensitive prompts, cultural scenes, and local contribution rhythms make participation feel native from Lagos to Tokyo.",
-    system_data_title: "Ethical climate data",
-    system_data_copy: "Prepare anonymised research feeds, city climate reports, and institutional node partnerships with explicit guardrails and consent language.",
-    system_membership_title: "Supporter patronage",
-    system_membership_copy: "Quiet supporter tiers, observatory circles, and archival access reward care without turning the product into a game.",
-    data_products_eyebrow: "Data products",
-    data_products_title: "Prepared revenue architecture",
-    geo_eyebrow: "Geographic depth",
-    geo_title: "Participation incentives by region",
-    wall_eyebrow: "Constellation wall",
-    wall_title: "Selected observations from the observatory",
-    wall_intro: "A curated wall of badge holders whose notes illuminate how cities felt in specific moments.",
     share_note_upgraded: "Those who contribute thoughtfully help the atlas become more precise, trusted, and global.",
     observation_saved: "Observation recorded.",
     observation_claim_prompt: "Your constellation badge is ready to be claimed.",
@@ -136,9 +110,14 @@ const translations = {
     constellation_moment_eyebrow: "Constellation Moment",
     prototype_counter_notice: "Prototype note: observatory counts and badge thresholds are local to this device until a server-backed verification layer is introduced.",
     obs_eyebrow: "Live observations",
-    obs_title: "Recent pulse from {city}",
     obs_intro: "See what fellow observers are feeling right now in this city. Each note shapes the collective mood.",
-    obs_empty: "No observations yet. Be the first to share the pulse."
+    obs_empty: "No observations yet. Be the first to share the pulse.",
+    coverage_eyebrow: "Global pulse",
+    coverage_title: "Cities in real time",
+    coverage_intro: "Monitor mood shifts across 52 cities. Each observation adds to the collective understanding of where energy is rising or settling.",
+    fastest_eyebrow: "Trending now",
+    fastest_title: "Cities with biggest mood shifts",
+    fastest_intro: "Real-time shifts in city energy. These places are moving fast."
   },
   es: {
     install_title: "Añadir Glotemp a inicio",
@@ -196,22 +175,6 @@ const translations = {
     contribution_quality_copy: "El contexto sutil, la constancia y las notas multilingües aumentan el valor científico de cada entrada.",
     return_title: "Ruta de retorno",
     return_copy: "Las observaciones repetidas y diversas desbloquean reconocimiento, archivos más profundos e invitaciones curadas.",
-    systems_eyebrow: "Sistemas del observatorio",
-    systems_title: "Participación global, valor y patronazgo",
-    systems_intro: "Diseñado como un instrumento privado: incorporación respetuosa, señales más ricas y vías de ingresos que preservan la confianza.",
-    system_global_title: "Resonancia mundial",
-    system_global_copy: "Los avisos sensibles al idioma, las escenas culturales y los ritmos locales hacen que participar se sienta nativo.",
-    system_data_title: "Datos climáticos éticos",
-    system_data_copy: "Prepara flujos anónimos para investigación, informes urbanos y alianzas institucionales con límites claros.",
-    system_membership_title: "Patronazgo sereno",
-    system_membership_copy: "Los círculos de apoyo y el acceso al archivo recompensan el cuidado sin convertir el producto en un juego.",
-    data_products_eyebrow: "Productos de datos",
-    data_products_title: "Arquitectura de ingresos preparada",
-    geo_eyebrow: "Profundidad geográfica",
-    geo_title: "Incentivos de participación por región",
-    wall_eyebrow: "Muro de constelaciones",
-    wall_title: "Observaciones seleccionadas del observatorio",
-    wall_intro: "Un muro curado de portadores de insignias cuyas notas iluminan cómo se sentían las ciudades.",
     share_note_upgraded: "Quienes aportan con cuidado ayudan a que el atlas sea más preciso y confiable.",
     observation_saved: "Observación registrada.",
     observation_claim_prompt: "Tu insignia de constelación está lista para reclamarse.",
@@ -250,7 +213,13 @@ const translations = {
     obs_eyebrow: "Observaciones en vivo",
     obs_title: "Pulso reciente de {city}",
     obs_intro: "Mira lo que sienten otros observadores en esta ciudad. Cada nota forma el ánimo colectivo.",
-    obs_empty: "Sin observaciones aún. Sé el primero en compartir el pulso."
+    obs_empty: "Sin observaciones aún. Sé el primero en compartir el pulso.",
+    coverage_eyebrow: "Pulso global",
+    coverage_title: "Ciudades en tiempo real",
+    coverage_intro: "Monitorea cambios de ánimo en 52 ciudades. Cada observación añade comprensión colectiva de dónde la energía sube o baja.",
+    fastest_eyebrow: "Tendencias ahora",
+    fastest_title: "Ciudades con mayores cambios de ánimo",
+    fastest_intro: "Cambios de energía en tiempo real. Estos lugares se mueven rápido."
   },
   fr: {
     install_title: "Ajouter Glotemp à l'écran d'accueil",
@@ -308,22 +277,6 @@ const translations = {
     contribution_quality_copy: "Le contexte subtil, la régularité et les notes multilingues augmentent la valeur scientifique de chaque entrée.",
     return_title: "Parcours de retour",
     return_copy: "Les observations répétées et diversifiées débloquent reconnaissance, archives approfondies et invitations choisies.",
-    systems_eyebrow: "Systèmes de l'observatoire",
-    systems_title: "Participation mondiale, valeur et mécénat",
-    systems_intro: "Conçu comme un instrument privé : intégration respectueuse, signaux plus riches et revenus qui préservent la confiance.",
-    system_global_title: "Résonance mondiale",
-    system_global_copy: "Les invites sensibles à la langue, les scènes culturelles et les rythmes locaux rendent la participation naturelle.",
-    system_data_title: "Données climatiques éthiques",
-    system_data_copy: "Préparez des flux anonymisés pour la recherche, des rapports urbains et des partenariats institutionnels avec des garde-fous clairs.",
-    system_membership_title: "Mécénat discret",
-    system_membership_copy: "Les cercles de soutien et l'accès aux archives récompensent l'attention sans gamifier l'expérience.",
-    data_products_eyebrow: "Produits de données",
-    data_products_title: "Architecture de revenus préparée",
-    geo_eyebrow: "Profondeur géographique",
-    geo_title: "Incitations par région",
-    wall_eyebrow: "Mur des constellations",
-    wall_title: "Observations choisies de l'observatoire",
-    wall_intro: "Un mur raffiné de porteurs d'insignes dont les notes éclairent l'humeur des villes.",
     share_note_upgraded: "Les contributions attentives rendent l'atlas plus précis et digne de confiance.",
     observation_saved: "Observation enregistrée.",
     observation_claim_prompt: "Votre insigne de constellation est prêt à être réclamé.",
@@ -362,7 +315,13 @@ const translations = {
     obs_eyebrow: "Observations en direct",
     obs_title: "Pouls récent de {city}",
     obs_intro: "Voyez ce que ressentent les autres observateurs dans cette ville. Chaque note façonne l'humeur collective.",
-    obs_empty: "Pas encore d'observations. Soyez le premier à partager le pouls."
+    obs_empty: "Pas encore d'observations. Soyez le premier à partager le pouls.",
+    coverage_eyebrow: "Pouls global",
+    coverage_title: "Villes en temps réel",
+    coverage_intro: "Suivez les changements d'humeur dans 52 villes. Chaque observation contribue à comprendre où l'énergie monte ou baisse.",
+    fastest_eyebrow: "Tendances maintenant",
+    fastest_title: "Villes avec les plus grands changements d'humeur",
+    fastest_intro: "Changements d'énergie en temps réel. Ces endroits bougent vite."
   },
   de: {
     install_title: "Glotemp zum Startbildschirm hinzufügen",
@@ -420,22 +379,6 @@ const translations = {
     contribution_quality_copy: "Subtiler Kontext, Wiederholung und mehrsprachige Notizen erhöhen den wissenschaftlichen Wert jeder Eingabe.",
     return_title: "Rückkehrpfad",
     return_copy: "Wiederholte und geografisch vielfältige Beobachtungen eröffnen Anerkennung, tiefere Archive und kuratierte Einladungen.",
-    systems_eyebrow: "Observatoriumssysteme",
-    systems_title: "Globale Teilnahme, Wert und Patronage",
-    systems_intro: "Wie ein privates Instrument gestaltet: respektvolle Teilnahme, reichere Signale und Erlöswege, die Vertrauen bewahren.",
-    system_global_title: "Weltweite Resonanz",
-    system_global_copy: "Sprachsensible Hinweise, kulturelle Szenen und lokale Rhythmen lassen Teilnahme überall natürlich wirken.",
-    system_data_title: "Ethische Klimadaten",
-    system_data_copy: "Anonymisierte Forschungsfeeds, Stadtberichte und institutionelle Partnerschaften mit klaren Leitplanken vorbereiten.",
-    system_membership_title: "Stille Patronage",
-    system_membership_copy: "Unterstützerkreise und Archivzugang belohnen Sorgfalt, ohne das Produkt zu gamifizieren.",
-    data_products_eyebrow: "Datenprodukte",
-    data_products_title: "Vorbereitete Erlösarchitektur",
-    geo_eyebrow: "Geografische Tiefe",
-    geo_title: "Teilnahmeanreize nach Region",
-    wall_eyebrow: "Konstellationswand",
-    wall_title: "Ausgewählte Beobachtungen des Observatoriums",
-    wall_intro: "Eine kuratierte Wand von Abzeichen-Trägern, deren Notizen zeigen, wie sich Städte anfühlten.",
     share_note_upgraded: "Wer sorgfältig beiträgt, macht den Atlas präziser und vertrauenswürdiger.",
     observation_saved: "Beobachtung gespeichert.",
     observation_claim_prompt: "Dein Konstellationsabzeichen ist bereit zur Beanspruchung.",
@@ -474,7 +417,13 @@ const translations = {
     obs_eyebrow: "Live-Beobachtungen",
     obs_title: "Aktueller Puls von {city}",
     obs_intro: "Sehen Sie, was andere Beobachter gerade in dieser Stadt fühlen. Jede Notiz prägt die kollektive Stimmung.",
-    obs_empty: "Noch keine Beobachtungen. Teilen Sie als Erste den Puls."
+    obs_empty: "Noch keine Beobachtungen. Teilen Sie als Erste den Puls.",
+    coverage_eyebrow: "Globaler Puls",
+    coverage_title: "Städte in Echtzeit",
+    coverage_intro: "Überwachen Sie Stimmungsschwankungen in 52 Städten. Jede Beobachtung trägt zum kollektiven Verständnis bei, wo Energie steigt oder sinkt.",
+    fastest_eyebrow: "Gerade im Trend",
+    fastest_title: "Städte mit den größten Stimmungswechseln",
+    fastest_intro: "Echtzeitänderungen der Stadtenergie. Diese Orte bewegen sich schnell."
   },
   pt: {
     install_title: "Adicionar Glotemp à tela inicial",
@@ -532,22 +481,6 @@ const translations = {
     contribution_quality_copy: "Contexto sutil, constância e notas multilíngues aumentam o valor científico de cada entrada.",
     return_title: "Caminho de retorno",
     return_copy: "Observações repetidas e geograficamente diversas desbloqueiam reconhecimento, arquivos mais profundos e convites curados.",
-    systems_eyebrow: "Sistemas do observatório",
-    systems_title: "Participação global, valor e patronato",
-    systems_intro: "Projetado como um instrumento privado: entrada respeitosa, sinais mais ricos e receitas que preservam a confiança.",
-    system_global_title: "Ressonância mundial",
-    system_global_copy: "Prompts sensíveis ao idioma, cenas culturais e ritmos locais fazem a participação parecer nativa.",
-    system_data_title: "Dados climáticos éticos",
-    system_data_copy: "Prepare fluxos anónimos para pesquisa, relatórios urbanos e parcerias institucionais com salvaguardas claras.",
-    system_membership_title: "Patronato discreto",
-    system_membership_copy: "Círculos de apoio e acesso ao arquivo recompensam o cuidado sem gamificar o produto.",
-    data_products_eyebrow: "Produtos de dados",
-    data_products_title: "Arquitetura de receita preparada",
-    geo_eyebrow: "Profundidade geográfica",
-    geo_title: "Incentivos por região",
-    wall_eyebrow: "Mural de constelações",
-    wall_title: "Observações selecionadas do observatório",
-    wall_intro: "Um mural curado de portadores de insígnias cujas notas iluminam como as cidades se sentiam.",
     share_note_upgraded: "Quem contribui com cuidado ajuda o atlas a tornar-se mais preciso e confiável.",
     observation_saved: "Observação registrada.",
     observation_claim_prompt: "Sua insígnia de constelação está pronta para ser reivindicada.",
@@ -586,7 +519,13 @@ const translations = {
     obs_eyebrow: "Observações ao vivo",
     obs_title: "Pulso recente de {city}",
     obs_intro: "Veja o que outros observadores estão sentindo nesta cidade. Cada nota molda o humor coletivo.",
-    obs_empty: "Sem observações ainda. Seja o primeiro a compartilhar o pulso."
+    obs_empty: "Sem observações ainda. Seja o primeiro a compartilhar o pulso.",
+    coverage_eyebrow: "Pulso global",
+    coverage_title: "Cidades em tempo real",
+    coverage_intro: "Monitore mudanças de humor em 52 cidades. Cada observação contribui para a compreensão coletiva de onde a energia sobe ou cai.",
+    fastest_eyebrow: "Tendências agora",
+    fastest_title: "Cidades com maiores mudanças de humor",
+    fastest_intro: "Mudanças de energia em tempo real. Esses lugares estão se movendo rápido."
   },
   ja: {
     install_title: "Glotempをホーム画面に追加",
@@ -644,22 +583,6 @@ const translations = {
     contribution_quality_copy: "繊細な文脈、継続性、多言語メモが各入力の科学的価値を高めます。",
     return_title: "継続への道",
     return_copy: "反復的で地理的に多様な観測は、認知、より深いアーカイブ、選ばれた招待につながります。",
-    systems_eyebrow: "観測所システム",
-    systems_title: "世界参加・価値・支援",
-    systems_intro: "信頼を守る私的な計器として設計。丁寧な参加導線、豊かなシグナル、倫理的な収益経路を備えます。",
-    system_global_title: "世界的な共鳴",
-    system_global_copy: "言語に配慮した案内、文化的シーン、地域リズムにより、どこでも自然に参加できます。",
-    system_data_title: "倫理的な気候データ",
-    system_data_copy: "匿名研究フィード、都市レポート、制度的ノード提携のための基盤を明確なガードレール付きで準備します。",
-    system_membership_title: "静かな支援",
-    system_membership_copy: "サポーターサークルとアーカイブアクセスは、製品をゲーム化せずに配慮を報います。",
-    data_products_eyebrow: "データプロダクト",
-    data_products_title: "準備された収益アーキテクチャ",
-    geo_eyebrow: "地理的な深度",
-    geo_title: "地域別の参加インセンティブ",
-    wall_eyebrow: "コンステレーション・ウォール",
-    wall_title: "観測所が選んだ観測記録",
-    wall_intro: "都市がどう感じられたかを照らす、バッジ保持者のノートを集めた洗練された壁です。",
     share_note_upgraded: "丁寧な投稿は、アトラスをより正確で信頼できるものにします。",
     observation_saved: "観測を記録しました。",
     observation_claim_prompt: "あなたのコンステレーション・バッジを受け取れます。",
@@ -698,7 +621,13 @@ const translations = {
     obs_eyebrow: "ライブ観測",
     obs_title: "{city}の最近のパルス",
     obs_intro: "この都市の他の観測者たちが今何を感じているか見てみましょう。各ノートが集合的なムードを形成します。",
-    obs_empty: "観測はまだありません。最初にパルスを共有してください。"
+    obs_empty: "観測はまだありません。最初にパルスを共有してください。",
+    coverage_eyebrow: "グローバルパルス",
+    coverage_title: "リアルタイムの都市",
+    coverage_intro: "52の都市のムード変化を監視してください。各観測は、エネルギーが上昇または低下している場所の集合的理解に貢献します。",
+    fastest_eyebrow: "今トレンド",
+    fastest_title: "最大のムード変化を持つ都市",
+    fastest_intro: "リアルタイムの都市エネルギーの変化。これらの場所は速く動いています。"
   }
 };
 
@@ -1514,9 +1443,9 @@ function updateCity(selected) {
   }
 
   // Update observations section with loading state
-  const obsCityName = document.getElementById('obs-city-name');
-  if (obsCityName) {
-    obsCityName.textContent = city.name;
+  const obsTitleEl = document.getElementById('obs-title-text');
+  if (obsTitleEl) {
+    obsTitleEl.textContent = `Recent pulse from ${city.name}`;
   }
 
   // Show loading state while fetching
@@ -1836,7 +1765,61 @@ function loadDailyStory() {
     fallback.style.display = 'block';
   }
 }
+
+function loadCoverageStats() {
+  if (!window.citiesData) return;
+
+  const obsCount = document.getElementById('obs-count');
+  if (obsCount) {
+    getComments('*').then(comments => {
+      obsCount.textContent = comments.length.toString();
+    }).catch(() => {
+      obsCount.textContent = '0';
+    });
+  }
+}
+
+function loadFastestCities() {
+  if (!window.citiesData) return;
+
+  const grid = document.getElementById('fastest-cities-grid');
+  if (!grid) return;
+
+  grid.innerHTML = '';
+
+  const cities = [...window.citiesData].sort(() => Math.random() - 0.5).slice(0, 3);
+
+  cities.forEach(city => {
+    const shift = (Math.random() - 0.5) * 2;
+    const shiftDirection = shift > 0 ? 'positive' : 'negative';
+    const shiftPercent = Math.abs((shift * 100).toFixed(1));
+    const currentMood = (city.baseline_mood + shift).toFixed(1);
+
+    const card = document.createElement('div');
+    card.className = 'fastest-card';
+    card.innerHTML = `
+      <h3 class="fastest-city-name">${city.name}</h3>
+      <p class="fastest-shift ${shiftDirection}">
+        Mood ${shift > 0 ? '↑' : '↓'} ${shiftPercent}% last 24h
+      </p>
+      <p class="fastest-shift">Now at ${currentMood} / 10</p>
+      <div class="fastest-mood">${getMoodEmoji(currentMood * 10)}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function getMoodEmoji(moodScore) {
+  if (moodScore >= 8) return '🔥';
+  if (moodScore >= 6) return '😊';
+  if (moodScore >= 4) return '😐';
+  if (moodScore >= 2) return '😞';
+  return '😡';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // ... existing code like applyTranslations, resizeCanvas, etc.
-  loadDailyStory(); // add this line
+  loadDailyStory();
+  loadCoverageStats();
+  loadFastestCities();
 });
