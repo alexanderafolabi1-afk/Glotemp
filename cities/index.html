@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Cities Directory | Glotemp</title>
+  <meta name="description" content="Live profiles of 150 global cities across 12 dimensions: Pulse, Tech, Finance, Work, Property, Education, Sport, Entertainment, Fashion, Food, Health, Transport.">
+  <meta name="canonical" content="https://glo-temp.com/cities">
+  <meta property="og:title" content="Global Cities Directory">
+  <meta property="og:description" content="Explore 150 cities with live data across every dimension that matters.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://glo-temp.com/cities">
+  <meta property="og:image" content="https://glo-temp.com/assets/og-cities.png">
+  <meta name="theme-color" content="#06060A">
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Global Cities Directory",
+    "description": "A comprehensive directory of 150 global cities with live data across 12 verticals.",
+    "url": "https://glo-temp.com/cities",
+    "isPartOf": {
+      "@type": "WebSite",
+      "@id": "https://glo-temp.com/"
+    }
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <nav class="nav-bar glass-card">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <span data-i18n="glotemp_logo">Glotemp</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/" data-i18n="nav_home">Home</a></li>
+        <li><a href="/cities" class="active" data-i18n="nav_cities">Cities</a></li>
+        <li><a href="/about" data-i18n="nav_about">About</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <section class="cities-header glass-card">
+      <h1 data-i18n="cities_title">Global Cities Directory</h1>
+      <p data-i18n="cities_subtitle">Live profiles of 150 cities across 12 dimensions.</p>
+
+      <div class="filter-controls">
+        <select id="region-filter" class="filter-select">
+          <option value="">All Regions</option>
+          <option value="Asia-Pacific">Asia-Pacific</option>
+          <option value="Europe">Europe</option>
+          <option value="North America">North America</option>
+          <option value="South America">South America</option>
+          <option value="Africa">Africa</option>
+          <option value="Middle East">Middle East</option>
+        </select>
+
+        <input type="text" id="search-cities" class="filter-input" placeholder="Search cities..." data-i18n="cities_search_placeholder">
+      </div>
+    </section>
+
+    <section class="cities-grid">
+      <div id="cities-list"></div>
+    </section>
+  </main>
+
+  <footer class="footer glass-card">
+    <div class="footer-content">
+      <p class="small-print" data-i18n="footer_copyright">&copy; 2026 Glotemp. Live city intelligence.</p>
+    </div>
+  </footer>
+
+  <script src="/cities-data.js"></script>
+  <script>
+    // Load and render cities directory
+    function renderCitiesDirectory() {
+      const listEl = document.getElementById('cities-list');
+      const regionFilter = document.getElementById('region-filter');
+      const searchInput = document.getElementById('search-cities');
+
+      function renderCities() {
+        const region = regionFilter.value;
+        const search = searchInput.value.toLowerCase();
+
+        const filtered = window.CITIES_DATA.filter(city => {
+          const matchRegion = !region || city.region === region;
+          const matchSearch = !search || city.name.toLowerCase().includes(search) || city.country.toLowerCase().includes(search);
+          return matchRegion && matchSearch;
+        });
+
+        listEl.innerHTML = filtered.map(city => `
+          <a href="/cities/${city.slug}" class="city-card glass-card">
+            <div class="city-card-header">
+              <h2>${city.name}</h2>
+              <span class="city-country">${city.country}</span>
+            </div>
+            <div class="city-card-stats">
+              <div class="stat">
+                <span class="stat-label">Penetration</span>
+                <span class="stat-value">${(city.penetration * 100).toFixed(0)}%</span>
+              </div>
+              <div class="stat">
+                <span class="stat-label">Metro Pop</span>
+                <span class="stat-value">${(city.metro_pop / 1000000).toFixed(1)}M</span>
+              </div>
+              <div class="stat">
+                <span class="stat-label">Mood</span>
+                <span class="stat-value">${city.mood.toFixed(1)}</span>
+              </div>
+            </div>
+          </a>
+        `).join('');
+      }
+
+      regionFilter.addEventListener('change', renderCities);
+      searchInput.addEventListener('input', renderCities);
+      renderCities();
+    }
+
+    if (window.CITIES_DATA) {
+      renderCitiesDirectory();
+    }
+  </script>
+  <script src="/app.js" defer></script>
+</body>
+</html>
