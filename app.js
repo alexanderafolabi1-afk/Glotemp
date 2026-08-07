@@ -2335,3 +2335,207 @@ document.addEventListener('DOMContentLoaded', () => {
   // Setup live ticker
   setupLiveTicker();
 });
+
+// ===== v11 MOBILE-FIRST ADDITIONS =====
+
+// ----- Hamburger Navigation -----
+(function initHamburger() {
+  const hamburger = document.getElementById('nav-hamburger');
+  const panel = document.getElementById('nav-panel');
+  const closeBtn = document.getElementById('nav-panel-close');
+  const langMobile = document.getElementById('lang-switch-mobile');
+  const langDesktop = document.getElementById('lang-switch');
+  if (!hamburger || !panel) return;
+
+  function openPanel() {
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+    hamburger.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closePanel() {
+    panel.classList.remove('open');
+    panel.setAttribute('aria-hidden', 'true');
+    hamburger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    hamburger.focus();
+  }
+
+  hamburger.addEventListener('click', openPanel);
+  if (closeBtn) closeBtn.addEventListener('click', closePanel);
+
+  panel.addEventListener('click', (e) => {
+    if (e.target === panel) closePanel();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && panel.classList.contains('open')) closePanel();
+  });
+
+  // Wire mobile lang button to the same modal as desktop
+  if (langMobile && langDesktop) {
+    langMobile.addEventListener('click', () => {
+      closePanel();
+      langDesktop.click();
+    });
+  }
+})();
+
+// ----- Ticker tap-pause -----
+(function initTickerTapPause() {
+  // Run after DOMContentLoaded setup is done
+  function attach() {
+    const track = document.querySelector('.ticker-track');
+    if (!track) return;
+    let paused = false;
+    track.addEventListener('touchstart', () => {
+      paused = true;
+      track.style.animationPlayState = 'paused';
+    }, { passive: true });
+    track.addEventListener('touchend', () => {
+      paused = false;
+      track.style.animationPlayState = 'running';
+    }, { passive: true });
+  }
+  // Ticker is built inside DOMContentLoaded, so wait a tick
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(attach, 100));
+  } else {
+    setTimeout(attach, 100);
+  }
+})();
+
+// ----- How It Works image fallback -----
+(function initHowItWorksImages() {
+  function setup() {
+    document.querySelectorAll('.hiw-img').forEach(img => {
+      img.addEventListener('error', () => {
+        const slot = img.closest('.hiw-image-slot');
+        const numeral = img.getAttribute('data-hiw-numeral') || '';
+        if (!slot) return;
+        slot.classList.add('hiw-no-image');
+        slot.innerHTML = `<span class="hiw-numeral-only">${numeral}</span>`;
+      }, { once: true });
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+})();
+
+// ----- Kyiv fallback read-more -----
+(function initFallbackReadMore() {
+  function setup() {
+    const btn = document.getElementById('read-more-fallback');
+    const full = document.getElementById('story-fallback-full');
+    if (!btn || !full) return;
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const open = !full.hidden;
+      full.hidden = open;
+      btn.textContent = open ? 'Read more' : 'Show less';
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+})();
+
+// ----- City comment box (under "Recent pulse from [city]") -----
+(function initCityCommentBox() {
+  function setup() {
+    const picker = document.getElementById('comment-mood-picker');
+    const textEl = document.getElementById('comment-text');
+    const submitBtn = document.getElementById('comment-submit');
+    const feedbackEl = document.getElementById('comment-feedback');
+    if (!picker || !textEl || !submitBtn) return;
+
+    let selectedMood = null;
+
+    picker.querySelectorAll('.mood-emoji').forEach(btn => {
+      btn.addEventListener('click', () => {
+        picker.querySelectorAll('.mood-emoji').forEach(b => {
+          b.style.opacity = '0.5';
+          b.style.transform = '';
+        });
+        btn.style.opacity = '1';
+        btn.style.transform = 'scale(1.2)';
+        selectedMood = btn.getAttribute('data-label') || btn.getAttribute('data-band') || 'Neutral';
+      });
+    });
+
+    submitBtn.addEventListener('click', () => {
+      const note = textEl.value.trim();
+      if (!note) {
+        if (feedbackEl) feedbackEl.textContent = 'Write something first.';
+        return;
+      }
+      const mood = selectedMood || 'Neutral';
+      const citySelectEl = document.getElementById('city-select');
+      const citySlug = citySelectEl ? citySelectEl.value : 'nyc';
+      const cityData = (typeof cities !== 'undefined') ? cities[citySlug] : null;
+      const cityName = cityData ? cityData.name : 'New York';
+      const bandMap = { charged: 0.9, warm: 0.7, equilibrium: 0.5, restrained: 0.3, low: 0.2 };
+      const moodLabelToBand = {
+        Energized: 'charged', Good: 'warm', Neutral: 'equilibrium', Low: 'restrained', Cautious: 'low'
+      };
+      const band = moodLabelToBand[mood] || 'equilibrium';
+      const sentiment = bandMap[band] || 0.5;
+
+      const observation = {
+        mood,
+        intensity: 65,
+        scene: 'street',
+        lens: 'global',
+        cadence: 'midday',
+        note,
+        city: cityName,
+        createdAt: new Date().toISOString()
+      };
+      if (typeof observatoryState !== 'undefined') {
+        observatoryState.observations.unshift(observation);
+        observatoryState.observations = observatoryState.observations.slice(0, 24);
+        if (typeof saveObservatory === 'function') saveObservatory();
+      }
+
+      // Also inject into SEED_OBSERVATIONS so renderObservations picks it up
+      if (!window.SEED_OBSERVATIONS) window.SEED_OBSERVATIONS = [];
+      window.SEED_OBSERVATIONS.unshift({
+        city: citySlug,
+        cityName,
+        sentiment,
+        text: note,
+        context: note,
+        intensity: 7,
+        created_at: new Date().toISOString()
+      });
+
+      // Refresh feed
+      if (typeof renderObservations === 'function') renderObservations(citySlug, false);
+
+      // Feedback
+      if (feedbackEl) feedbackEl.textContent = 'Observation shared.';
+      textEl.value = '';
+      picker.querySelectorAll('.mood-emoji').forEach(b => {
+        b.style.opacity = '0.5';
+        b.style.transform = '';
+      });
+      selectedMood = null;
+
+      // Clear feedback after 3s
+      setTimeout(() => { if (feedbackEl) feedbackEl.textContent = ''; }, 3000);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+})();
