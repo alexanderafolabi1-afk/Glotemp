@@ -1513,12 +1513,19 @@ function updateCity(selected) {
     updateAffiliateLinks(city.name);
   }
 
-  // Update observations section
+  // Update observations section with loading state
   const obsCityName = document.getElementById('obs-city-name');
   if (obsCityName) {
     obsCityName.textContent = city.name;
   }
-  renderObservations(selected);
+
+  // Show loading state while fetching
+  renderObservations(selected, true);
+
+  // Simulate API call (would be real in production)
+  setTimeout(() => {
+    renderObservations(selected, false);
+  }, 300);
 }
 
 // Observations / Comments
@@ -1557,12 +1564,17 @@ function formatTimeAgo(timestamp) {
   return timestamp;
 }
 
-function renderObservations(citySlug) {
-  const observations = mockObservations[citySlug] || [];
+function renderObservations(citySlug, loading = false) {
   const grid = document.getElementById('observations-grid');
-  const cityNameEl = document.getElementById('obs-city-name');
 
   if (!grid) return;
+
+  if (loading) {
+    grid.innerHTML = '<div class="obs-loading"></div><div class="obs-loading"></div><div class="obs-loading"></div>';
+    return;
+  }
+
+  const observations = mockObservations[citySlug] || [];
 
   if (observations.length === 0) {
     grid.innerHTML = `<div class="obs-empty" data-i18n="obs_empty">${t('obs_empty')}</div>`;
