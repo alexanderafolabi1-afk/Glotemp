@@ -31,7 +31,7 @@ const STORIES = [
     excerpt: "Where Aztec canals, mariachi, and floating fiestas collide.",
     image: "city-mexico-city",
     imageAlt: "Colorful trajineras boats on Xochimilco canals with floating gardens and flowers",
-    trivia: "- Xochimilco means ‘place of the flowers’ in Nahuatl.\n- The chinampas are still used to grow vegetables Today.\n- The canals stretch over 170 km.",
+    trivia: "- Xochimilco means ‘place of the flowers’ in Nahuatl.\n- The chinampas are still used to grow vegetables today.\n- The canals stretch over 170 km.",
     history_nugget: "Xochimilco was built by the Aztecs as an intricate system of artificial islands for agriculture, later declared a World Heritage site in 1987.",
     date: "2025-01-29"
   },
