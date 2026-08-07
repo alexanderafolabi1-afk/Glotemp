@@ -830,13 +830,6 @@ textarea:focus:not(:focus-visible) {
   min-height: 200px;
 }
 
-/* Image load error fallback */
-.card-media.image-error {
-  background: var(--basalt);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 .card-placeholder-content {
   text-align: center;
