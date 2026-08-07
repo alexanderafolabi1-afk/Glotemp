@@ -831,6 +831,10 @@ textarea:focus:not(:focus-visible) {
 }
 
 
+.card-media.image-error::after {
+  content: none;
+}
+
 .card-placeholder-content {
   text-align: center;
   font-family: var(--font-mono);
