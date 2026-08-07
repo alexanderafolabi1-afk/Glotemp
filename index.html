@@ -74,18 +74,8 @@
             <div class="barometer-temperature" data-i18n="mood">MOOD</div>
             <div class="barometer-value" id="barometer-value">7.8</div>
 
-            <!-- Image-based barometer with picture element -->
-            <div class="barometer-image-container" id="barometer-image-container">
-              <picture id="barometer-picture" class="barometer-picture">
-                <!-- Equilibrium: preloaded (most common) -->
-                <source srcset="/assets/barometer-equilibrium@400.avif 400w, /assets/barometer-equilibrium.avif 768w" type="image/avif" media="(max-width: 768px)">
-                <source srcset="/assets/barometer-equilibrium@400.webp 400w, /assets/barometer-equilibrium.webp 768w" type="image/webp" media="(max-width: 768px)">
-                <source srcset="/assets/barometer-equilibrium.avif" type="image/avif" media="(min-width: 769px)">
-                <source srcset="/assets/barometer-equilibrium.webp" type="image/webp" media="(min-width: 769px)">
-                <img src="/assets/barometer-equilibrium.png" alt="Mood barometer" class="barometer-image" id="barometer-image" width="768" height="1376" loading="eager">
-              </picture>
-              <div class="barometer-image-overlay" id="barometer-image-overlay"></div>
-            </div>
+            <!-- Barometer artwork -->
+            <img id="barometer-image" src="/assets/barometer-equilibrium.png" alt="Mood barometer" class="barometer-image" width="280" height="503" loading="eager">
 
             <div class="barometer-label" id="barometer-label">Equilibrium</div>
           </div>
