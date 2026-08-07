@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pulse Rankings | Glotemp</title>
+  <meta name="description" content="How does every city feel right now? Live pulse rankings based on mood, sentiment, and energy levels.">
+  <meta name="canonical" content="https://glo-temp.com/verticals/pulse">
+  <meta property="og:title" content="Global Pulse Rankings">
+  <meta property="og:description" content="Which cities are surging with energy, and which are in a reflective mood?">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://glo-temp.com/verticals/pulse">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Pulse Rankings",
+    "description": "Live ranking of global cities by emotional temperature and energy level.",
+    "url": "https://glo-temp.com/verticals/pulse",
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": []
+    }
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <nav class="nav-bar glass-card">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <span data-i18n="glotemp_logo">Glotemp</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/" data-i18n="nav_home">Home</a></li>
+        <li><a href="/cities" data-i18n="nav_cities">Cities</a></li>
+        <li><a href="/verticals" data-i18n="nav_verticals">Verticals</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <section class="ranking-header glass-card vertical-pulse">
+      <h1 data-i18n="vertical_pulse">Pulse</h1>
+      <p data-i18n="pulse_description">How does every city feel right now?</p>
+      <p class="ranking-threshold" data-i18n="ranking_note">Rankings require minimum signal volume to publish.</p>
+    </section>
+
+    <div class="ranking-controls glass-card">
+      <button id="toggle-details" class="btn-text" data-i18n="show_details">Show Details</button>
+      <span id="last-updated" class="ranking-updated"></span>
+    </div>
+
+    <section class="ranking-list">
+      <div id="pulse-ranking" class="ranking-content">
+        <div class="loading" data-i18n="loading">Loading rankings...</div>
+      </div>
+    </section>
+
+    <section class="ranking-info glass-card">
+      <h2 data-i18n="what_is_pulse">What is Pulse?</h2>
+      <p data-i18n="pulse_explanation">
+        Pulse measures the emotional temperature of a city right now. It combines human check-ins,
+        sentiment analysis from global news streams (GDELT), and local event signals to show whether
+        a city feels energized, contemplative, or somewhere in between.
+      </p>
+      <h3 data-i18n="pulse_sources">Data Sources</h3>
+      <ul>
+        <li><strong data-i18n="source_user_checkins">User Check-ins:</strong> <span data-i18n="source_user_checkins_desc">Direct mood reports from travelers</span></li>
+        <li><strong data-i18n="source_sentiment">GDELT Sentiment:</strong> <span data-i18n="source_sentiment_desc">Global news and social media sentiment analysis</span></li>
+        <li><strong data-i18n="source_events">Event Signals:</strong> <span data-i18n="source_events_desc">Concert, festival, and cultural event calendars</span></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="footer glass-card">
+    <div class="footer-content">
+      <p class="small-print" data-i18n="footer_copyright">&copy; 2026 Glotemp. Live city intelligence.</p>
+    </div>
+  </footer>
+
+  <script src="/cities-data.js"></script>
+  <script src="/verticals-engine.js"></script>
+  <script>
+    // Load and render Pulse ranking
+    async function loadPulseRanking() {
+      const rankingEl = document.getElementById('pulse-ranking');
+      const lastUpdatedEl = document.getElementById('last-updated');
+
+      try {
+        // Fetch latest pulse readings
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/readings?vertical=eq.pulse&order=fetched_at.desc&limit=150`,
+          {
+            headers: {
+              'apikey': SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+              'Accept': 'application/json'
+            }
+          }
+        );
+
+        if (!response.ok) {
+          rankingEl.innerHTML = '<p data-i18n="error_loading">Error loading rankings. Please try again later.</p>';
+          return;
+        }
+
+        const readings = await response.json();
+        const cityMoods = new Map();
+
+        // Aggregate mood by city (average of recent readings)
+        readings.forEach(reading => {
+          if (!cityMoods.has(reading.city_slug)) {
+            cityMoods.set(reading.city_slug, { values: [], source: reading.source });
+          }
+          if (reading.value !== null) {
+            cityMoods.get(reading.city_slug).values.push(reading.value);
+          }
+        });
+
+        // Calculate averages and create ranking
+        const ranked = Array.from(cityMoods.entries())
+          .map(([slug, data]) => {
+            const city = window.CITIES_DATA.find(c => c.slug === slug);
+            const avgMood = data.values.length > 0
+              ? data.values.reduce((a, b) => a + b, 0) / data.values.length
+              : city?.mood || 0;
+
+            return {
+              slug,
+              name: city?.name || slug,
+              country: city?.country || '',
+              mood: avgMood,
+              signalVolume: data.values.length
+            };
+          })
+          .filter(city => city.signalVolume > 0)
+          .sort((a, b) => b.mood - a.mood);
+
+        // Render ranking
+        rankingEl.innerHTML = ranked.slice(0, 50).map((city, idx) => `
+          <a href="/cities/${city.slug}" class="ranking-item glass-card">
+            <span class="ranking-position">#${idx + 1}</span>
+            <div class="ranking-city">
+              <h3>${city.name}</h3>
+              <p>${city.country}</p>
+            </div>
+            <div class="ranking-score">
+              <span class="score-value">${city.mood.toFixed(1)}</span>
+              <span class="score-label">Mood</span>
+            </div>
+            <span class="ranking-signal">${city.signalVolume} signals</span>
+          </a>
+        `).join('');
+
+        lastUpdatedEl.textContent = `Updated ${verticals.getTimeAgo(new Date())}`;
+      } catch (error) {
+        console.error('Error loading Pulse ranking:', error);
+        rankingEl.innerHTML = '<p data-i18n="error_loading">Error loading rankings.</p>';
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadPulseRanking);
+    } else {
+      loadPulseRanking();
+    }
+  </script>
+  <script src="/app.js" defer></script>
+</body>
+</html>
