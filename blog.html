@@ -257,15 +257,15 @@ function loadPosts() {
       const citySlug = container.dataset.city;
       container.innerHTML = `
         <div class="comment-section">
-          <h4>💬 City Pulse Comments</h4>
+          <h4>City Pulse Comments</h4>
           <div class="comment-input-wrap">
             <textarea class="comment-input" placeholder="Share the vibe (max 280 chars)..." maxlength="280"></textarea>
             <div class="mood-picker">
-              <button class="mood-emoji" data-mood="🔥" title="Energized">🔥</button>
-              <button class="mood-emoji" data-mood="😊" title="Good">😊</button>
-              <button class="mood-emoji" data-mood="😐" title="Neutral">😐</button>
-              <button class="mood-emoji" data-mood="😞" title="Low">😞</button>
-              <button class="mood-emoji" data-mood="😡" title="Cautious">😡</button>
+              <button class="mood-emoji" data-mood="🔥" title="Energized">▲</button>
+              <button class="mood-emoji" data-mood="😊" title="Good">◆</button>
+              <button class="mood-emoji" data-mood="😐" title="Neutral">●</button>
+              <button class="mood-emoji" data-mood="😞" title="Low">▼</button>
+              <button class="mood-emoji" data-mood="😡" title="Cautious">◇</button>
             </div>
             <button class="btn-neon comment-submit">Post Comment</button>
           </div>
