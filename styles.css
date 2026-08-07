@@ -1,6 +1,5 @@
 /* ===== GLOTEMP DESIGN SYSTEM v2 ===== */
-/* Google Fonts Imports */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@6..72,300;6..72,400;6..72,500&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+/* Fonts loaded via link in HTML head */
 
 /* ===== COLOR TOKEN SYSTEM ===== */
 :root {
@@ -70,11 +69,11 @@
 
 /* ===== BACKGROUND & TEXTURE ===== */
 body {
-  font-family: var(--font-body);
-  font-weight: var(--fw-regular);
-  font-size: var(--body-size);
-  line-height: var(--body-height);
-  letter-spacing: -0.2px;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.75;
+  letter-spacing: 0;
   font-variant-numeric: tabular-nums;
   background-color: var(--obsidian);
   color: var(--bone);
@@ -244,14 +243,14 @@ body::after {
 }
 
 .page-header h1 {
-  font-family: var(--font-display);
-  font-size: var(--display-l-size);
-  font-weight: var(--fw-light);
-  letter-spacing: -0.02em;
-  font-optical-sizing: auto;
+  font-family: 'Fraunces', serif;
+  font-variation-settings: 'opsz' 120, 'SOFT' 20, 'WONK' 1;
+  font-weight: 300;
+  font-size: clamp(38px, 5vw, 60px);
+  letter-spacing: -0.025em;
   color: var(--bone);
   margin: 0.5rem 0 1rem 0;
-  line-height: 1.2;
+  line-height: 1.05;
   text-wrap: balance;
 }
 
@@ -1076,12 +1075,13 @@ textarea:focus:not(:focus-visible) {
 }
 
 .eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: var(--eyebrow-size);
+  letter-spacing: 0.2em;
   color: var(--ash);
   margin-bottom: 0.45rem;
-  font-family: var(--font-mono);
   display: block;
   width: 100%;
   padding-bottom: 0.75rem;
@@ -1707,23 +1707,23 @@ textarea:focus:not(:focus-visible) {
 
 /* ===== TYPOGRAPHY ===== */
 h1 {
-  font-family: var(--font-display);
-  font-size: var(--display-xl-size);
-  line-height: var(--display-xl-height);
-  font-weight: var(--fw-light);
-  letter-spacing: -0.02em;
-  font-optical-sizing: auto;
+  font-family: 'Fraunces', serif;
+  font-variation-settings: 'opsz' 120, 'SOFT' 20, 'WONK' 1;
+  font-weight: 300;
+  font-size: clamp(38px, 5vw, 60px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
   text-wrap: balance;
   color: var(--bone);
 }
 
 h2 {
-  font-family: var(--font-display);
-  font-size: var(--heading-size);
-  line-height: var(--heading-height);
-  font-weight: var(--fw-regular);
-  letter-spacing: -0.01em;
-  font-optical-sizing: auto;
+  font-family: 'Fraunces', serif;
+  font-variation-settings: 'opsz' 48, 'SOFT' 10, 'WONK' 0;
+  font-weight: 400;
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
   text-wrap: balance;
   color: var(--bone);
 }
@@ -1746,10 +1746,13 @@ h4 {
 }
 
 p {
-  font-family: var(--font-body);
-  font-size: var(--body-size);
-  line-height: var(--body-height);
+  font-family: 'Manrope', sans-serif;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.75;
+  letter-spacing: 0;
   max-width: 68ch;
+  color: var(--ash);
 }
 
 small {
