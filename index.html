@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=7" />
+  <link rel="stylesheet" href="/styles.css?v=8" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
@@ -67,12 +67,42 @@
         <p class="section-copy" data-i18n="pulse_intro">Watch the mood of cities turning over in real time. Select any city to pin it and dive deeper.</p>
       </div>
 
-      <div class="instrument-images">
-        <img class="instrument-image" src="/assets/barometer-low.png" alt="Low mood barometer" width="300" height="537">
-        <img class="instrument-image" src="/assets/barometer-restrained.png" alt="Restrained mood barometer" width="300" height="537">
-        <img class="instrument-image" src="/assets/barometer-equilibrium.png" alt="Equilibrium mood barometer" width="300" height="537">
-        <img class="instrument-image" src="/assets/barometer-warm.png" alt="Warm mood barometer" width="300" height="537">
-        <img class="instrument-image" src="/assets/barometer-charged.png" alt="Charged mood barometer" width="300" height="537">
+      <div class="instrument-images" id="instrument-row">
+        <div class="instrument-slot" data-slot="0">
+          <img class="instrument-image" src="/assets/barometer-equilibrium.png" alt="Barometer" width="300" height="537">
+          <div class="instrument-label">
+            <span class="instrument-city-name">—</span>
+            <span class="instrument-band-name">—</span>
+          </div>
+        </div>
+        <div class="instrument-slot" data-slot="1">
+          <img class="instrument-image" src="/assets/barometer-warm.png" alt="Barometer" width="300" height="537">
+          <div class="instrument-label">
+            <span class="instrument-city-name">—</span>
+            <span class="instrument-band-name">—</span>
+          </div>
+        </div>
+        <div class="instrument-slot" data-slot="2">
+          <img class="instrument-image" src="/assets/barometer-equilibrium.png" alt="Barometer" width="300" height="537">
+          <div class="instrument-label">
+            <span class="instrument-city-name">—</span>
+            <span class="instrument-band-name">—</span>
+          </div>
+        </div>
+        <div class="instrument-slot" data-slot="3">
+          <img class="instrument-image" src="/assets/barometer-low.png" alt="Barometer" width="300" height="537">
+          <div class="instrument-label">
+            <span class="instrument-city-name">—</span>
+            <span class="instrument-band-name">—</span>
+          </div>
+        </div>
+        <div class="instrument-slot" data-slot="4">
+          <img class="instrument-image" src="/assets/barometer-charged.png" alt="Barometer" width="300" height="537">
+          <div class="instrument-label">
+            <span class="instrument-city-name">—</span>
+            <span class="instrument-band-name">—</span>
+          </div>
+        </div>
       </div>
 
       <!-- City Selector Dropdown -->
@@ -223,24 +253,24 @@
           <p class="eyebrow" data-i18n="coverage_eyebrow">Global pulse</p>
           <h2 data-i18n="coverage_title">Cities in real time</h2>
         </div>
-        <p class="section-copy" data-i18n="coverage_intro">Monitor mood shifts across 52 cities. Each observation adds to the collective understanding of where energy is rising or settling.</p>
+        <p class="section-copy" data-i18n="coverage_intro">Monitor mood shifts across cities worldwide. Each observation adds to the collective understanding of where energy is rising or settling.</p>
       </div>
       <div id="coverage-grid" class="coverage-grid">
         <div class="stat-card glass-card">
           <p class="stat-label" data-i18n="coverage_cities_tracked">Cities tracked</p>
-          <p class="stat-value">52</p>
+          <p class="stat-value" id="cities-tracked-count">150</p>
         </div>
         <div class="stat-card glass-card">
           <p class="stat-label" data-i18n="coverage_live_observations">Live observations</p>
-          <p class="stat-value" id="obs-count">AWAITING</p>
+          <p class="stat-value" id="obs-count">0</p>
         </div>
         <div class="stat-card glass-card">
-          <p class="stat-label" data-i18n="coverage_languages">Languages</p>
-          <p class="stat-value">6</p>
+          <p class="stat-label" data-i18n="coverage_obs_today">Observations today</p>
+          <p class="stat-value" id="obs-today">0</p>
         </div>
         <div class="stat-card glass-card">
-          <p class="stat-label" data-i18n="coverage_regions">Regions covered</p>
-          <p class="stat-value">6</p>
+          <p class="stat-label" data-i18n="coverage_cities_moving">Cities moving</p>
+          <p class="stat-value" id="cities-moving">0</p>
         </div>
       </div>
     </section>
@@ -284,6 +314,7 @@
   </div>
 
   <script src="/cities-data.js" defer></script>
+  <script src="/seed-observations.js" defer></script>
   <script src="/stories.js" defer></script>
   <script src="/app.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
@@ -298,37 +329,8 @@
     }
   </script>
   <script>
-    /* Stat row: AWAITING for zero live observations; --ash for zero values */
+    /* 8s trending cities timeout */
     (function () {
-      function applyStatColours() {
-        document.querySelectorAll('.stat-card .stat-value').forEach(function (el) {
-          var raw = el.textContent.trim();
-          var n = parseFloat(raw);
-          if (el.id === 'obs-count') {
-            if (raw === '0' || raw === '') {
-              el.textContent = 'AWAITING';
-              el.classList.add('stat-zero');
-            } else if (raw !== 'AWAITING') {
-              el.classList.remove('stat-zero');
-            }
-          } else {
-            if (n === 0) {
-              el.classList.add('stat-zero');
-            } else {
-              el.classList.remove('stat-zero');
-            }
-          }
-        });
-      }
-
-      /* Watch obs-count for updates from app.js */
-      var obsEl = document.getElementById('obs-count');
-      if (obsEl && window.MutationObserver) {
-        new MutationObserver(applyStatColours).observe(obsEl, { childList: true, characterData: true, subtree: true });
-      }
-      applyStatColours();
-
-      /* 8s trending cities timeout */
       setTimeout(function () {
         var grid = document.getElementById('fastest-cities-grid');
         if (!grid) return;

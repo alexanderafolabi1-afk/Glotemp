@@ -119,7 +119,9 @@ const translations = {
     obs_empty: "No observations yet. Be the first to share the pulse.",
     coverage_eyebrow: "Global pulse",
     coverage_title: "Cities in real time",
-    coverage_intro: "Monitor mood shifts across 52 cities. Each observation adds to the collective understanding of where energy is rising or settling.",
+    coverage_intro: "Monitor mood shifts across cities worldwide. Each observation adds to the collective understanding of where energy is rising or settling.",
+    coverage_obs_today: "Observations today",
+    coverage_cities_moving: "Cities moving",
     coverage_cities_tracked: "Cities tracked",
     coverage_live_observations: "Live observations",
     coverage_languages: "Languages",
@@ -1407,13 +1409,22 @@ function drawPulse() {
 // City data simulation
 let cities = {}; // Will be populated from data/cities.json
 
-// Load cities data from JSON file
+// Load cities data — prefer CITIES_DATA (cities-data.js), fall back to JSON
 async function loadCitiesData() {
+  const src = (typeof window !== 'undefined' && window.CITIES_DATA) ? window.CITIES_DATA : null;
+  if (src && src.length) {
+    src.forEach(city => {
+      cities[city.slug] = {
+        name: city.name,
+        mood: city.mood || 7.0,
+        dims: city.dims || [7,7,7,7,7,7,7,7,7,7,7,7]
+      };
+    });
+    return cities;
+  }
   try {
     const response = await fetch('/data/cities.json');
     const data = await response.json();
-
-    // Convert to format expected by existing code
     data.cities.forEach(city => {
       cities[city.slug] = {
         name: city.name,
@@ -1421,11 +1432,9 @@ async function loadCitiesData() {
         dims: city.dimensions
       };
     });
-
     return cities;
   } catch (error) {
     console.error('Failed to load cities data:', error);
-    // Fallback to basic cities if file not available
     cities = {
       nyc: { name: "New York", mood: 7.8, dims: [8.2,7.1,9.0,7.5,8.8,6.9,7.0,5.2,9.3,8.0,7.4,8.1] },
       london: { name: "London", mood: 6.9, dims: [7.0,6.8,7.5,7.2,8.0,7.1,6.5,5.8,7.8,7.3,6.9,7.6] },
@@ -1620,42 +1629,47 @@ function addStars(amount) {
   loadStars();
 }
 
-// Load cities from data file and populate selector
+// Load cities from CITIES_DATA (cities-data.js) into the selector
 async function loadCitiesIntoSelector() {
-  try {
-    const response = await fetch('/data/cities.json');
-    const data = await response.json();
-    const select = document.getElementById('city-select');
+  const src = (typeof window !== 'undefined' && window.CITIES_DATA) ? window.CITIES_DATA : null;
+  const select = document.getElementById('city-select');
+  if (!select) return;
 
-    if (!select) return;
-
-    // Group cities by region
-    const byRegion = {};
-    data.cities.forEach(city => {
-      if (!byRegion[city.region]) byRegion[city.region] = [];
-      byRegion[city.region].push(city);
-    });
-
-    // Add options grouped by region
-    Object.keys(byRegion).sort().forEach(region => {
-      const optgroup = document.createElement('optgroup');
-      optgroup.label = region;
-
-      byRegion[region].forEach(city => {
-        const option = document.createElement('option');
-        option.value = city.slug;
-        option.textContent = `${city.name}, ${city.country}`;
-        optgroup.appendChild(option);
-      });
-
-      select.appendChild(optgroup);
-    });
-
-    // Set NYC as default
-    select.value = 'nyc';
-  } catch (error) {
-    console.error('Failed to load cities:', error);
+  let cityList = [];
+  if (src && src.length) {
+    cityList = src;
+  } else {
+    try {
+      const response = await fetch('/data/cities.json');
+      const data = await response.json();
+      cityList = data.cities.map(c => ({ slug: c.slug, name: c.name, country: c.country, region: c.region }));
+    } catch (error) {
+      console.error('Failed to load cities:', error);
+      return;
+    }
   }
+
+  // Group by region
+  const byRegion = {};
+  cityList.forEach(city => {
+    const r = city.region || 'Other';
+    if (!byRegion[r]) byRegion[r] = [];
+    byRegion[r].push(city);
+  });
+
+  Object.keys(byRegion).sort().forEach(region => {
+    const optgroup = document.createElement('optgroup');
+    optgroup.label = region;
+    byRegion[region].forEach(city => {
+      const option = document.createElement('option');
+      option.value = city.slug;
+      option.textContent = `${city.name}, ${city.country || city.iso || ''}`;
+      optgroup.appendChild(option);
+    });
+    select.appendChild(optgroup);
+  });
+
+  select.value = 'nyc';
 }
 
 // Initialize everything
@@ -1892,14 +1906,192 @@ function loadDailyStory() {
   }
 }
 
+// Return seed observations (+ any real ones from Supabase in future)
+function getRecentComments(limit) {
+  const seed = (window.SEED_OBSERVATIONS || []);
+  return Promise.resolve(limit ? seed.slice(0, limit) : seed);
+}
+
+// Map mood score to band name + barometer image filename
+function moodToBand(mood) {
+  if (mood >= 8.5) return { band: 'charged',     img: '/assets/barometer-charged.png' };
+  if (mood >= 7.0) return { band: 'warm',        img: '/assets/barometer-warm.png' };
+  if (mood >= 5.0) return { band: 'equilibrium', img: '/assets/barometer-equilibrium.png' };
+  if (mood >= 3.0) return { band: 'restrained',  img: '/assets/barometer-restrained.png' };
+  return            { band: 'low',          img: '/assets/barometer-low.png' };
+}
+
+// Animate a numeric stat value ticking up from 0 to target
+function tickStatUp(el, target, duration) {
+  if (!el || !target) return;
+  const start = performance.now();
+  function step(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(eased * target).toString();
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
 function loadCoverageStats() {
-  const obsCount = document.getElementById('obs-count');
-  if (obsCount) {
-    getRecentComments(1000).then(comments => {
-      obsCount.textContent = comments.length.toString();
-    }).catch(() => {
-      obsCount.textContent = '0';
+  // Cities tracked from dataset
+  const tracked = (window.CITIES_DATA || []).length || 150;
+  const trackedEl = document.getElementById('cities-tracked-count');
+  if (trackedEl) tickStatUp(trackedEl, tracked, 800);
+
+  getRecentComments(1000).then(comments => {
+    const now = Date.now();
+    const h24 = 24 * 3600000;
+    const h48 = 48 * 3600000;
+
+    // Total live observations
+    const obsEl = document.getElementById('obs-count');
+    if (obsEl) tickStatUp(obsEl, comments.length, 1200);
+
+    // Observations in last 24h
+    const today = comments.filter(c => {
+      const ms = c.created_at ? new Date(c.created_at).getTime() : 0;
+      return (now - ms) < h24;
     });
+    const todayEl = document.getElementById('obs-today');
+    if (todayEl) tickStatUp(todayEl, today.length, 1000);
+
+    // Cities whose sentiment moved in the last 24h vs 24-48h window
+    const cityRecent = {};
+    const cityOlder  = {};
+    comments.forEach(c => {
+      const age = now - (c.created_at ? new Date(c.created_at).getTime() : 0);
+      if (age < h24)            (cityRecent[c.city] = cityRecent[c.city] || []).push(c.sentiment || 0);
+      else if (age < h48)       (cityOlder[c.city]  = cityOlder[c.city]  || []).push(c.sentiment || 0);
+    });
+    const avg = arr => arr.reduce((s, v) => s + v, 0) / arr.length;
+    let moving = 0;
+    Object.keys(cityRecent).forEach(city => {
+      if (cityOlder[city]) {
+        const diff = Math.abs(avg(cityRecent[city]) - avg(cityOlder[city]));
+        if (diff > 0.1) moving++;
+      }
+    });
+    const movingEl = document.getElementById('cities-moving');
+    if (movingEl) tickStatUp(movingEl, moving || Math.ceil(Object.keys(cityRecent).length * 0.4), 900);
+  }).catch(() => {});
+}
+
+// Barometer rotation — 5 slots, staggered, session-shuffled
+function setupBarometerRotation() {
+  const slots = document.querySelectorAll('.instrument-slot');
+  if (!slots.length) return;
+
+  const allCities = (window.CITIES_DATA || []).filter(c => c.available !== false);
+  if (allCities.length < 5) return;
+
+  // Shuffle once per session
+  const shuffled = allCities.slice().sort(() => Math.random() - 0.5);
+  let cursor = 0;
+
+  // Assign 5 unique starting cities
+  const assigned = [];
+  for (let i = 0; i < 5; i++) {
+    assigned.push(shuffled[cursor++ % shuffled.length]);
+  }
+
+  function nextUniqueCity(excluding) {
+    for (let tries = 0; tries < shuffled.length * 2; tries++) {
+      const c = shuffled[cursor++ % shuffled.length];
+      if (!excluding.includes(c.slug)) return c;
+    }
+    return shuffled[0];
+  }
+
+  function updateSlot(slotEl, cityData) {
+    const img = slotEl.querySelector('.instrument-image');
+    const nameEl = slotEl.querySelector('.instrument-city-name');
+    const bandEl = slotEl.querySelector('.instrument-band-name');
+    if (!img || !nameEl || !bandEl) return;
+
+    const { band, img: imgSrc } = moodToBand(cityData.mood || 7.0);
+    const isChange = img.getAttribute('src') !== imgSrc && img.getAttribute('src') && img.getAttribute('src').indexOf('barometer') !== -1;
+
+    if (isChange) {
+      img.classList.add('instrument-fading');
+      setTimeout(() => {
+        img.src = imgSrc;
+        img.alt = band + ' mood barometer';
+        img.classList.remove('instrument-fading');
+      }, 350);
+    } else {
+      img.src = imgSrc;
+      img.alt = band + ' mood barometer';
+    }
+
+    nameEl.textContent = cityData.name;
+    bandEl.textContent = band;
+  }
+
+  // Initial render
+  slots.forEach((slot, i) => {
+    updateSlot(slot, assigned[i]);
+  });
+
+  // Prefers-reduced-motion: skip auto-rotation
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const STAGGER_MS   = 1400;  // gap between slot firings
+  const INTERVAL_MS  = 7000;  // each slot repeats every 7s
+  let paused = false;
+
+  document.addEventListener('visibilitychange', () => { paused = document.hidden; });
+
+  slots.forEach((slot, i) => {
+    setTimeout(() => {
+      setInterval(() => {
+        if (paused || slot.matches(':hover')) return;
+        const current = assigned.map(c => c.slug);
+        const next = nextUniqueCity(current);
+        assigned[i] = next;
+        updateSlot(slot, next);
+      }, INTERVAL_MS);
+    }, i * STAGGER_MS);
+  });
+}
+
+// Live ticker — continuous scroll of seed observations
+function setupLiveTicker() {
+  const ticker = document.getElementById('ticker-content');
+  if (!ticker) return;
+
+  const obs = (window.SEED_OBSERVATIONS || []).slice().sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+  );
+
+  if (!obs.length) return;
+
+  function escTick(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // Build a wide inline track that repeats for continuous scroll
+  const items = [...obs, ...obs].map(o => {
+    const city = escTick(o.cityName || o.city || '');
+    const note = escTick((o.context || '').slice(0, 80));
+    return `<span class="ticker-item"><strong>${city}</strong> — ${note}</span>`;
+  }).join('<span class="ticker-sep">·</span>');
+
+  ticker.innerHTML = `<div class="ticker-track" aria-live="off">${items}</div>`;
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // Show first item statically
+    const first = obs[0];
+    const fc = escTick(first.cityName || first.city);
+    const fn = escTick((first.context || '').slice(0, 100));
+    ticker.innerHTML = `<p class="ticker-placeholder"><strong>${fc}</strong> — ${fn}</p>`;
   }
 }
 
@@ -1907,25 +2099,78 @@ function loadFastestCities() {
   const grid = document.getElementById('fastest-cities-grid');
   if (!grid) return;
 
+  const obs = window.SEED_OBSERVATIONS || [];
+  if (!obs.length) {
+    // fall back to random city entries
+    grid.innerHTML = '';
+    const cityEntries = Object.entries(cities).sort(() => Math.random() - 0.5).slice(0, 3);
+    cityEntries.forEach(([slug, cityData]) => {
+      const shift = (Math.random() - 0.5) * 2;
+      const shiftDirection = shift > 0 ? 'positive' : 'negative';
+      const shiftPercent = Math.abs((shift * 100).toFixed(1));
+      const currentMood = Math.max(0, Math.min(10, cityData.mood + shift)).toFixed(1);
+      const card = document.createElement('div');
+      card.className = 'fastest-card';
+      card.innerHTML = `
+        <h3 class="fastest-city-name">${cityData.name}</h3>
+        <p class="fastest-shift ${shiftDirection}">Mood ${shift > 0 ? '↑' : '↓'} ${shiftPercent}% last 24h</p>
+        <p class="fastest-shift">Now at ${currentMood} / 10</p>
+        <div class="fastest-mood">${getMoodEmoji(parseFloat(currentMood))}</div>
+      `;
+      grid.appendChild(card);
+    });
+    return;
+  }
+
+  // Compute average sentiment per city from last 24h vs 24-48h
+  const now = Date.now();
+  const h24 = 24 * 3600000;
+  const h48 = 48 * 3600000;
+  const recent = {}, older = {};
+  const cityNames = {};
+
+  obs.forEach(o => {
+    const age = now - new Date(o.created_at).getTime();
+    const key = o.city;
+    cityNames[key] = o.cityName || o.city;
+    if (age < h24)        (recent[key] = recent[key] || []).push(o.sentiment || 0);
+    else if (age < h48)   (older[key]  = older[key]  || []).push(o.sentiment || 0);
+  });
+
+  const avg = arr => arr.reduce((s, v) => s + v, 0) / arr.length;
+
+  const shifts = Object.keys(recent)
+    .filter(c => older[c])
+    .map(c => ({
+      city: c,
+      name: cityNames[c],
+      shift: avg(recent[c]) - avg(older[c]),
+      recentAvg: avg(recent[c])
+    }))
+    .sort((a, b) => Math.abs(b.shift) - Math.abs(a.shift))
+    .slice(0, 3);
+
+  // If not enough comparison data, top by recent activity
+  if (shifts.length < 3) {
+    const topByActivity = Object.keys(recent)
+      .filter(c => !shifts.find(s => s.city === c))
+      .slice(0, 3 - shifts.length)
+      .map(c => ({ city: c, name: cityNames[c], shift: avg(recent[c]) - 0.65, recentAvg: avg(recent[c]) }));
+    shifts.push(...topByActivity);
+  }
+
   grid.innerHTML = '';
-
-  const cityEntries = Object.entries(cities).sort(() => Math.random() - 0.5).slice(0, 3);
-
-  cityEntries.forEach(([slug, cityData]) => {
-    const shift = (Math.random() - 0.5) * 2;
-    const shiftDirection = shift > 0 ? 'positive' : 'negative';
-    const shiftPercent = Math.abs((shift * 100).toFixed(1));
-    const currentMood = Math.max(0, Math.min(10, cityData.mood + shift)).toFixed(1);
-
+  shifts.forEach(({ name, shift, recentAvg }) => {
+    const direction = shift >= 0 ? 'positive' : 'negative';
+    const pct = Math.abs(shift * 100).toFixed(1);
+    const moodScore = Math.max(0, Math.min(10, 7.0 + recentAvg * 2)).toFixed(1);
     const card = document.createElement('div');
     card.className = 'fastest-card';
     card.innerHTML = `
-      <h3 class="fastest-city-name">${cityData.name}</h3>
-      <p class="fastest-shift ${shiftDirection}">
-        Mood ${shift > 0 ? '↑' : '↓'} ${shiftPercent}% last 24h
-      </p>
-      <p class="fastest-shift">Now at ${currentMood} / 10</p>
-      <div class="fastest-mood">${getMoodEmoji(parseFloat(currentMood))}</div>
+      <h3 class="fastest-city-name">${name}</h3>
+      <p class="fastest-shift ${direction}">Mood ${shift >= 0 ? '↑' : '↓'} ${pct}% last 24h</p>
+      <p class="fastest-shift">Now at ${moodScore} / 10</p>
+      <div class="fastest-mood">${getMoodEmoji(parseFloat(moodScore))}</div>
     `;
     grid.appendChild(card);
   });
@@ -1956,17 +2201,14 @@ function setupScrollReveals() {
   });
 }
 
-// Live ticker updates
-function setupLiveTicker() {
-  // Ticker content is pre-rendered in HTML with data-i18n attributes
-  // applyTranslations will handle localization on load
-}
+// Live ticker updates — implemented above in setupLiveTicker()
 
 document.addEventListener('DOMContentLoaded', () => {
   // ... existing code like applyTranslations, resizeCanvas, etc.
   loadDailyStory();
   loadCoverageStats();
   loadFastestCities();
+  setupBarometerRotation();
 
   // Setup scroll reveal animations
   if ('IntersectionObserver' in window) {
