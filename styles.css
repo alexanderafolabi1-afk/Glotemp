@@ -85,8 +85,7 @@ body {
   position: relative;
 }
 
-/* Cracked black leather surface.
-   Two layers of SVG fractal noise: fine grain over broad mottling. */
+/* Leather texture background - darker, high-contrast cracked leather */
 body::before {
   content: '';
   position: fixed;
@@ -96,12 +95,36 @@ body::before {
   height: 100%;
   background-color: var(--obsidian);
   background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)' opacity='0.55'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.014' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='800' height='800' filter='url(%23m)' opacity='0.85'/%3E%3C/svg%3E");
-  background-size: 300px 300px, 800px 800px;
-  background-repeat: repeat, repeat;
-  background-position: 0 0, 0 0;
-  background-blend-mode: overlay, normal;
+    /* Large mottling layer - DARK - creates the hide texture */
+    radial-gradient(ellipse 120px 90px at 15% 25%, rgba(233,231,240,0.08) 0%, transparent 40%),
+    radial-gradient(ellipse 100px 80px at 75% 60%, rgba(233,231,240,0.06) 0%, transparent 45%),
+    radial-gradient(ellipse 110px 85px at 45% 75%, rgba(233,231,240,0.07) 0%, transparent 42%),
+    radial-gradient(ellipse 95px 70px at 85% 20%, rgba(233,231,240,0.055) 0%, transparent 48%),
+    radial-gradient(ellipse 105px 75px at 25% 55%, rgba(233,231,240,0.065) 0%, transparent 46%),
+    /* Medium grain texture - subtle */
+    radial-gradient(ellipse 3px 2px at 20% 30%, rgba(233,231,240,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 3px 2px at 60% 70%, rgba(233,231,240,0.035) 0%, transparent 50%),
+    radial-gradient(ellipse 3px 2px at 40% 50%, rgba(233,231,240,0.038) 0%, transparent 50%),
+    radial-gradient(ellipse 3px 2px at 80% 20%, rgba(233,231,240,0.033) 0%, transparent 50%),
+    radial-gradient(ellipse 3px 2px at 10% 90%, rgba(233,231,240,0.042) 0%, transparent 50%),
+    /* Fine hair texture */
+    repeating-linear-gradient(
+      45deg,
+      transparent 0px,
+      transparent 2px,
+      rgba(233,231,240,0.015) 2px,
+      rgba(233,231,240,0.015) 3px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0px,
+      transparent 2px,
+      rgba(233,231,240,0.012) 2px,
+      rgba(233,231,240,0.012) 3px
+    );
+  background-size: cover, cover, cover, cover, cover, cover, cover, cover, cover, cover, 8px 8px, 8px 8px;
+  background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+  background-repeat: repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat;
   background-attachment: fixed;
   opacity: 0.9;
   pointer-events: none;
@@ -248,6 +271,23 @@ body::after {
   justify-content: center;
   margin-bottom: 1.5rem;
   transition: all var(--smooth-transition);
+}
+
+.barometer-artwork {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.barometer-artwork svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .barometer-chamber.ascending {
@@ -537,13 +577,21 @@ body::after {
 }
 
 /* ===== FOCUS STATES ===== */
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
   outline: 2px solid var(--ion);
   outline-offset: 2px;
+}
+
+a:focus:not(:focus-visible),
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* ===== INSTALL BANNER ===== */
@@ -726,6 +774,73 @@ textarea:focus-visible {
   transform: translateY(-2px);
 }
 
+.affiliate-btn svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+/* ===== CARD MEDIA COMPONENT ===== */
+.card-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 1rem;
+  border: 1px solid var(--hairline);
+}
+
+.card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.card-media:hover img {
+  transform: scale(1.02);
+}
+
+/* Image gradient overlay for text legibility */
+.card-media::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to top, rgba(6,6,10,0.6), transparent);
+  pointer-events: none;
+}
+
+/* ===== PLACEHOLDER CARD ===== */
+.card-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3 / 2;
+  background: var(--basalt);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  min-height: 200px;
+}
+
+.card-placeholder-content {
+  text-align: center;
+  font-family: var(--font-mono);
+  color: var(--ash);
+}
+
+.card-placeholder-name {
+  font-size: var(--subheading-size-mobile);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.05em;
+  word-break: break-word;
+  padding: 0 1rem;
+}
+
 /* ===== DAILY STORY ===== */
 #daily-story {
   position: relative;
@@ -819,17 +934,13 @@ textarea:focus-visible {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
-.blog-card-emoji {
-  font-size: 2.5rem;
-  line-height: 1;
-  margin-bottom: 0.6rem;
-  user-select: none;
+/* Blog card uses card-media instead of emoji */
+.blog-card .card-media {
+  margin-bottom: 0.8rem;
 }
 
-.blog-card-emoji img.emoji {
-  height: 2.5rem;
-  width: auto;
-  vertical-align: middle;
+.blog-card .card-placeholder {
+  margin-bottom: 0.8rem;
 }
 
 .blog-card-body {
@@ -1635,5 +1746,74 @@ small {
 
   .navbar {
     padding: 0.7rem 1rem;
+  }
+}
+
+/* ===== FOCUS RINGS & ACCESSIBILITY ===== */
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--ion);
+  outline-offset: 2px;
+}
+
+a:focus:not(:focus-visible),
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Remove outline for mouse users on buttons with hover */
+button:hover:not(:focus-visible) {
+  outline: none;
+}
+
+/* ===== UTILITY CLASSES ===== */
+.prose-section {
+  color: var(--ash);
+  line-height: 1.7;
+  max-width: 68ch;
+}
+
+.prose-section a {
+  color: var(--ion);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.prose-section a:hover {
+  color: var(--bone);
+  text-decoration: underline;
+}
+
+.page-main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.section-grid {
+  display: grid;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.pull-quote {
+  border-left: 3px solid var(--ion);
+  padding-left: 1.5rem;
+  font-size: var(--subheading-size-mobile);
+  font-weight: var(--fw-medium);
+  margin: 1.5rem 0;
+  color: var(--bone);
+}
+
+/* Ensure safe areas on mobile with notches/home indicators */
+@supports (padding: max(0px)) {
+  .footer {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
 }
