@@ -6,7 +6,7 @@ const translations = {
     dismiss: "✕",
     mood: "Mood",
     trip_engine_title: "Trip Engine",
-    trip_question: "Should you travel to <strong></strong> this weekend?",
+    trip_question: "Should you travel to {city} this weekend?",
     trip_go_reason: "The streets are charged. Energy is high. The moment is right.",
     trip_maybe_reason: "It’s decent, but check the weather first.",
     trip_wait_reason: "Mood is low; maybe next weekend.",
@@ -39,6 +39,10 @@ const translations = {
     trivia: "Trivia",
     history: "History",
     read_more: "Read more",
+    pulse_eyebrow: "Live instruments",
+    pulse_title: "Instrument room",
+    pulse_intro: "Watch the mood of cities turning over in real time. Select any city to pin it and dive deeper.",
+    no_observations: "Be the first to share an observation. Check in now.",
     checkin_eyebrow: "Observation intake",
     checkin_intro: "Offer a quiet signal from where you stand. Richer observations deepen the atlas while keeping the ritual gentle.",
     intensity_label: "Intensity",
@@ -131,7 +135,7 @@ const translations = {
     dismiss: "✕",
     mood: "Ánimo",
     trip_engine_title: "Motor de Viaje",
-    trip_question: "¿Deberías viajar a <strong></strong> este fin de semana?",
+    trip_question: "¿Deberías viajar a {city} este fin de semana?",
     trip_go_reason: "Las calles están cargadas de energía. El momento es perfecto.",
     trip_maybe_reason: "Está bien, pero revisa el clima primero.",
     trip_wait_reason: "El ánimo está bajo; tal vez el próximo fin de semana.",
@@ -160,6 +164,10 @@ const translations = {
     trivia: "Curiosidades",
     history: "Historia",
     read_more: "Leer más",
+    pulse_eyebrow: "Instrumentos en vivo",
+    pulse_title: "Sala de instrumentos",
+    pulse_intro: "Mira cómo cambia el ánimo de las ciudades en tiempo real. Selecciona una ciudad para fijarla y profundizar.",
+    no_observations: "Sé el primero en compartir una observación. Regístrate ahora.",
     checkin_eyebrow: "Ingreso de observación",
     checkin_intro: "Ofrece una señal discreta desde donde estás. Las observaciones más ricas profundizan el atlas sin romper el ritual.",
     intensity_label: "Intensidad",
@@ -238,7 +246,7 @@ const translations = {
     dismiss: "✕",
     mood: "Humeur",
     trip_engine_title: "Moteur de Voyage",
-    trip_question: "Devriez-vous voyager à <strong></strong> ce week-end ?",
+    trip_question: "Devriez-vous voyager à {city} ce week-end ?",
     trip_go_reason: "Les rues sont chargées d'énergie. Le moment est parfait.",
     trip_maybe_reason: "C'est correct, mais vérifiez la météo.",
     trip_wait_reason: "L'humeur est basse, peut-être le week-end prochain.",
@@ -267,6 +275,10 @@ const translations = {
     trivia: "Anecdotes",
     history: "Histoire",
     read_more: "En savoir plus",
+    pulse_eyebrow: "Instruments en direct",
+    pulse_title: "Salle des instruments",
+    pulse_intro: "Regardez l'humeur des villes évoluer en temps réel. Sélectionnez une ville pour l'épingler et explorer davantage.",
+    no_observations: "Soyez le premier à partager une observation. Enregistrez-vous maintenant.",
     checkin_eyebrow: "Prise d'observation",
     checkin_intro: "Offrez un signal discret depuis votre position. Des observations plus riches approfondissent l'atlas sans rompre le rituel.",
     intensity_label: "Intensité",
@@ -345,7 +357,7 @@ const translations = {
     dismiss: "✕",
     mood: "Stimmung",
     trip_engine_title: "Reise-Engine",
-    trip_question: "Sollten Sie dieses Wochenende nach <strong></strong> reisen?",
+    trip_question: "Sollten Sie dieses Wochenende nach {city} reisen?",
     trip_go_reason: "Die Straßen sind voller Energie. Der Moment ist richtig.",
     trip_maybe_reason: "Ganz okay, aber prüfe das Wetter.",
     trip_wait_reason: "Stimmung ist niedrig; vielleicht nächstes Wochenende.",
@@ -374,6 +386,10 @@ const translations = {
     trivia: "Wissenswertes",
     history: "Geschichte",
     read_more: "Mehr lesen",
+    pulse_eyebrow: "Live-Instrumente",
+    pulse_title: "Instrumentenraum",
+    pulse_intro: "Beobachten Sie, wie sich die Stimmung von Städten in Echtzeit verändert. Wählen Sie eine Stadt aus, um sie anzupinnen und tiefer einzutauchen.",
+    no_observations: "Seien Sie der Erste, der eine Beobachtung teilt. Jetzt einchecken.",
     checkin_eyebrow: "Beobachtungseingang",
     checkin_intro: "Sende ein leises Signal von deinem Standort. Reichere Beobachtungen vertiefen den Atlas, ohne das Ritual zu stören.",
     intensity_label: "Intensität",
@@ -452,7 +468,7 @@ const translations = {
     dismiss: "✕",
     mood: "Humor",
     trip_engine_title: "Motor de Viagem",
-    trip_question: "Você deveria viajar para <strong></strong> neste fim de semana?",
+    trip_question: "Você deveria viajar para {city} neste fim de semana?",
     trip_go_reason: "As ruas estão carregadas de energia. O momento é perfeito.",
     trip_maybe_reason: "Está razoável, mas verifique o clima.",
     trip_wait_reason: "O humor está baixo; talvez no próximo fim de semana.",
@@ -481,6 +497,10 @@ const translations = {
     trivia: "Curiosidades",
     history: "História",
     read_more: "Ler mais",
+    pulse_eyebrow: "Instrumentos ao vivo",
+    pulse_title: "Sala de instrumentos",
+    pulse_intro: "Veja o humor das cidades mudando em tempo real. Selecione qualquer cidade para fixá-la e aprofundar.",
+    no_observations: "Seja o primeiro a compartilhar uma observação. Faça check-in agora.",
     checkin_eyebrow: "Entrada de observação",
     checkin_intro: "Ofereça um sinal discreto de onde você está. Observações mais ricas aprofundam o atlas sem quebrar o ritual.",
     intensity_label: "Intensidade",
@@ -559,7 +579,7 @@ const translations = {
     dismiss: "✕",
     mood: "ムード",
     trip_engine_title: "トリップエンジン",
-    trip_question: "今週末<strong></strong>へ旅行すべきですか？",
+    trip_question: "今週末{city}へ旅行すべきですか？",
     trip_go_reason: "街はエネルギーに満ちています。今がその時です。",
     trip_maybe_reason: "まあまあですが、天気を確認してください。",
     trip_wait_reason: "気分は低め、次の週末かも。",
@@ -588,6 +608,10 @@ const translations = {
     trivia: "トリビア",
     history: "歴史",
     read_more: "続きを読む",
+    pulse_eyebrow: "ライブ計器",
+    pulse_title: "計器室",
+    pulse_intro: "都市のムードがリアルタイムで移り変わる様子を見守りましょう。都市を選んで固定し、さらに深く確認できます。",
+    no_observations: "最初の観測を共有してください。今すぐチェックイン。",
     checkin_eyebrow: "観測入力",
     checkin_intro: "今いる場所から静かなシグナルを届けてください。より豊かな観測は儀式を壊さずにアトラスを深めます。",
     intensity_label: "強度",
@@ -772,6 +796,20 @@ const supportedLangs = Object.keys(translations);
 let currentLang = (navigator.language || 'en').split('-')[0];
 if (!supportedLangs.includes(currentLang)) currentLang = 'en';
 
+function hasUsableTranslation(value) {
+  if (value === undefined || value === null) return false;
+  if (typeof value === 'string') return value.trim().length > 0;
+  return true;
+}
+
+function resolveTranslation(key) {
+  const localized = translations[currentLang]?.[key];
+  if (hasUsableTranslation(localized)) return localized;
+  const english = translations.en?.[key];
+  if (hasUsableTranslation(english)) return english;
+  return null;
+}
+
 function setLanguage(lang) {
   currentLang = lang;
   document.documentElement.lang = lang;
@@ -779,24 +817,92 @@ function setLanguage(lang) {
   applyTranslations();
 }
 
-function t(key) {
-  return translations[currentLang]?.[key] || translations.en[key] || key;
+function t(key, fallback = '') {
+  const value = resolveTranslation(key);
+  return value === null ? fallback : value;
+}
+
+function updateTextNodeOnly(el, text) {
+  const textNode = Array.from(el.childNodes).find(node => node.nodeType === Node.TEXT_NODE);
+  if (textNode) {
+    textNode.textContent = text;
+    return true;
+  }
+  if (el.childElementCount === 0) {
+    el.textContent = text;
+    return true;
+  }
+  return false;
+}
+
+function updateTripQuestionText(el, template) {
+  const cityEl = el.querySelector('#trip-city');
+  if (!cityEl || typeof template !== 'string') return false;
+
+  const [before, ...rest] = template.split('{city}');
+  if (rest.length !== 1) return false;
+  const after = rest.join('{city}');
+
+  let beforeNode = null;
+  let afterNode = null;
+  const childNodes = Array.from(el.childNodes);
+  const cityIndex = childNodes.indexOf(cityEl);
+  childNodes.forEach((node, index) => {
+    if (node.nodeType !== Node.TEXT_NODE) return;
+    if (index < cityIndex) {
+      beforeNode = beforeNode || node;
+      return;
+    }
+    if (index > cityIndex) afterNode = afterNode || node;
+  });
+
+  if (!beforeNode) {
+    beforeNode = document.createTextNode('');
+    el.insertBefore(beforeNode, cityEl);
+  }
+
+  if (!afterNode) {
+    afterNode = document.createTextNode('');
+    if (cityEl.nextSibling) el.insertBefore(afterNode, cityEl.nextSibling);
+    else el.appendChild(afterNode);
+  }
+
+  beforeNode.textContent = before;
+  afterNode.textContent = after;
+  return true;
 }
 
 function applyTranslations() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
+    if (el.closest('#instruments-carousel')) return;
+    if (el.querySelector('img')) return;
+
     const key = el.dataset.i18n;
+    const translated = resolveTranslation(key);
+    if (!hasUsableTranslation(translated)) return;
+
     if (key === 'trip_question') {
-      el.innerHTML = t(key).replace('<strong></strong>', `<strong>${document.getElementById('trip-city')?.textContent || ''}</strong>`);
-    } else {
-      el.textContent = t(key);
+      if (!updateTripQuestionText(el, translated)) updateTextNodeOnly(el, translated);
+      return;
     }
+
+    updateTextNodeOnly(el, translated);
   });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.dataset.i18nPlaceholder;
-    el.setAttribute('placeholder', t(key));
+    const translated = resolveTranslation(key);
+    if (!hasUsableTranslation(translated)) return;
+    el.setAttribute('placeholder', translated);
   });
 }
+
+// Restore language
+const savedLang = localStorage.getItem('glotemp-lang');
+if (savedLang && supportedLangs.includes(savedLang)) currentLang = savedLang;
+document.documentElement.lang = currentLang;
+
+// Run before DOMContentLoaded work so keys never render.
+applyTranslations();
 
 // ----- Language Switch Modal -----
 (function initLangUI() {
@@ -818,11 +924,6 @@ function applyTranslations() {
   document.body.appendChild(modal);
   document.getElementById('lang-switch').onclick = () => modal.style.display = 'flex';
 })();
-
-// Restore language
-const savedLang = localStorage.getItem('glotemp-lang');
-if (savedLang && supportedLangs.includes(savedLang)) currentLang = savedLang;
-document.documentElement.lang = currentLang;
 
 // ----- Observatory System -----
 const OBSERVATORY_STORAGE_KEY = 'glotemp-observatory';
@@ -1649,7 +1750,6 @@ async function loadCitiesIntoSelector() {
 
 // Initialize everything
 document.addEventListener('DOMContentLoaded', async () => {
-  applyTranslations();
   preloadBarometerImages();
   await loadCitiesData();
   loadCitiesIntoSelector();
