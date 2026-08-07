@@ -310,7 +310,232 @@ body::after {
   }
 }
 
-/* ===== LIVING BAROMETER ===== */
+/* ===== INSTRUMENTS CAROUSEL ===== */
+.instruments-carousel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 2rem;
+  justify-content: center;
+}
+
+.instrument-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 550px;
+}
+
+.instrument-header {
+  padding: 1.5rem 1.5rem 0.5rem;
+}
+
+.instrument-city {
+  font-family: 'Fraunces', serif;
+  font-size: 1.2rem;
+  font-weight: 300;
+  color: var(--bone);
+  margin: 0;
+}
+
+.instrument-barometer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  min-height: 360px;
+  background: transparent;
+}
+
+.instrument-barometer .barometer-image {
+  width: 220px;
+  height: auto;
+  object-fit: contain;
+  opacity: 1;
+  transition: opacity 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.instrument-barometer .barometer-image.transitioning {
+  opacity: 0;
+}
+
+.instrument-band {
+  padding: 1rem 1.5rem 1.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--ash);
+  text-align: center;
+}
+
+/* Breathing animation on instrument cards */
+@keyframes instrument-breathe {
+  0%, 100% { filter: brightness(0.92); }
+  50% { filter: brightness(1.0); }
+}
+
+.instrument-card {
+  animation: instrument-breathe 6s ease-in-out infinite;
+}
+
+/* Stagger breathing animation per slot */
+.carousel-slot[data-slot="1"] .instrument-card { animation-delay: 0s; }
+.carousel-slot[data-slot="2"] .instrument-card { animation-delay: 1.5s; }
+.carousel-slot[data-slot="3"] .instrument-card { animation-delay: 3s; }
+.carousel-slot[data-slot="4"] .instrument-card { animation-delay: 4.5s; }
+
+.instrument-card:hover,
+.instrument-card:focus-within {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .instrument-card {
+    animation: none;
+  }
+  .instrument-barometer .barometer-image {
+    transition: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .instruments-carousel {
+    grid-template-columns: 1fr;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    padding-bottom: 1rem;
+  }
+
+  .carousel-slot {
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+
+  .instrument-card {
+    min-height: 480px;
+  }
+
+  .instrument-barometer {
+    min-height: 300px;
+  }
+
+  .instrument-barometer .barometer-image {
+    width: calc(34vh * 0.4);
+    height: auto;
+    max-width: 180px;
+  }
+}
+
+/* ===== LIVE TICKER ===== */
+.live-ticker {
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+}
+
+.ticker-content {
+  flex: 1;
+  display: flex;
+  gap: 1rem;
+  overflow: hidden;
+}
+
+.ticker-observation {
+  display: inline-flex;
+  gap: 0.5rem;
+  white-space: nowrap;
+  animation: scroll-ticker linear infinite;
+  padding-right: 2rem;
+}
+
+@keyframes scroll-ticker {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.ticker-observation:hover {
+  animation-play-state: paused;
+}
+
+.ticker-placeholder {
+  color: var(--ash);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-observation {
+    animation: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* ===== SCROLL REVEAL ANIMATIONS ===== */
+.carousel-slot,
+.glass-card,
+section {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 400ms ease-out, transform 400ms ease-out;
+}
+
+.carousel-slot.revealed,
+.glass-card.revealed,
+section.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.carousel-slot:nth-child(1) { transition-delay: 0ms; }
+.carousel-slot:nth-child(2) { transition-delay: 80ms; }
+.carousel-slot:nth-child(3) { transition-delay: 160ms; }
+.carousel-slot:nth-child(4) { transition-delay: 240ms; }
+
+/* ===== CARD HOVER EFFECTS ===== */
+.instrument-card {
+  transition: transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 600ms ease-out;
+}
+
+.instrument-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--ion);
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--ion);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel-slot,
+  .glass-card,
+  section,
+  .instrument-card,
+  .glass-card {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ===== CITY SELECTOR PANEL ===== */
+.city-selector {
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.city-details {
+  margin-top: 1rem;
+}
+
+/* ===== LIVING BAROMETER (LEGACY) ===== */
 .barometer-chamber {
   position: relative;
   width: 100%;

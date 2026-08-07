@@ -1862,9 +1862,66 @@ function getMoodEmoji(moodScore) {
   return '😡';
 }
 
+// Scroll reveal animations
+function setupScrollReveals() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+  document.querySelectorAll('.carousel-slot, .glass-card, section').forEach(el => {
+    observer.observe(el);
+  });
+}
+
+// Live ticker updates
+function setupLiveTicker() {
+  // TODO: Fetch recent observations and update ticker
+  // For now, placeholder shows invitation
+  const tickerContent = document.getElementById('ticker-content');
+  if (tickerContent) {
+    tickerContent.innerHTML = '<p class="ticker-placeholder" data-i18n="no_observations">Be the first to share an observation. Check in now.</p>';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // ... existing code like applyTranslations, resizeCanvas, etc.
   loadDailyStory();
   loadCoverageStats();
   loadFastestCities();
+
+  // Initialize rotating instruments carousel
+  if (window.CITIES_DATA && window.InstrumentsCarousel) {
+    const carousel = initCarousel(window.CITIES_DATA);
+
+    // Setup city selection to pin carousel slot 1
+    const citySelect = document.getElementById('city-select');
+    if (citySelect) {
+      citySelect.addEventListener('change', (e) => {
+        const selectedCity = window.CITIES_DATA.find(c => c.slug === e.target.value);
+        if (selectedCity && carousel) {
+          carousel.pinSlot(1, selectedCity.slug);
+
+          // Show city details panel
+          const panel = document.getElementById('city-selector-panel');
+          if (panel) {
+            panel.style.display = 'block';
+            document.getElementById('selected-city-name').textContent = selectedCity.name;
+            // TODO: Load city-specific details (dimensions, observations, etc.)
+          }
+        }
+      });
+    }
+  }
+
+  // Setup scroll reveal animations
+  if ('IntersectionObserver' in window) {
+    setupScrollReveals();
+  }
+
+  // Setup live ticker
+  setupLiveTicker();
 });
