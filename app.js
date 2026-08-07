@@ -1594,6 +1594,29 @@ function getCurrentFeaturedStory() {
   return stories[index];
 }
 
+function renderStoryImage(story) {
+  if (!story.image) {
+    return `<div class="card-placeholder">
+      <div class="card-placeholder-content">
+        <div class="card-placeholder-name">${story.city}</div>
+      </div>
+    </div>`;
+  }
+
+  const imageName = story.image;
+  return `<picture class="card-media">
+    <source srcset="assets/art/${imageName}-1200.avif 1200w, assets/art/${imageName}-600.avif 600w" type="image/avif" />
+    <source srcset="assets/art/${imageName}-1200.webp 1200w, assets/art/${imageName}-600.webp 600w" type="image/webp" />
+    <img src="assets/art/${imageName}-1200.png"
+         srcset="assets/art/${imageName}-1200.png 1200w, assets/art/${imageName}-600.png 600w"
+         alt="${story.imageAlt || story.city}"
+         width="1200"
+         height="800"
+         loading="eager"
+         decoding="async" />
+  </picture>`;
+}
+
 function loadDailyStory() {
   const storySection = document.getElementById('story-content');
   const fallback = document.getElementById('story-fallback');
@@ -1602,7 +1625,11 @@ function loadDailyStory() {
     const story = getCurrentFeaturedStory();
     if (!story) throw new Error('No story available');
 
-    document.getElementById('story-emoji').textContent = story.emoji || '🌍';
+    const storyImageContainer = document.getElementById('story-image');
+    if (storyImageContainer) {
+      storyImageContainer.innerHTML = renderStoryImage(story);
+    }
+
     document.getElementById('story-city').textContent = story.city;
     document.getElementById('story-title').textContent = story.title;
     document.getElementById('story-excerpt').textContent = story.excerpt || '';
@@ -1620,10 +1647,6 @@ function loadDailyStory() {
 
     storySection.style.display = 'block';
     fallback.style.display = 'none';
-
-    if (window.twemoji) {
-      twemoji.parse(document.getElementById('daily-story'));
-    }
   } catch (e) {
     storySection.style.display = 'none';
     fallback.style.display = 'block';

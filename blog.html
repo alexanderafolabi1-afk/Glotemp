@@ -9,11 +9,11 @@
   <meta property="og:title" content="Glotemp – City Stories" />
   <meta property="og:description" content="Glotemp – City Stories: Discover the real-time mood and energy of cities through daily pulse updates and local stories." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://glotemp.com/blog.html" />
+  <meta property="og:url" content="https://glo-temp.com/blog.html" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Glotemp – City Stories" />
   <meta name="twitter:description" content="Glotemp – City Stories: Discover the real-time mood and energy of cities through daily pulse updates and local stories." />
-  <link rel="canonical" href="https://glotemp.com/blog.html" />
+  <link rel="canonical" href="https://glo-temp.com/blog.html" />
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png" />
@@ -21,7 +21,6 @@
   <!-- Version must be bumped on CSS-affecting deploys -->
   <link rel="stylesheet" href="styles.css?v=3" />
   <title>Glotemp – City Stories</title>
-  <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <div id="app">
@@ -164,8 +163,32 @@ function loadPosts() {
         const card = document.createElement('div');
         card.className = 'glass-card blog-card';
         card.dataset.city = post.city.toLowerCase();
+
+        // Render image or placeholder
+        let imageHtml = '';
+        if (post.image) {
+          const imageName = post.image;
+          imageHtml = `<picture class="card-media">
+            <source srcset="assets/art/${imageName}-1200.avif 1200w, assets/art/${imageName}-600.avif 600w" type="image/avif" />
+            <source srcset="assets/art/${imageName}-1200.webp 1200w, assets/art/${imageName}-600.webp 600w" type="image/webp" />
+            <img src="assets/art/${imageName}-1200.png"
+                 srcset="assets/art/${imageName}-1200.png 1200w, assets/art/${imageName}-600.png 600w"
+                 alt="${post.imageAlt || post.city}"
+                 width="1200"
+                 height="800"
+                 loading="lazy"
+                 decoding="async" />
+          </picture>`;
+        } else {
+          imageHtml = `<div class="card-placeholder">
+            <div class="card-placeholder-content">
+              <div class="card-placeholder-name">${post.city}</div>
+            </div>
+          </div>`;
+        }
+
         card.innerHTML = `
-          <div class="blog-emoji">${post.emoji || '🌍'}</div>
+          ${imageHtml}
           <div class="blog-city">${post.city}</div>
           <h3 class="blog-title">${post.title}</h3>
           <p class="blog-excerpt">${(post.excerpt || post.content || '').substring(0, 200)}</p>
@@ -208,11 +231,6 @@ function loadPosts() {
 
         grid.appendChild(card);
       });
-
-      // Emoji rendering
-      if (window.twemoji) {
-        twemoji.parse(grid, { folder: 'svg', ext: '.svg' });
-      }
     }
 
     // Search filter
