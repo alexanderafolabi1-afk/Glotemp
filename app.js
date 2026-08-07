@@ -1876,12 +1876,68 @@ function getCurrentFeaturedStory() {
   return stories[index];
 }
 
+function handleStoryImageError(imageEl) {
+  const base = (imageEl.dataset.imageBase || '').replace(/[^a-z0-9-]/g, '');
+  const step = Number(imageEl.dataset.fallbackStep || '0');
+
+  if (base && step === 0) {
+    imageEl.dataset.fallbackStep = '1';
+    imageEl.src = `/assets/art/${base}-1200.png`;
+    return;
+  }
+
+  if (base && step === 1) {
+    imageEl.dataset.fallbackStep = '2';
+    imageEl.src = `/assets/art/${base}-600.png`;
+    return;
+  }
+
+  if (typeof imageEl._storyImageErrorHandler === 'function') {
+    imageEl.removeEventListener('error', imageEl._storyImageErrorHandler);
+    delete imageEl._storyImageErrorHandler;
+  }
+  imageEl.closest('.card-media')?.classList.add('image-error');
+  const label = String(imageEl.dataset.imageLabel || 'Story')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><rect width='1200' height='800' fill='#14131A'/><text x='600' y='420' text-anchor='middle' fill='#A9A7B4' font-family='Manrope,Arial,sans-serif' font-size='64'>${label}</text></svg>`;
+  imageEl.src = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
 function renderStoryImage(story) {
-  // No image field in story data (files don't exist), render text-only placeholder
-  return `<div class="card-placeholder">
-    <div class="card-placeholder-content">
-      <div class="card-placeholder-name">${story.city}</div>
-    </div>
+  const escapeHtml = (value) => String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const safeCity = escapeHtml(story.city || '');
+  const safeAlt = escapeHtml(story.imageAlt || story.city || 'City story image');
+  const imageName = (typeof story.image === 'string' ? story.image.trim().toLowerCase() : '')
+    .replace(/[^a-z0-9-]/g, '');
+
+  if (!imageName) {
+    return `<div class="card-placeholder">
+      <div class="card-placeholder-content">
+        <div class="card-placeholder-name">${safeCity}</div>
+      </div>
+    </div>`;
+  }
+
+  return `<div class="card-media">
+    <img src="/assets/art/${imageName}.png"
+         alt="${safeAlt}"
+         width="1200"
+         height="800"
+         loading="lazy"
+         decoding="async"
+         data-image-base="${imageName}"
+         data-image-label="${safeCity}"
+         data-fallback-step="0"
+         data-story-image="true" />
   </div>`;
 }
 
@@ -1896,6 +1952,12 @@ function loadDailyStory() {
     const storyImageContainer = document.getElementById('story-image');
     if (storyImageContainer) {
       storyImageContainer.innerHTML = renderStoryImage(story);
+      const storyImageEl = storyImageContainer.querySelector('img[data-story-image="true"]');
+      if (storyImageEl) {
+        const onStoryImageError = () => handleStoryImageError(storyImageEl);
+        storyImageEl._storyImageErrorHandler = onStoryImageError;
+        storyImageEl.addEventListener('error', onStoryImageError);
+      }
     }
 
     document.getElementById('story-city').textContent = story.city;
