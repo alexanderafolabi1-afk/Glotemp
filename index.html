@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=10" />
+  <link rel="stylesheet" href="/styles.css?v=11" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
@@ -48,14 +48,29 @@
         <span class="logo-text">Glotemp</span>
         <span class="pulse-dot"></span>
       </div>
-      <div class="nav-links">
+      <div class="nav-links" id="nav-links-desktop">
         <a href="/" class="active">Pulse</a>
         <a href="/about">About</a>
         <a href="/explore">Explore</a>
         <a href="/blog">Stories</a>
         <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
       </div>
+      <button id="nav-hamburger" class="nav-hamburger" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-panel">
+        <span></span><span></span><span></span>
+      </button>
     </nav>
+
+    <!-- Mobile full-screen nav panel -->
+    <div id="nav-panel" class="nav-panel" aria-hidden="true" role="dialog" aria-label="Navigation">
+      <button id="nav-panel-close" class="nav-panel-close" aria-label="Close navigation">✕</button>
+      <nav class="nav-panel-links">
+        <a href="/">Pulse</a>
+        <a href="/about">About</a>
+        <a href="/explore">Explore</a>
+        <a href="/blog">Stories</a>
+        <button id="lang-switch-mobile" class="nav-panel-lang" title="Change language">◉ Language</button>
+      </nav>
+    </div>
 
     <!-- Hero City Pulse -->
     <section class="hero-section">
@@ -124,12 +139,56 @@
       </div>
     </section>
 
+    <!-- How It Works -->
+    <section class="how-it-works">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">How it works</p>
+          <h2>Three steps. One reading.</h2>
+        </div>
+      </div>
+      <div class="hiw-steps">
+        <div class="hiw-step">
+          <div class="hiw-image-slot">
+            <img src="/assets/how-1.png" alt="Check in" class="hiw-img" data-hiw-numeral="01">
+          </div>
+          <div class="hiw-body">
+            <span class="hiw-numeral">01</span>
+            <h3 class="hiw-title">Check in</h3>
+            <p class="hiw-copy">You tell us how your city feels right now.</p>
+          </div>
+        </div>
+        <div class="hiw-step">
+          <div class="hiw-image-slot">
+            <img src="/assets/how-2.png" alt="We aggregate" class="hiw-img" data-hiw-numeral="02">
+          </div>
+          <div class="hiw-body">
+            <span class="hiw-numeral">02</span>
+            <h3 class="hiw-title">We aggregate</h3>
+            <p class="hiw-copy">Thousands of signals become one reading.</p>
+          </div>
+        </div>
+        <div class="hiw-step">
+          <div class="hiw-image-slot">
+            <img src="/assets/how-3.png" alt="The instrument moves" class="hiw-img" data-hiw-numeral="03">
+          </div>
+          <div class="hiw-body">
+            <span class="hiw-numeral">03</span>
+            <h3 class="hiw-title">The instrument moves</h3>
+            <p class="hiw-copy">The city's mood becomes visible to all.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Trip Engine -->
     <section class="trip-engine glass-card">
       <h2 data-i18n="trip_engine_title">Trip Engine</h2>
       <div class="trip-question">
-        <p data-i18n="trip_question">Should you travel to <strong id="trip-city">New York</strong> this weekend?</p>
-        <div id="trip-verdict" class="verdict verdict-go">GO</div>
+        <div class="trip-question-line">
+          <p data-i18n="trip_question">Should you travel to <strong id="trip-city">New York</strong> this weekend?</p>
+          <span id="trip-verdict" class="verdict verdict-go">GO</span>
+        </div>
         <p class="verdict-reason" id="trip-reason" data-i18n="trip_go_reason">The streets are charged. Energy is high. The moment is right.</p>
       </div>
       <!-- Affiliate Links -->
@@ -157,9 +216,13 @@
         <a href="#" id="read-more" data-i18n="read_more">Read more</a>
       </div>
       <div id="story-fallback" style="display:none;">
-        <p>Kyiv: Protection, Coffee & Art</p>
+        <p class="eyebrow">Kyiv</p>
         <h3>Kyiv's Unbreakable Spirit</h3>
         <p>Discover how a city at war still dances, paints, and dreams.</p>
+        <a href="#" id="read-more-fallback">Read more</a>
+        <div id="story-fallback-full" hidden>
+          <p>Protection, Coffee & Art — Kyiv's creative scene has become a form of resistance. Underground galleries open after curfew, jazz bars fill at noon, and murals appear overnight. The city's pulse is defiant, warm, and extraordinarily alive.</p>
+        </div>
       </div>
     </section>
 
@@ -296,6 +359,21 @@
           <h2 id="obs-title-text">Recent pulse from New York</h2>
         </div>
         <p class="section-copy" data-i18n="obs_intro">See what fellow observers are feeling right now in this city. Each note shapes the collective mood.</p>
+      </div>
+      <!-- Comment / observation box -->
+      <div class="city-comment-form" id="city-comment-form">
+        <div class="comment-mood-row" id="comment-mood-picker" role="group" aria-label="Select mood">
+          <button class="mood-emoji" data-band="charged" data-label="Energized" type="button" title="Energized">▲</button>
+          <button class="mood-emoji" data-band="warm"    data-label="Good"      type="button" title="Good">◆</button>
+          <button class="mood-emoji" data-band="equilibrium" data-label="Neutral" type="button" title="Neutral">●</button>
+          <button class="mood-emoji" data-band="restrained"  data-label="Low"    type="button" title="Low">▼</button>
+          <button class="mood-emoji" data-band="low"     data-label="Cautious"  type="button" title="Cautious">◇</button>
+        </div>
+        <textarea class="comment-input" id="comment-text" rows="3" maxlength="280" placeholder="Share what you're feeling in this city right now…"></textarea>
+        <div class="comment-form-actions">
+          <button class="btn-neon comment-submit" id="comment-submit" type="button">Share observation</button>
+          <p id="comment-feedback" class="inline-feedback" aria-live="polite"></p>
+        </div>
       </div>
       <div id="observations-grid" class="observations-grid">
         <div class="obs-empty">No observations yet. <a href="#observation-form">Be the first to share the pulse.</a></div>
