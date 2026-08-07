@@ -1402,21 +1402,9 @@ function switchBarometerImage(newBand, oldBand) {
 }
 
 function updateBarometerPictureElement(band) {
-  const picture = document.getElementById('barometer-picture');
   const image = document.getElementById('barometer-image');
+  if (!image) return;
 
-  if (!picture) return;
-
-  // Update picture sources for responsive images
-  const sources = picture.querySelectorAll('source');
-  sources.forEach(source => {
-    const srcset = source.getAttribute('srcset');
-    if (srcset) {
-      source.setAttribute('srcset', srcset.replace(/barometer-\w+/g, `barometer-${band}`));
-    }
-  });
-
-  // Update img src as fallback
   image.src = `/assets/barometer-${band}.png`;
   image.alt = `Mood barometer: ${band}`;
 }
@@ -1425,7 +1413,6 @@ function updateBarometerPictureElement(band) {
 // Preload barometer images and handle failures
 function preloadBarometerImages() {
   const image = document.getElementById('barometer-image');
-  const container = document.getElementById('barometer-image-container');
   const chamber = document.getElementById('barometer-chamber');
   if (!image) return;
 
@@ -1436,21 +1423,19 @@ function preloadBarometerImages() {
   preloadLink.href = '/assets/barometer-equilibrium.avif';
   document.head.appendChild(preloadLink);
 
-  // Handle image load failure with fallback to CSS barometer
+  // Handle image load failure
   image.addEventListener('error', () => {
-    console.warn('Barometer image failed to load, falling back to CSS barometer');
-    if (container) container.style.display = 'none';
+    console.warn('Barometer image failed to load');
     if (chamber) chamber.classList.add('fallback');
   });
 
   // Verify image actually loads
   const img = new Image();
   img.onerror = () => {
-    console.warn('Barometer image preload failed, will use CSS fallback');
-    if (container) container.style.display = 'none';
+    console.warn('Barometer image preload failed');
     if (chamber) chamber.classList.add('fallback');
   };
-  img.src = '/assets/barometer-equilibrium.avif';
+  img.src = '/assets/barometer-equilibrium.png';
 }
 
 // Time-based ambient lighting
