@@ -1418,6 +1418,17 @@ function updateCity(selected) {
   // Synthesize emotional temperature from multiple sources
   const synthesizedMood = synthesizeEmotionalTemperature(city);
 
+  // Apply mood-responsive background tinting (0-10 scale)
+  // Cool mood (0-5): shift towards blue, desaturate
+  // Neutral (5-7.5): minimal tint
+  // Warm mood (7.5-10): shift towards orange/red, increase saturation
+  const moodNormalized = synthesizedMood / 10; // 0-1 scale
+  const hueShift = (moodNormalized - 0.5) * 120; // -60 to +60 degrees
+  const saturation = 0.8 + (Math.abs(moodNormalized - 0.5) * 0.6); // 0.8-1.1 based on distance from neutral
+
+  document.documentElement.style.setProperty('--mood-hue', `${hueShift}deg`);
+  document.documentElement.style.setProperty('--mood-saturation', saturation.toFixed(2));
+
   document.getElementById('city-name').textContent = city.name;
   document.getElementById('trip-city').textContent = city.name;
 
