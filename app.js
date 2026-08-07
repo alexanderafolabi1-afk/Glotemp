@@ -1877,26 +1877,34 @@ function getCurrentFeaturedStory() {
 }
 
 function renderStoryImage(story) {
-  const imageName = typeof story.image === 'string' ? story.image.trim() : '';
+  const escapeHtml = (value) => String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const safeCity = escapeHtml(story.city || '');
+  const safeAlt = escapeHtml(story.imageAlt || story.city || 'City story image');
+  const imageName = (typeof story.image === 'string' ? story.image.trim().toLowerCase() : '')
+    .replace(/[^a-z0-9-]/g, '');
+
   if (!imageName) {
     return `<div class="card-placeholder">
       <div class="card-placeholder-content">
-        <div class="card-placeholder-name">${story.city}</div>
+        <div class="card-placeholder-name">${safeCity}</div>
       </div>
     </div>`;
   }
 
   return `<picture class="card-media">
-    <source srcset="/assets/art/${imageName}-1200.avif 1200w, /assets/art/${imageName}-600.avif 600w" type="image/avif" />
-    <source srcset="/assets/art/${imageName}-1200.webp 1200w, /assets/art/${imageName}-600.webp 600w" type="image/webp" />
-    <img src="/assets/art/${imageName}-1200.png"
-         srcset="/assets/art/${imageName}-1200.png 1200w, /assets/art/${imageName}-600.png 600w"
-         alt="${story.imageAlt || story.city}"
+    <img src="/assets/art/${imageName}.png"
+         alt="${safeAlt}"
          width="1200"
          height="800"
          loading="lazy"
          decoding="async"
-         onerror="this.onerror=null;this.closest('.card-media')?.classList.add('image-error');this.src='/assets/barometer-equilibrium.png';this.srcset='';" />
+         data-fallback-step="0"
+         onerror="if(this.dataset.fallbackStep==='0'){this.dataset.fallbackStep='1';this.src='/assets/art/${imageName}-1200.png';return;}if(this.dataset.fallbackStep==='1'){this.dataset.fallbackStep='2';this.src='/assets/art/${imageName}-600.png';return;}this.onerror=null;this.closest('.card-media')?.classList.add('image-error');this.src='/assets/barometer-equilibrium.png';" />
   </picture>`;
 }
 
