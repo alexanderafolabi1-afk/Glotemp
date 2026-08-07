@@ -1,6 +1,6 @@
 // Glotemp Service Worker
 // Cache versioning: bump CACHE_VERSION on every CSS-affecting or major deploy
-const CACHE_VERSION = 'glotemp-v10';
+const CACHE_VERSION = 'glotemp-v11';
 
 // Assets that are versioned and cacheable (network-first)
 const NETWORK_FIRST_ASSETS = [
@@ -9,7 +9,6 @@ const NETWORK_FIRST_ASSETS = [
   '/stories.js',
   '/cookie-consent.js',
   '/tempo-economy.js',
-  '/carousel.js',
   '/cities-data.js'
 ];
 
@@ -59,6 +58,11 @@ self.addEventListener('fetch', event => {
 
   // Skip cross-origin requests
   if (url.origin !== location.origin) {
+    return;
+  }
+
+  if (url.pathname.startsWith('/assets/')) {
+    event.respondWith(fetch(event.request));
     return;
   }
 
