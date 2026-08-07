@@ -39,6 +39,7 @@ const translations = {
     trivia: "Trivia",
     history: "History",
     read_more: "Read more",
+    show_less: "Show less",
     pulse_eyebrow: "Live instruments",
     pulse_title: "Instrument room",
     pulse_intro: "Watch the mood of cities turning over in real time. Select any city to pin it and dive deeper.",
@@ -1336,6 +1337,15 @@ function recordObservation(event) {
   addStars(note ? 18 : 12);
   renderSignalPanels();
   document.getElementById('observation-feedback').textContent = t('observation_saved');
+  // Refresh the feed to show the new observation
+  const currentCity = document.getElementById('city-select')?.value || 'nyc';
+  renderObservations(currentCity, false);
+  // Update the live observation count
+  const obsEl = document.getElementById('obs-count');
+  if (obsEl) {
+    const total = (window.SEED_OBSERVATIONS || []).length + observatoryState.observations.length;
+    obsEl.textContent = total;
+  }
   if (observatoryState.pendingMoment) openConstellationMoment(observatoryState.pendingMoment);
 }
 
@@ -1493,19 +1503,23 @@ function updateCity(selected) {
   document.documentElement.style.setProperty('--mood-hue', `${hueShift}deg`);
   document.documentElement.style.setProperty('--mood-saturation', saturation.toFixed(2));
 
-  document.getElementById('city-name').textContent = city.name;
-  document.getElementById('trip-city').textContent = city.name;
+  const cityNameEl = document.getElementById('city-name');
+  if (cityNameEl) cityNameEl.textContent = city.name;
+  const tripCityEl = document.getElementById('trip-city');
+  if (tripCityEl) tripCityEl.textContent = city.name;
 
   // dimensions
   const dimNames = t('dimensions');
   const grid = document.getElementById('dimensions-grid');
-  grid.innerHTML = '';
-  city.dims.forEach((val, idx) => {
-    const badge = document.createElement('span');
-    badge.className = 'dim-badge';
-    badge.innerHTML = `<span>${dimNames[idx] || idx}</span> <strong>${val.toFixed(1)}</strong>`;
-    grid.appendChild(badge);
-  });
+  if (grid) {
+    grid.innerHTML = '';
+    city.dims.forEach((val, idx) => {
+      const badge = document.createElement('span');
+      badge.className = 'dim-badge';
+      badge.innerHTML = `<span>${dimNames[idx] || idx}</span> <strong>${val.toFixed(1)}</strong>`;
+      grid.appendChild(badge);
+    });
+  }
   // Trip verdict using synthesized mood
   const verdictEl = document.getElementById('trip-verdict');
   const reasonEl = document.getElementById('trip-reason');
@@ -1579,7 +1593,17 @@ function getSentimentLabel(sentiment) {
 }
 
 function formatTimeAgo(timestamp) {
-  return timestamp;
+  if (!timestamp) return '';
+  const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+  if (isNaN(date.getTime())) return String(timestamp);
+  const diffMs = Date.now() - date.getTime();
+  const diffMin = Math.round(diffMs / 60000);
+  if (diffMin < 2) return 'just now';
+  if (diffMin < 60) return `${diffMin} min ago`;
+  const diffH = Math.round(diffMin / 60);
+  if (diffH < 24) return `${diffH} hour${diffH === 1 ? '' : 's'} ago`;
+  const diffD = Math.round(diffH / 24);
+  return `${diffD} day${diffD === 1 ? '' : 's'} ago`;
 }
 
 function renderObservations(citySlug, loading = false) {
@@ -1592,7 +1616,19 @@ function renderObservations(citySlug, loading = false) {
     return;
   }
 
-  const observations = mockObservations[citySlug] || [];
+  // Merge local observations (for this city name) with seed observations
+  const cityData = cities[citySlug];
+  const cityName = cityData ? cityData.name : '';
+  const localObs = observatoryState.observations
+    .filter(o => o.city === cityName)
+    .map(o => ({
+      sentiment: o.mood === 'Energized' ? 0.9 : o.mood === 'Good' ? 0.7 : o.mood === 'Neutral' ? 0.5 : o.mood === 'Low' ? 0.3 : 0.2,
+      text: o.note || `${o.mood} · ${o.scene}`,
+      intensity: Math.round(o.intensity / 10),
+      created_at: 'just now'
+    }));
+  const seedObs = (window.SEED_OBSERVATIONS || []).filter(o => o.city === citySlug);
+  const observations = [...localObs, ...seedObs];
 
   if (observations.length === 0) {
     grid.innerHTML = `<div class="obs-empty" data-i18n="obs_empty">${t('obs_empty')}</div>`;
@@ -1602,15 +1638,18 @@ function renderObservations(citySlug, loading = false) {
   grid.innerHTML = observations.map((obs, idx) => {
     const sentiment = getSentimentLabel(obs.sentiment);
     const intensity = obs.intensity || 5;
+    const text = (obs.context || obs.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const timeStr = formatTimeAgo(obs.created_at);
+    const bandInfo = moodToBand(obs.sentiment * 10);
     return `
-      <div class="obs-card">
-        <div class="obs-sentiment ${sentiment}" data-i18n="sentiment_${sentiment}">
+      <div class="obs-card obs-feed-item" style="animation-delay:${idx * 50}ms">
+        <div class="obs-sentiment ${sentiment}" style="color:${bandInfo.color}">
           ${sentiment.toUpperCase()}
         </div>
-        <div class="obs-text">${obs.text}</div>
+        <div class="obs-text">${text}</div>
         <div class="obs-meta">
-          <span class="obs-time">${formatTimeAgo(obs.created_at)}</span>
-          <span class="obs-intensity">Intensity: ${intensity}/10</span>
+          <span class="obs-time">${timeStr}</span>
+          <span class="obs-intensity" style="color:${bandInfo.color}">Intensity: ${intensity}/10</span>
         </div>
       </div>
     `;
@@ -1904,6 +1943,27 @@ function loadDailyStory() {
 
     storySection.style.display = 'block';
     fallback.style.display = 'none';
+
+    // Wire read-more to toggle full story content
+    const readMoreEl = document.getElementById('read-more');
+    if (readMoreEl) {
+      let fullContentEl = document.getElementById('story-full-content');
+      if (!fullContentEl) {
+        fullContentEl = document.createElement('div');
+        fullContentEl.id = 'story-full-content';
+        fullContentEl.className = 'story-full-content-expand';
+        storySection.appendChild(fullContentEl);
+      }
+      fullContentEl.textContent = story.content || '';
+      readMoreEl.href = '#';
+      readMoreEl.onclick = (e) => {
+        e.preventDefault();
+        const open = !fullContentEl.hidden;
+        fullContentEl.hidden = open;
+        readMoreEl.textContent = open ? t('read_more') : t('show_less') || 'Show less';
+      };
+      fullContentEl.hidden = true;
+    }
   } catch (e) {
     storySection.style.display = 'none';
     fallback.style.display = 'block';
@@ -1916,11 +1976,22 @@ function getRecentComments(limit) {
   return Promise.resolve(limit ? seed.slice(0, limit) : seed);
 }
 
+// Pin a city by slug — called from barometer and trending card clicks
+function loadCityBySlug(slug) {
+  if (!cities[slug]) return;
+  const select = document.getElementById('city-select');
+  if (select) select.value = slug;
+  updateCity(slug);
+  // Smooth-scroll to instrument row so user sees the update
+  const row = document.getElementById('instrument-row');
+  if (row) row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
 // Map mood score to band name + barometer image filename
 function moodToBand(mood) {
   if (mood >= 8.5) return { band: 'charged',     color: '#C86BE0', img: '/assets/barometer-charged.png' };
   if (mood >= 7.0) return { band: 'warm',        color: '#F5A25A', img: '/assets/barometer-warm.png' };
-  if (mood >= 5.0) return { band: 'equilibrium', color: '#E9E7F0', img: '/assets/barometer-equilibrium.png' };
+  if (mood >= 5.0) return { band: 'equilibrium', color: '#F0E0C8', img: '/assets/barometer-equilibrium.png' };
   if (mood >= 3.0) return { band: 'restrained',  color: '#6BA8F5', img: '/assets/barometer-restrained.png' };
   return            { band: 'low',          color: '#4FD8E8', img: '/assets/barometer-low.png' };
 }
@@ -2026,17 +2097,20 @@ function setupBarometerRotation() {
         img.src = imgSrc;
         img.alt = band + ' mood barometer';
         img.classList.remove('instrument-fading');
-        img.style.filter = `drop-shadow(0 0 10px ${color}50)`;
+        img.style.filter = `drop-shadow(0 6px 18px ${color}60)`;
       }, 350);
     } else {
       img.src = imgSrc;
       img.alt = band + ' mood barometer';
-      img.style.filter = `drop-shadow(0 0 10px ${color}50)`;
+      img.style.filter = `drop-shadow(0 6px 18px ${color}60)`;
     }
+
+    slotEl.style.setProperty('--slot-glow', color);
 
     nameEl.textContent = cityData.name;
     nameEl.style.color = color;
     bandEl.textContent = band;
+    bandEl.style.color = color;
 
     // Dim tooltip: top-3 dims from `cities` global (loaded async) or fallback
     let tip = slotEl.querySelector('.instr-dim-tip');
@@ -2170,7 +2244,7 @@ function setupTrendingRotation() {
     card.innerHTML = `
       <h3 class="fastest-city-name" style="color:${color}">${cityData.name}</h3>
       <p class="fastest-shift">${cityData.country || ''}</p>
-      <p class="fastest-shift">${band} · ${moodScore} / 10</p>
+      <p class="fastest-shift" style="color:${color}">${band} · ${moodScore} / 10</p>
       <div class="fastest-mood">${getMoodEmoji(mood)}</div>
     `;
   }
