@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=4" />
+  <link rel="stylesheet" href="/styles.css?v=5" />
   <title>Glotemp – City Stories</title>
 </head>
 <body>
@@ -171,7 +171,7 @@ function loadPosts() {
           imageHtml = `<picture class="card-media">
             <source srcset="/assets/art/${imageName}-1200.avif 1200w, /assets/art/${imageName}-600.avif 600w" type="image/avif" />
             <source srcset="/assets/art/${imageName}-1200.webp 1200w, /assets/art/${imageName}-600.webp 600w" type="image/webp" />
-            <img src="//assets/art/${imageName}-1200.png"
+            <img src="/assets/art/${imageName}-1200.png"
                  srcset="/assets/art/${imageName}-1200.png 1200w, /assets/art/${imageName}-600.png 600w"
                  alt="${post.imageAlt || post.city}"
                  width="1200"

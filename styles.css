@@ -2096,6 +2096,118 @@ small {
   }
 }
 
+/* ===== COVERAGE & TRENDING SECTIONS ===== */
+.coverage-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.stat-card {
+  padding: 1.5rem;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(45, 95, 159, 0.04), rgba(233, 231, 240, 0.02));
+  border: 1px solid rgba(45, 95, 159, 0.1);
+  border-radius: 18px;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  border-color: rgba(45, 95, 159, 0.2);
+  background: linear-gradient(135deg, rgba(45, 95, 159, 0.08), rgba(233, 231, 240, 0.04));
+}
+
+.stat-card .stat-label {
+  font-size: 0.875rem;
+  color: var(--ash);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.stat-card .stat-value {
+  font-size: 2.5rem;
+  font-weight: 500;
+  color: var(--ion);
+  margin: 0;
+}
+
+.fastest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.fastest-card {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(45, 95, 159, 0.04), rgba(233, 231, 240, 0.02));
+  border: 1px solid rgba(45, 95, 159, 0.1);
+  border-radius: 18px;
+  transition: all 0.3s ease;
+}
+
+.fastest-card:hover {
+  border-color: rgba(45, 95, 159, 0.2);
+  background: linear-gradient(135deg, rgba(45, 95, 159, 0.08), rgba(233, 231, 240, 0.04));
+  transform: translateY(-2px);
+}
+
+.fastest-city-name {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--ion);
+  margin: 0 0 0.5rem 0;
+}
+
+.fastest-shift {
+  font-size: 0.9rem;
+  color: var(--ash);
+  margin: 0.25rem 0;
+}
+
+.fastest-shift.positive {
+  color: #4CAF50;
+}
+
+.fastest-shift.negative {
+  color: #FF6B6B;
+}
+
+.fastest-mood {
+  font-size: 2rem;
+  margin-top: 1rem;
+}
+
+.fastest-placeholder {
+  padding: 2rem;
+  text-align: center;
+  color: var(--ash);
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+  .coverage-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .coverage-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fastest-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card .stat-value {
+    font-size: 2rem;
+  }
+}
+
 /* ===== LOADING STATES ===== */
 @keyframes pulse-load {
   0%, 100% { opacity: 0.6; }
