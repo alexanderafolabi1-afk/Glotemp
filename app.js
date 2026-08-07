@@ -2012,7 +2012,7 @@ function setupBarometerRotation() {
     if (!img || !nameEl || !bandEl) return;
 
     const { band, img: imgSrc } = moodToBand(cityData.mood || 7.0);
-    const isChange = img.src !== imgSrc && img.src.indexOf('barometer') !== -1;
+    const isChange = img.getAttribute('src') !== imgSrc && img.getAttribute('src') && img.getAttribute('src').indexOf('barometer') !== -1;
 
     if (isChange) {
       img.classList.add('instrument-fading');
@@ -2068,10 +2068,19 @@ function setupLiveTicker() {
 
   if (!obs.length) return;
 
+  function escTick(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   // Build a wide inline track that repeats for continuous scroll
   const items = [...obs, ...obs].map(o => {
-    const city = o.cityName || o.city || '';
-    const note = (o.context || '').slice(0, 80);
+    const city = escTick(o.cityName || o.city || '');
+    const note = escTick((o.context || '').slice(0, 80));
     return `<span class="ticker-item"><strong>${city}</strong> — ${note}</span>`;
   }).join('<span class="ticker-sep">·</span>');
 
@@ -2080,7 +2089,9 @@ function setupLiveTicker() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     // Show first item statically
     const first = obs[0];
-    ticker.innerHTML = `<p class="ticker-placeholder"><strong>${first.cityName || first.city}</strong> — ${(first.context || '').slice(0, 100)}</p>`;
+    const fc = escTick(first.cityName || first.city);
+    const fn = escTick((first.context || '').slice(0, 100));
+    ticker.innerHTML = `<p class="ticker-placeholder"><strong>${fc}</strong> — ${fn}</p>`;
   }
 }
 
