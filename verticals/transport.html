@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finance Rankings | Glotemp</title>
-  <meta name="description" content="Where should you invest or trade? Live financial indicators for 150 global cities.">
-  <meta name="canonical" content="https://glo-temp.com/verticals/finance">
-  <meta property="og:title" content="Global Finance Rankings">
-  <meta property="og:description" content="City-level financial data: cost of living, investment climate, currency stability.">
+  <title>Transport Rankings | Glotemp</title>
+  <meta name="description" content="Which cities have the best transit? Rankings based on public transit quality, bike sharing, and congestion.">
+  <meta name="canonical" content="https://glo-temp.com/verticals/transport">
+  <meta property="og:title" content="Global Transport Rankings">
+  <meta property="og:description" content="Find cities with best public transit, lowest congestion, and most bike infrastructure.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://glo-temp.com/verticals/finance">
+  <meta property="og:url" content="https://glo-temp.com/verticals/transport">
 
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": "Finance Rankings",
-    "description": "Live ranking of global cities by economic indicators, cost of living, and investment opportunity.",
-    "url": "https://glo-temp.com/verticals/finance",
+    "name": "Transport Rankings",
+    "description": "Global ranking of cities by transit quality, congestion levels, and mobility infrastructure.",
+    "url": "https://glo-temp.com/verticals/transport",
     "mainEntity": {
       "@type": "ItemList",
       "itemListElement": []
@@ -45,9 +45,9 @@
   </nav>
 
   <main class="page-content">
-    <section class="ranking-header glass-card vertical-finance">
-      <h1>Finance</h1>
-      <p data-i18n="finance_description">Should I invest or trade here?</p>
+    <section class="ranking-header glass-card vertical-transport">
+      <h1>Transport</h1>
+      <p data-i18n="transport_description">Which cities have the best mobility?</p>
       <p class="ranking-threshold" data-i18n="ranking_note">Rankings require minimum signal volume to publish.</p>
     </section>
 
@@ -57,23 +57,23 @@
     </div>
 
     <section class="ranking-list">
-      <div id="finance-ranking" class="ranking-content">
+      <div id="transport-ranking" class="ranking-content">
         <div class="loading" data-i18n="loading">Loading rankings...</div>
       </div>
     </section>
 
     <section class="ranking-info glass-card">
-      <h2>What is Finance?</h2>
+      <h2>What is Transport?</h2>
       <p>
-        Finance tracks the economic health and investment opportunity in each city. It measures cost of living,
-        currency stability, inflation rates, and economic growth forecasts to help you
-        decide where to invest, trade, or relocate.
+        Transport measures the mobility infrastructure and transportation efficiency of a city.
+        It combines public transit system quality and coverage, traffic congestion levels, bike-sharing density,
+        pedestrian infrastructure, and commute time efficiency to identify cities where getting around is convenient and sustainable.
       </p>
-      <h3 data-i18n="finance_sources">Data Sources</h3>
+      <h3 data-i18n="transport_sources">Data Sources</h3>
       <ul>
-        <li><strong>World Bank:</strong> <span>GDP, inflation, economic indicators</span></li>
-        <li><strong>Currency Markets:</strong> <span>Real-time currency exchange rates and stability</span></li>
-        <li><strong>Economic Data:</strong> <span>Cost of living and market analysis</span></li>
+        <li><strong>Transitland API:</strong> <span>Public transit stops, routes, and schedules</span></li>
+        <li><strong>OpenStreetMap:</strong> <span>Bike infrastructure and pedestrian routes</span></li>
+        <li><strong>Traffic Data:</strong> <span>Congestion indices and commute time metrics</span></li>
       </ul>
     </section>
   </main>
@@ -87,15 +87,15 @@
   <script src="/cities-data.js"></script>
   <script src="/verticals-engine.js"></script>
   <script>
-    // Load and render Finance ranking
-    async function loadFinanceRanking() {
-      const rankingEl = document.getElementById('finance-ranking');
+    // Load and render Transport ranking
+    async function loadTransportRanking() {
+      const rankingEl = document.getElementById('transport-ranking');
       const lastUpdatedEl = document.getElementById('last-updated');
 
       try {
-        // Fetch latest finance readings
+        // Fetch latest transport readings
         const response = await fetch(
-          `${SUPABASE_URL}/rest/v1/readings?vertical=eq.finance&order=fetched_at.desc&limit=150`,
+          `${SUPABASE_URL}/rest/v1/readings?vertical=eq.transport&order=fetched_at.desc&limit=150`,
           {
             headers: {
               'apikey': SUPABASE_ANON_KEY,
@@ -111,40 +111,40 @@
         }
 
         const readings = await response.json();
-        const cityFinance = new Map();
+        const cityTransport = new Map();
 
-        // Aggregate currency strength by city (main ranking metric)
+        // Aggregate transit quality by city (main ranking metric)
         readings.forEach(reading => {
-          if (!cityFinance.has(reading.city_slug)) {
-            cityFinance.set(reading.city_slug, { strength: [], col: [], inflation: [], source: reading.source });
+          if (!cityTransport.has(reading.city_slug)) {
+            cityTransport.set(reading.city_slug, { transit: [], bikes: [], congestion: [], source: reading.source });
           }
-          if (reading.metric === 'currency_strength' && reading.value !== null) {
-            cityFinance.get(reading.city_slug).strength.push(reading.value);
-          } else if (reading.metric === 'cost_of_living' && reading.value !== null) {
-            cityFinance.get(reading.city_slug).col.push(reading.value);
-          } else if (reading.metric === 'inflation_rate' && reading.value !== null) {
-            cityFinance.get(reading.city_slug).inflation.push(reading.value);
+          if (reading.metric === 'transit_quality' && reading.value !== null) {
+            cityTransport.get(reading.city_slug).transit.push(reading.value);
+          } else if (reading.metric === 'bike_share_bikes' && reading.value !== null) {
+            cityTransport.get(reading.city_slug).bikes.push(reading.value);
+          } else if (reading.metric === 'congestion_level' && reading.value !== null) {
+            cityTransport.get(reading.city_slug).congestion.push(reading.value);
           }
         });
 
         // Calculate averages and create ranking
-        const ranked = Array.from(cityFinance.entries())
+        const ranked = Array.from(cityTransport.entries())
           .map(([slug, data]) => {
             const city = window.CITIES_DATA.find(c => c.slug === slug);
-            const avgStrength = data.strength.length > 0
-              ? data.strength.reduce((a, b) => a + b, 0) / data.strength.length
+            const avgTransit = data.transit.length > 0
+              ? data.transit.reduce((a, b) => a + b, 0) / data.transit.length
               : 0;
 
             return {
               slug,
               name: city?.name || slug,
               country: city?.country || '',
-              strength: avgStrength,
-              signalVolume: data.strength.length
+              transit: avgTransit,
+              signalVolume: data.transit.length
             };
           })
           .filter(city => city.signalVolume > 0)
-          .sort((a, b) => b.strength - a.strength);
+          .sort((a, b) => b.transit - a.transit);
 
         // Render ranking
         rankingEl.innerHTML = ranked.slice(0, 50).map((city, idx) => `
@@ -155,8 +155,8 @@
               <p>${city.country}</p>
             </div>
             <div class="ranking-score">
-              <span class="score-value">${city.strength.toFixed(1)}</span>
-              <span class="score-label">Currency Strength</span>
+              <span class="score-value">${city.transit.toFixed(1)}</span>
+              <span class="score-label">Transit Quality</span>
             </div>
             <span class="ranking-signal">${city.signalVolume} signals</span>
           </a>
@@ -164,15 +164,15 @@
 
         lastUpdatedEl.textContent = `Updated ${verticals.getTimeAgo(new Date())}`;
       } catch (error) {
-        console.error('Error loading Finance ranking:', error);
+        console.error('Error loading Transport ranking:', error);
         rankingEl.innerHTML = '<p data-i18n="error_loading">Error loading rankings.</p>';
       }
     }
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadFinanceRanking);
+      document.addEventListener('DOMContentLoaded', loadTransportRanking);
     } else {
-      loadFinanceRanking();
+      loadTransportRanking();
     }
   </script>
   <script src="/app.js" defer></script>

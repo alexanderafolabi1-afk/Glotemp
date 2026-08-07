@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finance Rankings | Glotemp</title>
-  <meta name="description" content="Where should you invest or trade? Live financial indicators for 150 global cities.">
-  <meta name="canonical" content="https://glo-temp.com/verticals/finance">
-  <meta property="og:title" content="Global Finance Rankings">
-  <meta property="og:description" content="City-level financial data: cost of living, investment climate, currency stability.">
+  <title>Food Rankings | Glotemp</title>
+  <meta name="description" content="Which cities have the best food scenes? Rankings based on restaurants, Michelin stars, and culinary diversity.">
+  <meta name="canonical" content="https://glo-temp.com/verticals/food">
+  <meta property="og:title" content="Global Food Rankings">
+  <meta property="og:description" content="Find cities with vibrant culinary scenes, award-winning restaurants, and diverse cuisines.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://glo-temp.com/verticals/finance">
+  <meta property="og:url" content="https://glo-temp.com/verticals/food">
 
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": "Finance Rankings",
-    "description": "Live ranking of global cities by economic indicators, cost of living, and investment opportunity.",
-    "url": "https://glo-temp.com/verticals/finance",
+    "name": "Food Rankings",
+    "description": "Global ranking of cities by restaurant scene, Michelin stars, and culinary diversity.",
+    "url": "https://glo-temp.com/verticals/food",
     "mainEntity": {
       "@type": "ItemList",
       "itemListElement": []
@@ -45,9 +45,9 @@
   </nav>
 
   <main class="page-content">
-    <section class="ranking-header glass-card vertical-finance">
-      <h1>Finance</h1>
-      <p data-i18n="finance_description">Should I invest or trade here?</p>
+    <section class="ranking-header glass-card vertical-food">
+      <h1>Food</h1>
+      <p data-i18n="food_description">Where should you eat and explore cuisine?</p>
       <p class="ranking-threshold" data-i18n="ranking_note">Rankings require minimum signal volume to publish.</p>
     </section>
 
@@ -57,23 +57,23 @@
     </div>
 
     <section class="ranking-list">
-      <div id="finance-ranking" class="ranking-content">
+      <div id="food-ranking" class="ranking-content">
         <div class="loading" data-i18n="loading">Loading rankings...</div>
       </div>
     </section>
 
     <section class="ranking-info glass-card">
-      <h2>What is Finance?</h2>
+      <h2>What is Food?</h2>
       <p>
-        Finance tracks the economic health and investment opportunity in each city. It measures cost of living,
-        currency stability, inflation rates, and economic growth forecasts to help you
-        decide where to invest, trade, or relocate.
+        Food measures the vibrancy and quality of a city's culinary scene.
+        It combines restaurant density, Michelin star density, culinary innovation and awards,
+        food festival calendars, and cuisine diversity indices to show where exceptional dining and food culture thrive.
       </p>
-      <h3 data-i18n="finance_sources">Data Sources</h3>
+      <h3 data-i18n="food_sources">Data Sources</h3>
       <ul>
-        <li><strong>World Bank:</strong> <span>GDP, inflation, economic indicators</span></li>
-        <li><strong>Currency Markets:</strong> <span>Real-time currency exchange rates and stability</span></li>
-        <li><strong>Economic Data:</strong> <span>Cost of living and market analysis</span></li>
+        <li><strong>OpenStreetMap:</strong> <span>Restaurant listings and dining venue data</span></li>
+        <li><strong>Michelin Guides:</strong> <span>Award-winning and starred restaurants</span></li>
+        <li><strong>Culinary Data:</strong> <span>Cuisine diversity and food culture metrics</span></li>
       </ul>
     </section>
   </main>
@@ -87,15 +87,15 @@
   <script src="/cities-data.js"></script>
   <script src="/verticals-engine.js"></script>
   <script>
-    // Load and render Finance ranking
-    async function loadFinanceRanking() {
-      const rankingEl = document.getElementById('finance-ranking');
+    // Load and render Food ranking
+    async function loadFoodRanking() {
+      const rankingEl = document.getElementById('food-ranking');
       const lastUpdatedEl = document.getElementById('last-updated');
 
       try {
-        // Fetch latest finance readings
+        // Fetch latest food readings
         const response = await fetch(
-          `${SUPABASE_URL}/rest/v1/readings?vertical=eq.finance&order=fetched_at.desc&limit=150`,
+          `${SUPABASE_URL}/rest/v1/readings?vertical=eq.food&order=fetched_at.desc&limit=150`,
           {
             headers: {
               'apikey': SUPABASE_ANON_KEY,
@@ -111,40 +111,40 @@
         }
 
         const readings = await response.json();
-        const cityFinance = new Map();
+        const cityFood = new Map();
 
-        // Aggregate currency strength by city (main ranking metric)
+        // Aggregate culinary diversity by city (main ranking metric)
         readings.forEach(reading => {
-          if (!cityFinance.has(reading.city_slug)) {
-            cityFinance.set(reading.city_slug, { strength: [], col: [], inflation: [], source: reading.source });
+          if (!cityFood.has(reading.city_slug)) {
+            cityFood.set(reading.city_slug, { diversity: [], restaurants: [], michelin: [], source: reading.source });
           }
-          if (reading.metric === 'currency_strength' && reading.value !== null) {
-            cityFinance.get(reading.city_slug).strength.push(reading.value);
-          } else if (reading.metric === 'cost_of_living' && reading.value !== null) {
-            cityFinance.get(reading.city_slug).col.push(reading.value);
-          } else if (reading.metric === 'inflation_rate' && reading.value !== null) {
-            cityFinance.get(reading.city_slug).inflation.push(reading.value);
+          if (reading.metric === 'culinary_diversity' && reading.value !== null) {
+            cityFood.get(reading.city_slug).diversity.push(reading.value);
+          } else if (reading.metric === 'restaurant_count' && reading.value !== null) {
+            cityFood.get(reading.city_slug).restaurants.push(reading.value);
+          } else if (reading.metric === 'michelin_stars' && reading.value !== null) {
+            cityFood.get(reading.city_slug).michelin.push(reading.value);
           }
         });
 
         // Calculate averages and create ranking
-        const ranked = Array.from(cityFinance.entries())
+        const ranked = Array.from(cityFood.entries())
           .map(([slug, data]) => {
             const city = window.CITIES_DATA.find(c => c.slug === slug);
-            const avgStrength = data.strength.length > 0
-              ? data.strength.reduce((a, b) => a + b, 0) / data.strength.length
+            const avgDiversity = data.diversity.length > 0
+              ? data.diversity.reduce((a, b) => a + b, 0) / data.diversity.length
               : 0;
 
             return {
               slug,
               name: city?.name || slug,
               country: city?.country || '',
-              strength: avgStrength,
-              signalVolume: data.strength.length
+              diversity: avgDiversity,
+              signalVolume: data.diversity.length
             };
           })
           .filter(city => city.signalVolume > 0)
-          .sort((a, b) => b.strength - a.strength);
+          .sort((a, b) => b.diversity - a.diversity);
 
         // Render ranking
         rankingEl.innerHTML = ranked.slice(0, 50).map((city, idx) => `
@@ -155,8 +155,8 @@
               <p>${city.country}</p>
             </div>
             <div class="ranking-score">
-              <span class="score-value">${city.strength.toFixed(1)}</span>
-              <span class="score-label">Currency Strength</span>
+              <span class="score-value">${city.diversity.toFixed(1)}</span>
+              <span class="score-label">Culinary Diversity</span>
             </div>
             <span class="ranking-signal">${city.signalVolume} signals</span>
           </a>
@@ -164,15 +164,15 @@
 
         lastUpdatedEl.textContent = `Updated ${verticals.getTimeAgo(new Date())}`;
       } catch (error) {
-        console.error('Error loading Finance ranking:', error);
+        console.error('Error loading Food ranking:', error);
         rankingEl.innerHTML = '<p data-i18n="error_loading">Error loading rankings.</p>';
       }
     }
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadFinanceRanking);
+      document.addEventListener('DOMContentLoaded', loadFoodRanking);
     } else {
-      loadFinanceRanking();
+      loadFoodRanking();
     }
   </script>
   <script src="/app.js" defer></script>
