@@ -1268,7 +1268,9 @@ textarea:focus:not(:focus-visible) {
 
 .mood-btn.active {
   opacity: 1;
+  border-color: var(--ion);
   border-width: 2px;
+  box-shadow: 0 0 0 2px var(--obsidian), 0 0 0 3px var(--ion);
 }
 
 .observation-form,
@@ -2489,6 +2491,18 @@ button:hover:not(:focus-visible) {
 
 #read-more:hover {
   text-decoration: underline;
+}
+
+.story-full-content-expand {
+  color: var(--warm-sand);
+  font-size: var(--small-size);
+  line-height: 1.7;
+  max-width: 60ch;
+  margin-top: 0.5rem;
+}
+
+.story-full-content-expand[hidden] {
+  display: none;
 }
 
 #story-fallback {

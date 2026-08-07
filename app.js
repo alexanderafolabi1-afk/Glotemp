@@ -39,6 +39,7 @@ const translations = {
     trivia: "Trivia",
     history: "History",
     read_more: "Read more",
+    show_less: "Show less",
     pulse_eyebrow: "Live instruments",
     pulse_title: "Instrument room",
     pulse_intro: "Watch the mood of cities turning over in real time. Select any city to pin it and dive deeper.",
@@ -1592,7 +1593,17 @@ function getSentimentLabel(sentiment) {
 }
 
 function formatTimeAgo(timestamp) {
-  return timestamp;
+  if (!timestamp) return '';
+  const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+  if (isNaN(date.getTime())) return String(timestamp);
+  const diffMs = Date.now() - date.getTime();
+  const diffMin = Math.round(diffMs / 60000);
+  if (diffMin < 2) return 'just now';
+  if (diffMin < 60) return `${diffMin} min ago`;
+  const diffH = Math.round(diffMin / 60);
+  if (diffH < 24) return `${diffH} hour${diffH === 1 ? '' : 's'} ago`;
+  const diffD = Math.round(diffH / 24);
+  return `${diffD} day${diffD === 1 ? '' : 's'} ago`;
 }
 
 function renderObservations(citySlug, loading = false) {
@@ -1628,9 +1639,7 @@ function renderObservations(citySlug, loading = false) {
     const sentiment = getSentimentLabel(obs.sentiment);
     const intensity = obs.intensity || 5;
     const text = (obs.context || obs.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const timeStr = typeof obs.created_at === 'string' && obs.created_at.includes('T')
-      ? formatTimeAgo(new Date(obs.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}))
-      : formatTimeAgo(obs.created_at);
+    const timeStr = formatTimeAgo(obs.created_at);
     const bandInfo = moodToBand(obs.sentiment * 10);
     return `
       <div class="obs-card obs-feed-item" style="animation-delay:${idx * 50}ms">
@@ -1942,17 +1951,18 @@ function loadDailyStory() {
       if (!fullContentEl) {
         fullContentEl = document.createElement('div');
         fullContentEl.id = 'story-full-content';
-        fullContentEl.style.cssText = 'display:none;color:var(--warm-sand);font-size:var(--small-size);line-height:1.7;max-width:60ch;margin-top:0.5rem;';
+        fullContentEl.className = 'story-full-content-expand';
         storySection.appendChild(fullContentEl);
       }
       fullContentEl.textContent = story.content || '';
       readMoreEl.href = '#';
       readMoreEl.onclick = (e) => {
         e.preventDefault();
-        const open = fullContentEl.style.display !== 'none';
-        fullContentEl.style.display = open ? 'none' : 'block';
-        readMoreEl.textContent = open ? t('read_more') : '↑ Show less';
+        const open = !fullContentEl.hidden;
+        fullContentEl.hidden = open;
+        readMoreEl.textContent = open ? t('read_more') : t('show_less') || 'Show less';
       };
+      fullContentEl.hidden = true;
     }
   } catch (e) {
     storySection.style.display = 'none';
