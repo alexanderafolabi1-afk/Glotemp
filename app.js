@@ -874,7 +874,6 @@ function updateTripQuestionText(el, template) {
 
 function applyTranslations() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
-    if (el.closest('#instruments-carousel')) return;
     if (el.querySelector('img')) return;
 
     const key = el.dataset.i18n;
@@ -1455,93 +1454,6 @@ function synthesizeEmotionalTemperature(cityData) {
 }
 
 // Barometer color based on mood temperature
-function getBarometerState(mood) {
-  if (mood >= 8.5) return { band: 'charged', label: 'Surging Energy', temp: 'Hot' };
-  if (mood >= 6.5) return { band: 'warm', label: 'Expansive', temp: 'Warm' };
-  if (mood >= 4.5) return { band: 'equilibrium', label: 'Equilibrium', temp: 'Balanced' };
-  if (mood >= 2.0) return { band: 'restrained', label: 'Reserved', temp: 'Cool' };
-  return { band: 'low', label: 'Subdued', temp: 'Cold' };
-}
-
-let currentBarometerBand = 'equilibrium';
-
-// Render the Living Barometer (image-based with cross-fade)
-function renderBarometer(mood, label) {
-  const value = document.getElementById('barometer-value');
-  const labelEl = document.getElementById('barometer-label');
-  const image = document.getElementById('barometer-image');
-  const picture = document.getElementById('barometer-picture');
-  const state = getBarometerState(mood);
-
-  // Update numeric value
-  value.textContent = mood.toFixed(1);
-  labelEl.textContent = state.label;
-
-  // Switch image if band changed
-  if (state.band !== currentBarometerBand) {
-    switchBarometerImage(state.band, currentBarometerBand);
-    currentBarometerBand = state.band;
-  }
-}
-
-function switchBarometerImage(newBand, oldBand) {
-  const image = document.getElementById('barometer-image');
-  const picture = document.getElementById('barometer-picture');
-
-  // Check for prefers-reduced-motion
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  if (prefersReducedMotion) {
-    // Instant switch without animation
-    updateBarometerPictureElement(newBand);
-  } else {
-    // Cross-fade: fade out current, switch source, fade in (600ms)
-    image.classList.add('transitioning');
-
-    setTimeout(() => {
-      updateBarometerPictureElement(newBand);
-      image.classList.remove('transitioning');
-    }, 600);
-  }
-}
-
-function updateBarometerPictureElement(band) {
-  const image = document.getElementById('barometer-image');
-  if (!image) return;
-
-  image.src = `/assets/barometer-${band}.png`;
-  image.alt = `Mood barometer: ${band}`;
-}
-
-
-// Preload barometer images and handle failures
-function preloadBarometerImages() {
-  const image = document.getElementById('barometer-image');
-  const chamber = document.getElementById('barometer-chamber');
-  if (!image) return;
-
-  // Preload equilibrium (most likely first state)
-  const preloadLink = document.createElement('link');
-  preloadLink.rel = 'preload';
-  preloadLink.as = 'image';
-  preloadLink.href = '/assets/barometer-equilibrium.avif';
-  document.head.appendChild(preloadLink);
-
-  // Handle image load failure
-  image.addEventListener('error', () => {
-    console.warn('Barometer image failed to load');
-    if (chamber) chamber.classList.add('fallback');
-  });
-
-  // Verify image actually loads
-  const img = new Image();
-  img.onerror = () => {
-    console.warn('Barometer image preload failed');
-    if (chamber) chamber.classList.add('fallback');
-  };
-  img.src = '/assets/barometer-equilibrium.png';
-}
-
 // Time-based ambient lighting
 function updateAmbientLighting() {
   const hour = new Date().getHours();
@@ -1575,8 +1487,6 @@ function updateCity(selected) {
   document.getElementById('city-name').textContent = city.name;
   document.getElementById('trip-city').textContent = city.name;
 
-  // Render the Living Barometer
-  renderBarometer(synthesizedMood, city.name);
   // dimensions
   const dimNames = t('dimensions');
   const grid = document.getElementById('dimensions-grid');
@@ -1750,7 +1660,6 @@ async function loadCitiesIntoSelector() {
 
 // Initialize everything
 document.addEventListener('DOMContentLoaded', async () => {
-  preloadBarometerImages();
   await loadCitiesData();
   loadCitiesIntoSelector();
   resizeCanvas();
@@ -2042,7 +1951,7 @@ function setupScrollReveals() {
     });
   }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-  document.querySelectorAll('.carousel-slot, .glass-card, section').forEach(el => {
+  document.querySelectorAll('.glass-card, section').forEach(el => {
     observer.observe(el);
   });
 }
@@ -2058,30 +1967,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadDailyStory();
   loadCoverageStats();
   loadFastestCities();
-
-  // Initialize rotating instruments carousel
-  if (window.CITIES_DATA && window.InstrumentsCarousel) {
-    const carousel = initCarousel(window.CITIES_DATA);
-
-    // Setup city selection to pin carousel slot 1
-    const citySelect = document.getElementById('city-select');
-    if (citySelect) {
-      citySelect.addEventListener('change', (e) => {
-        const selectedCity = window.CITIES_DATA.find(c => c.slug === e.target.value);
-        if (selectedCity && carousel) {
-          carousel.pinSlot(1, selectedCity.slug);
-
-          // Show city details panel
-          const panel = document.getElementById('city-selector-panel');
-          if (panel) {
-            panel.style.display = 'block';
-            document.getElementById('selected-city-name').textContent = selectedCity.name;
-            // TODO: Load city-specific details (dimensions, observations, etc.)
-          }
-        }
-      });
-    }
-  }
 
   // Setup scroll reveal animations
   if ('IntersectionObserver' in window) {
