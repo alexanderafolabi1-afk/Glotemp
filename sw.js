@@ -1,6 +1,6 @@
 // Glotemp Service Worker
 // Cache versioning: bump CACHE_VERSION on every CSS-affecting or major deploy
-const CACHE_VERSION = 'glotemp-v8';
+const CACHE_VERSION = 'glotemp-v9';
 
 // Assets that are versioned and cacheable (network-first)
 const NETWORK_FIRST_ASSETS = [
