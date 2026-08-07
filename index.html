@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=6" />
+  <link rel="stylesheet" href="/styles.css?v=7" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
@@ -118,9 +118,11 @@
         <h3 id="story-city"></h3>
         <h4 id="story-title"></h4>
         <p id="story-excerpt"></p>
-        <button id="trivia-btn" class="btn-text" data-i18n="trivia">Trivia</button>
+        <div class="story-toggles">
+          <button id="trivia-btn" class="btn-text" data-i18n="trivia">Trivia</button>
+          <button id="history-btn" class="btn-text" data-i18n="history">History</button>
+        </div>
         <div id="trivia-text" style="display:none;"></div>
-        <button id="history-btn" class="btn-text" data-i18n="history">History</button>
         <div id="history-text" style="display:none;"></div>
         <a href="#" id="read-more" data-i18n="read_more">Read more</a>
       </div>
