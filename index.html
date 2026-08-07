@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=5" />
+  <link rel="stylesheet" href="/styles.css?v=6" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
@@ -270,7 +270,7 @@
         </div>
         <div class="stat-card glass-card">
           <p class="stat-label" data-i18n="coverage_live_observations">Live observations</p>
-          <p class="stat-value" id="obs-count">0</p>
+          <p class="stat-value" id="obs-count">AWAITING</p>
         </div>
         <div class="stat-card glass-card">
           <p class="stat-label" data-i18n="coverage_languages">Languages</p>
@@ -306,7 +306,7 @@
         <p class="section-copy" data-i18n="obs_intro">See what fellow observers are feeling right now in this city. Each note shapes the collective mood.</p>
       </div>
       <div id="observations-grid" class="observations-grid">
-        <div class="obs-empty" data-i18n="obs_empty">No observations yet. Be the first to share the pulse.</div>
+        <div class="obs-empty">No observations yet. <a href="#observation-form">Be the first to share the pulse.</a></div>
       </div>
     </section>
 
@@ -335,6 +335,49 @@
       document.getElementById('find-flights-btn').href = `https://www.skyscanner.com/transport/flights/${skycannerCity}/`;
       document.getElementById('travel-insurance-btn').href = `https://www.insuremytrip.com/search?location=${encodedCity}`;
     }
+  </script>
+  <script>
+    /* Stat row: AWAITING for zero live observations; --ash for zero values */
+    (function () {
+      function applyStatColours() {
+        document.querySelectorAll('.stat-card .stat-value').forEach(function (el) {
+          var raw = el.textContent.trim();
+          var n = parseFloat(raw);
+          if (el.id === 'obs-count') {
+            if (raw === '0' || raw === '') {
+              el.textContent = 'AWAITING';
+              el.classList.add('stat-zero');
+            } else if (raw !== 'AWAITING') {
+              el.classList.remove('stat-zero');
+            }
+          } else {
+            if (n === 0) {
+              el.classList.add('stat-zero');
+            } else {
+              el.classList.remove('stat-zero');
+            }
+          }
+        });
+      }
+
+      /* Watch obs-count for updates from app.js */
+      var obsEl = document.getElementById('obs-count');
+      if (obsEl && window.MutationObserver) {
+        new MutationObserver(applyStatColours).observe(obsEl, { childList: true, characterData: true, subtree: true });
+      }
+      applyStatColours();
+
+      /* 8s trending cities timeout */
+      setTimeout(function () {
+        var grid = document.getElementById('fastest-cities-grid');
+        if (!grid) return;
+        var placeholder = grid.querySelector('.fastest-placeholder');
+        if (placeholder) {
+          placeholder.classList.add('timed-out');
+          placeholder.textContent = 'No trending data yet — check back soon as more observations arrive.';
+        }
+      }, 8000);
+    }());
   </script>
 </body>
 </html>
