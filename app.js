@@ -110,14 +110,20 @@ const translations = {
     constellation_moment_eyebrow: "Constellation Moment",
     prototype_counter_notice: "Prototype note: observatory counts and badge thresholds are local to this device until a server-backed verification layer is introduced.",
     obs_eyebrow: "Live observations",
+    obs_title: "Recent pulse from {city}",
     obs_intro: "See what fellow observers are feeling right now in this city. Each note shapes the collective mood.",
     obs_empty: "No observations yet. Be the first to share the pulse.",
     coverage_eyebrow: "Global pulse",
     coverage_title: "Cities in real time",
     coverage_intro: "Monitor mood shifts across 52 cities. Each observation adds to the collective understanding of where energy is rising or settling.",
+    coverage_cities_tracked: "Cities tracked",
+    coverage_live_observations: "Live observations",
+    coverage_languages: "Languages",
+    coverage_regions: "Regions covered",
     fastest_eyebrow: "Trending now",
     fastest_title: "Cities with biggest mood shifts",
-    fastest_intro: "Real-time shifts in city energy. These places are moving fast."
+    fastest_intro: "Real-time shifts in city energy. These places are moving fast.",
+    fastest_loading: "Loading trending cities..."
   },
   es: {
     install_title: "Añadir Glotemp a inicio",
@@ -217,9 +223,14 @@ const translations = {
     coverage_eyebrow: "Pulso global",
     coverage_title: "Ciudades en tiempo real",
     coverage_intro: "Monitorea cambios de ánimo en 52 ciudades. Cada observación añade comprensión colectiva de dónde la energía sube o baja.",
+    coverage_cities_tracked: "Ciudades monitoreadas",
+    coverage_live_observations: "Observaciones en vivo",
+    coverage_languages: "Idiomas",
+    coverage_regions: "Regiones cubiertas",
     fastest_eyebrow: "Tendencias ahora",
     fastest_title: "Ciudades con mayores cambios de ánimo",
-    fastest_intro: "Cambios de energía en tiempo real. Estos lugares se mueven rápido."
+    fastest_intro: "Cambios de energía en tiempo real. Estos lugares se mueven rápido.",
+    fastest_loading: "Cargando ciudades en tendencia..."
   },
   fr: {
     install_title: "Ajouter Glotemp à l'écran d'accueil",
@@ -319,9 +330,14 @@ const translations = {
     coverage_eyebrow: "Pouls global",
     coverage_title: "Villes en temps réel",
     coverage_intro: "Suivez les changements d'humeur dans 52 villes. Chaque observation contribue à comprendre où l'énergie monte ou baisse.",
+    coverage_cities_tracked: "Villes suivies",
+    coverage_live_observations: "Observations en direct",
+    coverage_languages: "Langues",
+    coverage_regions: "Régions couvertes",
     fastest_eyebrow: "Tendances maintenant",
     fastest_title: "Villes avec les plus grands changements d'humeur",
-    fastest_intro: "Changements d'énergie en temps réel. Ces endroits bougent vite."
+    fastest_intro: "Changements d'énergie en temps réel. Ces endroits bougent vite.",
+    fastest_loading: "Chargement des villes en tendance..."
   },
   de: {
     install_title: "Glotemp zum Startbildschirm hinzufügen",
@@ -421,9 +437,14 @@ const translations = {
     coverage_eyebrow: "Globaler Puls",
     coverage_title: "Städte in Echtzeit",
     coverage_intro: "Überwachen Sie Stimmungsschwankungen in 52 Städten. Jede Beobachtung trägt zum kollektiven Verständnis bei, wo Energie steigt oder sinkt.",
+    coverage_cities_tracked: "Überwachte Städte",
+    coverage_live_observations: "Live-Beobachtungen",
+    coverage_languages: "Sprachen",
+    coverage_regions: "Abgedeckte Regionen",
     fastest_eyebrow: "Gerade im Trend",
     fastest_title: "Städte mit den größten Stimmungswechseln",
-    fastest_intro: "Echtzeitänderungen der Stadtenergie. Diese Orte bewegen sich schnell."
+    fastest_intro: "Echtzeitänderungen der Stadtenergie. Diese Orte bewegen sich schnell.",
+    fastest_loading: "Lade Trend-Städte..."
   },
   pt: {
     install_title: "Adicionar Glotemp à tela inicial",
@@ -523,9 +544,14 @@ const translations = {
     coverage_eyebrow: "Pulso global",
     coverage_title: "Cidades em tempo real",
     coverage_intro: "Monitore mudanças de humor em 52 cidades. Cada observação contribui para a compreensão coletiva de onde a energia sobe ou cai.",
+    coverage_cities_tracked: "Cidades monitoradas",
+    coverage_live_observations: "Observações ao vivo",
+    coverage_languages: "Idiomas",
+    coverage_regions: "Regiões cobertas",
     fastest_eyebrow: "Tendências agora",
     fastest_title: "Cidades com maiores mudanças de humor",
-    fastest_intro: "Mudanças de energia em tempo real. Esses lugares estão se movendo rápido."
+    fastest_intro: "Mudanças de energia em tempo real. Esses lugares estão se movendo rápido.",
+    fastest_loading: "Carregando cidades em tendência..."
   },
   ja: {
     install_title: "Glotempをホーム画面に追加",
@@ -625,9 +651,14 @@ const translations = {
     coverage_eyebrow: "グローバルパルス",
     coverage_title: "リアルタイムの都市",
     coverage_intro: "52の都市のムード変化を監視してください。各観測は、エネルギーが上昇または低下している場所の集合的理解に貢献します。",
+    coverage_cities_tracked: "監視対象都市",
+    coverage_live_observations: "ライブ観測",
+    coverage_languages: "言語",
+    coverage_regions: "対応地域",
     fastest_eyebrow: "今トレンド",
     fastest_title: "最大のムード変化を持つ都市",
-    fastest_intro: "リアルタイムの都市エネルギーの変化。これらの場所は速く動いています。"
+    fastest_intro: "リアルタイムの都市エネルギーの変化。これらの場所は速く動いています。",
+    fastest_loading: "トレンド都市を読み込み中..."
   }
 };
 
@@ -1491,7 +1522,7 @@ function updateCity(selected) {
   // Update observations section with loading state
   const obsTitleEl = document.getElementById('obs-title-text');
   if (obsTitleEl) {
-    obsTitleEl.textContent = `Recent pulse from ${city.name}`;
+    obsTitleEl.textContent = t('obs_title').replace('{city}', city.name);
   }
 
   // Show loading state while fetching
@@ -1814,11 +1845,9 @@ function loadDailyStory() {
 }
 
 function loadCoverageStats() {
-  if (!window.citiesData) return;
-
   const obsCount = document.getElementById('obs-count');
   if (obsCount) {
-    getComments('*').then(comments => {
+    getRecentComments(1000).then(comments => {
       obsCount.textContent = comments.length.toString();
     }).catch(() => {
       obsCount.textContent = '0';
@@ -1827,30 +1856,28 @@ function loadCoverageStats() {
 }
 
 function loadFastestCities() {
-  if (!window.citiesData) return;
-
   const grid = document.getElementById('fastest-cities-grid');
   if (!grid) return;
 
   grid.innerHTML = '';
 
-  const cities = [...window.citiesData].sort(() => Math.random() - 0.5).slice(0, 3);
+  const cityEntries = Object.entries(cities).sort(() => Math.random() - 0.5).slice(0, 3);
 
-  cities.forEach(city => {
+  cityEntries.forEach(([slug, cityData]) => {
     const shift = (Math.random() - 0.5) * 2;
     const shiftDirection = shift > 0 ? 'positive' : 'negative';
     const shiftPercent = Math.abs((shift * 100).toFixed(1));
-    const currentMood = (city.baseline_mood + shift).toFixed(1);
+    const currentMood = Math.max(0, Math.min(10, cityData.mood + shift)).toFixed(1);
 
     const card = document.createElement('div');
     card.className = 'fastest-card';
     card.innerHTML = `
-      <h3 class="fastest-city-name">${city.name}</h3>
+      <h3 class="fastest-city-name">${cityData.name}</h3>
       <p class="fastest-shift ${shiftDirection}">
         Mood ${shift > 0 ? '↑' : '↓'} ${shiftPercent}% last 24h
       </p>
       <p class="fastest-shift">Now at ${currentMood} / 10</p>
-      <div class="fastest-mood">${getMoodEmoji(currentMood * 10)}</div>
+      <div class="fastest-mood">${getMoodEmoji(parseFloat(currentMood))}</div>
     `;
     grid.appendChild(card);
   });
