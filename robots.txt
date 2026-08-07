@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Allow: /assets/
+Disallow: /admin
+
+Sitemap: https://glo-temp.com/sitemap.xml
