@@ -1391,13 +1391,13 @@ function switchBarometerImage(newBand, oldBand) {
     // Instant switch without animation
     updateBarometerPictureElement(newBand);
   } else {
-    // Cross-fade: fade out current, switch source, fade in
+    // Cross-fade: fade out current, switch source, fade in (600ms)
     image.classList.add('transitioning');
 
     setTimeout(() => {
       updateBarometerPictureElement(newBand);
       image.classList.remove('transitioning');
-    }, 300);
+    }, 600);
   }
 }
 
