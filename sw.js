@@ -1,6 +1,6 @@
 // Glotemp Service Worker
 // Cache versioning: bump CACHE_VERSION on every CSS-affecting or major deploy
-const CACHE_VERSION = 'glotemp-v9';
+const CACHE_VERSION = 'glotemp-v10';
 
 // Assets that are versioned and cacheable (network-first)
 const NETWORK_FIRST_ASSETS = [
@@ -8,7 +8,9 @@ const NETWORK_FIRST_ASSETS = [
   '/app.js',
   '/stories.js',
   '/cookie-consent.js',
-  '/tempo-economy.js'
+  '/tempo-economy.js',
+  '/carousel.js',
+  '/cities-data.js'
 ];
 
 // Immutable assets (cache-first)

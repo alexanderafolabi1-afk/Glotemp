@@ -1391,13 +1391,13 @@ function switchBarometerImage(newBand, oldBand) {
     // Instant switch without animation
     updateBarometerPictureElement(newBand);
   } else {
-    // Cross-fade: fade out current, switch source, fade in
+    // Cross-fade: fade out current, switch source, fade in (600ms)
     image.classList.add('transitioning');
 
     setTimeout(() => {
       updateBarometerPictureElement(newBand);
       image.classList.remove('transitioning');
-    }, 300);
+    }, 600);
   }
 }
 
@@ -1658,7 +1658,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Update ambient lighting periodically (every hour)
   setInterval(updateAmbientLighting, 3600000);
 
-  document.getElementById('city-select').addEventListener('change', (e) => updateCity(e.target.value));
+  const citySelect = document.getElementById('city-select');
+  if (citySelect) {
+    citySelect.addEventListener('change', (e) => updateCity(e.target.value));
+  }
   loadStars();
   maybeTrackHumanVisit();
   renderConstellationWall();
@@ -1862,9 +1865,64 @@ function getMoodEmoji(moodScore) {
   return '😡';
 }
 
+// Scroll reveal animations
+function setupScrollReveals() {
+  document.body.classList.add('scroll-reveals-enabled');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+  document.querySelectorAll('.carousel-slot, .glass-card, section').forEach(el => {
+    observer.observe(el);
+  });
+}
+
+// Live ticker updates
+function setupLiveTicker() {
+  // Ticker content is pre-rendered in HTML with data-i18n attributes
+  // applyTranslations will handle localization on load
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // ... existing code like applyTranslations, resizeCanvas, etc.
   loadDailyStory();
   loadCoverageStats();
   loadFastestCities();
+
+  // Initialize rotating instruments carousel
+  if (window.CITIES_DATA && window.InstrumentsCarousel) {
+    const carousel = initCarousel(window.CITIES_DATA);
+
+    // Setup city selection to pin carousel slot 1
+    const citySelect = document.getElementById('city-select');
+    if (citySelect) {
+      citySelect.addEventListener('change', (e) => {
+        const selectedCity = window.CITIES_DATA.find(c => c.slug === e.target.value);
+        if (selectedCity && carousel) {
+          carousel.pinSlot(1, selectedCity.slug);
+
+          // Show city details panel
+          const panel = document.getElementById('city-selector-panel');
+          if (panel) {
+            panel.style.display = 'block';
+            document.getElementById('selected-city-name').textContent = selectedCity.name;
+            // TODO: Load city-specific details (dimensions, observations, etc.)
+          }
+        }
+      });
+    }
+  }
+
+  // Setup scroll reveal animations
+  if ('IntersectionObserver' in window) {
+    setupScrollReveals();
+  }
+
+  // Setup live ticker
+  setupLiveTicker();
 });

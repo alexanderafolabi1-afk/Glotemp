@@ -23,7 +23,7 @@
   <!-- Type system: Fraunces (display), Manrope (body), IBM Plex Mono (data) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..500&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
   <link rel="stylesheet" href="/styles.css?v=5" />
@@ -59,30 +59,77 @@
 
     <!-- Hero City Pulse -->
     <section class="hero-section">
-      <div class="city-selector glass-card">
-        <select id="city-select" class="city-dropdown" aria-label="Select city">
-          <!-- Dynamically populated by app.js -->
-        </select>
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow" data-i18n="pulse_eyebrow">Live instruments</p>
+          <h2 data-i18n="pulse_title">Instrument room</h2>
+        </div>
+        <p class="section-copy" data-i18n="pulse_intro">Watch the mood of cities turning over in real time. Select any city to pin it and dive deeper.</p>
       </div>
-      <div class="pulse-container" id="pulse-container">
-        <canvas id="pulse-canvas"></canvas>
-        <div class="pulse-info">
-          <h1 id="city-name">New York</h1>
 
-          <!-- Living Barometer -->
-          <div class="barometer-chamber" id="barometer-chamber">
-            <div class="barometer-temperature" data-i18n="mood">MOOD</div>
-            <div class="barometer-value" id="barometer-value">7.8</div>
-
-            <!-- Barometer artwork -->
-            <img id="barometer-image" src="/assets/barometer-equilibrium.png" alt="Mood barometer" class="barometer-image" width="280" height="503" loading="eager">
-
-            <div class="barometer-label" id="barometer-label">Equilibrium</div>
+      <!-- Rotating Instruments Carousel -->
+      <div class="instruments-carousel" id="instruments-carousel">
+        <div class="carousel-slot" data-slot="1">
+          <div class="instrument-card glass-card">
+            <div class="instrument-header">
+              <h3 class="instrument-city"></h3>
+            </div>
+            <div class="instrument-barometer">
+              <img class="barometer-image" alt="Mood barometer" width="300" height="537" loading="lazy">
+            </div>
+            <div class="instrument-band"></div>
           </div>
-
-          <div class="dimensions-grid" id="dimensions-grid">
-            <!-- Filled by JS -->
+        </div>
+        <div class="carousel-slot" data-slot="2">
+          <div class="instrument-card glass-card">
+            <div class="instrument-header">
+              <h3 class="instrument-city"></h3>
+            </div>
+            <div class="instrument-barometer">
+              <img class="barometer-image" alt="Mood barometer" width="300" height="537" loading="lazy">
+            </div>
+            <div class="instrument-band"></div>
           </div>
+        </div>
+        <div class="carousel-slot" data-slot="3">
+          <div class="instrument-card glass-card">
+            <div class="instrument-header">
+              <h3 class="instrument-city"></h3>
+            </div>
+            <div class="instrument-barometer">
+              <img class="barometer-image" alt="Mood barometer" width="300" height="537" loading="lazy">
+            </div>
+            <div class="instrument-band"></div>
+          </div>
+        </div>
+        <div class="carousel-slot" data-slot="4">
+          <div class="instrument-card glass-card">
+            <div class="instrument-header">
+              <h3 class="instrument-city"></h3>
+            </div>
+            <div class="instrument-barometer">
+              <img class="barometer-image" alt="Mood barometer" width="300" height="537" loading="lazy">
+            </div>
+            <div class="instrument-band"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- City Selector Dropdown -->
+      <select id="city-select" style="display:none;"></select>
+
+      <!-- City Selector & Details (appears on selection) -->
+      <div class="city-selector glass-card" id="city-selector-panel" style="display:none;">
+        <h3 id="selected-city-name"></h3>
+        <div class="city-details" id="city-details">
+          <!-- Populated by app.js when city selected -->
+        </div>
+      </div>
+
+      <!-- Live Ticker -->
+      <div class="live-ticker glass-card">
+        <div class="ticker-content" id="ticker-content">
+          <p class="ticker-placeholder" data-i18n="no_observations">Be the first to share an observation. Check in now.</p>
         </div>
       </div>
     </section>
@@ -274,6 +321,8 @@
     </footer>
   </div>
 
+  <script src="/cities-data.js" defer></script>
+  <script src="/carousel.js" defer></script>
   <script src="/stories.js" defer></script>
   <script src="/app.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
