@@ -386,6 +386,7 @@ body::after {
 .carousel-slot[data-slot="2"] .instrument-card { animation-delay: 1.5s; }
 .carousel-slot[data-slot="3"] .instrument-card { animation-delay: 3s; }
 .carousel-slot[data-slot="4"] .instrument-card { animation-delay: 4.5s; }
+.carousel-slot[data-slot="5"] .instrument-card { animation-delay: 6s; }
 
 .instrument-card:hover,
 .instrument-card:focus-within {
@@ -497,6 +498,7 @@ body.scroll-reveals-enabled section.revealed {
 .carousel-slot:nth-child(2) { transition-delay: 80ms; }
 .carousel-slot:nth-child(3) { transition-delay: 160ms; }
 .carousel-slot:nth-child(4) { transition-delay: 240ms; }
+.carousel-slot:nth-child(5) { transition-delay: 320ms; }
 
 /* ===== CARD HOVER EFFECTS ===== */
 .instrument-card {
