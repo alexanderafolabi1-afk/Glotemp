@@ -947,8 +947,6 @@ textarea:focus:not(:focus-visible) {
 /* ===== DAILY STORY ===== */
 #daily-story {
   position: relative;
-  border-bottom: 2px solid;
-  border-image: linear-gradient(to right, var(--ion), var(--violet)) 1;
 }
 
 /* ===== BLOG PAGE ===== */
@@ -1191,11 +1189,10 @@ textarea:focus:not(:focus-visible) {
 /* ===== SECTION HEADINGS ===== */
 .section-heading {
   display: flex;
-  justify-content: space-between;
-  gap: 1.5rem;
+  flex-direction: column;
+  gap: 0;
   align-items: flex-start;
   margin-bottom: 1.25rem;
-  flex-wrap: wrap;
 }
 
 .eyebrow {
@@ -2393,4 +2390,153 @@ button:hover:not(:focus-visible) {
 
 .obs-empty a:hover {
   text-decoration: underline;
+}
+
+/* ===== HOMEPAGE LAYOUT CLEANUP ===== */
+
+/* 2. Strip panel appearance from non-card sections */
+.live-ticker,
+#daily-story,
+#coverage-stats,
+#fastest-moods,
+#observations-section {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* Disable hover lift on stripped sections */
+.live-ticker:hover,
+#daily-story:hover,
+#coverage-stats:hover,
+#fastest-moods:hover,
+#observations-section:hover {
+  transform: none;
+  border-color: transparent;
+}
+
+/* 3. Daily Pulse layout */
+#daily-story h2 {
+  font-family: var(--font-display);
+  font-size: var(--heading-size);
+  font-weight: var(--fw-light);
+  color: var(--bone);
+  margin-bottom: 1rem;
+}
+
+#story-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+#story-image {
+  display: none;
+}
+
+#story-city {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--ash);
+  margin: 0;
+}
+
+#story-title {
+  font-family: var(--font-display);
+  font-size: var(--subheading-size);
+  font-weight: var(--fw-medium);
+  color: var(--bone);
+  margin: 0;
+}
+
+#story-excerpt {
+  color: var(--ash);
+  max-width: 60ch;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.story-toggles {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+#trivia-text,
+#history-text {
+  color: var(--ash);
+  font-size: var(--small-size);
+  line-height: 1.6;
+  max-width: 60ch;
+}
+
+#read-more {
+  color: var(--ion);
+  text-decoration: none;
+  font-size: var(--small-size);
+  font-weight: var(--fw-medium);
+}
+
+#read-more:hover {
+  text-decoration: underline;
+}
+
+#story-fallback {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+/* 5. Stat row — no boxes, hairline vertical rules */
+.coverage-grid {
+  gap: 0;
+}
+
+.stat-card {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0 2rem;
+  text-align: left;
+  transition: none;
+}
+
+.stat-card:not(:last-child) {
+  border-right: 1px solid var(--hairline);
+}
+
+.stat-card:hover {
+  background: transparent;
+  border-color: transparent;
+  transform: none;
+}
+
+.stat-card:first-child {
+  padding-left: 0;
+}
+
+.stat-card:last-child {
+  padding-right: 0;
+}
+
+/* 6. Record observation button — ghost style */
+#record-observation.btn-neon {
+  background: transparent;
+  border: 1px solid var(--ion);
+  color: var(--ion);
+}
+
+#record-observation.btn-neon:hover {
+  background: var(--ion);
+  color: var(--obsidian);
+  opacity: 1;
 }
