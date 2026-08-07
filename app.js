@@ -1342,14 +1342,38 @@ function drawPulse() {
 }
 
 // City data simulation
-const cities = {
-  nyc: { name: "New York", mood: 7.8, dims: [8.2,7.1,9.0,7.5,8.8,6.9,7.0,5.2,9.3,8.0,7.4,8.1] },
-  london: { name: "London", mood: 6.9, dims: [7.0,6.8,7.5,7.2,8.0,7.1,6.5,5.8,7.8,7.3,6.9,7.6] },
-  tokyo: { name: "Tokyo", mood: 8.4, dims: [8.5,8.0,8.8,8.2,8.9,9.2,8.1,7.5,9.0,8.4,7.9,9.1] },
-  berlin: { name: "Berlin", mood: 7.2, dims: [7.3,6.5,8.2,7.0,7.8,7.5,7.2,6.0,8.5,7.6,7.0,7.9] },
-  "sao-paulo": { name: "São Paulo", mood: 7.0, dims: [7.1,6.2,7.8,6.8,7.0,5.9,6.4,4.8,7.2,6.9,7.3,6.5] },
-  paris: { name: "Paris", mood: 7.5, dims: [7.6,7.0,7.9,7.4,8.5,7.2,7.3,5.5,8.0,7.5,7.2,7.8] }
-};
+let cities = {}; // Will be populated from data/cities.json
+
+// Load cities data from JSON file
+async function loadCitiesData() {
+  try {
+    const response = await fetch('/data/cities.json');
+    const data = await response.json();
+
+    // Convert to format expected by existing code
+    data.cities.forEach(city => {
+      cities[city.slug] = {
+        name: city.name,
+        mood: city.baselineMood,
+        dims: city.dimensions
+      };
+    });
+
+    return cities;
+  } catch (error) {
+    console.error('Failed to load cities data:', error);
+    // Fallback to basic cities if file not available
+    cities = {
+      nyc: { name: "New York", mood: 7.8, dims: [8.2,7.1,9.0,7.5,8.8,6.9,7.0,5.2,9.3,8.0,7.4,8.1] },
+      london: { name: "London", mood: 6.9, dims: [7.0,6.8,7.5,7.2,8.0,7.1,6.5,5.8,7.8,7.3,6.9,7.6] },
+      tokyo: { name: "Tokyo", mood: 8.4, dims: [8.5,8.0,8.8,8.2,8.9,9.2,8.1,7.5,9.0,8.4,7.9,9.1] },
+      berlin: { name: "Berlin", mood: 7.2, dims: [7.3,6.5,8.2,7.0,7.8,7.5,7.2,6.0,8.5,7.6,7.0,7.9] },
+      "sao-paulo": { name: "São Paulo", mood: 7.0, dims: [7.1,6.2,7.8,6.8,7.0,5.9,6.4,4.8,7.2,6.9,7.3,6.5] },
+      paris: { name: "Paris", mood: 7.5, dims: [7.6,7.0,7.9,7.4,8.5,7.2,7.3,5.5,8.0,7.5,7.2,7.8] }
+    };
+    return cities;
+  }
+}
 
 // Multi-source Emotional Climate Engine
 function synthesizeEmotionalTemperature(cityData) {
@@ -1579,9 +1603,49 @@ function addStars(amount) {
   loadStars();
 }
 
+// Load cities from data file and populate selector
+async function loadCitiesIntoSelector() {
+  try {
+    const response = await fetch('/data/cities.json');
+    const data = await response.json();
+    const select = document.getElementById('city-select');
+
+    if (!select) return;
+
+    // Group cities by region
+    const byRegion = {};
+    data.cities.forEach(city => {
+      if (!byRegion[city.region]) byRegion[city.region] = [];
+      byRegion[city.region].push(city);
+    });
+
+    // Add options grouped by region
+    Object.keys(byRegion).sort().forEach(region => {
+      const optgroup = document.createElement('optgroup');
+      optgroup.label = region;
+
+      byRegion[region].forEach(city => {
+        const option = document.createElement('option');
+        option.value = city.slug;
+        option.textContent = `${city.name}, ${city.country}`;
+        optgroup.appendChild(option);
+      });
+
+      select.appendChild(optgroup);
+    });
+
+    // Set NYC as default
+    select.value = 'nyc';
+  } catch (error) {
+    console.error('Failed to load cities:', error);
+  }
+}
+
 // Initialize everything
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   applyTranslations();
+  await loadCitiesData();
+  loadCitiesIntoSelector();
   resizeCanvas();
   drawPulse();
   updateCity('nyc');
