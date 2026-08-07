@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=5" />
+  <link rel="stylesheet" href="/styles.css?v=11" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
@@ -48,14 +48,29 @@
         <span class="logo-text">Glotemp</span>
         <span class="pulse-dot"></span>
       </div>
-      <div class="nav-links">
+      <div class="nav-links" id="nav-links-desktop">
         <a href="/" class="active">Pulse</a>
         <a href="/about">About</a>
         <a href="/explore">Explore</a>
         <a href="/blog">Stories</a>
         <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
       </div>
+      <button id="nav-hamburger" class="nav-hamburger" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-panel">
+        <span></span><span></span><span></span>
+      </button>
     </nav>
+
+    <!-- Mobile full-screen nav panel -->
+    <div id="nav-panel" class="nav-panel" aria-hidden="true" role="dialog" aria-label="Navigation">
+      <button id="nav-panel-close" class="nav-panel-close" aria-label="Close navigation">✕</button>
+      <nav class="nav-panel-links">
+        <a href="/">Pulse</a>
+        <a href="/about">About</a>
+        <a href="/explore">Explore</a>
+        <a href="/blog">Stories</a>
+        <button id="lang-switch-mobile" class="nav-panel-lang" title="Change language">◉ Language</button>
+      </nav>
+    </div>
 
     <!-- Hero City Pulse -->
     <section class="hero-section">
@@ -67,50 +82,40 @@
         <p class="section-copy" data-i18n="pulse_intro">Watch the mood of cities turning over in real time. Select any city to pin it and dive deeper.</p>
       </div>
 
-      <!-- Rotating Instruments Carousel -->
-      <div class="instruments-carousel" id="instruments-carousel">
-        <div class="carousel-slot" data-slot="1">
-          <div class="instrument-card glass-card">
-            <div class="instrument-header">
-              <h3 class="instrument-city"></h3>
-            </div>
-            <div class="instrument-barometer">
-              <img class="barometer-image" alt="Mood barometer" width="300" height="537" loading="lazy">
-            </div>
-            <div class="instrument-band"></div>
+      <div class="instrument-images" id="instrument-row">
+        <div class="instrument-slot" data-slot="0">
+          <img class="instrument-image" src="/assets/barometer-equilibrium.png" alt="Barometer" width="300" height="537">
+          <div class="instrument-label">
+            <span class="instrument-city-name">—</span>
+            <span class="instrument-band-name">—</span>
           </div>
         </div>
-        <div class="carousel-slot" data-slot="2">
-          <div class="instrument-card glass-card">
-            <div class="instrument-header">
-              <h3 class="instrument-city"></h3>
-            </div>
-            <div class="instrument-barometer">
-              <img class="barometer-image" alt="Mood barometer" width="300" height="537" loading="lazy">
-            </div>
-            <div class="instrument-band"></div>
+        <div class="instrument-slot" data-slot="1">
+          <img class="instrument-image" src="/assets/barometer-warm.png" alt="Barometer" width="300" height="537">
+          <div class="instrument-label">
+            <span class="instrument-city-name">—</span>
+            <span class="instrument-band-name">—</span>
           </div>
         </div>
-        <div class="carousel-slot" data-slot="3">
-          <div class="instrument-card glass-card">
-            <div class="instrument-header">
-              <h3 class="instrument-city"></h3>
-            </div>
-            <div class="instrument-barometer">
-              <img class="barometer-image" alt="Mood barometer" width="300" height="537" loading="lazy">
-            </div>
-            <div class="instrument-band"></div>
+        <div class="instrument-slot" data-slot="2">
+          <img class="instrument-image" src="/assets/barometer-equilibrium.png" alt="Barometer" width="300" height="537">
+          <div class="instrument-label">
+            <span class="instrument-city-name">—</span>
+            <span class="instrument-band-name">—</span>
           </div>
         </div>
-        <div class="carousel-slot" data-slot="4">
-          <div class="instrument-card glass-card">
-            <div class="instrument-header">
-              <h3 class="instrument-city"></h3>
-            </div>
-            <div class="instrument-barometer">
-              <img class="barometer-image" alt="Mood barometer" width="300" height="537" loading="lazy">
-            </div>
-            <div class="instrument-band"></div>
+        <div class="instrument-slot" data-slot="3">
+          <img class="instrument-image" src="/assets/barometer-low.png" alt="Barometer" width="300" height="537">
+          <div class="instrument-label">
+            <span class="instrument-city-name">—</span>
+            <span class="instrument-band-name">—</span>
+          </div>
+        </div>
+        <div class="instrument-slot" data-slot="4">
+          <img class="instrument-image" src="/assets/barometer-charged.png" alt="Barometer" width="300" height="537">
+          <div class="instrument-label">
+            <span class="instrument-city-name">—</span>
+            <span class="instrument-band-name">—</span>
           </div>
         </div>
       </div>
@@ -134,12 +139,56 @@
       </div>
     </section>
 
+    <!-- How It Works -->
+    <section class="how-it-works">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">How it works</p>
+          <h2>Three steps. One reading.</h2>
+        </div>
+      </div>
+      <div class="hiw-steps">
+        <div class="hiw-step">
+          <div class="hiw-image-slot">
+            <img src="/assets/how-1.png" alt="Check in" class="hiw-img" data-hiw-numeral="01">
+          </div>
+          <div class="hiw-body">
+            <span class="hiw-numeral">01</span>
+            <h3 class="hiw-title">Check in</h3>
+            <p class="hiw-copy">You tell us how your city feels right now.</p>
+          </div>
+        </div>
+        <div class="hiw-step">
+          <div class="hiw-image-slot">
+            <img src="/assets/how-2.png" alt="We aggregate" class="hiw-img" data-hiw-numeral="02">
+          </div>
+          <div class="hiw-body">
+            <span class="hiw-numeral">02</span>
+            <h3 class="hiw-title">We aggregate</h3>
+            <p class="hiw-copy">Thousands of signals become one reading.</p>
+          </div>
+        </div>
+        <div class="hiw-step">
+          <div class="hiw-image-slot">
+            <img src="/assets/how-3.png" alt="The instrument moves" class="hiw-img" data-hiw-numeral="03">
+          </div>
+          <div class="hiw-body">
+            <span class="hiw-numeral">03</span>
+            <h3 class="hiw-title">The instrument moves</h3>
+            <p class="hiw-copy">The city's mood becomes visible to all.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Trip Engine -->
     <section class="trip-engine glass-card">
       <h2 data-i18n="trip_engine_title">Trip Engine</h2>
       <div class="trip-question">
-        <p data-i18n="trip_question">Should you travel to <strong id="trip-city">New York</strong> this weekend?</p>
-        <div id="trip-verdict" class="verdict verdict-go">GO</div>
+        <div class="trip-question-line">
+          <p data-i18n="trip_question">Should you travel to <strong id="trip-city">New York</strong> this weekend?</p>
+          <span id="trip-verdict" class="verdict verdict-go">GO</span>
+        </div>
         <p class="verdict-reason" id="trip-reason" data-i18n="trip_go_reason">The streets are charged. Energy is high. The moment is right.</p>
       </div>
       <!-- Affiliate Links -->
@@ -158,16 +207,22 @@
         <h3 id="story-city"></h3>
         <h4 id="story-title"></h4>
         <p id="story-excerpt"></p>
-        <button id="trivia-btn" class="btn-text" data-i18n="trivia">Trivia</button>
+        <div class="story-toggles">
+          <button id="trivia-btn" class="btn-text" data-i18n="trivia">Trivia</button>
+          <button id="history-btn" class="btn-text" data-i18n="history">History</button>
+        </div>
         <div id="trivia-text" style="display:none;"></div>
-        <button id="history-btn" class="btn-text" data-i18n="history">History</button>
         <div id="history-text" style="display:none;"></div>
         <a href="#" id="read-more" data-i18n="read_more">Read more</a>
       </div>
       <div id="story-fallback" style="display:none;">
-        <p>Kyiv: Protection, Coffee & Art</p>
+        <p class="eyebrow">Kyiv</p>
         <h3>Kyiv's Unbreakable Spirit</h3>
         <p>Discover how a city at war still dances, paints, and dreams.</p>
+        <a href="#" id="read-more-fallback">Read more</a>
+        <div id="story-fallback-full" hidden>
+          <p>Protection, Coffee & Art — Kyiv's creative scene has become a form of resistance. Underground galleries open after curfew, jazz bars fill at noon, and murals appear overnight. The city's pulse is defiant, warm, and extraordinarily alive.</p>
+        </div>
       </div>
     </section>
 
@@ -181,11 +236,11 @@
         <p class="section-copy" data-i18n="checkin_intro">Offer a quiet signal from where you stand. Richer observations deepen the atlas while keeping the ritual gentle.</p>
       </div>
       <div class="mood-buttons" role="group" aria-label="Mood choices">
-        <button class="mood-btn" data-mood="▲" data-label="Energized" title="Energized">▲</button>
-        <button class="mood-btn" data-mood="◆" data-label="Good" title="Good">◆</button>
-        <button class="mood-btn" data-mood="●" data-label="Neutral" title="Neutral">●</button>
-        <button class="mood-btn" data-mood="▼" data-label="Low" title="Low">▼</button>
-        <button class="mood-btn" data-mood="◇" data-label="Cautious" title="Cautious">◇</button>
+        <button class="mood-btn" data-mood="▲" data-band="charged"     data-label="Energized" title="Energized">▲</button>
+        <button class="mood-btn" data-mood="◆" data-band="warm"        data-label="Good"      title="Good">◆</button>
+        <button class="mood-btn" data-mood="●" data-band="equilibrium" data-label="Neutral"   title="Neutral">●</button>
+        <button class="mood-btn" data-mood="▼" data-band="restrained"  data-label="Low"       title="Low">▼</button>
+        <button class="mood-btn" data-mood="◇" data-band="low"         data-label="Cautious"  title="Cautious">◇</button>
       </div>
       <form id="observation-form" class="observation-form">
         <div class="form-grid">
@@ -261,24 +316,24 @@
           <p class="eyebrow" data-i18n="coverage_eyebrow">Global pulse</p>
           <h2 data-i18n="coverage_title">Cities in real time</h2>
         </div>
-        <p class="section-copy" data-i18n="coverage_intro">Monitor mood shifts across 52 cities. Each observation adds to the collective understanding of where energy is rising or settling.</p>
+        <p class="section-copy" data-i18n="coverage_intro">Monitor mood shifts across cities worldwide. Each observation adds to the collective understanding of where energy is rising or settling.</p>
       </div>
       <div id="coverage-grid" class="coverage-grid">
         <div class="stat-card glass-card">
           <p class="stat-label" data-i18n="coverage_cities_tracked">Cities tracked</p>
-          <p class="stat-value">52</p>
+          <p class="stat-value" id="cities-tracked-count">150</p>
         </div>
         <div class="stat-card glass-card">
           <p class="stat-label" data-i18n="coverage_live_observations">Live observations</p>
           <p class="stat-value" id="obs-count">0</p>
         </div>
         <div class="stat-card glass-card">
-          <p class="stat-label" data-i18n="coverage_languages">Languages</p>
-          <p class="stat-value">6</p>
+          <p class="stat-label" data-i18n="coverage_obs_today">Observations today</p>
+          <p class="stat-value" id="obs-today">0</p>
         </div>
         <div class="stat-card glass-card">
-          <p class="stat-label" data-i18n="coverage_regions">Regions covered</p>
-          <p class="stat-value">6</p>
+          <p class="stat-label" data-i18n="coverage_cities_moving">Cities moving</p>
+          <p class="stat-value" id="cities-moving">0</p>
         </div>
       </div>
     </section>
@@ -305,8 +360,23 @@
         </div>
         <p class="section-copy" data-i18n="obs_intro">See what fellow observers are feeling right now in this city. Each note shapes the collective mood.</p>
       </div>
+      <!-- Comment / observation box -->
+      <div class="city-comment-form" id="city-comment-form">
+        <div class="comment-mood-row" id="comment-mood-picker" role="group" aria-label="Select mood">
+          <button class="mood-emoji" data-band="charged" data-label="Energized" type="button" title="Energized">▲</button>
+          <button class="mood-emoji" data-band="warm"    data-label="Good"      type="button" title="Good">◆</button>
+          <button class="mood-emoji" data-band="equilibrium" data-label="Neutral" type="button" title="Neutral">●</button>
+          <button class="mood-emoji" data-band="restrained"  data-label="Low"    type="button" title="Low">▼</button>
+          <button class="mood-emoji" data-band="low"     data-label="Cautious"  type="button" title="Cautious">◇</button>
+        </div>
+        <textarea class="comment-input" id="comment-text" rows="3" maxlength="280" placeholder="Share what you're feeling in this city right now…"></textarea>
+        <div class="comment-form-actions">
+          <button class="btn-neon comment-submit" id="comment-submit" type="button">Share observation</button>
+          <p id="comment-feedback" class="inline-feedback" aria-live="polite"></p>
+        </div>
+      </div>
       <div id="observations-grid" class="observations-grid">
-        <div class="obs-empty" data-i18n="obs_empty">No observations yet. Be the first to share the pulse.</div>
+        <div class="obs-empty">No observations yet. <a href="#observation-form">Be the first to share the pulse.</a></div>
       </div>
     </section>
 
@@ -322,7 +392,7 @@
   </div>
 
   <script src="/cities-data.js" defer></script>
-  <script src="/carousel.js" defer></script>
+  <script src="/seed-observations.js" defer></script>
   <script src="/stories.js" defer></script>
   <script src="/app.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
@@ -335,6 +405,20 @@
       document.getElementById('find-flights-btn').href = `https://www.skyscanner.com/transport/flights/${skycannerCity}/`;
       document.getElementById('travel-insurance-btn').href = `https://www.insuremytrip.com/search?location=${encodedCity}`;
     }
+  </script>
+  <script>
+    /* 8s trending cities timeout */
+    (function () {
+      setTimeout(function () {
+        var grid = document.getElementById('fastest-cities-grid');
+        if (!grid) return;
+        var placeholder = grid.querySelector('.fastest-placeholder');
+        if (placeholder) {
+          placeholder.classList.add('timed-out');
+          placeholder.textContent = 'No trending data yet — check back soon as more observations arrive.';
+        }
+      }, 8000);
+    }());
   </script>
 </body>
 </html>

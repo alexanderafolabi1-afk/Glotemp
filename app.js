@@ -6,7 +6,7 @@ const translations = {
     dismiss: "✕",
     mood: "Mood",
     trip_engine_title: "Trip Engine",
-    trip_question: "Should you travel to <strong></strong> this weekend?",
+    trip_question: "Should you travel to {city} this weekend?",
     trip_go_reason: "The streets are charged. Energy is high. The moment is right.",
     trip_maybe_reason: "It’s decent, but check the weather first.",
     trip_wait_reason: "Mood is low; maybe next weekend.",
@@ -39,6 +39,11 @@ const translations = {
     trivia: "Trivia",
     history: "History",
     read_more: "Read more",
+    show_less: "Show less",
+    pulse_eyebrow: "Live instruments",
+    pulse_title: "Instrument room",
+    pulse_intro: "Watch the mood of cities turning over in real time. Select any city to pin it and dive deeper.",
+    no_observations: "Be the first to share an observation. Check in now.",
     checkin_eyebrow: "Observation intake",
     checkin_intro: "Offer a quiet signal from where you stand. Richer observations deepen the atlas while keeping the ritual gentle.",
     intensity_label: "Intensity",
@@ -115,7 +120,9 @@ const translations = {
     obs_empty: "No observations yet. Be the first to share the pulse.",
     coverage_eyebrow: "Global pulse",
     coverage_title: "Cities in real time",
-    coverage_intro: "Monitor mood shifts across 52 cities. Each observation adds to the collective understanding of where energy is rising or settling.",
+    coverage_intro: "Monitor mood shifts across cities worldwide. Each observation adds to the collective understanding of where energy is rising or settling.",
+    coverage_obs_today: "Observations today",
+    coverage_cities_moving: "Cities moving",
     coverage_cities_tracked: "Cities tracked",
     coverage_live_observations: "Live observations",
     coverage_languages: "Languages",
@@ -131,7 +138,7 @@ const translations = {
     dismiss: "✕",
     mood: "Ánimo",
     trip_engine_title: "Motor de Viaje",
-    trip_question: "¿Deberías viajar a <strong></strong> este fin de semana?",
+    trip_question: "¿Deberías viajar a {city} este fin de semana?",
     trip_go_reason: "Las calles están cargadas de energía. El momento es perfecto.",
     trip_maybe_reason: "Está bien, pero revisa el clima primero.",
     trip_wait_reason: "El ánimo está bajo; tal vez el próximo fin de semana.",
@@ -160,6 +167,10 @@ const translations = {
     trivia: "Curiosidades",
     history: "Historia",
     read_more: "Leer más",
+    pulse_eyebrow: "Instrumentos en vivo",
+    pulse_title: "Sala de instrumentos",
+    pulse_intro: "Mira cómo cambia el ánimo de las ciudades en tiempo real. Selecciona una ciudad para fijarla y profundizar.",
+    no_observations: "Sé el primero en compartir una observación. Regístrate ahora.",
     checkin_eyebrow: "Ingreso de observación",
     checkin_intro: "Ofrece una señal discreta desde donde estás. Las observaciones más ricas profundizan el atlas sin romper el ritual.",
     intensity_label: "Intensidad",
@@ -238,7 +249,7 @@ const translations = {
     dismiss: "✕",
     mood: "Humeur",
     trip_engine_title: "Moteur de Voyage",
-    trip_question: "Devriez-vous voyager à <strong></strong> ce week-end ?",
+    trip_question: "Devriez-vous voyager à {city} ce week-end ?",
     trip_go_reason: "Les rues sont chargées d'énergie. Le moment est parfait.",
     trip_maybe_reason: "C'est correct, mais vérifiez la météo.",
     trip_wait_reason: "L'humeur est basse, peut-être le week-end prochain.",
@@ -267,6 +278,10 @@ const translations = {
     trivia: "Anecdotes",
     history: "Histoire",
     read_more: "En savoir plus",
+    pulse_eyebrow: "Instruments en direct",
+    pulse_title: "Salle des instruments",
+    pulse_intro: "Regardez l'humeur des villes évoluer en temps réel. Sélectionnez une ville pour l'épingler et explorer davantage.",
+    no_observations: "Soyez le premier à partager une observation. Enregistrez-vous maintenant.",
     checkin_eyebrow: "Prise d'observation",
     checkin_intro: "Offrez un signal discret depuis votre position. Des observations plus riches approfondissent l'atlas sans rompre le rituel.",
     intensity_label: "Intensité",
@@ -345,7 +360,7 @@ const translations = {
     dismiss: "✕",
     mood: "Stimmung",
     trip_engine_title: "Reise-Engine",
-    trip_question: "Sollten Sie dieses Wochenende nach <strong></strong> reisen?",
+    trip_question: "Sollten Sie dieses Wochenende nach {city} reisen?",
     trip_go_reason: "Die Straßen sind voller Energie. Der Moment ist richtig.",
     trip_maybe_reason: "Ganz okay, aber prüfe das Wetter.",
     trip_wait_reason: "Stimmung ist niedrig; vielleicht nächstes Wochenende.",
@@ -374,6 +389,10 @@ const translations = {
     trivia: "Wissenswertes",
     history: "Geschichte",
     read_more: "Mehr lesen",
+    pulse_eyebrow: "Live-Instrumente",
+    pulse_title: "Instrumentenraum",
+    pulse_intro: "Beobachten Sie, wie sich die Stimmung von Städten in Echtzeit verändert. Wählen Sie eine Stadt aus, um sie anzupinnen und tiefer einzutauchen.",
+    no_observations: "Seien Sie der Erste, der eine Beobachtung teilt. Jetzt einchecken.",
     checkin_eyebrow: "Beobachtungseingang",
     checkin_intro: "Sende ein leises Signal von deinem Standort. Reichere Beobachtungen vertiefen den Atlas, ohne das Ritual zu stören.",
     intensity_label: "Intensität",
@@ -452,7 +471,7 @@ const translations = {
     dismiss: "✕",
     mood: "Humor",
     trip_engine_title: "Motor de Viagem",
-    trip_question: "Você deveria viajar para <strong></strong> neste fim de semana?",
+    trip_question: "Você deveria viajar para {city} neste fim de semana?",
     trip_go_reason: "As ruas estão carregadas de energia. O momento é perfeito.",
     trip_maybe_reason: "Está razoável, mas verifique o clima.",
     trip_wait_reason: "O humor está baixo; talvez no próximo fim de semana.",
@@ -481,6 +500,10 @@ const translations = {
     trivia: "Curiosidades",
     history: "História",
     read_more: "Ler mais",
+    pulse_eyebrow: "Instrumentos ao vivo",
+    pulse_title: "Sala de instrumentos",
+    pulse_intro: "Veja o humor das cidades mudando em tempo real. Selecione qualquer cidade para fixá-la e aprofundar.",
+    no_observations: "Seja o primeiro a compartilhar uma observação. Faça check-in agora.",
     checkin_eyebrow: "Entrada de observação",
     checkin_intro: "Ofereça um sinal discreto de onde você está. Observações mais ricas aprofundam o atlas sem quebrar o ritual.",
     intensity_label: "Intensidade",
@@ -559,7 +582,7 @@ const translations = {
     dismiss: "✕",
     mood: "ムード",
     trip_engine_title: "トリップエンジン",
-    trip_question: "今週末<strong></strong>へ旅行すべきですか？",
+    trip_question: "今週末{city}へ旅行すべきですか？",
     trip_go_reason: "街はエネルギーに満ちています。今がその時です。",
     trip_maybe_reason: "まあまあですが、天気を確認してください。",
     trip_wait_reason: "気分は低め、次の週末かも。",
@@ -588,6 +611,10 @@ const translations = {
     trivia: "トリビア",
     history: "歴史",
     read_more: "続きを読む",
+    pulse_eyebrow: "ライブ計器",
+    pulse_title: "計器室",
+    pulse_intro: "都市のムードがリアルタイムで移り変わる様子を見守りましょう。都市を選んで固定し、さらに深く確認できます。",
+    no_observations: "最初の観測を共有してください。今すぐチェックイン。",
     checkin_eyebrow: "観測入力",
     checkin_intro: "今いる場所から静かなシグナルを届けてください。より豊かな観測は儀式を壊さずにアトラスを深めます。",
     intensity_label: "強度",
@@ -772,6 +799,20 @@ const supportedLangs = Object.keys(translations);
 let currentLang = (navigator.language || 'en').split('-')[0];
 if (!supportedLangs.includes(currentLang)) currentLang = 'en';
 
+function hasUsableTranslation(value) {
+  if (value === undefined || value === null) return false;
+  if (typeof value === 'string') return value.trim().length > 0;
+  return true;
+}
+
+function resolveTranslation(key) {
+  const localized = translations[currentLang]?.[key];
+  if (hasUsableTranslation(localized)) return localized;
+  const english = translations.en?.[key];
+  if (hasUsableTranslation(english)) return english;
+  return null;
+}
+
 function setLanguage(lang) {
   currentLang = lang;
   document.documentElement.lang = lang;
@@ -779,24 +820,91 @@ function setLanguage(lang) {
   applyTranslations();
 }
 
-function t(key) {
-  return translations[currentLang]?.[key] || translations.en[key] || key;
+function t(key, fallback = '') {
+  const value = resolveTranslation(key);
+  return value === null ? fallback : value;
+}
+
+function updateTextNodeOnly(el, text) {
+  const textNode = Array.from(el.childNodes).find(node => node.nodeType === Node.TEXT_NODE);
+  if (textNode) {
+    textNode.textContent = text;
+    return true;
+  }
+  if (el.childElementCount === 0) {
+    el.textContent = text;
+    return true;
+  }
+  return false;
+}
+
+function updateTripQuestionText(el, template) {
+  const cityEl = el.querySelector('#trip-city');
+  if (!cityEl || typeof template !== 'string') return false;
+
+  const [before, ...rest] = template.split('{city}');
+  if (rest.length !== 1) return false;
+  const after = rest.join('{city}');
+
+  let beforeNode = null;
+  let afterNode = null;
+  const childNodes = Array.from(el.childNodes);
+  const cityIndex = childNodes.indexOf(cityEl);
+  childNodes.forEach((node, index) => {
+    if (node.nodeType !== Node.TEXT_NODE) return;
+    if (index < cityIndex) {
+      beforeNode = beforeNode || node;
+      return;
+    }
+    if (index > cityIndex) afterNode = afterNode || node;
+  });
+
+  if (!beforeNode) {
+    beforeNode = document.createTextNode('');
+    el.insertBefore(beforeNode, cityEl);
+  }
+
+  if (!afterNode) {
+    afterNode = document.createTextNode('');
+    if (cityEl.nextSibling) el.insertBefore(afterNode, cityEl.nextSibling);
+    else el.appendChild(afterNode);
+  }
+
+  beforeNode.textContent = before;
+  afterNode.textContent = after;
+  return true;
 }
 
 function applyTranslations() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
+    if (el.querySelector('img')) return;
+
     const key = el.dataset.i18n;
+    const translated = resolveTranslation(key);
+    if (!hasUsableTranslation(translated)) return;
+
     if (key === 'trip_question') {
-      el.innerHTML = t(key).replace('<strong></strong>', `<strong>${document.getElementById('trip-city')?.textContent || ''}</strong>`);
-    } else {
-      el.textContent = t(key);
+      if (!updateTripQuestionText(el, translated)) updateTextNodeOnly(el, translated);
+      return;
     }
+
+    updateTextNodeOnly(el, translated);
   });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.dataset.i18nPlaceholder;
-    el.setAttribute('placeholder', t(key));
+    const translated = resolveTranslation(key);
+    if (!hasUsableTranslation(translated)) return;
+    el.setAttribute('placeholder', translated);
   });
 }
+
+// Restore language
+const savedLang = localStorage.getItem('glotemp-lang');
+if (savedLang && supportedLangs.includes(savedLang)) currentLang = savedLang;
+document.documentElement.lang = currentLang;
+
+// Run before DOMContentLoaded work so keys never render.
+applyTranslations();
 
 // ----- Language Switch Modal -----
 (function initLangUI() {
@@ -818,11 +926,6 @@ function applyTranslations() {
   document.body.appendChild(modal);
   document.getElementById('lang-switch').onclick = () => modal.style.display = 'flex';
 })();
-
-// Restore language
-const savedLang = localStorage.getItem('glotemp-lang');
-if (savedLang && supportedLangs.includes(savedLang)) currentLang = savedLang;
-document.documentElement.lang = currentLang;
 
 // ----- Observatory System -----
 const OBSERVATORY_STORAGE_KEY = 'glotemp-observatory';
@@ -1234,23 +1337,34 @@ function recordObservation(event) {
   addStars(note ? 18 : 12);
   renderSignalPanels();
   document.getElementById('observation-feedback').textContent = t('observation_saved');
+  // Refresh the feed to show the new observation
+  const currentCity = document.getElementById('city-select')?.value || 'nyc';
+  renderObservations(currentCity, false);
+  // Update the live observation count
+  const obsEl = document.getElementById('obs-count');
+  if (obsEl) {
+    const total = (window.SEED_OBSERVATIONS || []).length + observatoryState.observations.length;
+    obsEl.textContent = total;
+  }
   if (observatoryState.pendingMoment) openConstellationMoment(observatoryState.pendingMoment);
 }
 
 // ----- Pulse Simulation & Canvas -----
 const canvas = document.getElementById('pulse-canvas');
-const ctx = canvas.getContext('2d');
+const ctx = canvas ? canvas.getContext('2d') : null;
 let animationId;
 let pulsePoints = [];
 
 function resizeCanvas() {
+  if (!canvas) return;
   canvas.width = canvas.parentElement.offsetWidth;
   canvas.height = canvas.parentElement.offsetHeight;
   initPulsePoints();
 }
-window.addEventListener('resize', resizeCanvas);
+if (canvas) window.addEventListener('resize', resizeCanvas);
 
 function initPulsePoints() {
+  if (!canvas) return;
   pulsePoints = [];
   const count = 15;
   for (let i = 0; i < count; i++) {
@@ -1266,6 +1380,7 @@ function initPulsePoints() {
 }
 
 function drawPulse() {
+  if (!ctx) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   // draw connecting lines
   ctx.beginPath();
@@ -1304,13 +1419,22 @@ function drawPulse() {
 // City data simulation
 let cities = {}; // Will be populated from data/cities.json
 
-// Load cities data from JSON file
+// Load cities data — prefer CITIES_DATA (cities-data.js), fall back to JSON
 async function loadCitiesData() {
+  const src = (typeof window !== 'undefined' && window.CITIES_DATA) ? window.CITIES_DATA : null;
+  if (src && src.length) {
+    src.forEach(city => {
+      cities[city.slug] = {
+        name: city.name,
+        mood: city.mood || 7.0,
+        dims: city.dims || [7,7,7,7,7,7,7,7,7,7,7,7]
+      };
+    });
+    return cities;
+  }
   try {
     const response = await fetch('/data/cities.json');
     const data = await response.json();
-
-    // Convert to format expected by existing code
     data.cities.forEach(city => {
       cities[city.slug] = {
         name: city.name,
@@ -1318,11 +1442,9 @@ async function loadCitiesData() {
         dims: city.dimensions
       };
     });
-
     return cities;
   } catch (error) {
     console.error('Failed to load cities data:', error);
-    // Fallback to basic cities if file not available
     cities = {
       nyc: { name: "New York", mood: 7.8, dims: [8.2,7.1,9.0,7.5,8.8,6.9,7.0,5.2,9.3,8.0,7.4,8.1] },
       london: { name: "London", mood: 6.9, dims: [7.0,6.8,7.5,7.2,8.0,7.1,6.5,5.8,7.8,7.3,6.9,7.6] },
@@ -1351,93 +1473,6 @@ function synthesizeEmotionalTemperature(cityData) {
 }
 
 // Barometer color based on mood temperature
-function getBarometerState(mood) {
-  if (mood >= 8.5) return { band: 'charged', label: 'Surging Energy', temp: 'Hot' };
-  if (mood >= 6.5) return { band: 'warm', label: 'Expansive', temp: 'Warm' };
-  if (mood >= 4.5) return { band: 'equilibrium', label: 'Equilibrium', temp: 'Balanced' };
-  if (mood >= 2.0) return { band: 'restrained', label: 'Reserved', temp: 'Cool' };
-  return { band: 'low', label: 'Subdued', temp: 'Cold' };
-}
-
-let currentBarometerBand = 'equilibrium';
-
-// Render the Living Barometer (image-based with cross-fade)
-function renderBarometer(mood, label) {
-  const value = document.getElementById('barometer-value');
-  const labelEl = document.getElementById('barometer-label');
-  const image = document.getElementById('barometer-image');
-  const picture = document.getElementById('barometer-picture');
-  const state = getBarometerState(mood);
-
-  // Update numeric value
-  value.textContent = mood.toFixed(1);
-  labelEl.textContent = state.label;
-
-  // Switch image if band changed
-  if (state.band !== currentBarometerBand) {
-    switchBarometerImage(state.band, currentBarometerBand);
-    currentBarometerBand = state.band;
-  }
-}
-
-function switchBarometerImage(newBand, oldBand) {
-  const image = document.getElementById('barometer-image');
-  const picture = document.getElementById('barometer-picture');
-
-  // Check for prefers-reduced-motion
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  if (prefersReducedMotion) {
-    // Instant switch without animation
-    updateBarometerPictureElement(newBand);
-  } else {
-    // Cross-fade: fade out current, switch source, fade in (600ms)
-    image.classList.add('transitioning');
-
-    setTimeout(() => {
-      updateBarometerPictureElement(newBand);
-      image.classList.remove('transitioning');
-    }, 600);
-  }
-}
-
-function updateBarometerPictureElement(band) {
-  const image = document.getElementById('barometer-image');
-  if (!image) return;
-
-  image.src = `/assets/barometer-${band}.png`;
-  image.alt = `Mood barometer: ${band}`;
-}
-
-
-// Preload barometer images and handle failures
-function preloadBarometerImages() {
-  const image = document.getElementById('barometer-image');
-  const chamber = document.getElementById('barometer-chamber');
-  if (!image) return;
-
-  // Preload equilibrium (most likely first state)
-  const preloadLink = document.createElement('link');
-  preloadLink.rel = 'preload';
-  preloadLink.as = 'image';
-  preloadLink.href = '/assets/barometer-equilibrium.avif';
-  document.head.appendChild(preloadLink);
-
-  // Handle image load failure
-  image.addEventListener('error', () => {
-    console.warn('Barometer image failed to load');
-    if (chamber) chamber.classList.add('fallback');
-  });
-
-  // Verify image actually loads
-  const img = new Image();
-  img.onerror = () => {
-    console.warn('Barometer image preload failed');
-    if (chamber) chamber.classList.add('fallback');
-  };
-  img.src = '/assets/barometer-equilibrium.png';
-}
-
 // Time-based ambient lighting
 function updateAmbientLighting() {
   const hour = new Date().getHours();
@@ -1468,35 +1503,41 @@ function updateCity(selected) {
   document.documentElement.style.setProperty('--mood-hue', `${hueShift}deg`);
   document.documentElement.style.setProperty('--mood-saturation', saturation.toFixed(2));
 
-  document.getElementById('city-name').textContent = city.name;
-  document.getElementById('trip-city').textContent = city.name;
+  const cityNameEl = document.getElementById('city-name');
+  if (cityNameEl) cityNameEl.textContent = city.name;
+  const tripCityEl = document.getElementById('trip-city');
+  if (tripCityEl) tripCityEl.textContent = city.name;
 
-  // Render the Living Barometer
-  renderBarometer(synthesizedMood, city.name);
   // dimensions
   const dimNames = t('dimensions');
   const grid = document.getElementById('dimensions-grid');
-  grid.innerHTML = '';
-  city.dims.forEach((val, idx) => {
-    const badge = document.createElement('span');
-    badge.className = 'dim-badge';
-    badge.innerHTML = `<span>${dimNames[idx] || idx}</span> <strong>${val.toFixed(1)}</strong>`;
-    grid.appendChild(badge);
-  });
+  if (grid) {
+    grid.innerHTML = '';
+    city.dims.forEach((val, idx) => {
+      const badge = document.createElement('span');
+      badge.className = 'dim-badge';
+      badge.innerHTML = `<span>${dimNames[idx] || idx}</span> <strong>${val.toFixed(1)}</strong>`;
+      grid.appendChild(badge);
+    });
+  }
   // Trip verdict using synthesized mood
   const verdictEl = document.getElementById('trip-verdict');
   const reasonEl = document.getElementById('trip-reason');
+  const verdictColor = moodToBand(synthesizedMood).color;
   if (synthesizedMood >= 7.8) {
     verdictEl.textContent = 'GO';
     verdictEl.className = 'verdict verdict-go';
+    verdictEl.style.color = verdictColor;
     reasonEl.textContent = t('trip_go_reason');
   } else if (synthesizedMood >= 6.5) {
     verdictEl.textContent = 'MAYBE';
     verdictEl.className = 'verdict verdict-maybe';
+    verdictEl.style.color = verdictColor;
     reasonEl.textContent = t('trip_maybe_reason');
   } else {
     verdictEl.textContent = 'WAIT';
     verdictEl.className = 'verdict verdict-wait';
+    verdictEl.style.color = verdictColor;
     reasonEl.textContent = t('trip_wait_reason');
   }
   // Update affiliate links with city name
@@ -1552,7 +1593,17 @@ function getSentimentLabel(sentiment) {
 }
 
 function formatTimeAgo(timestamp) {
-  return timestamp;
+  if (!timestamp) return '';
+  const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+  if (isNaN(date.getTime())) return String(timestamp);
+  const diffMs = Date.now() - date.getTime();
+  const diffMin = Math.round(diffMs / 60000);
+  if (diffMin < 2) return 'just now';
+  if (diffMin < 60) return `${diffMin} min ago`;
+  const diffH = Math.round(diffMin / 60);
+  if (diffH < 24) return `${diffH} hour${diffH === 1 ? '' : 's'} ago`;
+  const diffD = Math.round(diffH / 24);
+  return `${diffD} day${diffD === 1 ? '' : 's'} ago`;
 }
 
 function renderObservations(citySlug, loading = false) {
@@ -1565,7 +1616,19 @@ function renderObservations(citySlug, loading = false) {
     return;
   }
 
-  const observations = mockObservations[citySlug] || [];
+  // Merge local observations (for this city name) with seed observations
+  const cityData = cities[citySlug];
+  const cityName = cityData ? cityData.name : '';
+  const localObs = observatoryState.observations
+    .filter(o => o.city === cityName)
+    .map(o => ({
+      sentiment: o.mood === 'Energized' ? 0.9 : o.mood === 'Good' ? 0.7 : o.mood === 'Neutral' ? 0.5 : o.mood === 'Low' ? 0.3 : 0.2,
+      text: o.note || `${o.mood} · ${o.scene}`,
+      intensity: Math.round(o.intensity / 10),
+      created_at: 'just now'
+    }));
+  const seedObs = (window.SEED_OBSERVATIONS || []).filter(o => o.city === citySlug);
+  const observations = [...localObs, ...seedObs];
 
   if (observations.length === 0) {
     grid.innerHTML = `<div class="obs-empty" data-i18n="obs_empty">${t('obs_empty')}</div>`;
@@ -1575,15 +1638,18 @@ function renderObservations(citySlug, loading = false) {
   grid.innerHTML = observations.map((obs, idx) => {
     const sentiment = getSentimentLabel(obs.sentiment);
     const intensity = obs.intensity || 5;
+    const text = (obs.context || obs.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const timeStr = formatTimeAgo(obs.created_at);
+    const bandInfo = moodToBand(obs.sentiment * 10);
     return `
-      <div class="obs-card">
-        <div class="obs-sentiment ${sentiment}" data-i18n="sentiment_${sentiment}">
+      <div class="obs-card obs-feed-item" style="animation-delay:${idx * 50}ms">
+        <div class="obs-sentiment ${sentiment}" style="color:${bandInfo.color}">
           ${sentiment.toUpperCase()}
         </div>
-        <div class="obs-text">${obs.text}</div>
+        <div class="obs-text">${text}</div>
         <div class="obs-meta">
-          <span class="obs-time">${formatTimeAgo(obs.created_at)}</span>
-          <span class="obs-intensity">Intensity: ${intensity}/10</span>
+          <span class="obs-time">${timeStr}</span>
+          <span class="obs-intensity" style="color:${bandInfo.color}">Intensity: ${intensity}/10</span>
         </div>
       </div>
     `;
@@ -1606,48 +1672,51 @@ function addStars(amount) {
   loadStars();
 }
 
-// Load cities from data file and populate selector
+// Load cities from CITIES_DATA (cities-data.js) into the selector
 async function loadCitiesIntoSelector() {
-  try {
-    const response = await fetch('/data/cities.json');
-    const data = await response.json();
-    const select = document.getElementById('city-select');
+  const src = (typeof window !== 'undefined' && window.CITIES_DATA) ? window.CITIES_DATA : null;
+  const select = document.getElementById('city-select');
+  if (!select) return;
 
-    if (!select) return;
-
-    // Group cities by region
-    const byRegion = {};
-    data.cities.forEach(city => {
-      if (!byRegion[city.region]) byRegion[city.region] = [];
-      byRegion[city.region].push(city);
-    });
-
-    // Add options grouped by region
-    Object.keys(byRegion).sort().forEach(region => {
-      const optgroup = document.createElement('optgroup');
-      optgroup.label = region;
-
-      byRegion[region].forEach(city => {
-        const option = document.createElement('option');
-        option.value = city.slug;
-        option.textContent = `${city.name}, ${city.country}`;
-        optgroup.appendChild(option);
-      });
-
-      select.appendChild(optgroup);
-    });
-
-    // Set NYC as default
-    select.value = 'nyc';
-  } catch (error) {
-    console.error('Failed to load cities:', error);
+  let cityList = [];
+  if (src && src.length) {
+    cityList = src;
+  } else {
+    try {
+      const response = await fetch('/data/cities.json');
+      const data = await response.json();
+      cityList = data.cities.map(c => ({ slug: c.slug, name: c.name, country: c.country, region: c.region }));
+    } catch (error) {
+      console.error('Failed to load cities:', error);
+      return;
+    }
   }
+
+  // Group by region
+  const byRegion = {};
+  cityList.forEach(city => {
+    const r = city.region || 'Other';
+    if (!byRegion[r]) byRegion[r] = [];
+    byRegion[r].push(city);
+  });
+
+  Object.keys(byRegion).sort().forEach(region => {
+    const optgroup = document.createElement('optgroup');
+    optgroup.label = region;
+    byRegion[region].forEach(city => {
+      const option = document.createElement('option');
+      option.value = city.slug;
+      option.textContent = `${city.name}, ${city.country || city.iso || ''}`;
+      optgroup.appendChild(option);
+    });
+    select.appendChild(optgroup);
+  });
+
+  select.value = 'nyc';
 }
 
 // Initialize everything
 document.addEventListener('DOMContentLoaded', async () => {
-  applyTranslations();
-  preloadBarometerImages();
   await loadCitiesData();
   loadCitiesIntoSelector();
   resizeCanvas();
@@ -1773,12 +1842,68 @@ function getCurrentFeaturedStory() {
   return stories[index];
 }
 
+function handleStoryImageError(imageEl) {
+  const base = (imageEl.dataset.imageBase || '').replace(/[^a-z0-9-]/g, '');
+  const step = Number(imageEl.dataset.fallbackStep || '0');
+
+  if (base && step === 0) {
+    imageEl.dataset.fallbackStep = '1';
+    imageEl.src = `/assets/art/${base}-1200.png`;
+    return;
+  }
+
+  if (base && step === 1) {
+    imageEl.dataset.fallbackStep = '2';
+    imageEl.src = `/assets/art/${base}-600.png`;
+    return;
+  }
+
+  if (typeof imageEl._storyImageErrorHandler === 'function') {
+    imageEl.removeEventListener('error', imageEl._storyImageErrorHandler);
+    delete imageEl._storyImageErrorHandler;
+  }
+  imageEl.closest('.card-media')?.classList.add('image-error');
+  const label = String(imageEl.dataset.imageLabel || 'Story')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><rect width='1200' height='800' fill='#14131A'/><text x='600' y='420' text-anchor='middle' fill='#A9A7B4' font-family='Manrope,Arial,sans-serif' font-size='64'>${label}</text></svg>`;
+  imageEl.src = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
 function renderStoryImage(story) {
-  // No image field in story data (files don't exist), render text-only placeholder
-  return `<div class="card-placeholder">
-    <div class="card-placeholder-content">
-      <div class="card-placeholder-name">${story.city}</div>
-    </div>
+  const escapeHtml = (value) => String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const safeCity = escapeHtml(story.city || '');
+  const safeAlt = escapeHtml(story.imageAlt || story.city || 'City story image');
+  const imageName = (typeof story.image === 'string' ? story.image.trim().toLowerCase() : '')
+    .replace(/[^a-z0-9-]/g, '');
+
+  if (!imageName) {
+    return `<div class="card-placeholder">
+      <div class="card-placeholder-content">
+        <div class="card-placeholder-name">${safeCity}</div>
+      </div>
+    </div>`;
+  }
+
+  return `<div class="card-media">
+    <img src="/assets/art/${imageName}.png"
+         alt="${safeAlt}"
+         width="1200"
+         height="800"
+         loading="lazy"
+         decoding="async"
+         data-image-base="${imageName}"
+         data-image-label="${safeCity}"
+         data-fallback-step="0"
+         data-story-image="true" />
   </div>`;
 }
 
@@ -1793,6 +1918,12 @@ function loadDailyStory() {
     const storyImageContainer = document.getElementById('story-image');
     if (storyImageContainer) {
       storyImageContainer.innerHTML = renderStoryImage(story);
+      const storyImageEl = storyImageContainer.querySelector('img[data-story-image="true"]');
+      if (storyImageEl) {
+        const onStoryImageError = () => handleStoryImageError(storyImageEl);
+        storyImageEl._storyImageErrorHandler = onStoryImageError;
+        storyImageEl.addEventListener('error', onStoryImageError);
+      }
     }
 
     document.getElementById('story-city').textContent = story.city;
@@ -1812,49 +1943,354 @@ function loadDailyStory() {
 
     storySection.style.display = 'block';
     fallback.style.display = 'none';
+
+    // Wire read-more to toggle full story content
+    const readMoreEl = document.getElementById('read-more');
+    if (readMoreEl) {
+      let fullContentEl = document.getElementById('story-full-content');
+      if (!fullContentEl) {
+        fullContentEl = document.createElement('div');
+        fullContentEl.id = 'story-full-content';
+        fullContentEl.className = 'story-full-content-expand';
+        storySection.appendChild(fullContentEl);
+      }
+      fullContentEl.textContent = story.content || '';
+      readMoreEl.href = '#';
+      readMoreEl.onclick = (e) => {
+        e.preventDefault();
+        const open = !fullContentEl.hidden;
+        fullContentEl.hidden = open;
+        readMoreEl.textContent = open ? t('read_more') : t('show_less') || 'Show less';
+      };
+      fullContentEl.hidden = true;
+    }
   } catch (e) {
     storySection.style.display = 'none';
     fallback.style.display = 'block';
   }
 }
 
+// Return seed observations (+ any real ones from Supabase in future)
+function getRecentComments(limit) {
+  const seed = (window.SEED_OBSERVATIONS || []);
+  return Promise.resolve(limit ? seed.slice(0, limit) : seed);
+}
+
+// Pin a city by slug — called from barometer and trending card clicks
+function loadCityBySlug(slug) {
+  if (!cities[slug]) return;
+  const select = document.getElementById('city-select');
+  if (select) select.value = slug;
+  updateCity(slug);
+  // Smooth-scroll to instrument row so user sees the update
+  const row = document.getElementById('instrument-row');
+  if (row) row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Map mood score to band name + barometer image filename
+function moodToBand(mood) {
+  if (mood >= 8.5) return { band: 'charged',     color: '#C86BE0', img: '/assets/barometer-charged.png' };
+  if (mood >= 7.0) return { band: 'warm',        color: '#F5A25A', img: '/assets/barometer-warm.png' };
+  if (mood >= 5.0) return { band: 'equilibrium', color: '#F0E0C8', img: '/assets/barometer-equilibrium.png' };
+  if (mood >= 3.0) return { band: 'restrained',  color: '#6BA8F5', img: '/assets/barometer-restrained.png' };
+  return            { band: 'low',          color: '#4FD8E8', img: '/assets/barometer-low.png' };
+}
+
+// Animate a numeric stat value ticking up from 0 to target
+function tickStatUp(el, target, duration) {
+  if (!el || !target) return;
+  const start = performance.now();
+  function step(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(eased * target).toString();
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
 function loadCoverageStats() {
-  const obsCount = document.getElementById('obs-count');
-  if (obsCount) {
-    getRecentComments(1000).then(comments => {
-      obsCount.textContent = comments.length.toString();
-    }).catch(() => {
-      obsCount.textContent = '0';
+  // Cities tracked from dataset
+  const tracked = (window.CITIES_DATA || []).length || 150;
+  const trackedEl = document.getElementById('cities-tracked-count');
+  if (trackedEl) tickStatUp(trackedEl, tracked, 800);
+
+  getRecentComments(1000).then(comments => {
+    const now = Date.now();
+    const h24 = 24 * 3600000;
+    const h48 = 48 * 3600000;
+
+    // Total live observations
+    const obsEl = document.getElementById('obs-count');
+    if (obsEl) tickStatUp(obsEl, comments.length, 1200);
+
+    // Observations in last 24h
+    const today = comments.filter(c => {
+      const ms = c.created_at ? new Date(c.created_at).getTime() : 0;
+      return (now - ms) < h24;
     });
+    const todayEl = document.getElementById('obs-today');
+    if (todayEl) tickStatUp(todayEl, today.length, 1000);
+
+    // Cities whose sentiment moved in the last 24h vs 24-48h window
+    const cityRecent = {};
+    const cityOlder  = {};
+    comments.forEach(c => {
+      const age = now - (c.created_at ? new Date(c.created_at).getTime() : 0);
+      if (age < h24)            (cityRecent[c.city] = cityRecent[c.city] || []).push(c.sentiment || 0);
+      else if (age < h48)       (cityOlder[c.city]  = cityOlder[c.city]  || []).push(c.sentiment || 0);
+    });
+    const avg = arr => arr.reduce((s, v) => s + v, 0) / arr.length;
+    let moving = 0;
+    Object.keys(cityRecent).forEach(city => {
+      if (cityOlder[city]) {
+        const diff = Math.abs(avg(cityRecent[city]) - avg(cityOlder[city]));
+        if (diff > 0.1) moving++;
+      }
+    });
+    const movingEl = document.getElementById('cities-moving');
+    if (movingEl) tickStatUp(movingEl, moving || Math.ceil(Object.keys(cityRecent).length * 0.4), 900);
+  }).catch(() => {});
+}
+
+// Barometer rotation — 5 slots, staggered, session-shuffled
+const BAROMETER_DIM_LABELS = ["Mood","Economic","Nightlife","Study","Tourism","Safety","Health","Traffic","Events","Community","Weather","Innovation"];
+
+function setupBarometerRotation() {
+  const slots = document.querySelectorAll('.instrument-slot');
+  if (!slots.length) return;
+
+  const allCities = (window.CITIES_DATA || []).filter(c => c.available !== false);
+  if (allCities.length < 5) return;
+
+  // Shuffle once per session
+  const shuffled = allCities.slice().sort(() => Math.random() - 0.5);
+  let cursor = 0;
+
+  // Assign 5 unique starting cities
+  const assigned = [];
+  for (let i = 0; i < 5; i++) {
+    assigned.push(shuffled[cursor++ % shuffled.length]);
+  }
+
+  function nextUniqueCity(excluding) {
+    for (let tries = 0; tries < shuffled.length * 2; tries++) {
+      const c = shuffled[cursor++ % shuffled.length];
+      if (!excluding.includes(c.slug)) return c;
+    }
+    return shuffled[0];
+  }
+
+  function updateSlot(slotEl, cityData) {
+    const img = slotEl.querySelector('.instrument-image');
+    const nameEl = slotEl.querySelector('.instrument-city-name');
+    const bandEl = slotEl.querySelector('.instrument-band-name');
+    if (!img || !nameEl || !bandEl) return;
+
+    const { band, color, img: imgSrc } = moodToBand(cityData.mood || 7.0);
+    const isChange = img.getAttribute('src') !== imgSrc && img.getAttribute('src') && img.getAttribute('src').indexOf('barometer') !== -1;
+
+    if (isChange) {
+      img.classList.add('instrument-fading');
+      setTimeout(() => {
+        img.src = imgSrc;
+        img.alt = band + ' mood barometer';
+        img.classList.remove('instrument-fading');
+        img.style.filter = `drop-shadow(0 6px 18px ${color}60)`;
+      }, 350);
+    } else {
+      img.src = imgSrc;
+      img.alt = band + ' mood barometer';
+      img.style.filter = `drop-shadow(0 6px 18px ${color}60)`;
+    }
+
+    slotEl.style.setProperty('--slot-glow', color);
+
+    nameEl.textContent = cityData.name;
+    nameEl.style.color = color;
+    bandEl.textContent = band;
+    bandEl.style.color = color;
+
+    // Dim tooltip: top-3 dims from `cities` global (loaded async) or fallback
+    let tip = slotEl.querySelector('.instr-dim-tip');
+    if (!tip) {
+      tip = document.createElement('div');
+      tip.className = 'instr-dim-tip';
+      slotEl.appendChild(tip);
+    }
+    const cityEntry = (typeof cities !== 'undefined') && cities[cityData.slug];
+    if (cityEntry && cityEntry.dims) {
+      const top3 = cityEntry.dims
+        .map((v, i) => ({ label: BAROMETER_DIM_LABELS[i] || i, val: v }))
+        .sort((a, b) => b.val - a.val)
+        .slice(0, 3);
+      tip.innerHTML = top3.map(d => `<span style="color:${color}">${d.label}</span> ${d.val.toFixed(1)}`).join(' · ');
+    } else {
+      tip.textContent = `Mood ${(cityData.mood || 7.0).toFixed(1)} · ${band}`;
+    }
+
+    // Click-to-pin
+    slotEl.dataset.citySlug = cityData.slug;
+  }
+
+  // Initial render
+  slots.forEach((slot, i) => {
+    updateSlot(slot, assigned[i]);
+    slot.style.cursor = 'pointer';
+    slot.addEventListener('click', () => {
+      const slug = slot.dataset.citySlug;
+      if (slug && typeof loadCityBySlug === 'function') loadCityBySlug(slug);
+    });
+  });
+
+  // Prefers-reduced-motion: skip auto-rotation
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const STAGGER_MS   = 1400;  // gap between slot firings
+  const INTERVAL_MS  = 7000;  // each slot repeats every 7s
+  let paused = false;
+
+  document.addEventListener('visibilitychange', () => { paused = document.hidden; });
+
+  slots.forEach((slot, i) => {
+    setTimeout(() => {
+      setInterval(() => {
+        if (paused || slot.matches(':hover')) return;
+        const current = assigned.map(c => c.slug);
+        const next = nextUniqueCity(current);
+        assigned[i] = next;
+        updateSlot(slot, next);
+      }, INTERVAL_MS);
+    }, i * STAGGER_MS);
+  });
+}
+
+// Live ticker — continuous scroll of seed observations
+function setupLiveTicker() {
+  const ticker = document.getElementById('ticker-content');
+  if (!ticker) return;
+
+  const obs = (window.SEED_OBSERVATIONS || []).slice().sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+  );
+
+  if (!obs.length) return;
+
+  function escTick(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // Build a wide inline track that repeats for continuous scroll
+  const items = [...obs, ...obs].map(o => {
+    const city = escTick(o.cityName || o.city || '');
+    const note = escTick((o.context || '').slice(0, 80));
+    const cityObj = (window.CITIES_DATA || []).find(c => c.slug === o.city);
+    const mood = cityObj ? (cityObj.mood || 7.0) : 7.0;
+    const { color } = moodToBand(mood);
+    return `<span class="ticker-item"><strong style="color:${color}">${city}</strong> — ${note}</span>`;
+  }).join('<span class="ticker-sep">·</span>');
+
+  ticker.innerHTML = `<div class="ticker-track" aria-live="off">${items}</div>`;
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // Show first item statically
+    const first = obs[0];
+    const fc = escTick(first.cityName || first.city);
+    const fn = escTick((first.context || '').slice(0, 100));
+    ticker.innerHTML = `<p class="ticker-placeholder"><strong>${fc}</strong> — ${fn}</p>`;
   }
 }
 
-function loadFastestCities() {
+function setupTrendingRotation() {
   const grid = document.getElementById('fastest-cities-grid');
   if (!grid) return;
 
+  // Guard against re-initialisation
+  if (grid._trendingCleanup) { grid._trendingCleanup(); delete grid._trendingCleanup; }
+
+  const allCities = (window.CITIES_DATA || []).filter(c => c.available !== false);
+  if (allCities.length < 6) return;
+
+  // Shuffle once per session
+  const shuffled = allCities.slice().sort(() => Math.random() - 0.5);
+  let cursor = 0;
+
+  function nextUniqueCity(excluding) {
+    for (let tries = 0; tries < shuffled.length * 2; tries++) {
+      const c = shuffled[cursor++ % shuffled.length];
+      if (!excluding.includes(c.slug)) return c;
+    }
+    return shuffled[cursor++ % shuffled.length];
+  }
+
+  // Populate initial 6 cards
+  const assigned = [];
+  for (let i = 0; i < 6; i++) {
+    assigned.push(nextUniqueCity(assigned.map(c => c.slug)));
+  }
+
+  function renderCard(card, cityData) {
+    const mood = cityData.mood || 7.0;
+    const { band, color } = moodToBand(mood);
+    const moodScore = mood.toFixed(1);
+    card.dataset.slug = cityData.slug;
+    card.style.borderColor = color + '55';
+    card.innerHTML = `
+      <h3 class="fastest-city-name" style="color:${color}">${cityData.name}</h3>
+      <p class="fastest-shift">${cityData.country || ''}</p>
+      <p class="fastest-shift" style="color:${color}">${band} · ${moodScore} / 10</p>
+      <div class="fastest-mood">${getMoodEmoji(mood)}</div>
+    `;
+  }
+
   grid.innerHTML = '';
-
-  const cityEntries = Object.entries(cities).sort(() => Math.random() - 0.5).slice(0, 3);
-
-  cityEntries.forEach(([slug, cityData]) => {
-    const shift = (Math.random() - 0.5) * 2;
-    const shiftDirection = shift > 0 ? 'positive' : 'negative';
-    const shiftPercent = Math.abs((shift * 100).toFixed(1));
-    const currentMood = Math.max(0, Math.min(10, cityData.mood + shift)).toFixed(1);
-
+  const cards = [];
+  assigned.forEach((cityData, i) => {
     const card = document.createElement('div');
     card.className = 'fastest-card';
-    card.innerHTML = `
-      <h3 class="fastest-city-name">${cityData.name}</h3>
-      <p class="fastest-shift ${shiftDirection}">
-        Mood ${shift > 0 ? '↑' : '↓'} ${shiftPercent}% last 24h
-      </p>
-      <p class="fastest-shift">Now at ${currentMood} / 10</p>
-      <div class="fastest-mood">${getMoodEmoji(parseFloat(currentMood))}</div>
-    `;
+    renderCard(card, cityData);
+    card.addEventListener('click', () => {
+      const slug = card.dataset.slug;
+      if (slug && typeof loadCityBySlug === 'function') loadCityBySlug(slug);
+    });
     grid.appendChild(card);
+    cards.push(card);
   });
+
+  // Static under prefers-reduced-motion
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const SWAP_INTERVAL_MS = 2000;
+  let paused = false;
+  const intervalIds = [];
+
+  document.addEventListener('visibilitychange', () => { paused = document.hidden; });
+
+  cards.forEach((card, i) => {
+    const tid = setTimeout(() => {
+      const iid = setInterval(() => {
+        if (paused || card.matches(':hover')) return;
+        const next = nextUniqueCity(assigned.map(c => c.slug));
+        assigned[i] = next;
+        card.classList.add('swapping');
+        setTimeout(() => {
+          renderCard(card, next);
+          card.classList.remove('swapping');
+        }, 400);
+      }, SWAP_INTERVAL_MS * cards.length);
+      intervalIds.push(iid);
+    }, i * SWAP_INTERVAL_MS);
+    intervalIds.push(tid);
+  });
+
+  // Expose cleanup on grid for guard against re-init
+  grid._trendingCleanup = () => intervalIds.forEach(id => { clearTimeout(id); clearInterval(id); });
 }
 
 function getMoodEmoji(moodScore) {
@@ -1877,46 +2313,19 @@ function setupScrollReveals() {
     });
   }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-  document.querySelectorAll('.carousel-slot, .glass-card, section').forEach(el => {
+  document.querySelectorAll('.glass-card, section').forEach(el => {
     observer.observe(el);
   });
 }
 
-// Live ticker updates
-function setupLiveTicker() {
-  // Ticker content is pre-rendered in HTML with data-i18n attributes
-  // applyTranslations will handle localization on load
-}
+// Live ticker updates — implemented above in setupLiveTicker()
 
 document.addEventListener('DOMContentLoaded', () => {
   // ... existing code like applyTranslations, resizeCanvas, etc.
   loadDailyStory();
   loadCoverageStats();
-  loadFastestCities();
-
-  // Initialize rotating instruments carousel
-  if (window.CITIES_DATA && window.InstrumentsCarousel) {
-    const carousel = initCarousel(window.CITIES_DATA);
-
-    // Setup city selection to pin carousel slot 1
-    const citySelect = document.getElementById('city-select');
-    if (citySelect) {
-      citySelect.addEventListener('change', (e) => {
-        const selectedCity = window.CITIES_DATA.find(c => c.slug === e.target.value);
-        if (selectedCity && carousel) {
-          carousel.pinSlot(1, selectedCity.slug);
-
-          // Show city details panel
-          const panel = document.getElementById('city-selector-panel');
-          if (panel) {
-            panel.style.display = 'block';
-            document.getElementById('selected-city-name').textContent = selectedCity.name;
-            // TODO: Load city-specific details (dimensions, observations, etc.)
-          }
-        }
-      });
-    }
-  }
+  setupTrendingRotation();
+  setupBarometerRotation();
 
   // Setup scroll reveal animations
   if ('IntersectionObserver' in window) {
@@ -1926,3 +2335,207 @@ document.addEventListener('DOMContentLoaded', () => {
   // Setup live ticker
   setupLiveTicker();
 });
+
+// ===== v11 MOBILE-FIRST ADDITIONS =====
+
+// ----- Hamburger Navigation -----
+(function initHamburger() {
+  const hamburger = document.getElementById('nav-hamburger');
+  const panel = document.getElementById('nav-panel');
+  const closeBtn = document.getElementById('nav-panel-close');
+  const langMobile = document.getElementById('lang-switch-mobile');
+  const langDesktop = document.getElementById('lang-switch');
+  if (!hamburger || !panel) return;
+
+  function openPanel() {
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+    hamburger.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closePanel() {
+    panel.classList.remove('open');
+    panel.setAttribute('aria-hidden', 'true');
+    hamburger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    hamburger.focus();
+  }
+
+  hamburger.addEventListener('click', openPanel);
+  if (closeBtn) closeBtn.addEventListener('click', closePanel);
+
+  panel.addEventListener('click', (e) => {
+    if (e.target === panel) closePanel();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && panel.classList.contains('open')) closePanel();
+  });
+
+  // Wire mobile lang button to the same modal as desktop
+  if (langMobile && langDesktop) {
+    langMobile.addEventListener('click', () => {
+      closePanel();
+      langDesktop.click();
+    });
+  }
+})();
+
+// ----- Ticker tap-pause -----
+(function initTickerTapPause() {
+  // Run after DOMContentLoaded setup is done
+  function attach() {
+    const track = document.querySelector('.ticker-track');
+    if (!track) return;
+    let paused = false;
+    track.addEventListener('touchstart', () => {
+      paused = true;
+      track.style.animationPlayState = 'paused';
+    }, { passive: true });
+    track.addEventListener('touchend', () => {
+      paused = false;
+      track.style.animationPlayState = 'running';
+    }, { passive: true });
+  }
+  // Ticker is built inside DOMContentLoaded, so wait a tick
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(attach, 100));
+  } else {
+    setTimeout(attach, 100);
+  }
+})();
+
+// ----- How It Works image fallback -----
+(function initHowItWorksImages() {
+  function setup() {
+    document.querySelectorAll('.hiw-img').forEach(img => {
+      img.addEventListener('error', () => {
+        const slot = img.closest('.hiw-image-slot');
+        const numeral = img.getAttribute('data-hiw-numeral') || '';
+        if (!slot) return;
+        slot.classList.add('hiw-no-image');
+        slot.innerHTML = `<span class="hiw-numeral-only">${numeral}</span>`;
+      }, { once: true });
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+})();
+
+// ----- Kyiv fallback read-more -----
+(function initFallbackReadMore() {
+  function setup() {
+    const btn = document.getElementById('read-more-fallback');
+    const full = document.getElementById('story-fallback-full');
+    if (!btn || !full) return;
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const open = !full.hidden;
+      full.hidden = open;
+      btn.textContent = open ? 'Read more' : 'Show less';
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+})();
+
+// ----- City comment box (under "Recent pulse from [city]") -----
+(function initCityCommentBox() {
+  function setup() {
+    const picker = document.getElementById('comment-mood-picker');
+    const textEl = document.getElementById('comment-text');
+    const submitBtn = document.getElementById('comment-submit');
+    const feedbackEl = document.getElementById('comment-feedback');
+    if (!picker || !textEl || !submitBtn) return;
+
+    let selectedMood = null;
+
+    picker.querySelectorAll('.mood-emoji').forEach(btn => {
+      btn.addEventListener('click', () => {
+        picker.querySelectorAll('.mood-emoji').forEach(b => {
+          b.style.opacity = '0.5';
+          b.style.transform = '';
+        });
+        btn.style.opacity = '1';
+        btn.style.transform = 'scale(1.2)';
+        selectedMood = btn.getAttribute('data-label') || btn.getAttribute('data-band') || 'Neutral';
+      });
+    });
+
+    submitBtn.addEventListener('click', () => {
+      const note = textEl.value.trim();
+      if (!note) {
+        if (feedbackEl) feedbackEl.textContent = 'Write something first.';
+        return;
+      }
+      const mood = selectedMood || 'Neutral';
+      const citySelectEl = document.getElementById('city-select');
+      const citySlug = citySelectEl ? citySelectEl.value : 'nyc';
+      const cityData = (typeof cities !== 'undefined') ? cities[citySlug] : null;
+      const cityName = cityData ? cityData.name : 'New York';
+      const bandMap = { charged: 0.9, warm: 0.7, equilibrium: 0.5, restrained: 0.3, low: 0.2 };
+      const moodLabelToBand = {
+        Energized: 'charged', Good: 'warm', Neutral: 'equilibrium', Low: 'restrained', Cautious: 'low'
+      };
+      const band = moodLabelToBand[mood] || 'equilibrium';
+      const sentiment = bandMap[band] || 0.5;
+
+      const observation = {
+        mood,
+        intensity: 65,
+        scene: 'street',
+        lens: 'global',
+        cadence: 'midday',
+        note,
+        city: cityName,
+        createdAt: new Date().toISOString()
+      };
+      if (typeof observatoryState !== 'undefined') {
+        observatoryState.observations.unshift(observation);
+        observatoryState.observations = observatoryState.observations.slice(0, 24);
+        if (typeof saveObservatory === 'function') saveObservatory();
+      }
+
+      // Also inject into SEED_OBSERVATIONS so renderObservations picks it up
+      if (!window.SEED_OBSERVATIONS) window.SEED_OBSERVATIONS = [];
+      window.SEED_OBSERVATIONS.unshift({
+        city: citySlug,
+        cityName,
+        sentiment,
+        text: note,
+        context: note,
+        intensity: 7,
+        created_at: new Date().toISOString()
+      });
+
+      // Refresh feed
+      if (typeof renderObservations === 'function') renderObservations(citySlug, false);
+
+      // Feedback
+      if (feedbackEl) feedbackEl.textContent = 'Observation shared.';
+      textEl.value = '';
+      picker.querySelectorAll('.mood-emoji').forEach(b => {
+        b.style.opacity = '0.5';
+        b.style.transform = '';
+      });
+      selectedMood = null;
+
+      // Clear feedback after 3s
+      setTimeout(() => { if (feedbackEl) feedbackEl.textContent = ''; }, 3000);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+})();
