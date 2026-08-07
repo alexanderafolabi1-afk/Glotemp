@@ -72,19 +72,17 @@ class InstrumentsCarousel {
       return;
     }
 
-    // Get current cities to avoid duplicates
-    const currentCities = new Set(Object.values(this.slots).map(c => c?.slug));
+    const currentSlotCity = this.slots[slotNum];
+    const otherCities = new Set(Object.entries(this.slots).filter(([s]) => s !== slotNum).map(([, c]) => c?.slug));
 
-    // Find next unique city
+    // Find next unique city (must be different from current)
     let attempts = 0;
     let nextCity = null;
 
     while (attempts < 50) {
       const randomCity = this.allCities[Math.floor(Math.random() * this.allCities.length)];
-      if (!currentCities.has(randomCity.slug) || randomCity.slug === this.slots[slotNum]?.slug) {
+      if (randomCity.slug !== currentSlotCity?.slug && !otherCities.has(randomCity.slug)) {
         nextCity = randomCity;
-        currentCities.delete(this.slots[slotNum]?.slug);
-        currentCities.add(randomCity.slug);
         break;
       }
       attempts++;
@@ -166,6 +164,7 @@ class InstrumentsCarousel {
 
   unpinSlot() {
     this.pinnedSlot = null;
+    this.stopRotation();
     this.startRotation();
   }
 
@@ -181,6 +180,7 @@ class InstrumentsCarousel {
 
   setupEventListeners() {
     const carousel = document.getElementById('instruments-carousel');
+    if (!carousel) return;
 
     // Pause on hover or focus
     carousel.addEventListener('mouseenter', () => this.pause());
@@ -219,4 +219,9 @@ function initCarousel(cities) {
   const carousel = new InstrumentsCarousel(cities);
   window.carousel = carousel;
   return carousel;
+}
+
+if (typeof window !== 'undefined') {
+  window.InstrumentsCarousel = InstrumentsCarousel;
+  window.initCarousel = initCarousel;
 }

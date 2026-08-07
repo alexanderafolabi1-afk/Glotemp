@@ -478,17 +478,17 @@ body::after {
 }
 
 /* ===== SCROLL REVEAL ANIMATIONS ===== */
-.carousel-slot,
-.glass-card,
-section {
+body.scroll-reveals-enabled .carousel-slot,
+body.scroll-reveals-enabled .glass-card,
+body.scroll-reveals-enabled section {
   opacity: 0;
   transform: translateY(12px);
   transition: opacity 400ms ease-out, transform 400ms ease-out;
 }
 
 .carousel-slot.revealed,
-.glass-card.revealed,
-section.revealed {
+body.scroll-reveals-enabled .glass-card.revealed,
+body.scroll-reveals-enabled section.revealed {
   opacity: 1;
   transform: translateY(0);
 }

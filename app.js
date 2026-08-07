@@ -1658,7 +1658,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Update ambient lighting periodically (every hour)
   setInterval(updateAmbientLighting, 3600000);
 
-  document.getElementById('city-select').addEventListener('change', (e) => updateCity(e.target.value));
+  const citySelect = document.getElementById('city-select');
+  if (citySelect) {
+    citySelect.addEventListener('change', (e) => updateCity(e.target.value));
+  }
   loadStars();
   maybeTrackHumanVisit();
   renderConstellationWall();
@@ -1864,10 +1867,12 @@ function getMoodEmoji(moodScore) {
 
 // Scroll reveal animations
 function setupScrollReveals() {
+  document.body.classList.add('scroll-reveals-enabled');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('revealed');
+        observer.unobserve(entry.target);
       }
     });
   }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
@@ -1879,12 +1884,8 @@ function setupScrollReveals() {
 
 // Live ticker updates
 function setupLiveTicker() {
-  // TODO: Fetch recent observations and update ticker
-  // For now, placeholder shows invitation
-  const tickerContent = document.getElementById('ticker-content');
-  if (tickerContent) {
-    tickerContent.innerHTML = '<p class="ticker-placeholder" data-i18n="no_observations">Be the first to share an observation. Check in now.</p>';
-  }
+  // Ticker content is pre-rendered in HTML with data-i18n attributes
+  // applyTranslations will handle localization on load
 }
 
 document.addEventListener('DOMContentLoaded', () => {

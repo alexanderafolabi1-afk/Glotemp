@@ -38,10 +38,10 @@ const CITIES_DATA = [
   { slug: 'santiago', name: 'Santiago', country: 'Chile', iso: 'CL', region: 'South America', timezone: 'America/Santiago', lat: -33.4489, lon: -70.6693, metro_pop: 6310000, penetration: 0.87, rank: 24, mood: 6.6, available: true },
   { slug: 'lima', name: 'Lima', country: 'Peru', iso: 'PE', region: 'South America', timezone: 'America/Lima', lat: -12.0464, lon: -77.0428, metro_pop: 10555000, penetration: 0.76, rank: 25, mood: 6.5, available: true },
 
-  // Additional representative cities from different regions (25 cities shown; full 150 would continue this pattern)
+  // Additional representative cities from different regions (30 cities shown; full 150 would continue this pattern)
   { slug: 'moscow', name: 'Moscow', country: 'Russia', iso: 'RU', region: 'Europe', timezone: 'Europe/Moscow', lat: 55.7558, lon: 37.6173, metro_pop: 12632000, penetration: 0.88, rank: 26, mood: 6.2, available: true },
   { slug: 'seoul', name: 'Seoul', country: 'South Korea', iso: 'KR', region: 'East Asia', timezone: 'Asia/Seoul', lat: 37.5665, lon: 126.9780, metro_pop: 9904000, penetration: 0.98, rank: 27, mood: 6.8, available: true },
-  { slug: 'istanbul2', name: 'Ankara', country: 'Turkey', iso: 'TR', region: 'Middle East', timezone: 'Europe/Istanbul', lat: 39.9334, lon: 32.8597, metro_pop: 5031000, penetration: 0.92, rank: 28, mood: 6.5, available: true },
+  { slug: 'ankara', name: 'Ankara', country: 'Turkey', iso: 'TR', region: 'Middle East', timezone: 'Europe/Istanbul', lat: 39.9334, lon: 32.8597, metro_pop: 5031000, penetration: 0.92, rank: 28, mood: 6.5, available: true },
   { slug: 'nairobi', name: 'Nairobi', country: 'Kenya', iso: 'KE', region: 'East Africa', timezone: 'Africa/Nairobi', lat: -1.2864, lon: 36.8172, metro_pop: 4921000, penetration: 0.49, rank: 29, mood: 7.1, available: true },
   { slug: 'lagos', name: 'Lagos', country: 'Nigeria', iso: 'NG', region: 'West Africa', timezone: 'Africa/Lagos', lat: 6.5244, lon: 3.3792, metro_pop: 21324000, penetration: 0.42, rank: 30, mood: 7.3, available: true },
 
@@ -60,4 +60,8 @@ const CITIES_DATA = [
 // Export for use in app.js
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = CITIES_DATA;
+}
+
+if (typeof window !== 'undefined') {
+  window.CITIES_DATA = CITIES_DATA;
 }

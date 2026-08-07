@@ -8,7 +8,9 @@ const NETWORK_FIRST_ASSETS = [
   '/app.js',
   '/stories.js',
   '/cookie-consent.js',
-  '/tempo-economy.js'
+  '/tempo-economy.js',
+  '/carousel.js',
+  '/cities-data.js'
 ];
 
 // Immutable assets (cache-first)
