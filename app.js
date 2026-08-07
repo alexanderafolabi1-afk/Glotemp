@@ -1239,18 +1239,20 @@ function recordObservation(event) {
 
 // ----- Pulse Simulation & Canvas -----
 const canvas = document.getElementById('pulse-canvas');
-const ctx = canvas.getContext('2d');
+const ctx = canvas ? canvas.getContext('2d') : null;
 let animationId;
 let pulsePoints = [];
 
 function resizeCanvas() {
+  if (!canvas) return;
   canvas.width = canvas.parentElement.offsetWidth;
   canvas.height = canvas.parentElement.offsetHeight;
   initPulsePoints();
 }
-window.addEventListener('resize', resizeCanvas);
+if (canvas) window.addEventListener('resize', resizeCanvas);
 
 function initPulsePoints() {
+  if (!canvas) return;
   pulsePoints = [];
   const count = 15;
   for (let i = 0; i < count; i++) {
@@ -1266,6 +1268,7 @@ function initPulsePoints() {
 }
 
 function drawPulse() {
+  if (!ctx) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   // draw connecting lines
   ctx.beginPath();
