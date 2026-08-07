@@ -1796,15 +1796,17 @@ function renderStoryImage(story) {
 
   const imageName = story.image;
   return `<picture class="card-media">
-    <source srcset="assets/art/${imageName}-1200.avif 1200w, assets/art/${imageName}-600.avif 600w" type="image/avif" />
-    <source srcset="assets/art/${imageName}-1200.webp 1200w, assets/art/${imageName}-600.webp 600w" type="image/webp" />
-    <img src="assets/art/${imageName}-1200.png"
-         srcset="assets/art/${imageName}-1200.png 1200w, assets/art/${imageName}-600.png 600w"
+    <source srcset="/assets/art/${imageName}-1200.avif 1200w, /assets/art/${imageName}-600.avif 600w" type="image/avif" />
+    <source srcset="/assets/art/${imageName}-1200.webp 1200w, /assets/art/${imageName}-600.webp 600w" type="image/webp" />
+    <img src="/assets/art/${imageName}-1200.png"
+         srcset="/assets/art/${imageName}-1200.png 1200w, /assets/art/${imageName}-600.png 600w"
          alt="${story.imageAlt || story.city}"
          width="1200"
          height="800"
          loading="eager"
-         decoding="async" />
+         decoding="async"
+         class="story-image"
+         data-city="${story.city}" />
   </picture>`;
 }
 
@@ -1838,10 +1840,31 @@ function loadDailyStory() {
 
     storySection.style.display = 'block';
     fallback.style.display = 'none';
+
+    // Set up error handlers for story images
+    setupStoryImageFallback();
   } catch (e) {
     storySection.style.display = 'none';
     fallback.style.display = 'block';
   }
+}
+
+function setupStoryImageFallback() {
+  const storyImages = document.querySelectorAll('.story-image');
+  storyImages.forEach(img => {
+    img.addEventListener('error', () => {
+      const picture = img.parentElement;
+      const cityName = img.dataset.city || 'Unknown';
+
+      // Replace with placeholder
+      picture.classList.add('image-error');
+      picture.innerHTML = `
+        <div class="card-placeholder-content" style="text-align: center; width: 100%; font-family: var(--font-mono); color: var(--ash);">
+          <div style="font-size: 14px; letter-spacing: 0.05em;">${cityName}</div>
+        </div>
+      `;
+    });
+  });
 }
 
 function loadCoverageStats() {
