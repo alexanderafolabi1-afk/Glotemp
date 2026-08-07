@@ -1321,59 +1321,105 @@ function synthesizeEmotionalTemperature(cityData) {
 
 // Barometer color based on mood temperature
 function getBarometerState(mood) {
-  if (mood >= 8.0) return { class: 'charged', label: 'Surging Energy', temp: 'Hot' };
-  if (mood >= 7.2) return { class: 'warm', label: 'Expansive', temp: 'Warm' };
-  if (mood >= 6.0) return { class: '', label: 'Equilibrium', temp: 'Balanced' };
-  return { class: 'restrained', label: 'Reserved', temp: 'Cool' };
+  if (mood >= 8.5) return { band: 'charged', label: 'Surging Energy', temp: 'Hot' };
+  if (mood >= 6.5) return { band: 'warm', label: 'Expansive', temp: 'Warm' };
+  if (mood >= 4.5) return { band: 'equilibrium', label: 'Equilibrium', temp: 'Balanced' };
+  if (mood >= 2.0) return { band: 'restrained', label: 'Reserved', temp: 'Cool' };
+  return { band: 'low', label: 'Subdued', temp: 'Cold' };
 }
 
-// Render the Living Barometer
+let currentBarometerBand = 'equilibrium';
+
+// Render the Living Barometer (image-based with cross-fade)
 function renderBarometer(mood, label) {
-  const chamber = document.getElementById('barometer-chamber');
-  const fluid = document.getElementById('barometer-fluid');
-  const needle = document.getElementById('barometer-needle');
   const value = document.getElementById('barometer-value');
   const labelEl = document.getElementById('barometer-label');
+  const image = document.getElementById('barometer-image');
+  const picture = document.getElementById('barometer-picture');
   const state = getBarometerState(mood);
 
-  // Update fluid height and color
-  const height = Math.min(95, Math.max(10, mood * 12));
-  fluid.style.height = height + '%';
-
-  // Remove previous state classes
-  fluid.className = 'barometer-fluid';
-  if (state.class) fluid.classList.add(state.class);
-
-  // Update chamber glow if ascending
-  chamber.classList.remove('ascending');
-  if (mood > 7.5) {
-    setTimeout(() => chamber.classList.add('ascending'), 10);
-  }
-
-  // Update displays
+  // Update numeric value
   value.textContent = mood.toFixed(1);
   labelEl.textContent = state.label;
 
-  // Animate needle
-  needle.style.opacity = mood > 7.0 ? 1 : 0.4;
-  needle.style.transform = `translateX(-50%) scaleY(${0.8 + (mood / 10) * 0.3})`;
-
-  // Pressure graph (24-hour simulation)
-  updatePressureGraph(mood);
+  // Switch image if band changed
+  if (state.band !== currentBarometerBand) {
+    switchBarometerImage(state.band, currentBarometerBand);
+    currentBarometerBand = state.band;
+  }
 }
 
-function updatePressureGraph(currentMood) {
-  const graph = document.getElementById('barometer-graph');
-  if (!graph || graph.style.display === 'none') return;
+function switchBarometerImage(newBand, oldBand) {
+  const image = document.getElementById('barometer-image');
+  const picture = document.getElementById('barometer-picture');
 
-  let points = (localStorage.getItem('pressure-history') || '').split(',').map(Number).filter(n => !isNaN(n));
-  points.push(currentMood);
-  if (points.length > 24) points = points.slice(-24);
-  localStorage.setItem('pressure-history', points.join(','));
+  // Check for prefers-reduced-motion
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const line = document.getElementById('pressure-line');
-  const pointsStr = points.map((p, i) => `${(i/24)*240},${40 - (p/10)*40}`).join(' ');
-  line.setAttribute('points', pointsStr);
+  if (prefersReducedMotion) {
+    // Instant switch without animation
+    updateBarometerPictureElement(newBand);
+  } else {
+    // Cross-fade: fade out current, switch source, fade in
+    image.classList.add('transitioning');
+
+    setTimeout(() => {
+      updateBarometerPictureElement(newBand);
+      image.classList.remove('transitioning');
+    }, 300);
+  }
+}
+
+function updateBarometerPictureElement(band) {
+  const picture = document.getElementById('barometer-picture');
+  const image = document.getElementById('barometer-image');
+
+  if (!picture) return;
+
+  // Update picture sources for responsive images
+  const sources = picture.querySelectorAll('source');
+  sources.forEach(source => {
+    const srcset = source.getAttribute('srcset');
+    if (srcset) {
+      source.setAttribute('srcset', srcset.replace(/barometer-\w+/g, `barometer-${band}`));
+    }
+  });
+
+  // Update img src as fallback
+  image.src = `/assets/barometer-${band}.png`;
+  image.alt = `Mood barometer: ${band}`;
+}
+
+
+// Preload barometer images and handle failures
+function preloadBarometerImages() {
+  const image = document.getElementById('barometer-image');
+  const container = document.getElementById('barometer-image-container');
+  const chamber = document.getElementById('barometer-chamber');
+  if (!image) return;
+
+  // Preload equilibrium (most likely first state)
+  const preloadLink = document.createElement('link');
+  preloadLink.rel = 'preload';
+  preloadLink.as = 'image';
+  preloadLink.href = '/assets/barometer-equilibrium.avif';
+  document.head.appendChild(preloadLink);
+
+  // Handle image load failure with fallback to CSS barometer
+  image.addEventListener('error', () => {
+    console.warn('Barometer image failed to load, falling back to CSS barometer');
+    if (container) container.style.display = 'none';
+    if (chamber) chamber.classList.add('fallback');
+  });
+
+  // Verify image actually loads
+  const img = new Image();
+  img.onerror = () => {
+    console.warn('Barometer image preload failed, will use CSS fallback');
+    if (container) container.style.display = 'none';
+    if (chamber) chamber.classList.add('fallback');
+  };
+  img.src = '/assets/barometer-equilibrium.avif';
 }
 
 // Time-based ambient lighting
@@ -1585,6 +1631,7 @@ async function loadCitiesIntoSelector() {
 // Initialize everything
 document.addEventListener('DOMContentLoaded', async () => {
   applyTranslations();
+  preloadBarometerImages();
   await loadCitiesData();
   loadCitiesIntoSelector();
   resizeCanvas();
