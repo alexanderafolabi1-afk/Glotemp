@@ -1234,7 +1234,8 @@ textarea:focus:not(:focus-visible) {
 .systems-grid,
 .products-grid,
 .contribution-panels,
-.wall-grid {
+.wall-grid,
+.observations-grid {
   display: grid;
   gap: 1rem;
 }
@@ -1340,13 +1341,18 @@ textarea:focus:not(:focus-visible) {
 
 /* ===== CONSTELLATION WALL ===== */
 .constellation-wall,
-.observatory-systems {
+.observatory-systems,
+#observations-section {
   padding: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
 .wall-grid {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.observations-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
 .wall-card {
@@ -1367,6 +1373,74 @@ textarea:focus:not(:focus-visible) {
   margin: 0.75rem 0;
   color: var(--bone);
   max-width: 68ch;
+}
+
+/* ===== OBSERVATION CARDS ===== */
+.obs-card {
+  padding: 1rem;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(233, 231, 240, 0.04), rgba(233, 231, 240, 0.01));
+  border: 1px solid rgba(233, 231, 240, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.obs-sentiment {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ash);
+}
+
+.obs-sentiment.positive {
+  color: hsl(120, 60%, 50%);
+}
+
+.obs-sentiment.neutral {
+  color: hsl(30, 60%, 50%);
+}
+
+.obs-sentiment.negative {
+  color: hsl(0, 60%, 50%);
+}
+
+.obs-text {
+  line-height: 1.6;
+  color: var(--bone);
+  font-size: 0.95rem;
+}
+
+.obs-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(233, 231, 240, 0.04);
+}
+
+.obs-time {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ash);
+}
+
+.obs-intensity {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: rgba(233, 231, 240, 0.08);
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  color: var(--ash);
+}
+
+.obs-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--ash);
 }
 
 .constellation-modal {
