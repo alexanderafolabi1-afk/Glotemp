@@ -83,7 +83,6 @@
     { city: 'kuala-lumpur', cityName: 'Kuala Lumpur',   sentiment:  0.75, intensity: 8, scene: 'street',    language_lens: 'visitor',  context: 'KLCC park at sunset — twin towers glowing, city alive.', created_at: hoursAgo(4), source: 'seed' },
     { city: 'jakarta',      cityName: 'Jakarta',        sentiment:  0.65, intensity: 7, scene: 'transit',   language_lens: 'local',    context: 'Jakarta traffic — but the spirit of the city persists.', created_at: hoursAgo(6), source: 'seed' },
     { city: 'manila',       cityName: 'Manila',         sentiment:  0.70, intensity: 7, scene: 'street',    language_lens: 'local',    context: 'BGC on a weekend — a different Manila, bright and young.', created_at: hoursAgo(8), source: 'seed' },
-  ];
   { city: 'osaka', cityName: 'Osaka', sentiment: 0.88, intensity: 9, scene: 'street',    language_lens: 'local',   context: '道頓堀の夜は最高のエネルギーだ。屋台と人と笑い。', created_at: hoursAgo(1.5), source: 'seed' },
   { city: 'osaka', cityName: 'Osaka', sentiment: 0.82, intensity: 8, scene: 'nightlife', language_lens: 'visitor', context: 'Namba at midnight — takoyaki, neon, strangers becoming friends.', created_at: hoursAgo(6), source: 'seed' },
   { city: 'osaka', cityName: 'Osaka', sentiment: 0.75, intensity: 7, scene: 'cafe',      language_lens: 'local',   context: '梅田の喫茶店、のんびりした午後。', created_at: hoursAgo(13), source: 'seed' },
@@ -320,4 +319,5 @@
   { city: 'delhi', cityName: 'Delhi', sentiment: 0.78, intensity: 8, scene: 'nightlife', language_lens: 'local',   context: 'Hauz Khas Village — दिल्ली का युवा चेहरा, रात को जागता है।', created_at: hoursAgo(32), source: 'seed' },
   { city: 'melbourne', cityName: 'Melbourne', sentiment: 0.85, intensity: 9, scene: 'nightlife', language_lens: 'visitor', context: 'Collingwood Smith Street on a Friday — Melbourne\'s unpretentious cool.', created_at: hoursAgo(4), source: 'seed' },
   { city: 'melbourne', cityName: 'Melbourne', sentiment: 0.78, intensity: 8, scene: 'street',    language_lens: 'diaspora', context: 'Footscray Saturday morning — Vietnamese, Ethiopian, the whole world cooking.', created_at: hoursAgo(38), source: 'seed' },
+];
 }());

@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=8" />
+  <link rel="stylesheet" href="/styles.css?v=9" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
@@ -173,11 +173,11 @@
         <p class="section-copy" data-i18n="checkin_intro">Offer a quiet signal from where you stand. Richer observations deepen the atlas while keeping the ritual gentle.</p>
       </div>
       <div class="mood-buttons" role="group" aria-label="Mood choices">
-        <button class="mood-btn" data-mood="▲" data-label="Energized" title="Energized">▲</button>
-        <button class="mood-btn" data-mood="◆" data-label="Good" title="Good">◆</button>
-        <button class="mood-btn" data-mood="●" data-label="Neutral" title="Neutral">●</button>
-        <button class="mood-btn" data-mood="▼" data-label="Low" title="Low">▼</button>
-        <button class="mood-btn" data-mood="◇" data-label="Cautious" title="Cautious">◇</button>
+        <button class="mood-btn" data-mood="▲" data-band="charged"     data-label="Energized" title="Energized">▲</button>
+        <button class="mood-btn" data-mood="◆" data-band="warm"        data-label="Good"      title="Good">◆</button>
+        <button class="mood-btn" data-mood="●" data-band="equilibrium" data-label="Neutral"   title="Neutral">●</button>
+        <button class="mood-btn" data-mood="▼" data-band="restrained"  data-label="Low"       title="Low">▼</button>
+        <button class="mood-btn" data-mood="◇" data-band="low"         data-label="Cautious"  title="Cautious">◇</button>
       </div>
       <form id="observation-form" class="observation-form">
         <div class="form-grid">

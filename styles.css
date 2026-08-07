@@ -13,6 +13,13 @@
   --violet: #8B6BF5;
   --ember: #C86BE0;
 
+  /* Band Colors */
+  --band-low: #4FD8E8;
+  --band-restrained: #6BA8F5;
+  --band-equilibrium: #E9E7F0;
+  --band-warm: #F5A25A;
+  --band-charged: #C86BE0;
+
   /* Text Colors */
   --bone: #E9E7F0;
   --ash: #9C99AB;
@@ -817,44 +824,39 @@ textarea:focus:not(:focus-visible) {
 }
 
 .verdict {
-  display: inline-block;
-  font-size: 2.5rem;
-  font-weight: var(--fw-medium);
-  margin: 0.5rem 0;
-  padding: 0.2rem 1.5rem;
-  border-radius: 40px;
+  display: block;
+  font-size: 4rem;
+  font-weight: var(--fw-light);
   font-family: var(--font-display);
+  margin: 0.5rem 0;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  /* colour set inline by JS per band */
 }
 
-.verdict-go {
-  background: rgba(79, 216, 232, 0.15);
-  color: var(--ion);
-}
-
-.verdict-maybe {
-  background: rgba(255, 193, 7, 0.15);
-  color: #ffc107;
-}
-
-.verdict-wait {
-  background: rgba(200, 107, 224, 0.15);
-  color: var(--ember);
-}
+.verdict-go    { color: var(--band-warm); }
+.verdict-maybe { color: var(--band-restrained); }
+.verdict-wait  { color: var(--band-low); }
 
 /* ===== AFFILIATE LINKS ===== */
 .affiliate-links {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  flex-wrap: nowrap;
+  gap: 0.75rem;
   margin-top: 1.5rem;
   padding: 1.5rem 0;
 }
 
 .affiliate-btn {
   display: inline-flex;
+  flex: 1;
+  min-width: 0;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0 1rem;
+  height: 44px;
   background: transparent;
   border: 1px solid var(--hairline);
   border-radius: 20px;
@@ -863,7 +865,6 @@ textarea:focus:not(:focus-visible) {
   font-weight: var(--fw-medium);
   transition: all var(--transition);
   cursor: pointer;
-  min-height: 44px;
 }
 
 .affiliate-btn:hover {
@@ -2221,8 +2222,8 @@ small {
 .fastest-city-name {
   font-size: 1.3rem;
   font-weight: 600;
-  color: var(--ion);
   margin: 0 0 0.5rem 0;
+  /* colour set inline per band */
 }
 
 .fastest-shift {
@@ -2624,7 +2625,7 @@ button:hover:not(:focus-visible) {
 }
 
 .ticker-item strong {
-  color: var(--ion);
+  /* colour injected per-band via inline style */
   font-weight: 500;
 }
 
@@ -2656,3 +2657,64 @@ button:hover:not(:focus-visible) {
     animation: none;
   }
 }
+
+/* ===== FEED ITEM ENTRY ANIMATION ===== */
+@keyframes fade-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.obs-feed-item {
+  animation: fade-rise 0.4s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .obs-feed-item { animation: none; }
+}
+
+/* ===== TRENDING CARD ROTATION ===== */
+.fastest-card {
+  transition: opacity 0.4s ease, border-color 0.3s ease;
+}
+
+.fastest-card.swapping {
+  opacity: 0;
+}
+
+/* ===== BAROMETER DIM TOOLTIP ===== */
+.instr-dim-tip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--basalt-raised);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 20;
+}
+
+.instrument-slot {
+  position: relative;
+}
+
+.instrument-slot:hover .instr-dim-tip {
+  opacity: 1;
+}
+
+/* ===== MOOD BUTTON HOVER COLOUR PREVIEW ===== */
+.mood-btn {
+  transition: color var(--transition), border-color var(--transition), background var(--transition);
+}
+
+.mood-btn[data-band="charged"]:hover  { border-color: var(--band-charged);  color: var(--band-charged);  }
+.mood-btn[data-band="warm"]:hover     { border-color: var(--band-warm);     color: var(--band-warm);     }
+.mood-btn[data-band="equilibrium"]:hover { border-color: var(--band-equilibrium); color: var(--band-equilibrium); }
+.mood-btn[data-band="restrained"]:hover  { border-color: var(--band-restrained);  color: var(--band-restrained);  }
+.mood-btn[data-band="low"]:hover      { border-color: var(--band-low);      color: var(--band-low);      }
+

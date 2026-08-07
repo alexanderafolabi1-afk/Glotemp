@@ -1509,17 +1509,21 @@ function updateCity(selected) {
   // Trip verdict using synthesized mood
   const verdictEl = document.getElementById('trip-verdict');
   const reasonEl = document.getElementById('trip-reason');
+  const verdictColor = moodToBand(synthesizedMood).color;
   if (synthesizedMood >= 7.8) {
     verdictEl.textContent = 'GO';
     verdictEl.className = 'verdict verdict-go';
+    verdictEl.style.color = verdictColor;
     reasonEl.textContent = t('trip_go_reason');
   } else if (synthesizedMood >= 6.5) {
     verdictEl.textContent = 'MAYBE';
     verdictEl.className = 'verdict verdict-maybe';
+    verdictEl.style.color = verdictColor;
     reasonEl.textContent = t('trip_maybe_reason');
   } else {
     verdictEl.textContent = 'WAIT';
     verdictEl.className = 'verdict verdict-wait';
+    verdictEl.style.color = verdictColor;
     reasonEl.textContent = t('trip_wait_reason');
   }
   // Update affiliate links with city name
@@ -1914,11 +1918,11 @@ function getRecentComments(limit) {
 
 // Map mood score to band name + barometer image filename
 function moodToBand(mood) {
-  if (mood >= 8.5) return { band: 'charged',     img: '/assets/barometer-charged.png' };
-  if (mood >= 7.0) return { band: 'warm',        img: '/assets/barometer-warm.png' };
-  if (mood >= 5.0) return { band: 'equilibrium', img: '/assets/barometer-equilibrium.png' };
-  if (mood >= 3.0) return { band: 'restrained',  img: '/assets/barometer-restrained.png' };
-  return            { band: 'low',          img: '/assets/barometer-low.png' };
+  if (mood >= 8.5) return { band: 'charged',     color: '#C86BE0', img: '/assets/barometer-charged.png' };
+  if (mood >= 7.0) return { band: 'warm',        color: '#F5A25A', img: '/assets/barometer-warm.png' };
+  if (mood >= 5.0) return { band: 'equilibrium', color: '#E9E7F0', img: '/assets/barometer-equilibrium.png' };
+  if (mood >= 3.0) return { band: 'restrained',  color: '#6BA8F5', img: '/assets/barometer-restrained.png' };
+  return            { band: 'low',          color: '#4FD8E8', img: '/assets/barometer-low.png' };
 }
 
 // Animate a numeric stat value ticking up from 0 to target
@@ -1980,6 +1984,8 @@ function loadCoverageStats() {
 }
 
 // Barometer rotation — 5 slots, staggered, session-shuffled
+const BAROMETER_DIM_LABELS = ["Mood","Economic","Nightlife","Study","Tourism","Safety","Health","Traffic","Events","Community","Weather","Innovation"];
+
 function setupBarometerRotation() {
   const slots = document.querySelectorAll('.instrument-slot');
   if (!slots.length) return;
@@ -2011,7 +2017,7 @@ function setupBarometerRotation() {
     const bandEl = slotEl.querySelector('.instrument-band-name');
     if (!img || !nameEl || !bandEl) return;
 
-    const { band, img: imgSrc } = moodToBand(cityData.mood || 7.0);
+    const { band, color, img: imgSrc } = moodToBand(cityData.mood || 7.0);
     const isChange = img.getAttribute('src') !== imgSrc && img.getAttribute('src') && img.getAttribute('src').indexOf('barometer') !== -1;
 
     if (isChange) {
@@ -2020,19 +2026,48 @@ function setupBarometerRotation() {
         img.src = imgSrc;
         img.alt = band + ' mood barometer';
         img.classList.remove('instrument-fading');
+        img.style.filter = `drop-shadow(0 0 10px ${color}50)`;
       }, 350);
     } else {
       img.src = imgSrc;
       img.alt = band + ' mood barometer';
+      img.style.filter = `drop-shadow(0 0 10px ${color}50)`;
     }
 
     nameEl.textContent = cityData.name;
+    nameEl.style.color = color;
     bandEl.textContent = band;
+
+    // Dim tooltip: top-3 dims from `cities` global (loaded async) or fallback
+    let tip = slotEl.querySelector('.instr-dim-tip');
+    if (!tip) {
+      tip = document.createElement('div');
+      tip.className = 'instr-dim-tip';
+      slotEl.appendChild(tip);
+    }
+    const cityEntry = (typeof cities !== 'undefined') && cities[cityData.slug];
+    if (cityEntry && cityEntry.dims) {
+      const top3 = cityEntry.dims
+        .map((v, i) => ({ label: BAROMETER_DIM_LABELS[i] || i, val: v }))
+        .sort((a, b) => b.val - a.val)
+        .slice(0, 3);
+      tip.innerHTML = top3.map(d => `<span style="color:${color}">${d.label}</span> ${d.val.toFixed(1)}`).join(' · ');
+    } else {
+      tip.textContent = `Mood ${(cityData.mood || 7.0).toFixed(1)} · ${band}`;
+    }
+
+    // Click-to-pin
+    slotEl.dataset.citySlug = cityData.slug;
   }
 
   // Initial render
   slots.forEach((slot, i) => {
     updateSlot(slot, assigned[i]);
+    slot.style.cursor = 'pointer';
+    slot.addEventListener('click', () => {
+      const slug = slot.dataset.citySlug;
+      if (slug && typeof loadCityBySlug === 'function') loadCityBySlug(slug);
+    });
   });
 
   // Prefers-reduced-motion: skip auto-rotation
@@ -2081,7 +2116,10 @@ function setupLiveTicker() {
   const items = [...obs, ...obs].map(o => {
     const city = escTick(o.cityName || o.city || '');
     const note = escTick((o.context || '').slice(0, 80));
-    return `<span class="ticker-item"><strong>${city}</strong> — ${note}</span>`;
+    const cityObj = (window.CITIES_DATA || []).find(c => c.slug === o.city);
+    const mood = cityObj ? (cityObj.mood || 7.0) : 7.0;
+    const { color } = moodToBand(mood);
+    return `<span class="ticker-item"><strong style="color:${color}">${city}</strong> — ${note}</span>`;
   }).join('<span class="ticker-sep">·</span>');
 
   ticker.innerHTML = `<div class="ticker-track" aria-live="off">${items}</div>`;
@@ -2095,85 +2133,90 @@ function setupLiveTicker() {
   }
 }
 
-function loadFastestCities() {
+function setupTrendingRotation() {
   const grid = document.getElementById('fastest-cities-grid');
   if (!grid) return;
 
-  const obs = window.SEED_OBSERVATIONS || [];
-  if (!obs.length) {
-    // fall back to random city entries
-    grid.innerHTML = '';
-    const cityEntries = Object.entries(cities).sort(() => Math.random() - 0.5).slice(0, 3);
-    cityEntries.forEach(([slug, cityData]) => {
-      const shift = (Math.random() - 0.5) * 2;
-      const shiftDirection = shift > 0 ? 'positive' : 'negative';
-      const shiftPercent = Math.abs((shift * 100).toFixed(1));
-      const currentMood = Math.max(0, Math.min(10, cityData.mood + shift)).toFixed(1);
-      const card = document.createElement('div');
-      card.className = 'fastest-card';
-      card.innerHTML = `
-        <h3 class="fastest-city-name">${cityData.name}</h3>
-        <p class="fastest-shift ${shiftDirection}">Mood ${shift > 0 ? '↑' : '↓'} ${shiftPercent}% last 24h</p>
-        <p class="fastest-shift">Now at ${currentMood} / 10</p>
-        <div class="fastest-mood">${getMoodEmoji(parseFloat(currentMood))}</div>
-      `;
-      grid.appendChild(card);
-    });
-    return;
+  // Guard against re-initialisation
+  if (grid._trendingCleanup) { grid._trendingCleanup(); delete grid._trendingCleanup; }
+
+  const allCities = (window.CITIES_DATA || []).filter(c => c.available !== false);
+  if (allCities.length < 6) return;
+
+  // Shuffle once per session
+  const shuffled = allCities.slice().sort(() => Math.random() - 0.5);
+  let cursor = 0;
+
+  function nextUniqueCity(excluding) {
+    for (let tries = 0; tries < shuffled.length * 2; tries++) {
+      const c = shuffled[cursor++ % shuffled.length];
+      if (!excluding.includes(c.slug)) return c;
+    }
+    return shuffled[cursor++ % shuffled.length];
   }
 
-  // Compute average sentiment per city from last 24h vs 24-48h
-  const now = Date.now();
-  const h24 = 24 * 3600000;
-  const h48 = 48 * 3600000;
-  const recent = {}, older = {};
-  const cityNames = {};
+  // Populate initial 6 cards
+  const assigned = [];
+  for (let i = 0; i < 6; i++) {
+    assigned.push(nextUniqueCity(assigned.map(c => c.slug)));
+  }
 
-  obs.forEach(o => {
-    const age = now - new Date(o.created_at).getTime();
-    const key = o.city;
-    cityNames[key] = o.cityName || o.city;
-    if (age < h24)        (recent[key] = recent[key] || []).push(o.sentiment || 0);
-    else if (age < h48)   (older[key]  = older[key]  || []).push(o.sentiment || 0);
-  });
-
-  const avg = arr => arr.reduce((s, v) => s + v, 0) / arr.length;
-
-  const shifts = Object.keys(recent)
-    .filter(c => older[c])
-    .map(c => ({
-      city: c,
-      name: cityNames[c],
-      shift: avg(recent[c]) - avg(older[c]),
-      recentAvg: avg(recent[c])
-    }))
-    .sort((a, b) => Math.abs(b.shift) - Math.abs(a.shift))
-    .slice(0, 3);
-
-  // If not enough comparison data, top by recent activity
-  if (shifts.length < 3) {
-    const topByActivity = Object.keys(recent)
-      .filter(c => !shifts.find(s => s.city === c))
-      .slice(0, 3 - shifts.length)
-      .map(c => ({ city: c, name: cityNames[c], shift: avg(recent[c]) - 0.65, recentAvg: avg(recent[c]) }));
-    shifts.push(...topByActivity);
+  function renderCard(card, cityData) {
+    const mood = cityData.mood || 7.0;
+    const { band, color } = moodToBand(mood);
+    const moodScore = mood.toFixed(1);
+    card.dataset.slug = cityData.slug;
+    card.style.borderColor = color + '55';
+    card.innerHTML = `
+      <h3 class="fastest-city-name" style="color:${color}">${cityData.name}</h3>
+      <p class="fastest-shift">${cityData.country || ''}</p>
+      <p class="fastest-shift">${band} · ${moodScore} / 10</p>
+      <div class="fastest-mood">${getMoodEmoji(mood)}</div>
+    `;
   }
 
   grid.innerHTML = '';
-  shifts.forEach(({ name, shift, recentAvg }) => {
-    const direction = shift >= 0 ? 'positive' : 'negative';
-    const pct = Math.abs(shift * 100).toFixed(1);
-    const moodScore = Math.max(0, Math.min(10, 7.0 + recentAvg * 2)).toFixed(1);
+  const cards = [];
+  assigned.forEach((cityData, i) => {
     const card = document.createElement('div');
     card.className = 'fastest-card';
-    card.innerHTML = `
-      <h3 class="fastest-city-name">${name}</h3>
-      <p class="fastest-shift ${direction}">Mood ${shift >= 0 ? '↑' : '↓'} ${pct}% last 24h</p>
-      <p class="fastest-shift">Now at ${moodScore} / 10</p>
-      <div class="fastest-mood">${getMoodEmoji(parseFloat(moodScore))}</div>
-    `;
+    renderCard(card, cityData);
+    card.addEventListener('click', () => {
+      const slug = card.dataset.slug;
+      if (slug && typeof loadCityBySlug === 'function') loadCityBySlug(slug);
+    });
     grid.appendChild(card);
+    cards.push(card);
   });
+
+  // Static under prefers-reduced-motion
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const SWAP_INTERVAL_MS = 2000;
+  let paused = false;
+  const intervalIds = [];
+
+  document.addEventListener('visibilitychange', () => { paused = document.hidden; });
+
+  cards.forEach((card, i) => {
+    const tid = setTimeout(() => {
+      const iid = setInterval(() => {
+        if (paused || card.matches(':hover')) return;
+        const next = nextUniqueCity(assigned.map(c => c.slug));
+        assigned[i] = next;
+        card.classList.add('swapping');
+        setTimeout(() => {
+          renderCard(card, next);
+          card.classList.remove('swapping');
+        }, 400);
+      }, SWAP_INTERVAL_MS * cards.length);
+      intervalIds.push(iid);
+    }, i * SWAP_INTERVAL_MS);
+    intervalIds.push(tid);
+  });
+
+  // Expose cleanup on grid for guard against re-init
+  grid._trendingCleanup = () => intervalIds.forEach(id => { clearTimeout(id); clearInterval(id); });
 }
 
 function getMoodEmoji(moodScore) {
@@ -2207,7 +2250,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ... existing code like applyTranslations, resizeCanvas, etc.
   loadDailyStory();
   loadCoverageStats();
-  loadFastestCities();
+  setupTrendingRotation();
   setupBarometerRotation();
 
   // Setup scroll reveal animations
