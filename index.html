@@ -306,7 +306,7 @@
         <p class="section-copy" data-i18n="obs_intro">See what fellow observers are feeling right now in this city. Each note shapes the collective mood.</p>
       </div>
       <div id="observations-grid" class="observations-grid">
-        <div class="obs-empty" data-i18n="obs_empty">No observations yet. <a href="#observation-form">Be the first to share the pulse.</a></div>
+        <div class="obs-empty">No observations yet. <a href="#observation-form">Be the first to share the pulse.</a></div>
       </div>
     </section>
 
@@ -348,10 +348,14 @@
               el.textContent = 'AWAITING';
               el.classList.add('stat-zero');
             } else if (raw !== 'AWAITING') {
-              el.classList.toggle('stat-zero', n === 0);
+              el.classList.remove('stat-zero');
             }
           } else {
-            el.classList.toggle('stat-zero', n === 0);
+            if (n === 0) {
+              el.classList.add('stat-zero');
+            } else {
+              el.classList.remove('stat-zero');
+            }
           }
         });
       }
@@ -361,20 +365,18 @@
       if (obsEl && window.MutationObserver) {
         new MutationObserver(applyStatColours).observe(obsEl, { childList: true, characterData: true, subtree: true });
       }
-      document.addEventListener('DOMContentLoaded', applyStatColours);
+      applyStatColours();
 
       /* 8s trending cities timeout */
-      document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(function () {
         var grid = document.getElementById('fastest-cities-grid');
         if (!grid) return;
-        setTimeout(function () {
-          var placeholder = grid.querySelector('.fastest-placeholder');
-          if (placeholder) {
-            placeholder.classList.add('timed-out');
-            placeholder.textContent = 'No trending data yet — check back soon as more observations arrive.';
-          }
-        }, 8000);
-      });
+        var placeholder = grid.querySelector('.fastest-placeholder');
+        if (placeholder) {
+          placeholder.classList.add('timed-out');
+          placeholder.textContent = 'No trending data yet — check back soon as more observations arrive.';
+        }
+      }, 8000);
     }());
   </script>
 </body>
