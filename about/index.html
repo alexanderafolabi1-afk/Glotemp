@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#06060A" />
+  <meta name="description" content="About Glotemp — the world's first real-time mood infrastructure, turning the collective feeling of cities into living intelligence for travellers, businesses and communities." />
+  <meta name="keywords" content="about Glotemp, city mood infrastructure, urban intelligence, collective feeling" />
+  <meta property="og:title" content="About Glotemp" />
+  <meta property="og:description" content="About Glotemp — the world's first real-time mood infrastructure, turning the collective feeling of cities into living intelligence for travellers, businesses and communities." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://glo-temp.com/about" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="About Glotemp" />
+  <meta name="twitter:description" content="About Glotemp — the world's first real-time mood infrastructure, turning the collective feeling of cities into living intelligence for travellers, businesses and communities." />
+  <link rel="canonical" href="https://glo-temp.com/about" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <title>Glotemp – About</title>
+
+  <!-- Type system: Fraunces (display), Manrope (body), IBM Plex Mono (data) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..500&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+
+  <!-- Version must be bumped on CSS-affecting deploys -->
+  <link rel="stylesheet" href="/styles.css?v=3" />
+</head>
+<body>
+  <nav class="navbar glass">
+    <div class="nav-brand">
+      <img src="/assets/logo.png" alt="Glotemp" class="nav-logo">
+      <span class="logo-text">Glotemp</span>
+      <span class="pulse-dot"></span>
+    </div>
+    <div class="nav-links">
+      <a href="/">Pulse</a>
+      <a href="/about" class="active">About</a>
+      <a href="/explore">Explore</a>
+      <a href="/blog">Stories</a>
+      <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
+    </div>
+  </nav>
+
+  <main class="page-main">
+    <section class="glass-card page-header">
+      <p class="eyebrow" data-i18n="about_eyebrow">Observatory</p>
+      <h1 data-i18n="about_title">About Glotemp</h1>
+    </section>
+
+    <section class="prose-section">
+      <p data-i18n="about_intro">Every city breathes with its own rhythm. In the streets, in the cafés, in the transit hubs, there exists an invisible current of collective energy that shapes the character of urban spaces. This is the heartbeat of a city. And until now, it has remained invisible to those who long to understand it.</p>
+
+      <h2>The moment</h2>
+      <p>Imagine knowing the true pulse of a destination before you arrive. Not through algorithms that predict based on history, but through the living, breathing sentiment of thousands of people sharing their experience in real time. That moment, when expectation meets reality, when data becomes wisdom, is Glotemp.</p>
+
+      <h2>For travellers</h2>
+      <p>Travel is about discovery and connection. Glotemp changes the way you experience cities by revealing their true energy. Rather than following curated guides or outdated reviews, you tap into the collective consciousness of a city happening now. Should you visit that neighbourhood tonight? Is the city welcoming? What is the true vibe? These answers come not from algorithms, but from the authentic experiences of your fellow travellers.</p>
+
+      <h2>For cities and communities</h2>
+      <p>Urban planners, hospitality leaders and community organisers have always operated on incomplete data. Event organisers wonder if their gathering resonates. City authorities seek to understand neighbourhood sentiment. Local businesses want to know if they are truly serving their community. Glotemp closes this gap, turning anonymous check-ins into actionable intelligence that helps cities understand and serve their people better.</p>
+
+      <h2>The philosophy</h2>
+      <p>This is not surveillance. This is permission-based transparency. Every contribution is voluntary, a moment when someone chooses to share how a place makes them feel. Aggregated across thousands of voices, these moments reveal patterns that matter. The collective mood becomes a resource: for travellers seeking authenticity, for cities seeking understanding, for communities seeking connection.</p>
+
+      <p class="pull-quote">Glotemp is the infrastructure that turns the feeling of cities into intelligence. Real time. Real people. Real value.</p>
+    </section>
+  </main>
+
+  <footer class="footer glass">
+    <p>© 2025 RenviaIT Ltd. All rights reserved.</p>
+    <p class="small-print">
+      <a href="/privacy" data-i18n="privacy_policy">Privacy Policy</a> |
+      <a href="/terms" data-i18n="terms_of_service">Terms of Service</a> |
+      <a href="#" id="cookie-settings" data-i18n="cookie_settings">Cookie Settings</a>
+    </p>
+    <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
+  </footer>
+
+  <script>
+    // minimal i18n inject
+    const translationsAbout = {
+      en: {
+        about_title: "About Glotemp",
+        about_intro: "Every city breathes with its own rhythm. In the streets, in the cafés, in the transit hubs, there exists an invisible current of collective energy that shapes the character of urban spaces. This is the heartbeat of a city. And until now, it has remained invisible to those who long to understand it.",
+        privacy_policy: "Privacy Policy", terms_of_service: "Terms of Service", cookie_settings: "Cookie Settings"
+      },
+      es: {
+        about_title: "Acerca de Glotemp",
+        about_intro: "Cada ciudad respira con su propio ritmo. En las calles, en los cafés, en los centros de tránsito, existe una corriente invisible de energía colectiva que da forma al carácter de los espacios urbanos. Este es el latido de una ciudad. Y hasta ahora, ha permanecido invisible para quienes anhelan entenderla.",
+        privacy_policy: "Política de Privacidad", terms_of_service: "Términos de Servicio", cookie_settings: "Configuración de Cookies"
+      },
+      fr: {
+        about_title: "À propos de Glotemp",
+        about_intro: "Chaque ville respire avec son propre rythme. Dans les rues, dans les cafés, dans les centres de transit, existe un courant invisible d'énergie collective qui façonne le caractère des espaces urbains. C'est le pouls d'une ville. Et jusqu'à présent, il est resté invisible pour ceux qui aspirent à le comprendre.",
+        privacy_policy: "Politique de Confidentialité", terms_of_service: "Conditions d'Utilisation", cookie_settings: "Paramètres des Cookies"
+      },
+      de: {
+        about_title: "Über Glotemp",
+        about_intro: "Jede Stadt atmet in ihrem eigenen Rhythmus. In den Straßen, in den Cafés, in den Transitknoten existiert ein unsichtbarer Strom kollektiver Energie, der den Charakter urbaner Räume prägt. Das ist der Herzschlag einer Stadt. Und bis jetzt ist er für diejenigen unsichtbar geblieben, die ihn verstehen möchten.",
+        privacy_policy: "Datenschutzrichtlinie", terms_of_service: "Nutzungsbedingungen", cookie_settings: "Cookie-Einstellungen"
+      },
+      pt: {
+        about_title: "Sobre o Glotemp",
+        about_intro: "Cada cidade respira com seu próprio ritmo. Nas ruas, nos cafés, nos centros de trânsito, existe uma corrente invisível de energia coletiva que molda o caráter dos espaços urbanos. Este é o pulso de uma cidade. E até agora, permaneceu invisível para quem anseia compreendê-la.",
+        privacy_policy: "Política de Privacidade", terms_of_service: "Termos de Serviço", cookie_settings: "Configurações de Cookies"
+      },
+      ja: {
+        about_title: "Glotempについて",
+        about_intro: "すべての都市は独自のリズムで呼吸しています。街路、カフェ、交通拠点には、都市空間の性質を形作る集合的エネルギーの見えない流れが存在します。これが都市のパルスです。そして今まで、それを理解したいと願う人々には見えないままです。",
+        privacy_policy: "プライバシーポリシー", terms_of_service: "利用規約", cookie_settings: "Cookieの設定"
+      }
+    };
+    const lang = localStorage.getItem('glotemp-lang') || 'en';
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      el.textContent = translationsAbout[lang]?.[el.dataset.i18n] || translationsAbout.en[el.dataset.i18n] || el.textContent;
+    });
+  </script>
+  <script src="/cookie-consent.js" defer></script>
+  <script src="/tempo-economy.js" defer></script>
+</body>
+</html>

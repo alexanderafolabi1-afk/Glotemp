@@ -1,19 +1,19 @@
 // Glotemp Service Worker
 // Cache versioning: bump CACHE_VERSION on every CSS-affecting or major deploy
-const CACHE_VERSION = 'glotemp-v3';
+const CACHE_VERSION = 'glotemp-v4';
 
 // Assets that are versioned and cacheable (network-first)
 const NETWORK_FIRST_ASSETS = [
-  'styles.css',
-  'app.js',
-  'stories.js',
-  'cookie-consent.js',
-  'tempo-economy.js'
+  '/styles.css',
+  '/app.js',
+  '/stories.js',
+  '/cookie-consent.js',
+  '/tempo-economy.js'
 ];
 
 // Immutable assets (cache-first)
 const CACHE_FIRST_ASSETS = [
-  'manifest.json',
+  '/manifest.json',
   '/assets/icon-192.png',
   '/assets/icon-512.png',
   '/assets/logo.png',
@@ -60,8 +60,18 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Network-first for HTML pages
-  if (url.pathname === '/' || url.pathname.endsWith('.html')) {
+  // Network-first for HTML pages (clean URLs and legacy .html)
+  const isHtmlPage = url.pathname === '/' ||
+                     url.pathname.endsWith('.html') ||
+                     url.pathname === '/about' ||
+                     url.pathname === '/explore' ||
+                     url.pathname === '/blog' ||
+                     url.pathname === '/admin' ||
+                     url.pathname === '/privacy' ||
+                     url.pathname === '/terms' ||
+                     url.pathname === '/investors';
+
+  if (isHtmlPage) {
     event.respondWith(
       fetch(event.request)
         .then(response => {
