@@ -5,8 +5,8 @@
 class InstrumentsCarousel {
   constructor(cities) {
     this.allCities = cities || [];
-    this.slots = { 1: null, 2: null, 3: null, 4: null };
-    this.currentIndices = { 1: 0, 2: 0, 3: 0, 4: 0 };
+    this.slots = { 1: null, 2: null, 3: null, 4: null, 5: null };
+    this.currentIndices = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     this.rotationIntervals = {};
     this.isPaused = false;
     this.pinnedSlot = null;
@@ -18,8 +18,8 @@ class InstrumentsCarousel {
   }
 
   init() {
-    if (this.allCities.length < 4) {
-      console.warn('Carousel requires at least 4 cities');
+    if (this.allCities.length < 5) {
+      console.warn('Carousel requires at least 5 cities');
       return;
     }
 
@@ -38,6 +38,7 @@ class InstrumentsCarousel {
     this.slots[2] = shuffled[1];
     this.slots[3] = shuffled[2];
     this.slots[4] = shuffled[3];
+    this.slots[5] = shuffled[4];
   }
 
   renderAllSlots() {
@@ -113,12 +114,13 @@ class InstrumentsCarousel {
   startRotation() {
     if (this.visibilityHidden) return;
 
-    // Staggered rotation: slot 1 @ 0s, slot 2 @ 1.5s, slot 3 @ 3s, slot 4 @ 4.5s
+    // Staggered rotation: slot 1 @ 0s, slot 2 @ 1.5s, slot 3 @ 3s, slot 4 @ 4.5s, slot 5 @ 6s
     const rotationSchedule = {
       1: { delay: 0, interval: 6000 },
       2: { delay: 1500, interval: 6000 },
       3: { delay: 3000, interval: 6000 },
-      4: { delay: 4500, interval: 6000 }
+      4: { delay: 4500, interval: 6000 },
+      5: { delay: 6000, interval: 6000 }
     };
 
     Object.entries(rotationSchedule).forEach(([slot, config]) => {
