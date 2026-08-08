@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#14100B" />
+  <meta name="description" content="How a Glotemp reading is computed: normalisation, coverage weighting, observed versus modelled, publication thresholds and the confidence ramp. Versioned." />
+  <link rel="canonical" href="https://glo-temp.com/methodology" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <title>Methodology — Glotemp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=16" />
+
+</head>
+<body>
+  <nav class="navbar glass">
+    <div class="nav-brand">
+      <img src="/assets/logo.png" alt="Glotemp" class="nav-logo">
+      <span class="logo-text">Glotemp</span>
+      <span class="pulse-dot" aria-hidden="true">&#10084;&#65039;</span>
+    </div>
+    <div class="nav-links">
+      <a href="/">Pulse</a>
+      <a href="/feed">Feed</a>
+      <a href="/explore">Cities</a>
+      <a href="/about">About</a>
+      <a href="/gem" class="nav-gem">Hidden gem</a>
+    </div>
+  </nav>
+
+  <main class="page-main">
+    <section class="glass-card page-header">
+      <p class="eyebrow">Versioned &middot; v1.0 &middot; August 2026</p>
+      <h1>Methodology</h1>
+      <p class="section-copy" style="color:var(--sand); max-width:64ch;">How a Glotemp reading is made, what counts as observed, and what is explicitly modelled. This page is permanent and versioned: when the method changes, the version changes with it and the previous statement stays quotable.</p>
+    </section>
+
+    <section class="glass-card">
+      <p class="eyebrow">The reading</p>
+      <h2>What a number means</h2>
+      <p class="section-copy" style="color:var(--sand);">Every city carries a 0&ndash;10 reading per vertical. A reading is the mean of that vertical&rsquo;s stored values for the city, normalised across the observed range of all cities holding data for that vertical &mdash; a min&ndash;max scaling, because the underlying metrics do not share a native scale. Sentiment is scored out of ten; developer activity is an index; property appreciation is a percentage. Comparing them without normalising would be arithmetic on incompatible units.</p>
+    </section>
+
+    <section class="glass-card">
+      <p class="eyebrow">Weighting</p>
+      <h2>Coverage is the weight</h2>
+      <p class="section-copy" style="color:var(--sand);">The living index divides a city&rsquo;s summed normalised verticals by twelve &mdash; not by the number it happens to hold data for. A city with three covered verticals therefore cannot outrank a city with twelve on thin evidence. That division <em>is</em> the coverage weighting; there is no separate multiplier.</p>
+    </section>
+
+    <section class="glass-card">
+      <p class="eyebrow">Provenance</p>
+      <h2>Observed versus modelled</h2>
+      <p class="section-copy" style="color:var(--sand);">A figure is <strong>observed</strong> when it came from a live source in this run: OpenStreetMap Overpass, Ticketmaster Discovery, Open&#8209;Meteo, GDELT, the World Bank, WAQI, Transitland, OurAirports, or a human check&#8209;in. A figure is <strong>modelled</strong> when its shape or magnitude was derived rather than measured &mdash; for example a time&#8209;of&#8209;day curve with no measured hourly source behind it, or a seat&#8209;capacity figure derived from airport class. Modelled figures carry a MODELLED label in the interface. They are never presented as measurement.</p>
+      <p class="section-copy" style="color:var(--sand); margin-top:1rem;">Airport data is always described as <strong>scheduled seat capacity</strong>. It is never described as arrivals and never as passengers, because OurAirports publishes infrastructure, not traffic.</p>
+    </section>
+
+    <section class="glass-card">
+      <p class="eyebrow">Thresholds</p>
+      <h2>When we publish nothing</h2>
+      <p class="section-copy" style="color:var(--sand);">A vertical publishes for a city only once it clears a minimum of two stored signals. A Tonight mode publishes only when a live source returned something for it. Below those thresholds the interface shows a designed empty state. It does not show a spinner, and it does not show a number, because an invented number is worse than an honest absence.</p>
+    </section>
+
+    <section class="glass-card">
+      <p class="eyebrow">Confidence</p>
+      <h2>The ramp</h2>
+      <p class="section-copy" style="color:var(--sand);">Each stored reading carries a confidence between 0 and 1 set by its source. Readings below 0.6 are treated as modelled for the observed&#8209;versus&#8209;modelled split. Confidence rises with signal volume and with independent corroboration across sources; a single check&#8209;in moves a city&rsquo;s reading very little by design.</p>
+    </section>
+  </main>
+
+  <footer class="footer glass">
+    <p>&copy; 2026 RenviaIT Ltd. All rights reserved.</p>
+    <p class="small-print">
+      <a href="/privacy">Privacy Policy</a> |
+      <a href="/terms">Terms of Service</a> |
+      <a href="/methodology">Methodology</a> |
+      <a href="#" id="cookie-settings">Cookie Settings</a>
+    </p>
+    <p class="small-print footer-lang-row">
+      <button type="button" id="lang-switch" class="footer-lang">Language</button>
+    </p>
+  </footer>
+  <script src="/glotemp-core.js"></script>
+  <script src="/cookie-consent.js" defer></script>
+</body>
+</html>

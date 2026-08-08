@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#14100B" />
+  <meta name="description" content="Roll a die, land on a city, and open its long read: history, politics, life expectancy, and where to go." />
+  <link rel="canonical" href="https://glo-temp.com/gem" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <title>Hidden gem — Glotemp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=16" />
+  <style>
+    .gem-stage { display:flex; flex-direction:column; align-items:center; text-align:center; padding:2.5rem 0 1rem; }
+    .gem-die { width: clamp(120px,26vw,168px); aspect-ratio:1; cursor:pointer; }
+    .gem-die svg { display:block; width:100%; height:100%; }
+    .gem-cube { transform-origin: 90px 90px; }
+    .gem-roll { min-height: 3.4em; margin-top:1.6rem; font-family:var(--font-display);
+      font-size:clamp(20px,2.8vw,32px); font-weight:var(--fw-light); color:var(--ivory); line-height:1.3; max-width:26ch; }
+    .gem-go { min-height:52px; padding:0.8rem 2.4rem; margin-top:1.4rem; background:transparent;
+      border:1px solid var(--brass); color:var(--brass); font-family:var(--font-mono);
+      font-variant-caps:small-caps; font-size:1rem; letter-spacing:0.06em; cursor:pointer; }
+    .gem-go:hover:not(:disabled){ background:var(--brass); color:var(--obsidian); }
+    .gem-go:disabled{ opacity:0.5; cursor:wait; }
+    .gem-week { font-family:var(--font-mono); font-variant-caps:small-caps; font-size:0.78rem;
+      color:var(--brass); min-height:1.3em; margin-top:1rem; }
+    .gem-open { display:inline-block; margin-top:1.2rem; min-height:44px; color:var(--ivory);
+      text-decoration:none; border-bottom:1px solid var(--brass-dim); padding-bottom:3px; }
+    .gem-open:hover{ border-color:var(--brass); color:var(--brass); }
+    @media (prefers-reduced-motion: reduce){ .gem-cube{ transition:none !important; } }
+  </style>
+</head>
+<body>
+  <nav class="navbar glass">
+    <div class="nav-brand">
+      <img src="/assets/logo.png" alt="Glotemp" class="nav-logo">
+      <span class="logo-text">Glotemp</span>
+      <span class="pulse-dot" aria-hidden="true">&#10084;&#65039;</span>
+    </div>
+    <div class="nav-links">
+      <a href="/">Pulse</a>
+      <a href="/feed">Feed</a>
+      <a href="/explore">Cities</a>
+      <a href="/about">About</a>
+      <a href="/gem" class="nav-gem active">Hidden gem</a>
+    </div>
+  </nav>
+
+  <main class="page-main">
+    <section class="glass-card page-header">
+      <p class="eyebrow">One roll, one city</p>
+      <h1>Hidden gem</h1>
+      <p class="section-copy" style="color:var(--sand); max-width:60ch;">Roll the die. It lands on a city and opens its long-form page &mdash; history, politics, life expectancy, and where to actually go. One city carries City of the Week, but the die always works.</p>
+    </section>
+    <section class="glass-card">
+      <div class="gem-stage">
+        <div class="gem-die" id="gem-die"></div>
+        <button type="button" class="gem-go" id="gem-go">Roll</button>
+        <p class="gem-week" id="gem-week">&nbsp;</p>
+        <p class="gem-roll" id="gem-roll">The die is cold. Give it a throw.</p>
+        <a class="gem-open" id="gem-open" href="#" hidden>Open the long read &rarr;</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer glass">
+    <p>&copy; 2026 RenviaIT Ltd. All rights reserved.</p>
+    <p class="small-print">
+      <a href="/privacy">Privacy Policy</a> |
+      <a href="/terms">Terms of Service</a> |
+      <a href="/methodology">Methodology</a> |
+      <a href="#" id="cookie-settings">Cookie Settings</a>
+    </p>
+    <p class="small-print footer-lang-row">
+      <button type="button" id="lang-switch" class="footer-lang">Language</button>
+    </p>
+  </footer>
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
+  <script src="/glotemp-features.js"></script>
+  <script src="/glotemp-gem.js"></script>
+  <script src="/cookie-consent.js" defer></script>
+</body>
+</html>
