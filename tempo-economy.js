@@ -1,8 +1,9 @@
 // ===== TEMPO ECONOMY PLATFORM =====
 // Supabase integration, comments, reporters, and monetization
 
-const SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
+// var, not const -- see the matching comment in verticals-engine.js
+var SUPABASE_URL = SUPABASE_URL || 'https://hnysztednzqfzbmiqqgl.supabase.co';
+var SUPABASE_ANON_KEY = SUPABASE_ANON_KEY || 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
 
 // Supabase client
 const supabaseClient = {

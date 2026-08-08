@@ -135,8 +135,10 @@
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
   <script>
-    const SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
+    // var, not const: tempo-economy.js (loaded below) also declares
+    // these; var redeclaration across scripts is a safe no-op.
+    var SUPABASE_URL = SUPABASE_URL || 'https://hnysztednzqfzbmiqqgl.supabase.co';
+    var SUPABASE_ANON_KEY = SUPABASE_ANON_KEY || 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
     const CITY_A = 'bogota';
     const CITY_B = 'moscow';
     const VERTICALS = [
