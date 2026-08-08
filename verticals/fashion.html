@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fashion Rankings | Glotemp</title>
+  <meta name="description" content="Which cities are fashion hubs? Rankings based on designer brands, fashion events, and style influence.">
+  <meta name="canonical" content="https://glo-temp.com/verticals/fashion">
+  <meta property="og:title" content="Global Fashion Rankings">
+  <meta property="og:description" content="Find cities at the center of global fashion, style trends, and luxury retail.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://glo-temp.com/verticals/fashion">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Fashion Rankings",
+    "description": "Global ranking of cities by fashion influence, designer brands, and style events.",
+    "url": "https://glo-temp.com/verticals/fashion",
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": []
+    }
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <nav class="nav-bar glass-card">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <span data-i18n="glotemp_logo">Glotemp</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/" data-i18n="nav_home">Home</a></li>
+        <li><a href="/cities" data-i18n="nav_cities">Cities</a></li>
+        <li><a href="/verticals" data-i18n="nav_verticals">Verticals</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <section class="ranking-header glass-card vertical-fashion">
+      <h1>Fashion</h1>
+      <p data-i18n="fashion_description">Where is the center of global style?</p>
+      <p class="ranking-threshold" data-i18n="ranking_note">Rankings require minimum signal volume to publish.</p>
+    </section>
+
+    <div class="ranking-controls glass-card">
+      <button id="toggle-details" class="btn-text" data-i18n="show_details">Show Details</button>
+      <span id="last-updated" class="ranking-updated"></span>
+    </div>
+
+    <section class="ranking-list">
+      <div id="fashion-ranking" class="ranking-content">
+        <div class="loading" data-i18n="loading">Loading rankings...</div>
+      </div>
+    </section>
+
+    <section class="ranking-info glass-card">
+      <h2>What is Fashion?</h2>
+      <p>
+        Fashion measures a city's influence and prominence in the global style ecosystem.
+        It combines the presence of major designer brands, frequency of fashion events and runway shows,
+        global fashion news mentions, and trendiness indices to identify the centers of style and luxury retail.
+      </p>
+      <h3 data-i18n="fashion_sources">Data Sources</h3>
+      <ul>
+        <li><strong>Fashion Events:</strong> <span>Fashion week schedules and major events</span></li>
+        <li><strong>Luxury Retail:</strong> <span>Designer brand store locations and density</span></li>
+        <li><strong>Fashion News:</strong> <span>GDELT mentions of fashion brands and style trends</span></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="footer glass-card">
+    <div class="footer-content">
+      <p class="small-print" data-i18n="footer_copyright">&copy; 2026 Glotemp. Live city intelligence.</p>
+    </div>
+  </footer>
+
+  <script src="/cities-data.js"></script>
+  <script src="/verticals-engine.js"></script>
+  <script>
+    // Load and render Fashion ranking
+    async function loadFashionRanking() {
+      const rankingEl = document.getElementById('fashion-ranking');
+      const lastUpdatedEl = document.getElementById('last-updated');
+
+      try {
+        // Fetch latest fashion readings
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/readings?vertical=eq.fashion&order=fetched_at.desc&limit=150`,
+          {
+            headers: {
+              'apikey': SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+              'Accept': 'application/json'
+            }
+          }
+        );
+
+        if (!response.ok) {
+          rankingEl.innerHTML = '<p data-i18n="error_loading">Error loading rankings. Please try again later.</p>';
+          return;
+        }
+
+        const readings = await response.json();
+        const cityFashion = new Map();
+
+        // Aggregate style influence by city (main ranking metric)
+        readings.forEach(reading => {
+          if (!cityFashion.has(reading.city_slug)) {
+            cityFashion.set(reading.city_slug, { influence: [], brands: [], events: [], source: reading.source });
+          }
+          if (reading.metric === 'style_influence' && reading.value !== null) {
+            cityFashion.get(reading.city_slug).influence.push(reading.value);
+          } else if (reading.metric === 'designer_brands' && reading.value !== null) {
+            cityFashion.get(reading.city_slug).brands.push(reading.value);
+          } else if (reading.metric === 'fashion_events' && reading.value !== null) {
+            cityFashion.get(reading.city_slug).events.push(reading.value);
+          }
+        });
+
+        // Calculate averages and create ranking
+        const ranked = Array.from(cityFashion.entries())
+          .map(([slug, data]) => {
+            const city = window.CITIES_DATA.find(c => c.slug === slug);
+            const avgInfluence = data.influence.length > 0
+              ? data.influence.reduce((a, b) => a + b, 0) / data.influence.length
+              : 0;
+
+            return {
+              slug,
+              name: city?.name || slug,
+              country: city?.country || '',
+              influence: avgInfluence,
+              signalVolume: data.influence.length
+            };
+          })
+          .filter(city => city.signalVolume > 0)
+          .sort((a, b) => b.influence - a.influence);
+
+        // Render ranking
+        rankingEl.innerHTML = ranked.slice(0, 50).map((city, idx) => `
+          <a href="/cities/${city.slug}" class="ranking-item glass-card">
+            <span class="ranking-position">#${idx + 1}</span>
+            <div class="ranking-city">
+              <h3>${city.name}</h3>
+              <p>${city.country}</p>
+            </div>
+            <div class="ranking-score">
+              <span class="score-value">${city.influence.toFixed(1)}</span>
+              <span class="score-label">Style Influence</span>
+            </div>
+            <span class="ranking-signal">${city.signalVolume} signals</span>
+          </a>
+        `).join('');
+
+        lastUpdatedEl.textContent = `Updated ${verticals.getTimeAgo(new Date())}`;
+      } catch (error) {
+        console.error('Error loading Fashion ranking:', error);
+        rankingEl.innerHTML = '<p data-i18n="error_loading">Error loading rankings.</p>';
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadFashionRanking);
+    } else {
+      loadFashionRanking();
+    }
+  </script>
+  <script src="/app.js" defer></script>
+</body>
+</html>

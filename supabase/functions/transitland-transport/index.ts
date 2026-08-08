@@ -1,9 +1,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
 
-const supabase = createClient(
-  Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-);
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+const supabase = createClient(SUPABASE_URL ?? "", SUPABASE_SERVICE_ROLE_KEY ?? "");
 
 // City-to-Coordinates for Transitland bounding box search
 const cityCoords: Record<string, { lat: number; lon: number; radius: number }> = {
@@ -31,34 +31,35 @@ const cityCoords: Record<string, { lat: number; lon: number; radius: number }> =
 
 async function fetchTransitData(city: string, coords: { lat: number; lon: number; radius: number }) {
   try {
-    // Transitland API v2 (free tier)
+    const apiKey = Deno.env.get("TRANSITLAND_API_KEY");
     const bbox = `${coords.lon - coords.radius / 100},${coords.lat - coords.radius / 100},${coords.lon + coords.radius / 100},${coords.lat + coords.radius / 100}`;
     const query = `
       query {
         stops(where: {bbox: "${bbox}"}) {
-          edges {
-            node {
-              id
-            }
-          }
+          edges { node { id } }
         }
         routes(where: {bbox: "${bbox}"}) {
-          edges {
-            node {
-              id
-            }
-          }
+          edges { node { id } }
         }
       }
     `;
 
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "User-Agent": "glo-temp.com/1.0 (+https://glo-temp.com)",
+    };
+    // Transitland v2 GraphQL requires an apikey; without one every request is 401.
+    if (apiKey) headers["apikey"] = apiKey;
+
     const response = await fetch("https://api.transit.land/v2/graphql", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({ query }),
     });
 
     if (!response.ok) {
+      const body = await response.text().catch(() => "");
+      console.warn(`[transitland-transport] ${city}: HTTP ${response.status} — ${body.slice(0, 200)}, using synthetic fallback`);
       return {
         transit_quality: 5 + Math.random() * 4,
         bike_share_bikes: Math.floor(Math.random() * 5000),
@@ -78,8 +79,7 @@ async function fetchTransitData(city: string, coords: { lat: number; lon: number
       confidence: Math.min(0.85, (stopCount + routeCount) / 200),
     };
   } catch (error) {
-    console.error(`Error fetching transit data for ${city}:`, error);
-    // Return synthetic data on error
+    console.error(`[transitland-transport] ${city}: exception — ${error.message}, using synthetic fallback`);
     return {
       transit_quality: 5 + Math.random() * 4,
       bike_share_bikes: Math.floor(Math.random() * 5000),
@@ -95,7 +95,7 @@ async function insertReading(
   value: number,
   label: string,
   confidence: number
-) {
+): Promise<boolean> {
   const { error } = await supabase.from("readings").insert({
     city_slug: citySlug,
     vertical: "transport",
@@ -108,30 +108,56 @@ async function insertReading(
     fetched_at: new Date().toISOString(),
   });
 
-  if (error) console.error("Insert error:", error);
+  if (error) {
+    console.error(`[transitland-transport] insert failed for ${citySlug}/${metric}: ${error.message}`);
+    return false;
+  }
+  return true;
 }
 
-Deno.serve(async (req: Request) => {
+Deno.serve(async (_req: Request) => {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    console.error("[transitland-transport] Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env var");
+    return new Response(
+      JSON.stringify({ success: false, error: "Missing Supabase credentials (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY)" }),
+      { headers: { "Content-Type": "application/json" }, status: 500 }
+    );
+  }
+
   try {
-    let successCount = 0;
+    let rowsWritten = 0;
+    let citiesProcessed = 0;
 
     for (const [city, coords] of Object.entries(cityCoords)) {
       const result = await fetchTransitData(city, coords);
-      if (result) {
-        await insertReading(city, "transit_quality", result.transit_quality, "Public transit quality", result.confidence);
-        await insertReading(city, "bike_share_bikes", result.bike_share_bikes, "Bike share system size", result.confidence);
-        await insertReading(city, "congestion_level", result.congestion_level, "Traffic congestion level", result.confidence);
-        successCount++;
-      }
+      if (!result) continue;
+
+      const results = await Promise.all([
+        insertReading(city, "transit_quality", result.transit_quality, "Public transit quality", result.confidence),
+        insertReading(city, "bike_share_bikes", result.bike_share_bikes, "Bike share system size", result.confidence),
+        insertReading(city, "congestion_level", result.congestion_level, "Traffic congestion level", result.confidence),
+      ]);
+      const successes = results.filter(Boolean).length;
+      rowsWritten += successes;
+      if (successes > 0) citiesProcessed++;
+    }
+
+    console.log(`[transitland-transport] wrote ${rowsWritten} row(s) across ${citiesProcessed} of ${Object.keys(cityCoords).length} cities`);
+
+    if (rowsWritten === 0) {
+      return new Response(
+        JSON.stringify({ success: false, error: "No rows written — all inserts failed (check Supabase credentials)", cities: 0 }),
+        { headers: { "Content-Type": "application/json" }, status: 502 }
+      );
     }
 
     return new Response(
-      JSON.stringify({ success: true, cities: successCount }),
+      JSON.stringify({ success: true, rows: rowsWritten, cities: citiesProcessed }),
       { headers: { "Content-Type": "application/json" }, status: 200 }
     );
   } catch (error) {
-    console.error("Error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("[transitland-transport] fatal error:", error);
+    return new Response(JSON.stringify({ success: false, error: error.message }), {
       headers: { "Content-Type": "application/json" },
       status: 500,
     });

@@ -1,9 +1,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
 
-const supabase = createClient(
-  Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-);
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+const supabase = createClient(SUPABASE_URL ?? "", SUPABASE_SERVICE_ROLE_KEY ?? "");
 
 // City-to-Coordinates for Overpass bounding box search
 const cityBounds: Record<string, { south: number; west: number; north: number; east: number }> = {
@@ -30,52 +30,60 @@ const cityBounds: Record<string, { south: number; west: number; north: number; e
 };
 
 async function fetchPropertyData(city: string, bounds: any) {
-  try {
-    // Overpass API (free, no auth required)
-    // Query for buildings and residential areas
-    const query = `[bbox:${bounds.south},${bounds.west},${bounds.north},${bounds.east}];
-      (
-        node["building"="residential"];
-        way["building"="residential"];
-        relation["building"="residential"];
-      );
-      out count;`;
+  const mirrors = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.openstreetmap.ru/api/interpreter",
+  ];
+  const timeoutMs = 25000;
 
-    const response = await fetch("https://overpass-api.de/api/interpreter", {
-      method: "POST",
-      body: query,
-    });
+  const query = `[bbox:${bounds.south},${bounds.west},${bounds.north},${bounds.east}];
+    (
+      node["building"="residential"];
+      way["building"="residential"];
+      relation["building"="residential"];
+    );
+    out count;`;
 
-    if (!response.ok) {
-      return {
-        median_rent: 400 + Math.random() * 2600,
-        property_appreciation: -5 + Math.random() * 15,
-        housing_availability: 20 + Math.random() * 60,
-        confidence: 0.5,
-      };
+  for (const url of mirrors) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+      const response = await fetch(url, {
+        method: "POST",
+        body: query,
+        signal: controller.signal,
+        headers: { "User-Agent": "glo-temp.com/1.0 (+https://glo-temp.com)" },
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const text = await response.text();
+        const countMatch = text.match(/Count: (\d+)/);
+        const buildingCount = countMatch ? parseInt(countMatch[1]) : 1000;
+
+        return {
+          median_rent: 400 + Math.random() * 2600,
+          property_appreciation: -5 + Math.random() * 15,
+          housing_availability: Math.min(80, Math.max(20, buildingCount / 100)),
+          confidence: Math.min(0.8, buildingCount / 5000),
+        };
+      }
+
+      console.warn(`[overpass-property] ${city}: ${url} HTTP ${response.status}, trying next mirror`);
+    } catch (error) {
+      console.warn(`[overpass-property] ${city}: mirror ${url} failed — ${error.message}`);
     }
-
-    const text = await response.text();
-    // Parse OSM count from response
-    const countMatch = text.match(/Count: (\d+)/);
-    const buildingCount = countMatch ? parseInt(countMatch[1]) : 1000;
-
-    return {
-      median_rent: 400 + Math.random() * 2600,
-      property_appreciation: -5 + Math.random() * 15,
-      housing_availability: Math.min(80, Math.max(20, buildingCount / 100)),
-      confidence: Math.min(0.8, buildingCount / 5000),
-    };
-  } catch (error) {
-    console.error(`Error fetching property data for ${city}:`, error);
-    // Return synthetic data on error
-    return {
-      median_rent: 400 + Math.random() * 2600,
-      property_appreciation: -5 + Math.random() * 15,
-      housing_availability: 20 + Math.random() * 60,
-      confidence: 0.5,
-    };
   }
+
+  console.warn(`[overpass-property] ${city}: all mirrors failed, using synthetic fallback`);
+  return {
+    median_rent: 400 + Math.random() * 2600,
+    property_appreciation: -5 + Math.random() * 15,
+    housing_availability: 20 + Math.random() * 60,
+    confidence: 0.5,
+  };
 }
 
 async function insertReading(
@@ -84,7 +92,7 @@ async function insertReading(
   value: number,
   label: string,
   confidence: number
-) {
+): Promise<boolean> {
   const { error } = await supabase.from("readings").insert({
     city_slug: citySlug,
     vertical: "property",
@@ -97,30 +105,56 @@ async function insertReading(
     fetched_at: new Date().toISOString(),
   });
 
-  if (error) console.error("Insert error:", error);
+  if (error) {
+    console.error(`[overpass-property] insert failed for ${citySlug}/${metric}: ${error.message}`);
+    return false;
+  }
+  return true;
 }
 
-Deno.serve(async (req: Request) => {
+Deno.serve(async (_req: Request) => {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    console.error("[overpass-property] Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env var");
+    return new Response(
+      JSON.stringify({ success: false, error: "Missing Supabase credentials (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY)" }),
+      { headers: { "Content-Type": "application/json" }, status: 500 }
+    );
+  }
+
   try {
-    let successCount = 0;
+    let rowsWritten = 0;
+    let citiesProcessed = 0;
 
     for (const [city, bounds] of Object.entries(cityBounds)) {
       const result = await fetchPropertyData(city, bounds);
-      if (result) {
-        await insertReading(city, "median_rent", result.median_rent, "Median monthly rent (1BR)", result.confidence);
-        await insertReading(city, "property_appreciation", result.property_appreciation, "Annual property appreciation %", result.confidence);
-        await insertReading(city, "housing_availability", result.housing_availability, "New housing starts", result.confidence);
-        successCount++;
-      }
+      if (!result) continue;
+
+      const results = await Promise.all([
+        insertReading(city, "median_rent", result.median_rent, "Median monthly rent (1BR)", result.confidence),
+        insertReading(city, "property_appreciation", result.property_appreciation, "Annual property appreciation %", result.confidence),
+        insertReading(city, "housing_availability", result.housing_availability, "New housing starts", result.confidence),
+      ]);
+      const successes = results.filter(Boolean).length;
+      rowsWritten += successes;
+      if (successes > 0) citiesProcessed++;
+    }
+
+    console.log(`[overpass-property] wrote ${rowsWritten} row(s) across ${citiesProcessed} of ${Object.keys(cityBounds).length} cities`);
+
+    if (rowsWritten === 0) {
+      return new Response(
+        JSON.stringify({ success: false, error: "No rows written — all inserts failed (check Supabase credentials)", cities: 0 }),
+        { headers: { "Content-Type": "application/json" }, status: 502 }
+      );
     }
 
     return new Response(
-      JSON.stringify({ success: true, cities: successCount }),
+      JSON.stringify({ success: true, rows: rowsWritten, cities: citiesProcessed }),
       { headers: { "Content-Type": "application/json" }, status: 200 }
     );
   } catch (error) {
-    console.error("Error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("[overpass-property] fatal error:", error);
+    return new Response(JSON.stringify({ success: false, error: error.message }), {
       headers: { "Content-Type": "application/json" },
       status: 500,
     });

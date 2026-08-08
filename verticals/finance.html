@@ -11,6 +11,20 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://glo-temp.com/verticals/finance">
 
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Finance Rankings",
+    "description": "Live ranking of global cities by economic indicators, cost of living, and investment opportunity.",
+    "url": "https://glo-temp.com/verticals/finance",
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": []
+    }
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -34,21 +48,32 @@
     <section class="ranking-header glass-card vertical-finance">
       <h1>Finance</h1>
       <p data-i18n="finance_description">Should I invest or trade here?</p>
-      <p class="ranking-note" data-i18n="ranking_data_building">Finance data is currently building. Check back soon.</p>
+      <p class="ranking-threshold" data-i18n="ranking_note">Rankings require minimum signal volume to publish.</p>
+    </section>
+
+    <div class="ranking-controls glass-card">
+      <button id="toggle-details" class="btn-text" data-i18n="show_details">Show Details</button>
+      <span id="last-updated" class="ranking-updated"></span>
+    </div>
+
+    <section class="ranking-list">
+      <div id="finance-ranking" class="ranking-content">
+        <div class="loading" data-i18n="loading">Loading rankings...</div>
+      </div>
     </section>
 
     <section class="ranking-info glass-card">
       <h2>What is Finance?</h2>
       <p>
         Finance tracks the economic health and investment opportunity in each city. It measures cost of living,
-        currency stability, stock market activity, inflation trends, and economic growth forecasts to help you
+        currency stability, inflation rates, and economic growth forecasts to help you
         decide where to invest, trade, or relocate.
       </p>
       <h3 data-i18n="finance_sources">Data Sources</h3>
       <ul>
         <li><strong>World Bank:</strong> <span>GDP, inflation, economic indicators</span></li>
-        <li><strong>Frankfurter:</strong> <span>Real-time currency exchange rates</span></li>
-        <li><strong>Alpha Vantage:</strong> <span>Stock market indices and analytics</span></li>
+        <li><strong>Currency Markets:</strong> <span>Real-time currency exchange rates and stability</span></li>
+        <li><strong>Economic Data:</strong> <span>Cost of living and market analysis</span></li>
       </ul>
     </section>
   </main>
@@ -59,6 +84,97 @@
     </div>
   </footer>
 
+  <script src="/cities-data.js"></script>
+  <script src="/verticals-engine.js"></script>
+  <script>
+    // Load and render Finance ranking
+    async function loadFinanceRanking() {
+      const rankingEl = document.getElementById('finance-ranking');
+      const lastUpdatedEl = document.getElementById('last-updated');
+
+      try {
+        // Fetch latest finance readings
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/readings?vertical=eq.finance&order=fetched_at.desc&limit=150`,
+          {
+            headers: {
+              'apikey': SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+              'Accept': 'application/json'
+            }
+          }
+        );
+
+        if (!response.ok) {
+          rankingEl.innerHTML = '<p data-i18n="error_loading">Error loading rankings. Please try again later.</p>';
+          return;
+        }
+
+        const readings = await response.json();
+        const cityFinance = new Map();
+
+        // Aggregate currency strength by city (main ranking metric)
+        readings.forEach(reading => {
+          if (!cityFinance.has(reading.city_slug)) {
+            cityFinance.set(reading.city_slug, { strength: [], col: [], inflation: [], source: reading.source });
+          }
+          if (reading.metric === 'currency_strength' && reading.value !== null) {
+            cityFinance.get(reading.city_slug).strength.push(reading.value);
+          } else if (reading.metric === 'cost_of_living' && reading.value !== null) {
+            cityFinance.get(reading.city_slug).col.push(reading.value);
+          } else if (reading.metric === 'inflation_rate' && reading.value !== null) {
+            cityFinance.get(reading.city_slug).inflation.push(reading.value);
+          }
+        });
+
+        // Calculate averages and create ranking
+        const ranked = Array.from(cityFinance.entries())
+          .map(([slug, data]) => {
+            const city = window.CITIES_DATA.find(c => c.slug === slug);
+            const avgStrength = data.strength.length > 0
+              ? data.strength.reduce((a, b) => a + b, 0) / data.strength.length
+              : 0;
+
+            return {
+              slug,
+              name: city?.name || slug,
+              country: city?.country || '',
+              strength: avgStrength,
+              signalVolume: data.strength.length
+            };
+          })
+          .filter(city => city.signalVolume > 0)
+          .sort((a, b) => b.strength - a.strength);
+
+        // Render ranking
+        rankingEl.innerHTML = ranked.slice(0, 50).map((city, idx) => `
+          <a href="/cities/${city.slug}" class="ranking-item glass-card">
+            <span class="ranking-position">#${idx + 1}</span>
+            <div class="ranking-city">
+              <h3>${city.name}</h3>
+              <p>${city.country}</p>
+            </div>
+            <div class="ranking-score">
+              <span class="score-value">${city.strength.toFixed(1)}</span>
+              <span class="score-label">Currency Strength</span>
+            </div>
+            <span class="ranking-signal">${city.signalVolume} signals</span>
+          </a>
+        `).join('');
+
+        lastUpdatedEl.textContent = `Updated ${verticals.getTimeAgo(new Date())}`;
+      } catch (error) {
+        console.error('Error loading Finance ranking:', error);
+        rankingEl.innerHTML = '<p data-i18n="error_loading">Error loading rankings.</p>';
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadFinanceRanking);
+    } else {
+      loadFinanceRanking();
+    }
+  </script>
   <script src="/app.js" defer></script>
 </body>
 </html>
