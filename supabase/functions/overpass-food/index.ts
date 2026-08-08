@@ -1,9 +1,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
 
-const supabase = createClient(
-  Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-);
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+const supabase = createClient(SUPABASE_URL ?? "", SUPABASE_SERVICE_ROLE_KEY ?? "");
 
 // City-to-Coordinates for Overpass bounding box search
 const cityBounds: Record<string, { south: number; west: number; north: number; east: number }> = {
@@ -36,27 +36,25 @@ async function fetchFoodData(city: string, bounds: any) {
   ];
   const timeoutMs = 25000; // 25s timeout, function limit is 30s
 
+  const query = `[bbox:${bounds.south},${bounds.west},${bounds.north},${bounds.east}];
+    (
+      node["amenity"="restaurant"];
+      way["amenity"="restaurant"];
+      node["amenity"="cafe"];
+      way["amenity"="cafe"];
+    );
+    out count;`;
+
   for (const url of mirrors) {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-      const query = `[bbox:${bounds.south},${bounds.west},${bounds.north},${bounds.east}];
-        (
-          node["amenity"="restaurant"];
-          way["amenity"="restaurant"];
-          node["amenity"="cafe"];
-          way["amenity"="cafe"];
-        );
-        out count;`;
-
       const response = await fetch(url, {
         method: "POST",
         body: query,
         signal: controller.signal,
-        headers: {
-          "User-Agent": "glo-temp.com/1.0 (+https://glo-temp.com)",
-        },
+        headers: { "User-Agent": "glo-temp.com/1.0 (+https://glo-temp.com)" },
       });
 
       clearTimeout(timeoutId);
@@ -74,16 +72,13 @@ async function fetchFoodData(city: string, bounds: any) {
         };
       }
 
-      if (response.status === 429) {
-        console.warn(`${url} rate limited for ${city}, trying fallback`);
-        continue;
-      }
+      console.warn(`[overpass-food] ${city}: ${url} HTTP ${response.status}, trying next mirror`);
     } catch (error) {
-      console.warn(`Mirror ${url} failed for ${city}: ${error.message}`);
-      continue;
+      console.warn(`[overpass-food] ${city}: mirror ${url} failed — ${error.message}`);
     }
   }
 
+  console.error(`[overpass-food] ${city}: all mirrors failed, skipping city (no partial rows)`);
   return null;
 }
 
@@ -93,7 +88,7 @@ async function insertReading(
   value: number,
   label: string,
   confidence: number
-) {
+): Promise<boolean> {
   const { error } = await supabase.from("readings").insert({
     city_slug: citySlug,
     vertical: "food",
@@ -106,33 +101,56 @@ async function insertReading(
     fetched_at: new Date().toISOString(),
   });
 
-  if (error) console.error("Insert error:", error);
+  if (error) {
+    console.error(`[overpass-food] insert failed for ${citySlug}/${metric}: ${error.message}`);
+    return false;
+  }
+  return true;
 }
 
-Deno.serve(async (req: Request) => {
+Deno.serve(async (_req: Request) => {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    console.error("[overpass-food] Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env var");
+    return new Response(
+      JSON.stringify({ success: false, error: "Missing Supabase credentials (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY)" }),
+      { headers: { "Content-Type": "application/json" }, status: 500 }
+    );
+  }
+
   try {
-    let successCount = 0;
+    let rowsWritten = 0;
+    let citiesProcessed = 0;
 
     for (const [city, bounds] of Object.entries(cityBounds)) {
       const result = await fetchFoodData(city, bounds);
-      if (!result) {
-        console.warn(`No valid data for ${city}, skipping inserts`);
-        continue;
-      }
+      if (!result) continue;
 
-      await insertReading(city, "restaurant_count", result.restaurant_count, "Restaurants and dining venues", result.confidence);
-      await insertReading(city, "michelin_stars", result.michelin_stars, "Michelin-starred restaurants", result.confidence);
-      await insertReading(city, "culinary_diversity", result.culinary_diversity, "Culinary diversity score", result.confidence);
-      successCount++;
+      const results = await Promise.all([
+        insertReading(city, "restaurant_count", result.restaurant_count, "Restaurants and dining venues", result.confidence),
+        insertReading(city, "michelin_stars", result.michelin_stars, "Michelin-starred restaurants", result.confidence),
+        insertReading(city, "culinary_diversity", result.culinary_diversity, "Culinary diversity score", result.confidence),
+      ]);
+      const successes = results.filter(Boolean).length;
+      rowsWritten += successes;
+      if (successes > 0) citiesProcessed++;
+    }
+
+    console.log(`[overpass-food] wrote ${rowsWritten} row(s) across ${citiesProcessed} of ${Object.keys(cityBounds).length} cities`);
+
+    if (rowsWritten === 0) {
+      return new Response(
+        JSON.stringify({ success: false, error: "No rows written — all fetches or inserts failed", cities: 0 }),
+        { headers: { "Content-Type": "application/json" }, status: 502 }
+      );
     }
 
     return new Response(
-      JSON.stringify({ success: true, cities: successCount }),
+      JSON.stringify({ success: true, rows: rowsWritten, cities: citiesProcessed }),
       { headers: { "Content-Type": "application/json" }, status: 200 }
     );
   } catch (error) {
-    console.error("Error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("[overpass-food] fatal error:", error);
+    return new Response(JSON.stringify({ success: false, error: error.message }), {
       headers: { "Content-Type": "application/json" },
       status: 500,
     });
