@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/styles.css?v=16">
 </head>
 <body>
   <nav class="navbar glass">
@@ -31,10 +31,10 @@
     </div>
     <div class="nav-links">
       <a href="/">Pulse</a>
-      <a href="/about">About</a>
-      <a href="/explore" class="active">Explore</a>
       <a href="/feed">Feed</a>
-      <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
+      <a href="/explore" class="active">Cities</a>
+      <a href="/about">About</a>
+      <a href="/gem" class="nav-gem">Hidden gem</a>
     </div>
   </nav>
 
@@ -204,6 +204,9 @@
     <div class="footer-content">
       <p class="small-print" data-i18n="footer_copyright">&copy; 2026 Glotemp. Live city intelligence.</p>
     </div>
+    <p class="small-print footer-lang-row">
+      <button type="button" id="lang-switch" class="footer-lang">Language</button>
+    </p>
   </footer>
 
   <script src="/cities-data.js"></script>
@@ -211,6 +214,7 @@
   <script src="/glotemp-auth.js"></script>
   <script src="/glotemp-checkin.js"></script>
   <script src="/glotemp-tonight.js"></script>
+  <script src="/glotemp-features.js"></script>
   <script src="/verticals-engine.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
   

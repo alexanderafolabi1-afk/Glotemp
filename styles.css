@@ -3,22 +3,28 @@
 
 /* ===== COLOR TOKEN SYSTEM ===== */
 :root {
-  /* Primary Colors */
-  --obsidian: #06060A;
-  --basalt: #0F1018;
-  --basalt-raised: #171926;
+  /* GROUND -- deep warm brown-black. This product is about going out at
+     night: the room is dim and warm, and the light comes from the cream
+     dials and brass hairlines, not from the background. Nothing here is
+     allowed to drift cool. */
+  --obsidian: #14100B;        /* page ground */
+  --basalt: #1B1610;          /* first lift */
+  --basalt-raised: #231C14;   /* second lift, still warmer not greyer */
 
   /* Accent Colors */
   --ion: #4FD8E8;
   --violet: #8B6BF5;
   --ember: #C86BE0;
 
-  /* Text Colors */
-  --bone: #E9E7F0;
-  --ash: #9C99AB;
-  --hairline: rgba(233, 231, 240, 0.10);
+  /* TEXT -- ivory and sand only. --bone and --ash are legacy names used
+     in ~200 places across this file; rather than rewrite every call site
+     they are remapped onto the warm pair, which removes every cool grey
+     and every pure white on the site in one move. */
+  --bone: #F0E0C8;            /* was #F0E0C8 (cool white) */
+  --ash: #C9B79C;             /* was #C9B79C (cool grey) */
+  --hairline: rgba(176, 141, 87, 0.22);   /* brass-tinted, never grey */
 
-  /* Warm text tokens (inner pages: headings/body) */
+  /* Warm text tokens (canonical names) */
   --ivory: #F0E0C8;
   --sand: #C9B79C;
 
@@ -116,31 +122,31 @@ body::before {
   background-color: var(--obsidian);
   background-image:
     /* Large mottling layer - VERY DARK - creates the hide texture */
-    radial-gradient(ellipse 120px 90px at 15% 25%, rgba(233,231,240,0.032) 0%, transparent 40%),
-    radial-gradient(ellipse 100px 80px at 75% 60%, rgba(233,231,240,0.024) 0%, transparent 45%),
-    radial-gradient(ellipse 110px 85px at 45% 75%, rgba(233,231,240,0.028) 0%, transparent 42%),
-    radial-gradient(ellipse 95px 70px at 85% 20%, rgba(233,231,240,0.022) 0%, transparent 48%),
-    radial-gradient(ellipse 105px 75px at 25% 55%, rgba(233,231,240,0.026) 0%, transparent 46%),
+    radial-gradient(ellipse 120px 90px at 15% 25%, rgba(240, 224, 200,0.032) 0%, transparent 40%),
+    radial-gradient(ellipse 100px 80px at 75% 60%, rgba(240, 224, 200,0.024) 0%, transparent 45%),
+    radial-gradient(ellipse 110px 85px at 45% 75%, rgba(240, 224, 200,0.028) 0%, transparent 42%),
+    radial-gradient(ellipse 95px 70px at 85% 20%, rgba(240, 224, 200,0.022) 0%, transparent 48%),
+    radial-gradient(ellipse 105px 75px at 25% 55%, rgba(240, 224, 200,0.026) 0%, transparent 46%),
     /* Medium grain texture - subtle */
-    radial-gradient(ellipse 3px 2px at 20% 30%, rgba(233,231,240,0.016) 0%, transparent 50%),
-    radial-gradient(ellipse 3px 2px at 60% 70%, rgba(233,231,240,0.014) 0%, transparent 50%),
-    radial-gradient(ellipse 3px 2px at 40% 50%, rgba(233,231,240,0.015) 0%, transparent 50%),
-    radial-gradient(ellipse 3px 2px at 80% 20%, rgba(233,231,240,0.013) 0%, transparent 50%),
-    radial-gradient(ellipse 3px 2px at 10% 90%, rgba(233,231,240,0.017) 0%, transparent 50%),
+    radial-gradient(ellipse 3px 2px at 20% 30%, rgba(240, 224, 200,0.016) 0%, transparent 50%),
+    radial-gradient(ellipse 3px 2px at 60% 70%, rgba(240, 224, 200,0.014) 0%, transparent 50%),
+    radial-gradient(ellipse 3px 2px at 40% 50%, rgba(240, 224, 200,0.015) 0%, transparent 50%),
+    radial-gradient(ellipse 3px 2px at 80% 20%, rgba(240, 224, 200,0.013) 0%, transparent 50%),
+    radial-gradient(ellipse 3px 2px at 10% 90%, rgba(240, 224, 200,0.017) 0%, transparent 50%),
     /* Fine hair texture */
     repeating-linear-gradient(
       45deg,
       transparent 0px,
       transparent 2px,
-      rgba(233,231,240,0.006) 2px,
-      rgba(233,231,240,0.006) 3px
+      rgba(240, 224, 200,0.006) 2px,
+      rgba(240, 224, 200,0.006) 3px
     ),
     repeating-linear-gradient(
       -45deg,
       transparent 0px,
       transparent 2px,
-      rgba(233,231,240,0.005) 2px,
-      rgba(233,231,240,0.005) 3px
+      rgba(240, 224, 200,0.005) 2px,
+      rgba(240, 224, 200,0.005) 3px
     );
   background-size: cover, cover, cover, cover, cover, cover, cover, cover, cover, cover, 8px 8px, 8px 8px;
   background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
@@ -322,14 +328,42 @@ body::after {
 }
 
 /* ===== GLASS CARD SYSTEM ===== */
+/* KILL THE BOXES.
+   .glass / .glass-card used to be a filled, blurred, rounded panel with a
+   drop shadow -- the stacked-rounded-rectangle look that was the default
+   texture of this whole site. Content now sits on the page ground and is
+   separated by a single brass hairline above it. No fill, no radius, no
+   shadow. Kept as the same class names because ~2,400 pages reference
+   them; changing the rule changes every page at once.
+   Opt back in per element with .panel-boxed only where a real container
+   is unavoidable. */
 .glass,
 .glass-card {
-  background: rgba(23, 25, 38, var(--glass-opacity));
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--hairline);
-  border-radius: var(--radius);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 1px rgba(233, 231, 240, 0.08), inset 1px 1px 0 rgba(233, 231, 240, 0.04);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  border-top: 1px solid var(--hairline);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 2.75rem 0 2.25rem;
+  margin-bottom: 0;
+}
+
+/* First card on a page shouldn't carry a rule against the nav. */
+main > .glass-card:first-child,
+main > .glass:first-child,
+#app > .glass-card:first-child {
+  border-top: none;
+}
+
+/* Escape hatch: a genuine container. Circle, or hairline -- never a
+   filled rounded rectangle. */
+.panel-boxed {
+  border: 1px solid var(--brass-dim);
+  border-radius: 0;
+  padding: 1.5rem;
+  background: transparent;
 }
 
 @supports not (backdrop-filter: blur(1px)) {
@@ -375,11 +409,11 @@ body::after {
   width: 156px;
   padding: 1rem 0.75rem 1.5rem;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, rgba(23, 25, 38, 0.8) 0%, rgba(23, 25, 38, 0.6) 100%);
-  border: 1px solid rgba(233, 231, 240, 0.06);
+  background: linear-gradient(135deg, rgba(35, 28, 20, 0.8) 0%, rgba(35, 28, 20, 0.6) 100%);
+  border: 1px solid rgba(240, 224, 200, 0.06);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.5),
-    inset 0 1px 1px rgba(233, 231, 240, 0.06),
+    inset 0 1px 1px rgba(240, 224, 200, 0.06),
     inset -1px -1px 1px rgba(0, 0, 0, 0.3);
   transition: transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 600ms ease-out;
   animation: instrument-breathe 6s ease-in-out infinite;
@@ -472,13 +506,13 @@ body::after {
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(1.6px 1.6px at 20% 22%, #FFFFFF 55%, transparent 100%),
-    radial-gradient(1.6px 1.6px at 72% 16%, #FFFFFF 55%, transparent 100%),
-    radial-gradient(1.2px 1.2px at 42% 38%, #FFFFFF 55%, transparent 100%),
-    radial-gradient(1.6px 1.6px at 85% 48%, #FFFFFF 55%, transparent 100%),
-    radial-gradient(1.2px 1.2px at 14% 58%, #FFFFFF 55%, transparent 100%),
-    radial-gradient(1.6px 1.6px at 58% 12%, #FFFFFF 55%, transparent 100%),
-    radial-gradient(1.2px 1.2px at 30% 72%, #FFFFFF 55%, transparent 100%);
+    radial-gradient(1.6px 1.6px at 20% 22%, #F0E0C8 55%, transparent 100%),
+    radial-gradient(1.6px 1.6px at 72% 16%, #F0E0C8 55%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 42% 38%, #F0E0C8 55%, transparent 100%),
+    radial-gradient(1.6px 1.6px at 85% 48%, #F0E0C8 55%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 14% 58%, #F0E0C8 55%, transparent 100%),
+    radial-gradient(1.6px 1.6px at 58% 12%, #F0E0C8 55%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 30% 72%, #F0E0C8 55%, transparent 100%);
   animation: star-twinkle 3s ease-in-out infinite;
 }
 
@@ -497,7 +531,7 @@ body::after {
   position: absolute;
   width: 95px;
   height: 30px;
-  background: rgba(233, 231, 240, 0.65);
+  background: rgba(240, 224, 200, 0.65);
   border-radius: 50px;
   filter: blur(3px);
   animation: cloud-drift 15s linear infinite;
@@ -521,8 +555,8 @@ body::after {
   inset: -20% -50%;
   background: repeating-linear-gradient(
     4deg,
-    rgba(233, 231, 240, 0.14) 0px,
-    rgba(233, 231, 240, 0.14) 8px,
+    rgba(240, 224, 200, 0.14) 0px,
+    rgba(240, 224, 200, 0.14) 8px,
     transparent 8px,
     transparent 46px
   );
@@ -584,7 +618,7 @@ body::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: #E9E7F0;
+  background: #F0E0C8;
   opacity: 0;
   animation: lightning-flash 6s ease-in-out infinite;
 }
@@ -607,7 +641,7 @@ body::after {
   left: var(--flake-left, 50%);
   width: var(--flake-size, 4px);
   height: var(--flake-size, 4px);
-  background: #FFFFFF;
+  background: #F0E0C8;
   border-radius: 50%;
   opacity: 0;
   animation: snow-fall var(--flake-duration, 6s) linear infinite;
@@ -822,12 +856,12 @@ body.scroll-reveals-enabled section.revealed {
   width: 100%;
   min-height: 500px;
   border-radius: calc(var(--radius) * 1.5);
-  background: linear-gradient(135deg, rgba(23, 25, 38, 0.8) 0%, rgba(23, 25, 38, 0.6) 100%);
-  border: 1px solid rgba(233, 231, 240, 0.06);
+  background: linear-gradient(135deg, rgba(35, 28, 20, 0.8) 0%, rgba(35, 28, 20, 0.6) 100%);
+  border: 1px solid rgba(240, 224, 200, 0.06);
   overflow: hidden;
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.5),
-    inset 0 1px 1px rgba(233, 231, 240, 0.06),
+    inset 0 1px 1px rgba(240, 224, 200, 0.06),
     inset -1px -1px 1px rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
@@ -918,21 +952,21 @@ body.scroll-reveals-enabled section.revealed {
     box-shadow:
       0 8px 32px rgba(0, 0, 0, 0.5),
       0 0 20px rgba(200, 107, 224, 0.1),
-      inset 1px 1px 2px rgba(233, 231, 240, 0.1),
+      inset 1px 1px 2px rgba(240, 224, 200, 0.1),
       inset -1px -1px 1px rgba(0, 0, 0, 0.3);
   }
   50% {
     box-shadow:
       0 8px 32px rgba(0, 0, 0, 0.5),
       0 0 40px rgba(200, 107, 224, 0.25),
-      inset 1px 1px 2px rgba(233, 231, 240, 0.15),
+      inset 1px 1px 2px rgba(240, 224, 200, 0.15),
       inset -1px -1px 1px rgba(0, 0, 0, 0.3);
   }
   100% {
     box-shadow:
       0 8px 32px rgba(0, 0, 0, 0.5),
       0 0 20px rgba(200, 107, 224, 0.1),
-      inset 1px 1px 2px rgba(233, 231, 240, 0.1),
+      inset 1px 1px 2px rgba(240, 224, 200, 0.1),
       inset -1px -1px 1px rgba(0, 0, 0, 0.3);
   }
 }
@@ -1190,7 +1224,7 @@ textarea:focus:not(:focus-visible) {
 
 .dim-badge {
   padding: 0.3rem 0.8rem;
-  background: rgba(233, 231, 240, 0.08);
+  background: rgba(240, 224, 200, 0.08);
   border-radius: 20px;
   font-size: 0.8rem;
   display: flex;
@@ -1380,7 +1414,7 @@ textarea:focus:not(:focus-visible) {
   padding: 0.7rem 1.2rem;
   border-radius: 40px;
   border: 1px solid var(--hairline);
-  background: rgba(233, 231, 240, 0.05);
+  background: rgba(240, 224, 200, 0.05);
   color: var(--bone);
   font-size: 1rem;
   font-family: var(--font-body);
@@ -1576,7 +1610,7 @@ textarea:focus:not(:focus-visible) {
 
 .blog-full-content {
   margin-top: 1rem;
-  border-top: 1px solid rgba(233, 231, 240, 0.1);
+  border-top: 1px solid rgba(240, 224, 200, 0.1);
   padding-top: 1rem;
 }
 
@@ -1637,7 +1671,7 @@ textarea:focus:not(:focus-visible) {
 .mood-btn {
   position: relative;
   font-size: 1.35rem;
-  background-color: rgba(233, 231, 240, 0.05);
+  background-color: rgba(240, 224, 200, 0.05);
   border: 1px solid var(--hairline);
   border-radius: 12px;
   width: 48px;
@@ -1699,8 +1733,8 @@ textarea:focus:not(:focus-visible) {
 .observation-form textarea,
 .badge-form input,
 .badge-form textarea {
-  background: rgba(233, 231, 240, 0.05);
-  border: 1px solid rgba(233, 231, 240, 0.09);
+  background: rgba(240, 224, 200, 0.05);
+  border: 1px solid rgba(240, 224, 200, 0.09);
   border-radius: 16px;
   color: var(--bone);
   padding: 0.85rem 1rem;
@@ -1777,9 +1811,9 @@ textarea:focus:not(:focus-visible) {
 
 .product-card {
   padding: 1.4rem;
-  border: 1px solid rgba(233, 231, 240, 0.08);
+  border: 1px solid rgba(240, 224, 200, 0.08);
   border-radius: 22px;
-  background: rgba(233, 231, 240, 0.03);
+  background: rgba(240, 224, 200, 0.03);
 }
 
 /* ===== CONSTELLATION WALL ===== */
@@ -1801,8 +1835,8 @@ textarea:focus:not(:focus-visible) {
 .wall-card {
   padding: 1.2rem;
   border-radius: 22px;
-  background: linear-gradient(180deg, rgba(233, 231, 240, 0.04), rgba(233, 231, 240, 0.02));
-  border: 1px solid rgba(233, 231, 240, 0.08);
+  background: linear-gradient(180deg, rgba(240, 224, 200, 0.04), rgba(240, 224, 200, 0.02));
+  border: 1px solid rgba(240, 224, 200, 0.08);
 }
 
 .wall-city,
@@ -1822,8 +1856,8 @@ textarea:focus:not(:focus-visible) {
 .obs-card {
   padding: 1rem;
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(233, 231, 240, 0.04), rgba(233, 231, 240, 0.01));
-  border: 1px solid rgba(233, 231, 240, 0.06);
+  background: linear-gradient(180deg, rgba(240, 224, 200, 0.04), rgba(240, 224, 200, 0.01));
+  border: 1px solid rgba(240, 224, 200, 0.06);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -1861,7 +1895,7 @@ textarea:focus:not(:focus-visible) {
   align-items: center;
   margin-top: 0.5rem;
   padding-top: 0.5rem;
-  border-top: 1px solid rgba(233, 231, 240, 0.04);
+  border-top: 1px solid rgba(240, 224, 200, 0.04);
 }
 
 .obs-time {
@@ -1873,7 +1907,7 @@ textarea:focus:not(:focus-visible) {
 .obs-intensity {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  background: rgba(233, 231, 240, 0.08);
+  background: rgba(240, 224, 200, 0.08);
   padding: 0.25rem 0.5rem;
   border-radius: 12px;
   color: var(--ash);
@@ -1906,7 +1940,7 @@ textarea:focus:not(:focus-visible) {
   width: min(920px, 100%);
   padding: 1.5rem;
   position: relative;
-  background: linear-gradient(180deg, rgba(23, 25, 38, 0.95), rgba(15, 16, 24, 0.98));
+  background: linear-gradient(180deg, rgba(35, 28, 20, 0.95), rgba(15, 16, 24, 0.98));
   border-radius: var(--radius);
   border: 1px solid var(--hairline);
 }
@@ -1942,7 +1976,7 @@ textarea:focus:not(:focus-visible) {
 .comment-section {
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid rgba(233, 231, 240, 0.1);
+  border-top: 1px solid rgba(240, 224, 200, 0.1);
 }
 
 .comment-input-wrap {
@@ -1952,8 +1986,8 @@ textarea:focus:not(:focus-visible) {
 }
 
 .comment-input {
-  background: rgba(233, 231, 240, 0.06);
-  border: 1px solid rgba(233, 231, 240, 0.1);
+  background: rgba(240, 224, 200, 0.06);
+  border: 1px solid rgba(240, 224, 200, 0.1);
   border-radius: 12px;
   color: var(--bone);
   padding: 0.75rem 1rem;
@@ -1966,7 +2000,7 @@ textarea:focus:not(:focus-visible) {
 }
 
 .comment-input:focus {
-  background: rgba(233, 231, 240, 0.1);
+  background: rgba(240, 224, 200, 0.1);
   border-color: rgba(79, 216, 232, 0.5);
   box-shadow: 0 0 0 3px rgba(79, 216, 232, 0.1);
 }
@@ -1988,7 +2022,7 @@ textarea:focus:not(:focus-visible) {
    Selection state is toggled via inline style by app.js, not a class. */
 .mood-emoji {
   font-size: 1.35rem;
-  background-color: rgba(233, 231, 240, 0.05);
+  background-color: rgba(240, 224, 200, 0.05);
   border: 1px solid var(--hairline);
   border-radius: 12px;
   width: 44px;
@@ -2033,15 +2067,15 @@ textarea:focus:not(:focus-visible) {
 
 .comment-item {
   padding: 1rem;
-  background: rgba(233, 231, 240, 0.04);
-  border: 1px solid rgba(233, 231, 240, 0.08);
+  background: rgba(240, 224, 200, 0.04);
+  border: 1px solid rgba(240, 224, 200, 0.08);
   border-radius: 12px;
   transition: all var(--transition);
 }
 
 .comment-item:hover {
-  background: rgba(233, 231, 240, 0.08);
-  border-color: rgba(233, 231, 240, 0.15);
+  background: rgba(240, 224, 200, 0.08);
+  border-color: rgba(240, 224, 200, 0.15);
 }
 
 .comment-item p {
@@ -2063,7 +2097,7 @@ textarea:focus:not(:focus-visible) {
 .leaderboard-card {
   margin-top: 2rem;
   padding: 1.5rem;
-  background: rgba(23, 25, 38, var(--glass-opacity));
+  background: rgba(35, 28, 20, var(--glass-opacity));
   backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--hairline);
   border-radius: var(--radius);
@@ -2090,9 +2124,9 @@ textarea:focus:not(:focus-visible) {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
-  background: rgba(233, 231, 240, 0.03);
+  background: rgba(240, 224, 200, 0.03);
   border-radius: 8px;
-  border: 1px solid rgba(233, 231, 240, 0.06);
+  border: 1px solid rgba(240, 224, 200, 0.06);
 }
 
 .leaderboard-rank {
@@ -2233,7 +2267,7 @@ textarea:focus:not(:focus-visible) {
 }
 
 .lang-list {
-  background: rgba(23, 25, 38, var(--glass-opacity));
+  background: rgba(35, 28, 20, var(--glass-opacity));
   backdrop-filter: blur(var(--glass-blur));
   padding: 2rem;
   border-radius: var(--radius);
@@ -2253,7 +2287,7 @@ textarea:focus:not(:focus-visible) {
 }
 
 .lang-option:hover {
-  background: rgba(233, 231, 240, 0.15);
+  background: rgba(240, 224, 200, 0.15);
 }
 
 /* ===== TYPOGRAPHY ===== */
@@ -2592,7 +2626,7 @@ small {
 .stat-card {
   padding: 1.5rem;
   text-align: center;
-  background: linear-gradient(135deg, rgba(45, 95, 159, 0.04), rgba(233, 231, 240, 0.02));
+  background: linear-gradient(135deg, rgba(45, 95, 159, 0.04), rgba(240, 224, 200, 0.02));
   border: 1px solid rgba(45, 95, 159, 0.1);
   border-radius: 18px;
   transition: all 0.3s ease;
@@ -2600,7 +2634,7 @@ small {
 
 .stat-card:hover {
   border-color: rgba(45, 95, 159, 0.2);
-  background: linear-gradient(135deg, rgba(45, 95, 159, 0.08), rgba(233, 231, 240, 0.04));
+  background: linear-gradient(135deg, rgba(45, 95, 159, 0.08), rgba(240, 224, 200, 0.04));
 }
 
 .stat-card .stat-label {
@@ -2630,7 +2664,7 @@ small {
 
 .fastest-card {
   padding: 1.5rem;
-  background: linear-gradient(135deg, rgba(45, 95, 159, 0.04), rgba(233, 231, 240, 0.02));
+  background: linear-gradient(135deg, rgba(45, 95, 159, 0.04), rgba(240, 224, 200, 0.02));
   border: 1px solid rgba(45, 95, 159, 0.1);
   border-radius: 18px;
   transition: all 0.3s ease;
@@ -2638,7 +2672,7 @@ small {
 
 .fastest-card:hover {
   border-color: rgba(45, 95, 159, 0.2);
-  background: linear-gradient(135deg, rgba(45, 95, 159, 0.08), rgba(233, 231, 240, 0.04));
+  background: linear-gradient(135deg, rgba(45, 95, 159, 0.08), rgba(240, 224, 200, 0.04));
   transform: translateY(-2px);
 }
 
@@ -2707,7 +2741,7 @@ small {
 
 .obs-loading {
   height: 100px;
-  background: linear-gradient(90deg, rgba(233, 231, 240, 0.04), rgba(233, 231, 240, 0.02), rgba(233, 231, 240, 0.04));
+  background: linear-gradient(90deg, rgba(240, 224, 200, 0.04), rgba(240, 224, 200, 0.02), rgba(240, 224, 200, 0.04));
   border-radius: 18px;
   animation: pulse-load 2s ease-in-out infinite;
 }
@@ -2781,7 +2815,7 @@ button:hover:not(:focus-visible) {
 .city-card {
   display: block;
   padding: 1.5rem;
-  border: 1px solid rgba(233, 231, 240, 0.1);
+  border: 1px solid rgba(240, 224, 200, 0.1);
   border-radius: 12px;
   text-decoration: none;
   color: inherit;
@@ -2961,7 +2995,7 @@ button:hover:not(:focus-visible) {
   align-items: center;
   gap: 1.5rem;
   padding: 1.5rem;
-  border: 1px solid rgba(233, 231, 240, 0.1);
+  border: 1px solid rgba(240, 224, 200, 0.1);
   border-radius: 8px;
   text-decoration: none;
   color: inherit;
@@ -3461,8 +3495,8 @@ button:hover:not(:focus-visible) {
 
 .watch-email-row input {
   flex: 1 1 220px;
-  background: rgba(233, 231, 240, 0.05);
-  border: 1px solid rgba(233, 231, 240, 0.09);
+  background: rgba(240, 224, 200, 0.05);
+  border: 1px solid rgba(240, 224, 200, 0.09);
   border-radius: 10px;
   color: var(--ivory);
   padding: 0.7rem 1rem;
@@ -3645,8 +3679,8 @@ button:hover:not(:focus-visible) {
   width: 100%;
   min-height: 48px;
   padding: 0.8rem 1rem;
-  background: rgba(233, 231, 240, 0.05);
-  border: 1px solid rgba(233, 231, 240, 0.12);
+  background: rgba(240, 224, 200, 0.05);
+  border: 1px solid rgba(240, 224, 200, 0.12);
   border-radius: 12px;
   color: var(--ivory);
   font-family: var(--font-body);
@@ -3690,7 +3724,7 @@ button:hover:not(:focus-visible) {
 .checkin-mode {
   min-height: 44px;
   padding: 0.55rem 1rem;
-  background: rgba(233, 231, 240, 0.05);
+  background: rgba(240, 224, 200, 0.05);
   border: 1px solid var(--brass-dim);
   border-radius: 12px;
   color: var(--sand);
@@ -3725,8 +3759,8 @@ button:hover:not(:focus-visible) {
 .checkin-note {
   width: 100%;
   padding: 0.75rem 0.9rem;
-  background: rgba(233, 231, 240, 0.05);
-  border: 1px solid rgba(233, 231, 240, 0.12);
+  background: rgba(240, 224, 200, 0.05);
+  border: 1px solid rgba(240, 224, 200, 0.12);
   border-radius: 12px;
   color: var(--ivory);
   font-family: var(--font-body);
@@ -3750,7 +3784,7 @@ button:hover:not(:focus-visible) {
   border: 1px solid var(--hairline);
   border-radius: 12px;
   padding: 0.9rem 1rem;
-  background: rgba(23, 25, 38, 0.4);
+  background: rgba(35, 28, 20, 0.4);
 }
 
 .checkin-item-head {
@@ -3832,7 +3866,7 @@ button:hover:not(:focus-visible) {
   border-left: 2px solid var(--tonight-band, var(--brass-dim));
   border-radius: 14px;
   padding: 1.1rem 1.15rem;
-  background: rgba(23, 25, 38, 0.42);
+  background: rgba(35, 28, 20, 0.42);
   /* Reserved so filling a card from the network never shifts the grid. */
   min-height: 236px;
 }
@@ -3946,7 +3980,7 @@ button:hover:not(:focus-visible) {
 .spin-variant {
   min-height: 44px;
   padding: 0.55rem 1.05rem;
-  background: rgba(233, 231, 240, 0.05);
+  background: rgba(240, 224, 200, 0.05);
   border: 1px solid var(--brass-dim);
   border-radius: 999px;
   color: var(--sand);
@@ -4056,3 +4090,217 @@ button:hover:not(:focus-visible) {
   .spin-rotor { transition: none !important; }
   .spin-sentence { transition: none; }
 }
+
+/* ===== TYPOGRAPHY, ENFORCED SITE-WIDE =====
+   Fraunces  -> all headings and city names
+   Manrope   -> all body text
+   IBM Plex Mono -> numbers, readings, timestamps, small-caps labels ONLY
+   No system font anywhere: every family below ends in an explicit
+   webfont, and the generic fallback is the matching webfont's own class
+   rather than the browser default. */
+html, body, button, input, select, textarea {
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6,
+.city-name, .dial-name, .instrument-city-name, .spin-title,
+.tonight-mode-name, .checkin-item-name, .feed-city, .gt-auth-title,
+.hiw-title, .story-city, .rival-city {
+  font-family: var(--font-display);
+}
+
+/* The mono quirk lives here and nowhere else. */
+.eyebrow, .stat-value, .stat-label,
+.instrument-band-name, .tonight-mode-reading, .tonight-now, .tonight-facts,
+.tonight-prov, .tonight-mode-status, .checkin-item-mode, .checkin-item-intensity,
+.checkin-item-time, .feed-mode, .feed-intensity, .feed-time, .band-chip,
+.pagination-btn, .cities-meta-row, .ranking-basis-note, .now-showing-label,
+.spin-variant, .spin-go, .spin-aff-kind, .spin-prov, .checkin-label,
+.checkin-count, .checkin-status, .watch-count, .footer p, .small-print,
+.gt-auth-label, .gt-auth-status, .gt-auth-divider, .checkin-mode,
+.reading-metric, .reading-time, .reading-source, .rank-pos, .rank-value,
+.obs-meta, .obs-intensity, .sparkline-label, .sun-time, .mover-delta,
+time, .instr-clock, .tonight-modelled {
+  font-family: var(--font-mono);
+}
+
+/* Numbers should never wobble between glyph widths. */
+.stat-value, .tonight-mode-reading, .checkin-item-intensity, .feed-intensity,
+.rank-value, .mover-delta, .sun-time {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== NAV: HIDDEN GEM + FOOTER LANGUAGE ===== */
+.nav-gem { color: var(--brass) !important; opacity: 1 !important; }
+.nav-gem:hover { color: var(--ivory) !important; }
+
+.footer-lang-row { margin-top: 0.6rem; }
+.footer-lang {
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--brass-dim);
+  color: var(--sand);
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 11px;
+  padding: 0 0 2px;
+  cursor: pointer;
+  min-height: 24px;
+}
+.footer-lang:hover { color: var(--ivory); border-color: var(--brass); }
+
+/* ===== OBSERVATIONS ON THE GROUND (no grey grid cards) ===== */
+.obs-list { display: block; }
+.obs-row {
+  display: block;
+  padding: 1.15rem 0 1.15rem 1rem;
+  border-top: 1px solid var(--hairline);
+  /* The city's band colour tints the row from its left edge -- the only
+     "container" is a 2px light source, not a panel. */
+  border-left: 2px solid var(--obs-band, var(--brass-dim));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--obs-band, transparent) 7%, transparent) 0%, transparent 42%);
+}
+.obs-row:first-child { border-top: none; }
+.obs-head { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; margin-bottom: 0.3rem; }
+.obs-city { font-family: var(--font-display); font-size: 1rem; color: var(--obs-band, var(--ivory)); }
+.obs-meta { font-size: 0.72rem; color: var(--sand); letter-spacing: 0.05em; }
+.obs-intensity { font-size: 0.72rem; color: var(--obs-band, var(--sand)); }
+.obs-text { color: var(--sand); font-size: 0.94rem; line-height: 1.6; max-width: 68ch; }
+
+/* ===== SPARKLINES ===== */
+.sparkline { display: block; width: 100%; height: 22px; margin-top: 0.45rem; overflow: visible; }
+.sparkline-label {
+  font-size: 0.62rem; color: var(--sand); opacity: 0.75;
+  letter-spacing: 0.06em; margin-top: 0.15rem; display: block;
+}
+
+/* ===== FIRST LIGHT / LAST LIGHT ===== */
+.sun-row {
+  display: flex; gap: 1.75rem; flex-wrap: wrap;
+  padding: 1rem 0; border-top: 1px solid var(--hairline);
+  min-height: 58px;
+}
+.sun-item { display: flex; align-items: center; gap: 0.55rem; }
+.sun-label { font-family: var(--font-mono); font-variant-caps: small-caps; font-size: 0.72rem; color: var(--sand); letter-spacing: 0.06em; }
+.sun-time { font-size: 1rem; color: var(--ivory); }
+
+/* ===== RIVALS ===== */
+.rival-block { padding: 1.5rem 0; border-top: 1px solid var(--hairline); min-height: 150px; }
+.rival-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.rival-pair { display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; }
+.rival-side { display: flex; flex-direction: column; gap: 0.2rem; min-width: 120px; }
+.rival-city { font-size: 1.15rem; color: var(--ivory); }
+.rival-reading { font-family: var(--font-mono); font-size: 1.35rem; color: var(--rival-band, var(--ivory)); }
+.rival-vs { font-family: var(--font-mono); font-variant-caps: small-caps; font-size: 0.8rem; color: var(--brass); }
+.rival-verdict { font-family: var(--font-mono); font-size: 0.78rem; color: var(--sand); margin-top: 0.9rem; }
+
+/* ===== EMPTY STATES THAT RECRUIT ===== */
+.empty-recruit {
+  padding: 2rem 0;
+  color: var(--sand);
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 52ch;
+}
+.empty-recruit strong { color: var(--ivory); font-family: var(--font-display); font-weight: var(--fw-light); }
+.empty-recruit .empty-cta { color: var(--brass); }
+
+/* ===== TRIP ENGINE / AD-READY SLOT ===== */
+.trip-slot { padding: 2rem 0; border-top: 1px solid var(--hairline); }
+.trip-verdict-line {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.6vw, 30px);
+  font-weight: var(--fw-light);
+  color: var(--ivory);
+  line-height: 1.35;
+  max-width: 34ch;
+  min-height: 2.7em;
+}
+.trip-actions { display: flex; gap: 1.75rem; flex-wrap: wrap; margin-top: 1.4rem; min-height: 48px; }
+.trip-action {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  min-height: 44px; text-decoration: none; color: var(--ivory);
+  font-size: 0.95rem; padding-bottom: 3px;
+  border-bottom: 1px solid var(--brass-dim);
+  transition: border-color var(--transition), color var(--transition);
+}
+.trip-action:hover { border-color: var(--brass); color: var(--brass); }
+.trip-action svg { flex: 0 0 auto; }
+.trip-sponsor-note {
+  margin-top: 1.25rem; font-family: var(--font-mono);
+  font-variant-caps: small-caps; font-size: 0.7rem;
+  color: var(--sand); opacity: 0.6;
+}
+
+/* ===== AUTH MODAL: hairlines, not stacked boxes ===== */
+.gt-auth-modal { border-radius: 0; border: 1px solid var(--brass-dim); background: var(--obsidian); }
+.gt-auth-close { border-radius: 0; }
+.gt-auth-provider {
+  border-radius: 0; background: transparent; color: var(--ivory);
+  border: 1px solid var(--brass-dim);
+  display: flex; align-items: center; justify-content: center; gap: 0.7rem;
+}
+.gt-auth-provider:hover { border-color: var(--brass); background: transparent; transform: none; }
+.gt-auth-provider[data-provider="apple"] { background: transparent; }
+.gt-auth-input { border-radius: 0; border: none; border-bottom: 1px solid var(--brass-dim); background: transparent; padding-left: 0; }
+.gt-auth-input:focus { border-bottom-color: var(--brass); }
+.gt-auth-brand { flex: 0 0 auto; }
+
+/* ===== HOMEPAGE: SHRINK AND BREATHE =====
+   Every panel was far too large. Sizes come down hard; the space that
+   frees up becomes air between sections rather than more chrome. */
+.spin-section { min-height: 0 !important; padding: 2.5rem 0 2rem !important; border: none !important; border-top: 1px solid var(--hairline) !important; }
+.spin-dial { width: clamp(132px, 22vw, 172px); }
+.spin-title { font-size: clamp(22px, 2.6vw, 32px); margin-bottom: 0.9rem; }
+.spin-sentence { font-size: clamp(17px, 1.9vw, 22px); margin-top: 1.1rem; min-height: 2.7em; }
+.spin-go { min-height: 46px; padding: 0.7rem 2rem; font-size: 0.95rem; }
+.spin-variant { min-height: 40px; padding: 0.4rem 0.85rem; font-size: 0.8rem; }
+.spin-affiliates { margin-top: 1rem; }
+
+/* Instrument room: smaller cards, rotation untouched. */
+.instrument-slot { width: 118px !important; padding: 0.6rem 0.4rem 0.9rem !important; background: transparent !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; }
+.instrument-visual { max-width: 84px !important; border-radius: 6px; }
+.instrument-city-name { font-size: 0.82rem; min-height: 2.2em; }
+.instrument-band-name { font-size: 0.58rem; }
+.instrument-images { gap: 10px !important; }
+
+/* More air between sections, less inside them. */
+.hero-section { padding: 2.5rem 0 2rem; }
+.page-main > section + section,
+#app > section + section { margin-top: 0; }
+.section-heading { margin-bottom: 1.5rem; }
+
+/* Daily Pulse -> showcase rotator */
+.showcase { padding: 0.5rem 0 0; min-height: 132px; }
+.showcase-city { font-family: var(--font-display); font-size: clamp(26px, 3.4vw, 40px); font-weight: var(--fw-light); line-height: 1.1; }
+.showcase-line { color: var(--sand); font-size: 1rem; margin-top: 0.5rem; min-height: 1.6em; max-width: 46ch; }
+.showcase-open { display: inline-block; margin-top: 0.9rem; min-height: 44px; color: var(--ivory); text-decoration: none; border-bottom: 1px solid var(--brass-dim); padding-bottom: 3px; }
+.showcase-open:hover { color: var(--brass); border-color: var(--brass); }
+
+/* Live ticker sheds its panel too. */
+.live-ticker { border: none !important; border-top: 1px solid var(--hairline) !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; padding: 1rem 0 !important; }
+
+/* Check-in composer: three fields, on the ground. */
+.check-in { padding: 2.5rem 0 2rem; }
+.checkin-composer, .comment-input-wrap { border: none !important; border-radius: 0 !important; background: transparent !important; padding: 0 !important; }
+.form-grid { grid-template-columns: 1fr !important; max-width: 34rem; }
+.observation-form input, .observation-form select, .observation-form textarea {
+  border-radius: 0; border: none; border-bottom: 1px solid var(--brass-dim); background: transparent; padding-left: 0;
+}
+.observation-form input:focus, .observation-form textarea:focus { outline: none; border-bottom-color: var(--brass); }
+
+/* Trip verdict inherits the band colour of the reading it describes. */
+.trip-verdict-line { color: var(--trip-band, var(--ivory)); }
+
+/* Stat rows lose their boxes. */
+.stat-card { background: transparent !important; border: none !important; border-top: 1px solid var(--hairline) !important; border-radius: 0 !important; padding: 1rem 0 !important; }
+.coverage-grid { gap: 0 2rem !important; }
+
+/* Re-reserve the boxes that fill from JS after the shrink pass. Values
+   are the measured rendered heights at each breakpoint; without these,
+   the spin shell and the showcase rotator fill in and push the page,
+   which is exactly the CLS the shrink reintroduced. */
+.spin-section { min-height: 669px !important; }
+.showcase { min-height: 147px; }
+@media (max-width: 900px) { .spin-section { min-height: 634px !important; } .showcase { min-height: 132px; } }
+@media (max-width: 600px) { .spin-section { min-height: 756px !important; } }

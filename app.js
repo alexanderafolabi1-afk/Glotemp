@@ -1,3 +1,35 @@
+
+// Warm, decisive trip copy built from live signals: the synthesized
+// reading, the city's real local weekday, and the hour of day. Every
+// branch commits to an answer -- there is no "maybe, check the weather".
+function buildTripLine(city, reading) {
+  let day = '', hour = 12;
+  try {
+    const tz = (window.CITIES_DATA || []).find(c => c.name === city.name)?.timezone;
+    if (tz) {
+      day = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long' }).format(new Date());
+      hour = Number(new Intl.DateTimeFormat('en-US', { timeZone: tz, hour12: false, hour: 'numeric' })
+        .formatToParts(new Date()).find(p => p.type === 'hour').value) % 24;
+    }
+  } catch (e) { /* fall through to a dayless sentence */ }
+  const when = hour < 5 ? 'tonight' : hour < 11 ? 'this morning'
+    : hour < 16 ? 'this afternoon' : hour < 21 ? 'this evening' : 'tonight';
+  const dayPart = day ? `${day} ` : '';
+
+  if (reading >= 8.2) {
+    return `Go to ${city.name}. It is running hot ${dayPart}${when} — book it before the good tables are gone.`;
+  }
+  if (reading >= 7.2) {
+    return `${city.name} is warm and moving ${dayPart}${when}. This is the version of the city people come back for.`;
+  }
+  if (reading >= 6.2) {
+    return `${city.name} is holding steady ${dayPart}${when} — the calm, unhurried version, and the one worth having to yourself.`;
+  }
+  if (reading >= 4.5) {
+    return `${city.name} is quiet ${dayPart}${when}. Go for the long dinner and the empty streets, not the crowd.`;
+  }
+  return `${city.name} has gone still ${dayPart}${when}. Go if you want it hushed — you will have the place almost alone.`;
+}
 // ----- i18n Setup -----
 const translations = {
   en: {
@@ -898,9 +930,22 @@ function applyTranslations() {
   });
 }
 
-// Restore language
+// Language: auto-detect from the browser on first load, then respect an
+// explicit choice for ever after. An explicit pick must win over the
+// browser, so the stored value is checked first and navigator.languages
+// only fills in when nothing has been chosen yet.
 const savedLang = localStorage.getItem('glotemp-lang');
-if (savedLang && supportedLangs.includes(savedLang)) currentLang = savedLang;
+if (savedLang && supportedLangs.includes(savedLang)) {
+  currentLang = savedLang;
+} else {
+  const candidates = (navigator.languages && navigator.languages.length)
+    ? navigator.languages
+    : [navigator.language || navigator.userLanguage || 'en'];
+  for (const tag of candidates) {
+    const base = String(tag).toLowerCase().split('-')[0];
+    if (supportedLangs.includes(base)) { currentLang = base; break; }
+  }
+}
 document.documentElement.lang = currentLang;
 
 // Run before DOMContentLoaded work so keys never render.
@@ -1326,9 +1371,12 @@ function recordObservation(event) {
   const observation = {
     mood: selectedMood,
     intensity: Number(document.getElementById('intensity-range').value),
-    scene: document.getElementById('scene-select').value,
-    lens: document.getElementById('language-lens').value,
-    cadence: document.getElementById('cadence-select').value,
+    // Scene / language lens / contribution cadence were removed from the
+    // composer -- nobody understood them. Kept as stable defaults so the
+    // stored shape does not change under existing readers.
+    scene: 'street',
+    lens: 'global',
+    cadence: 'midday',
     note,
     city: cities[document.getElementById('city-select')?.value || 'nyc']?.name || 'New York',
     createdAt: new Date().toISOString()
@@ -1522,25 +1570,16 @@ function updateCity(selected) {
       grid.appendChild(badge);
     });
   }
-  // Trip verdict using synthesized mood
-  const verdictEl = document.getElementById('trip-verdict');
-  const reasonEl = document.getElementById('trip-reason');
+  // Trip verdict. Warm, decisive, persuasive -- and generated from live
+  // data (band, the city's real local day and hour) rather than picked
+  // from three fixed strings. The old copy topped out at
+  // "MAYBE / It's decent, but check the weather first", which talks a
+  // person out of going; nothing here hedges.
+  const verdictLine = document.getElementById('trip-verdict-line');
   const verdictColor = moodToBand(synthesizedMood).color;
-  if (synthesizedMood >= 7.8) {
-    verdictEl.textContent = 'GO';
-    verdictEl.className = 'verdict verdict-go';
-    verdictEl.style.color = verdictColor;
-    reasonEl.textContent = t('trip_go_reason');
-  } else if (synthesizedMood >= 6.5) {
-    verdictEl.textContent = 'MAYBE';
-    verdictEl.className = 'verdict verdict-maybe';
-    verdictEl.style.color = verdictColor;
-    reasonEl.textContent = t('trip_maybe_reason');
-  } else {
-    verdictEl.textContent = 'WAIT';
-    verdictEl.className = 'verdict verdict-wait';
-    verdictEl.style.color = verdictColor;
-    reasonEl.textContent = t('trip_wait_reason');
+  if (verdictLine) {
+    verdictLine.textContent = buildTripLine(city, synthesizedMood);
+    verdictLine.style.setProperty('--trip-band', verdictColor);
   }
   // Update affiliate links with city name
   if (typeof updateAffiliateLinks === 'function') {
@@ -1633,27 +1672,37 @@ function renderObservations(citySlug, loading = false) {
   const observations = [...localObs, ...seedObs];
 
   if (observations.length === 0) {
-    grid.innerHTML = `<div class="obs-empty" data-i18n="obs_empty">${t('obs_empty')}</div>`;
+    // Empty states recruit. Never "no data".
+    const cityRec = (window.CITIES_DATA || []).find(x => x.slug === citySlug);
+    const nm = cityRec ? cityRec.name : 'this city';
+    grid.innerHTML = `<p class="empty-recruit"><strong>Nobody has spoken for ${nm} today.</strong><br>
+      <span class="empty-cta">Be the first.</span></p>`;
     return;
   }
 
-  grid.innerHTML = observations.map((obs, idx) => {
-    const sentiment = getSentimentLabel(obs.sentiment);
+  // Rows sit on the ground, tinted by the city's band colour and
+  // separated by a hairline -- no grey grid cards.
+  grid.className = 'obs-list';
+  grid.innerHTML = observations.map((obs) => {
     const intensity = obs.intensity || 5;
     const text = (obs.context || obs.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const timeStr = formatTimeAgo(obs.created_at);
     const bandInfo = moodToBand(obs.sentiment * 10);
+    // The old tag read POSITIVE on literally every row because it came
+    // from sentiment, which the seed data sets high across the board.
+    // Derive it from intensity instead, so it actually varies and means
+    // something the reader can check against the number beside it.
+    const tag = intensity >= 8 ? 'Charged' : intensity >= 6 ? 'Lively'
+      : intensity >= 4 ? 'Steady' : intensity >= 2 ? 'Low key' : 'Still';
     return `
-      <div class="obs-card obs-feed-item" style="animation-delay:${idx * 50}ms">
-        <div class="obs-sentiment ${sentiment}" style="color:${bandInfo.color}">
-          ${sentiment.toUpperCase()}
+      <article class="obs-row" style="--obs-band:${bandInfo.color}">
+        <div class="obs-head">
+          <span class="obs-meta">${tag}</span>
+          <span class="obs-intensity">${intensity}/10</span>
+          <span class="obs-meta">${timeStr}</span>
         </div>
-        <div class="obs-text">${text}</div>
-        <div class="obs-meta">
-          <span class="obs-time">${timeStr}</span>
-          <span class="obs-intensity" style="color:${bandInfo.color}">Intensity: ${intensity}/10</span>
-        </div>
-      </div>
+        <p class="obs-text">${text}</p>
+      </article>
     `;
   }).join('');
 }
@@ -1661,8 +1710,10 @@ function renderObservations(citySlug, loading = false) {
 // Check-in & Stars
 function loadStars() {
   const stars = parseInt(localStorage.getItem('glotemp-stars') || '0');
-  document.getElementById('stars-count').textContent = stars;
+  const starsEl = document.getElementById('stars-count');
+  if (starsEl) starsEl.textContent = stars;
   const rankEl = document.getElementById('user-rank');
+  if (!rankEl) return;
   if (stars > 500) rankEl.textContent = 'Founding Luminary';
   else if (stars > 200) rankEl.textContent = 'Observatory Circle';
   else if (stars > 50) rankEl.textContent = 'Pathfinder';
@@ -2458,7 +2509,7 @@ function setupScrollReveals() {
 
 document.addEventListener('DOMContentLoaded', () => {
   // ... existing code like applyTranslations, resizeCanvas, etc.
-  loadDailyStory();
+  // Daily Pulse is now the city showcase rotator (glotemp-showcase.js).
   loadCoverageStats();
   setupTrendingRotation();
   setupBarometerRotation();

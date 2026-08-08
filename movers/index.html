@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#14100B" />
+  <meta name="description" content="The biggest movers in city readings this week, computed from stored seven day history." />
+  <link rel="canonical" href="https://glo-temp.com/movers" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <title>Weekly movers — Glotemp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=16" />
+  <style>
+    .mover-row { display:flex; align-items:baseline; gap:1rem; flex-wrap:wrap;
+      padding:1.1rem 0 1.1rem 1rem; border-top:1px solid var(--hairline);
+      border-left:2px solid var(--mv-band,var(--brass-dim)); text-decoration:none; }
+    .mover-row:first-child{ border-top:none; }
+    .mover-rank{ font-family:var(--font-mono); font-size:0.8rem; color:var(--sand); min-width:2.4em; }
+    .mover-city{ font-family:var(--font-display); font-size:1.1rem; color:var(--mv-band,var(--ivory)); }
+    .mover-country{ font-family:var(--font-mono); font-size:0.72rem; color:var(--sand); }
+    .mover-delta{ margin-left:auto; font-size:1rem; color:var(--mv-band,var(--ivory)); }
+    .mover-spark{ width:120px; flex:0 0 auto; }
+    .movers-list{ min-height:420px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar glass">
+    <div class="nav-brand">
+      <img src="/assets/logo.png" alt="Glotemp" class="nav-logo">
+      <span class="logo-text">Glotemp</span>
+      <span class="pulse-dot" aria-hidden="true">&#10084;&#65039;</span>
+    </div>
+    <div class="nav-links">
+      <a href="/">Pulse</a>
+      <a href="/feed">Feed</a>
+      <a href="/explore">Cities</a>
+      <a href="/about">About</a>
+      <a href="/gem" class="nav-gem">Hidden gem</a>
+    </div>
+  </nav>
+
+  <main class="page-main">
+    <section class="glass-card page-header">
+      <p class="eyebrow">Seven day change</p>
+      <h1>Weekly movers</h1>
+      <p class="section-copy" style="color:var(--sand); max-width:62ch;">The biggest movement in city readings over the last seven days, computed from stored history. Cities without enough stored history to measure a change are not listed &mdash; they are not shown as flat.</p>
+    </section>
+    <section class="glass-card">
+      <div class="movers-list" id="movers-list" aria-live="polite">
+        <p class="empty-recruit"><strong>Reading the week&hellip;</strong></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer glass">
+    <p>&copy; 2026 RenviaIT Ltd. All rights reserved.</p>
+    <p class="small-print">
+      <a href="/privacy">Privacy Policy</a> |
+      <a href="/terms">Terms of Service</a> |
+      <a href="/methodology">Methodology</a> |
+      <a href="#" id="cookie-settings">Cookie Settings</a>
+    </p>
+    <p class="small-print footer-lang-row">
+      <button type="button" id="lang-switch" class="footer-lang">Language</button>
+    </p>
+  </footer>
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
+  <script src="/glotemp-features.js"></script>
+  <script src="/glotemp-movers.js"></script>
+  <script src="/cookie-consent.js" defer></script>
+</body>
+</html>

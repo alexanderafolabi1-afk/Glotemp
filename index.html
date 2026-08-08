@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=15" />
+  <link rel="stylesheet" href="/styles.css?v=16" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
@@ -49,12 +49,12 @@
         <span class="pulse-dot" aria-hidden="true">❤️</span>
       </div>
       <div class="nav-links" id="nav-links-desktop">
-        <a href="/" class="active">Pulse</a>
-        <a href="/about">About</a>
-        <a href="/explore">Explore</a>
-        <a href="/feed">Feed</a>
-        <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
-      </div>
+      <a href="/" class="active">Pulse</a>
+      <a href="/feed">Feed</a>
+      <a href="/explore">Cities</a>
+      <a href="/about">About</a>
+      <a href="/gem" class="nav-gem">Hidden gem</a>
+    </div>
       <button id="nav-hamburger" class="nav-hamburger" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-panel">
         <span></span><span></span><span></span>
       </button>
@@ -65,10 +65,10 @@
       <button id="nav-panel-close" class="nav-panel-close" aria-label="Close navigation">✕</button>
       <nav class="nav-panel-links">
         <a href="/">Pulse</a>
-        <a href="/about">About</a>
-        <a href="/explore">Explore</a>
         <a href="/feed">Feed</a>
-        <button id="lang-switch-mobile" class="nav-panel-lang" title="Change language">◉ Language</button>
+        <a href="/explore">Cities</a>
+        <a href="/about">About</a>
+        <a href="/gem">Hidden gem</a>
       </nav>
     </div>
 
@@ -190,48 +190,27 @@
       </div>
     </section>
 
-    <!-- Trip Engine -->
-    <section class="trip-engine glass-card">
-      <h2 data-i18n="trip_engine_title">Trip Engine</h2>
-      <div class="trip-question">
-        <div class="trip-question-line">
-          <p data-i18n="trip_question">Should you travel to <strong id="trip-city">New York</strong> this weekend?</p>
-          <span id="trip-verdict" class="verdict verdict-go">GO</span>
-        </div>
-        <p class="verdict-reason" id="trip-reason" data-i18n="trip_go_reason">The streets are charged. Energy is high. The moment is right.</p>
+    <!-- Trip Engine: designed as ad-ready inventory. A sponsor can occupy
+         .trip-actions (or sit beside it) without the layout changing --
+         the slot's height is reserved and the row is a fixed shape. -->
+    <section class="glass-card trip-slot">
+      <p class="eyebrow" data-i18n="trip_engine_title">Should you go</p>
+      <p class="trip-verdict-line" id="trip-verdict-line">Reading the city&hellip;</p>
+      <div class="trip-actions" id="trip-actions">
+        <a class="trip-action" id="book-hotel-btn" href="https://booking.com/searchresults?ss=New%20York" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18V7M3 12h13a4 4 0 014 4v2M3 18h18"/><circle cx="7.5" cy="9.5" r="1.6"/></svg><span data-i18n="book_hotel">Room</span></a>
+        <a class="trip-action" id="find-flights-btn" href="https://www.skyscanner.net/transport/flights/" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.2 3.3a1.6 1.6 0 013.1 0l1.5 5.4 6.1 1.8a1.2 1.2 0 010 2.3l-6.1 1.8-1.5 5.4a1.6 1.6 0 01-3.1 0l-1.5-5.4-6.1-1.8a1.2 1.2 0 010-2.3l6.1-1.8z"/></svg><span data-i18n="find_flights">Flight</span></a>
+        <a class="trip-action" id="book-table-btn" href="https://www.opentable.com/" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v8a2 2 0 002 2h0a2 2 0 002-2V3M7 13v8M17 3c-1.7 0-2.5 2-2.5 4.5S15.3 12 17 12v9"/></svg><span>Table</span></a>
       </div>
-      <!-- Affiliate Links -->
-      <div class="affiliate-links">
-        <a id="book-hotel-btn" href="https://booking.com/searchresults?ss=New%20York" target="_blank" rel="noopener noreferrer" class="affiliate-btn"><span data-i18n="book_hotel">Book a Hotel</span></a>
-        <a id="find-flights-btn" href="https://www.skyscanner.com/transport/flights/" target="_blank" rel="noopener noreferrer" class="affiliate-btn"><span data-i18n="find_flights">Find Flights</span></a>
-        <a id="travel-insurance-btn" href="https://www.insuremytrip.com/" target="_blank" rel="noopener noreferrer" class="affiliate-btn"><span data-i18n="travel_insurance">Get Insurance</span></a>
-      </div>
+      <p class="trip-sponsor-note" id="trip-sponsor-note">Available placement</p>
     </section>
 
-    <!-- Daily Story -->
-    <section id="daily-story" class="glass-card">
-      <h2 data-i18n="daily_story">Daily Pulse</h2>
-      <div id="story-content">
-        <div id="story-image"></div>
-        <h3 id="story-city"></h3>
-        <h4 id="story-title"></h4>
-        <p id="story-excerpt"></p>
-        <div class="story-toggles">
-          <button id="trivia-btn" class="btn-text" data-i18n="trivia">Trivia</button>
-          <button id="history-btn" class="btn-text" data-i18n="history">History</button>
-        </div>
-        <div id="trivia-text" style="display:none;"></div>
-        <div id="history-text" style="display:none;"></div>
-        <a href="#" id="read-more" data-i18n="read_more">Read more</a>
-      </div>
-      <div id="story-fallback" style="display:none;">
-        <p class="eyebrow">Kyiv</p>
-        <h3>Kyiv's Unbreakable Spirit</h3>
-        <p>Discover how a city at war still dances, paints, and dreams.</p>
-        <a href="#" id="read-more-fallback">Read more</a>
-        <div id="story-fallback-full" hidden>
-          <p>Protection, Coffee & Art — Kyiv's creative scene has become a form of resistance. Underground galleries open after curfew, jazz bars fill at noon, and murals appear overnight. The city's pulse is defiant, warm, and extraordinarily alive.</p>
-        </div>
+    <!-- Daily Pulse: city showcase rotator. Default city is Helsinki. -->
+    <section class="glass-card" id="daily-story">
+      <p class="eyebrow" data-i18n="daily_story">Daily pulse</p>
+      <div id="showcase" class="showcase">
+        <h2 class="showcase-city" id="showcase-city">Helsinki</h2>
+        <p class="showcase-line" id="showcase-line">&nbsp;</p>
+        <a class="showcase-open" id="showcase-open" href="/cities/helsinki.html">Open Helsinki &rarr;</a>
       </div>
     </section>
 
@@ -258,36 +237,6 @@
             <input id="intensity-range" type="range" min="10" max="100" step="5" value="65" />
             <strong id="intensity-value">65</strong>
           </label>
-          <label>
-            <span data-i18n="scene_label">Scene</span>
-            <select id="scene-select">
-              <option value="street" data-i18n="scene_street">Street</option>
-              <option value="work" data-i18n="scene_work">Work</option>
-              <option value="campus" data-i18n="scene_campus">Campus</option>
-              <option value="cafe" data-i18n="scene_cafe">Café</option>
-              <option value="nightlife" data-i18n="scene_nightlife">Nightlife</option>
-              <option value="transit" data-i18n="scene_transit">Transit</option>
-              <option value="home" data-i18n="scene_home">Home</option>
-            </select>
-          </label>
-          <label>
-            <span data-i18n="language_label">Language lens</span>
-            <select id="language-lens">
-              <option value="global">Global</option>
-              <option value="local">Local</option>
-              <option value="diaspora">Diaspora</option>
-              <option value="visitor">Visitor</option>
-            </select>
-          </label>
-          <label>
-            <span data-i18n="cadence_label">Contribution cadence</span>
-            <select id="cadence-select">
-              <option value="first-light">First light</option>
-              <option value="midday">Midday</option>
-              <option value="twilight">Twilight</option>
-              <option value="late-hours">Late hours</option>
-            </select>
-          </label>
         </div>
         <label class="full-width">
           <span data-i18n="context_label">Optional local note</span>
@@ -298,53 +247,6 @@
           <p id="observation-feedback" class="inline-feedback" aria-live="polite"></p>
         </div>
       </form>
-      <div class="stars-display observatory-status">
-        <div>
-          <span data-i18n="stars">Stars</span>: <span id="stars-count">0</span>
-          <span class="rank" id="user-rank">Explorer</span>
-        </div>
-        <div class="human-signal-pill" id="human-signal-pill" data-i18n="human_signal_verified">Human signal verified</div>
-      </div>
-      <div class="contribution-panels">
-        <article class="mini-panel glass-card">
-          <h3 data-i18n="contribution_quality_title">Quality of signal</h3>
-          <p data-i18n="contribution_quality_copy">Subtle context, repeat observations, and cross-language notes increase the scientific value of each entry.</p>
-          <ul id="quality-indicators" class="signal-list"></ul>
-        </article>
-        <article class="mini-panel glass-card">
-          <h3 data-i18n="return_title">Return pathway</h3>
-          <p data-i18n="return_copy">Repeated, geographically diverse observations gradually unlock supporter recognition, deeper archives, and curated invitations.</p>
-          <ul id="cadence-indicators" class="signal-list"></ul>
-        </article>
-      </div>
-    </section>
-
-    <section id="coverage-stats" class="glass-card">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow" data-i18n="coverage_eyebrow">Global pulse</p>
-          <h2 data-i18n="coverage_title">Cities in real time</h2>
-        </div>
-        <p class="section-copy" data-i18n="coverage_intro">Monitor mood shifts across cities worldwide. Each observation adds to the collective understanding of where energy is rising or settling.</p>
-      </div>
-      <div id="coverage-grid" class="coverage-grid">
-        <div class="stat-card glass-card">
-          <p class="stat-label" data-i18n="coverage_cities_tracked">Cities tracked</p>
-          <p class="stat-value" id="cities-tracked-count">150</p>
-        </div>
-        <div class="stat-card glass-card">
-          <p class="stat-label" data-i18n="coverage_live_observations">Live observations</p>
-          <p class="stat-value" id="obs-count">0</p>
-        </div>
-        <div class="stat-card glass-card">
-          <p class="stat-label" data-i18n="coverage_obs_today">Observations today</p>
-          <p class="stat-value" id="obs-today">0</p>
-        </div>
-        <div class="stat-card glass-card">
-          <p class="stat-label" data-i18n="coverage_cities_moving">Cities moving</p>
-          <p class="stat-value" id="cities-moving">0</p>
-        </div>
-      </div>
     </section>
 
     <section id="fastest-moods" class="glass-card">
@@ -397,7 +299,10 @@
         <a href="#" id="cookie-settings" data-i18n="cookie_settings">Cookie Settings</a>
       </p>
       <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
-    </footer>
+      <p class="small-print footer-lang-row">
+      <button type="button" id="lang-switch" class="footer-lang">Language</button>
+    </p>
+  </footer>
   </div>
 
   <script src="/cities-data.js" defer></script>
@@ -406,17 +311,22 @@
   <script src="/living-index.js" defer></script>
   <script src="/glotemp-core.js" defer></script>
   <script src="/glotemp-tonight.js" defer></script>
+  <script src="/glotemp-showcase.js" defer></script>
   <script src="/glotemp-spin.js" defer></script>
   <script src="/app.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
   <script src="/cookie-consent.js" defer></script>
   <script defer>
+    // Trip Engine slot: flight / room / table. The insurance link was
+    // replaced by Table, so every lookup is guarded -- an absent slot must
+    // never throw and take the rest of the page's init down with it.
     function updateAffiliateLinks(cityName) {
       const encodedCity = encodeURIComponent(cityName);
-      document.getElementById('book-hotel-btn').href = `https://booking.com/searchresults?ss=${encodedCity}`;
-      const skycannerCity = encodeURIComponent(cityName.replace(/\s+/g, ''));
-      document.getElementById('find-flights-btn').href = `https://www.skyscanner.com/transport/flights/${skycannerCity}/`;
-      document.getElementById('travel-insurance-btn').href = `https://www.insuremytrip.com/search?location=${encodedCity}`;
+      const set = (id, href) => { const el = document.getElementById(id); if (el) el.href = href; };
+      set('book-hotel-btn', `https://booking.com/searchresults?ss=${encodedCity}`);
+      const skyscannerCity = encodeURIComponent(cityName.replace(/\s+/g, ''));
+      set('find-flights-btn', `https://www.skyscanner.com/transport/flights/${skyscannerCity}/`);
+      set('book-table-btn', `https://www.opentable.com/s?term=${encodedCity}`);
     }
   </script>
   <script>
