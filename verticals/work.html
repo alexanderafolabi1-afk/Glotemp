@@ -40,7 +40,7 @@
     <div class="nav-links">
       <a href="/">Pulse</a>
       <a href="/about">About</a>
-      <a href="/explore">Cities</a>
+      <a href="/explore">Explore</a>
       <a href="/blog">Feed</a>
       <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
     </div>
@@ -162,7 +162,7 @@
 
         // Render ranking
         rankingEl.innerHTML = ranked.slice(0, 50).map((city, idx) => `
-          <a href="/cities/${city.slug}" class="ranking-item glass-card">
+          <a href="/cities/${city.slug}.html" class="ranking-item glass-card">
             <span class="ranking-position">#${idx + 1}</span>
             <div class="ranking-city">
               <h3>${city.name}</h3>

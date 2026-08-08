@@ -6,20 +6,20 @@
   <meta name="theme-color" content="#06060A" />
   <meta name="description" content="Every city Glotemp tracks in one live directory: current band, reading, and coverage across all 12 verticals. Search, filter, and sort 150 cities in real time." />
   <meta name="keywords" content="city directory, city rankings, live city data, explore cities, city mood index" />
-  <meta property="og:title" content="Cities — Glotemp" />
+  <meta property="og:title" content="Explore — Glotemp" />
   <meta property="og:description" content="Every city Glotemp tracks in one live directory: current band, reading, and coverage across all 12 verticals." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/explore" />
   <meta property="og:image" content="https://glo-temp.com/assets/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Cities — Glotemp" />
+  <meta name="twitter:title" content="Explore — Glotemp" />
   <meta name="twitter:description" content="Every city Glotemp tracks in one live directory: current band, reading, and coverage across all 12 verticals." />
   <link rel="canonical" href="https://glo-temp.com/explore" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <title>Cities — Glotemp</title>
+  <title>Explore — Glotemp</title>
 
   <script type="application/ld+json">
   {
@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=12" />
+  <link rel="stylesheet" href="/styles.css?v=13" />
 
   <style>
     /* Page-scoped styles for the Cities index. Kept inline so this page
@@ -60,6 +60,7 @@
       color: var(--ivory);
       padding: 0.85rem 1rem;
       font: inherit;
+      font-family: var(--font-body);
       min-height: 44px;
     }
     .cities-select {
@@ -69,6 +70,7 @@
       color: var(--ivory);
       padding: 0.85rem 1rem;
       font: inherit;
+      font-family: var(--font-body);
       min-height: 44px;
     }
     .band-filter-row {
@@ -77,13 +79,14 @@
       flex-wrap: wrap;
     }
     .band-chip {
-      border: 1px solid var(--hairline);
+      border: 1px solid var(--brass-dim);
       background: transparent;
       color: var(--sand);
       padding: 0.5rem 1rem;
       border-radius: 999px;
       font-family: var(--font-mono);
-      font-size: 0.8rem;
+      font-variant-caps: small-caps;
+      font-size: 0.85rem;
       cursor: pointer;
       transition: all var(--transition);
       min-height: 44px;
@@ -96,88 +99,179 @@
     .cities-meta-row {
       display: flex;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
       color: var(--sand);
       font-size: 0.85rem;
       font-family: var(--font-mono);
+      font-variant-caps: small-caps;
     }
-    .cities-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+    .ranking-basis-note {
+      padding: 0 1.5rem 1rem;
+      color: var(--sand);
+      font-family: var(--font-mono);
+      font-variant-caps: small-caps;
+      font-size: 0.78rem;
+      letter-spacing: 0.02em;
+      opacity: 0.85;
+    }
+
+    /* ===== Now Showing: top-20 pool strip ===== */
+    .now-showing {
+      padding: 1.5rem 1.5rem 0.5rem;
+    }
+    .now-showing-label {
+      font-family: var(--font-mono);
+      font-variant-caps: small-caps;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      color: var(--sand);
+      margin-bottom: 0.9rem;
+      display: block;
+    }
+    .now-showing-strip {
+      display: flex;
       gap: 1rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      scroll-snap-type: x proximity;
+      /* Reserves the loaded-content height up front (measured from a
+         rendered strip of 64px dials) so swapping the "Loading…" text
+         for real dials once the ranking resolves doesn't shift anything
+         below it -- this is the only thing keeping CLS at 0. */
+      min-height: 112px;
+    }
+    .now-showing-strip .dial-wrap {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+    }
+    .now-showing-strip .dial-face-outer { width: 64px; }
+    .now-showing-strip .dial-name { font-size: 0.72rem; max-width: 72px; }
+
+    /* ===== Dial grid ===== */
+    .dials-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem 0.75rem;
       padding: 1.5rem;
       transition: opacity 250ms ease;
+      justify-items: center;
     }
-    .cities-grid.is-sorting { opacity: 0.4; }
-    @media (max-width: 900px) {
-      .cities-grid { grid-template-columns: repeat(2, 1fr); }
+    .dials-grid.is-sorting { opacity: 0.4; }
+    @media (min-width: 768px) {
+      .dials-grid { grid-template-columns: repeat(4, 1fr); }
     }
-    @media (max-width: 600px) {
-      .cities-grid { grid-template-columns: 1fr; }
+    @media (min-width: 1440px) {
+      .dials-grid { grid-template-columns: repeat(6, 1fr); }
     }
-    .city-card {
+
+    .dial-wrap {
       display: block;
       text-decoration: none;
-      border: 1px solid var(--hairline);
-      border-radius: 16px;
-      overflow: hidden;
-      background: rgba(23, 25, 38, 0.5);
+      text-align: center;
       cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 16px;
+      transition: transform 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
-    .city-card .img-slot {
-      aspect-ratio: 3 / 2;
+    .dial-wrap:hover,
+    .dial-wrap:focus-visible {
+      transform: translateY(-4px);
     }
-    .city-card .img-slot-fallback {
-      font-size: 1.4rem;
-      color: var(--card-band, var(--band-equilibrium));
+
+    .dial-face-outer {
+      position: relative;
+      width: 108px;
+      max-width: 100%;
+      aspect-ratio: 1;
+      margin: 0 auto;
+      animation: dial-breathe var(--dial-breathe-duration, 4.5s) ease-in-out infinite;
     }
-    .city-card-body {
-      padding: 1.1rem;
+    .dial-face-outer svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+    @keyframes dial-breathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.015); }
     }
-    .city-card-name {
+
+    .dial-hand {
+      transition: transform 3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: 60px 60px;
+    }
+    .dial-wrap:hover .dial-hand,
+    .dial-wrap:focus-visible .dial-hand {
+      transition: transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .dial-name {
+      margin-top: 0.6rem;
       font-family: var(--font-display);
-      font-size: 1.3rem;
-      color: var(--card-band, var(--ivory));
-      margin-bottom: 0.2rem;
+      font-size: 0.92rem;
+      font-weight: var(--fw-light);
+      color: var(--ivory);
+      line-height: 1.2;
     }
-    .city-card-country {
+    .dial-country {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
       color: var(--sand);
-      font-size: 0.85rem;
-      margin-bottom: 0.8rem;
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity 250ms ease;
     }
-    .city-card-band-row {
+    .dial-wrap:hover .dial-country,
+    .dial-wrap:focus-visible .dial-country {
+      opacity: 1;
+      max-height: 1.2em;
+      margin-top: 0.1rem;
+    }
+
+    /* ===== Pagination ===== */
+    .cities-pagination {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      gap: 1.25rem;
+      padding: 0.5rem 1.5rem 2rem;
       font-family: var(--font-mono);
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--card-band, var(--sand));
-      margin-bottom: 0.5rem;
-    }
-    .city-card-bar-track {
-      height: 6px;
-      border-radius: 3px;
-      background: rgba(233, 231, 240, 0.08);
-      overflow: hidden;
-      margin-bottom: 0.6rem;
-    }
-    .city-card-bar-fill {
-      height: 100%;
-      background: var(--card-band, var(--band-equilibrium));
-      border-radius: 3px;
-      width: 0%;
-      transition: width 600ms cubic-bezier(0.25,0.46,0.45,0.94);
-    }
-    .city-card-coverage {
-      font-size: 0.78rem;
+      font-variant-caps: small-caps;
+      font-size: 0.85rem;
       color: var(--sand);
-      font-family: var(--font-mono);
     }
+    .pagination-btn {
+      background: transparent;
+      border: 1px solid var(--brass-dim);
+      color: var(--ivory);
+      border-radius: 10px;
+      padding: 0.6rem 1.1rem;
+      font-family: var(--font-mono);
+      font-variant-caps: small-caps;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all var(--transition);
+      min-height: 44px;
+    }
+    .pagination-btn:hover:not(:disabled) {
+      border-color: var(--brass);
+      color: var(--obsidian);
+      background: var(--brass);
+    }
+    .pagination-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
     .cities-empty {
       padding: 3rem 1.5rem;
       text-align: center;
       color: var(--sand);
+      font-family: var(--font-mono);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .dial-face-outer { animation: none; }
+      .dial-hand { transition: none; }
     }
   </style>
 </head>
@@ -191,7 +285,7 @@
     <div class="nav-links">
       <a href="/">Pulse</a>
       <a href="/about">About</a>
-      <a href="/explore" class="active">Cities</a>
+      <a href="/explore" class="active">Explore</a>
       <a href="/blog">Feed</a>
       <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
     </div>
@@ -205,6 +299,12 @@
     </section>
 
     <section class="glass-card" style="padding:0; overflow:hidden;">
+      <div class="now-showing">
+        <span class="now-showing-label">Now showing — top 20 by living index</span>
+        <div class="now-showing-strip" id="now-showing-strip" aria-label="Top 20 cities by living index"></div>
+      </div>
+      <p class="ranking-basis-note" id="ranking-basis-note">RANKED BY MEAN READING ACROSS ALL 12 VERTICALS, WEIGHTED BY COVERAGE — LOADING…</p>
+
       <div class="cities-toolbar">
         <div class="cities-search-row">
           <input type="text" id="city-search" class="cities-search-input" placeholder="Search city or country…" aria-label="Search cities">
@@ -212,8 +312,8 @@
             <option value="">All regions</option>
           </select>
           <select id="sort-select" class="cities-select" aria-label="Sort cities">
-            <option value="mood-desc">Sort: Mood (high to low)</option>
-            <option value="mood-asc">Sort: Mood (low to high)</option>
+            <option value="mood-desc">Sort: Reading (high to low)</option>
+            <option value="mood-asc">Sort: Reading (low to high)</option>
             <option value="movement">Sort: 24h movement</option>
             <option value="coverage">Sort: Coverage</option>
             <option value="name">Sort: Name (A–Z)</option>
@@ -234,8 +334,9 @@
       </div>
     </section>
 
-    <div id="cities-grid" class="cities-grid" aria-live="polite"></div>
+    <div id="cities-grid" class="dials-grid" aria-live="polite"></div>
     <div id="cities-empty" class="cities-empty" style="display:none;">No cities match that search.</div>
+    <div class="cities-pagination" id="cities-pagination"></div>
   </main>
 
   <footer class="footer glass">
@@ -250,22 +351,116 @@
 
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
+  <script src="/living-index.js"></script>
   <script>
-    const VERTICAL_SLUGS = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
     // var, not const: tempo-economy.js (loaded below) also declares
     // these; var redeclaration across scripts is a safe no-op.
     var SUPABASE_URL = SUPABASE_URL || 'https://hnysztednzqfzbmiqqgl.supabase.co';
     var SUPABASE_ANON_KEY = SUPABASE_ANON_KEY || 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
+
+    const PAGE_SIZE = 24;
 
     const state = {
       search: '',
       region: '',
       band: '',
       sort: 'mood-desc',
-      coverage: new Map(),   // slug -> 0..1
+      page: 1,
+      coverage: new Map(),   // slug -> 0..100 (from living-index; overridden by ranking data when it loads)
       movement: new Map(),   // slug -> signed number (24h delta, best-effort)
+      reading: new Map(),    // slug -> 0..10 pulse reading (falls back to city.mood)
+      rankingCities: null,   // full ranked list from GlotempLivingIndex, once loaded
     };
 
+    // ===== DIAL RENDERING =====
+    // Circular instrument face: ivory face + brass hairline, a band-
+    // colored reading arc (thickness also encodes band), coverage tick
+    // marks, and a real-time hour hand. SVG so every stroke is live data,
+    // not an image -- nothing here is a file in /assets/.
+    const BAND_ARC_WIDTH = { charged: 5, warm: 4, equilibrium: 3, restrained: 4, low: 5 };
+    const CX = 60, CY = 60, R_FACE = 40, R_ARC = 46, R_TICK_IN = 50, R_TICK_OUT = 54;
+    const ARC_CIRC = 2 * Math.PI * R_ARC;
+
+    function cityHourAngle(timezone) {
+      try {
+        const parts = new Intl.DateTimeFormat('en-US', {
+          timeZone: timezone, hour12: false, hour: 'numeric', minute: 'numeric'
+        }).formatToParts(new Date());
+        const hour = Number(parts.find(p => p.type === 'hour').value) % 24;
+        const minute = Number(parts.find(p => p.type === 'minute').value);
+        const hour12 = hour % 12;
+        return ((hour12 + minute / 60) / 12) * 360;
+      } catch (e) {
+        return 0;
+      }
+    }
+
+    function tickMarksSVG(coveragePercent) {
+      const filled = coveragePercent === null ? 0 : Math.round((coveragePercent / 100) * 12);
+      let out = '';
+      for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * 360 - 90;
+        const rad = (angle * Math.PI) / 180;
+        const x1 = CX + R_TICK_IN * Math.cos(rad);
+        const y1 = CY + R_TICK_IN * Math.sin(rad);
+        const x2 = CX + R_TICK_OUT * Math.cos(rad);
+        const y2 = CY + R_TICK_OUT * Math.sin(rad);
+        const on = i < filled;
+        out += `<line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" stroke="${on ? 'var(--sand)' : 'var(--brass-dim)'}" stroke-width="${on ? 1.6 : 1}" stroke-linecap="round" />`;
+      }
+      return out;
+    }
+
+    function dialSVG(city) {
+      const { band, color } = GlotempCore.moodToBand(city.reading);
+      const arcWidth = BAND_ARC_WIDTH[band] || 3;
+      const arcLen = ARC_CIRC * Math.max(0, Math.min(1, city.reading / 10));
+      const angle = cityHourAngle(city.timezone);
+      const readingLabel = `${city.name}, ${city.country} — reading ${city.reading.toFixed(1)} of 10, ${band} band, ${city.coveragePercent === null ? 'coverage unknown' : city.coveragePercent + '% coverage'}`;
+      return `<svg viewBox="0 0 120 120" role="img" aria-label="${readingLabel.replace(/"/g, '&quot;')}">
+        <g>${tickMarksSVG(city.coveragePercent)}</g>
+        <circle cx="${CX}" cy="${CY}" r="${R_FACE}" fill="#F0E0C8" />
+        <circle cx="${CX}" cy="${CY}" r="${R_FACE}" fill="none" stroke="var(--brass)" stroke-width="1.25" />
+        <circle cx="${CX}" cy="${CY}" r="${R_ARC}" fill="none" stroke="${color}"
+          stroke-width="${arcWidth}" stroke-linecap="round"
+          stroke-dasharray="${arcLen.toFixed(2)} ${(ARC_CIRC - arcLen).toFixed(2)}"
+          transform="rotate(-90 ${CX} ${CY})" />
+        <line class="dial-hand" data-timezone="${city.timezone}" x1="${CX}" y1="${CY}" x2="${CX}" y2="${CY - 26}"
+          stroke="#3A2E22" stroke-width="2" stroke-linecap="round"
+          style="transform: rotate(${angle.toFixed(2)}deg); transform-origin: ${CX}px ${CY}px;" />
+        <circle cx="${CX}" cy="${CY}" r="2.5" fill="#3A2E22" />
+      </svg>`;
+    }
+
+    function dialWrapHTML(city) {
+      const reading = state.reading.has(city.slug) ? state.reading.get(city.slug) : city.mood;
+      const coveragePercent = state.coverage.has(city.slug) ? state.coverage.get(city.slug) : null;
+      const dialCity = Object.assign({}, city, { reading, coveragePercent });
+      // Breathe faster (2.5s) for a high reading, slower (6s) for a low one.
+      const breatheDuration = (6 - (reading / 10) * 3.5).toFixed(2);
+      return `<a class="dial-wrap hover-lift" href="/cities/${city.slug}.html"
+          data-city-link="${city.slug}" data-city-nav="false">
+        <div class="dial-face-outer" style="--dial-breathe-duration:${breatheDuration}s;">
+          ${dialSVG(dialCity)}
+        </div>
+        <div class="dial-name">${city.name}</div>
+        <div class="dial-country">${city.country}</div>
+      </a>`;
+    }
+
+    let handTimer = null;
+    function startHandClock() {
+      if (handTimer) return;
+      handTimer = setInterval(() => {
+        document.querySelectorAll('.dial-hand[data-timezone]').forEach(el => {
+          const angle = cityHourAngle(el.getAttribute('data-timezone'));
+          el.style.transform = `rotate(${angle.toFixed(2)}deg)`;
+        });
+      }, 60000);
+    }
+
+    // ===== FILTER / SORT / PAGINATE (search & sort always run across all
+    // 150 cities; only the final page slice is limited to 24) =====
     function buildRegionOptions() {
       const regions = [...new Set(CITIES_DATA.map(c => c.region))].sort();
       const sel = document.getElementById('region-filter');
@@ -284,66 +479,57 @@
         list = list.filter(c => c.name.toLowerCase().includes(q) || c.country.toLowerCase().includes(q));
       }
       if (state.region) list = list.filter(c => c.region === state.region);
-      if (state.band) list = list.filter(c => GlotempCore.moodToBand(c.mood).band === state.band);
+      if (state.band) list = list.filter(c => GlotempCore.moodToBand(state.reading.get(c.slug) || c.mood).band === state.band);
 
       list = [...list];
-      if (state.sort === 'mood-desc') list.sort((a, b) => b.mood - a.mood);
-      else if (state.sort === 'mood-asc') list.sort((a, b) => a.mood - b.mood);
+      const readingOf = c => state.reading.has(c.slug) ? state.reading.get(c.slug) : c.mood;
+      if (state.sort === 'mood-desc') list.sort((a, b) => readingOf(b) - readingOf(a));
+      else if (state.sort === 'mood-asc') list.sort((a, b) => readingOf(a) - readingOf(b));
       else if (state.sort === 'name') list.sort((a, b) => a.name.localeCompare(b.name));
       else if (state.sort === 'coverage') list.sort((a, b) => (state.coverage.get(b.slug) || 0) - (state.coverage.get(a.slug) || 0));
       else if (state.sort === 'movement') list.sort((a, b) => Math.abs(state.movement.get(b.slug) || 0) - Math.abs(state.movement.get(a.slug) || 0));
       return list;
     }
 
-    function cardHTML(city, index) {
-      const { band, color } = GlotempCore.moodToBand(city.mood);
-      const coverage = state.coverage.has(city.slug) ? Math.round(state.coverage.get(city.slug) * 100) : null;
-      const movement = state.movement.get(city.slug);
-      const moveLabel = (movement === undefined) ? '' :
-        (movement > 0.05 ? `▲ ${movement.toFixed(1)}` : movement < -0.05 ? `▼ ${Math.abs(movement).toFixed(1)}` : '— steady');
-
-      return `
-        <a class="city-card hover-lift reveal-on-scroll" href="/cities/${city.slug}.html"
-           data-city-link="${city.slug}" data-city-nav="false"
-           style="--card-band:${color}; --reveal-index:${index % 12};">
-          ${GlotempCore.imgSlotHTML(`/assets/city-${city.slug}.png`, city.name, city.name)}
-          <div class="city-card-body">
-            <div class="city-card-name">${city.name}</div>
-            <div class="city-card-country">${city.country} · ${city.region}</div>
-            <div class="city-card-band-row">
-              <span>${band}</span>
-              <span>${city.mood.toFixed(1)} / 10 ${moveLabel}</span>
-            </div>
-            <div class="city-card-bar-track"><div class="city-card-bar-fill" style="width:${city.mood * 10}%;"></div></div>
-            <div class="city-card-coverage">${coverage === null ? 'Coverage: —' : `Coverage: ${coverage}% of verticals`}</div>
-          </div>
-        </a>`;
+    function renderPagination(totalItems) {
+      const el = document.getElementById('cities-pagination');
+      const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+      if (state.page > totalPages) state.page = totalPages;
+      el.innerHTML = `
+        <button class="pagination-btn" id="page-prev" ${state.page <= 1 ? 'disabled' : ''}>← Prev</button>
+        <span>Page ${state.page} of ${totalPages}</span>
+        <button class="pagination-btn" id="page-next" ${state.page >= totalPages ? 'disabled' : ''}>Next →</button>
+      `;
+      const prev = document.getElementById('page-prev');
+      const next = document.getElementById('page-next');
+      if (prev) prev.addEventListener('click', () => { state.page--; render(); window.scrollTo({ top: document.getElementById('cities-grid').offsetTop - 80, behavior: 'smooth' }); });
+      if (next) next.addEventListener('click', () => { state.page++; render(); window.scrollTo({ top: document.getElementById('cities-grid').offsetTop - 80, behavior: 'smooth' }); });
     }
 
     function render({ animateSort } = {}) {
       const grid = document.getElementById('cities-grid');
       const empty = document.getElementById('cities-empty');
-      const list = filteredSortedCities();
+      const fullList = filteredSortedCities();
 
-      document.getElementById('cities-count').textContent = `${list.length} ${list.length === 1 ? 'city' : 'cities'}`;
+      document.getElementById('cities-count').textContent = `${fullList.length} ${fullList.length === 1 ? 'city' : 'cities'}`;
 
-      if (!list.length) {
+      if (!fullList.length) {
         grid.innerHTML = '';
         empty.style.display = 'block';
+        document.getElementById('cities-pagination').innerHTML = '';
         return;
       }
       empty.style.display = 'none';
 
+      const start = (state.page - 1) * PAGE_SIZE;
+      const pageItems = fullList.slice(start, start + PAGE_SIZE);
+
       const draw = () => {
-        grid.innerHTML = list.map(cardHTML).join('');
+        grid.innerHTML = pageItems.map(dialWrapHTML).join('');
         grid.classList.remove('is-sorting');
-        wireReveal();
         GlotempCore.wireCityLinks(grid);
-        grid.querySelectorAll('.city-card').forEach(card => {
-          card.addEventListener('click', () => {
-            window.location.href = card.getAttribute('href');
-          });
-        });
+        startHandClock();
+        renderPagination(fullList.length);
       };
 
       if (animateSort) {
@@ -354,52 +540,84 @@
       }
     }
 
-    let revealObserver;
-    function wireReveal() {
-      if (!revealObserver) {
-        revealObserver = ('IntersectionObserver' in window)
-          ? new IntersectionObserver((entries) => {
-              entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                  entry.target.classList.add('is-visible');
-                  revealObserver.unobserve(entry.target);
-                }
-              });
-            }, { rootMargin: '0px 0px -40px 0px' })
-          : null;
+    function renderNowShowing(top20) {
+      const strip = document.getElementById('now-showing-strip');
+      if (!top20 || !top20.length) {
+        strip.innerHTML = '<span style="color:var(--sand); font-family:var(--font-mono); font-size:0.85rem;">Loading…</span>';
+        return;
       }
-      document.querySelectorAll('.reveal-on-scroll:not(.is-visible)').forEach(el => {
-        if (revealObserver) revealObserver.observe(el);
-        else el.classList.add('is-visible'); // no IO support: show immediately
+      strip.innerHTML = top20.map(c => dialWrapHTML({
+        slug: c.slug, name: c.name, country: c.country, mood: c.mood, timezone: c.timezone
+      })).join('');
+      GlotempCore.wireCityLinks(strip);
+      startHandClock();
+    }
+
+    function wireControls() {
+      document.getElementById('city-search').addEventListener('input', (e) => {
+        state.search = e.target.value;
+        state.page = 1;
+        render();
+      });
+      document.getElementById('region-filter').addEventListener('change', (e) => {
+        state.region = e.target.value;
+        state.page = 1;
+        render({ animateSort: true });
+      });
+      document.getElementById('sort-select').addEventListener('change', (e) => {
+        state.sort = e.target.value;
+        state.page = 1;
+        render({ animateSort: true });
+      });
+      document.querySelectorAll('.band-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('.band-chip').forEach(c => c.removeAttribute('data-active'));
+          chip.setAttribute('data-active', 'true');
+          state.band = chip.getAttribute('data-band');
+          state.page = 1;
+          render({ animateSort: true });
+        });
       });
     }
 
-    async function loadCoverageAndMovement() {
+    async function loadRankingData() {
+      try {
+        const result = await GlotempLivingIndex.getRanking();
+        state.rankingCities = result.cities;
+        result.cities.forEach(c => {
+          state.reading.set(c.slug, c.pulseReading);
+          if (c.coveragePercent !== null) state.coverage.set(c.slug, c.coveragePercent);
+        });
+        const basisNote = document.getElementById('ranking-basis-note');
+        if (result.rankingBasis === 'readings') {
+          basisNote.textContent = 'RANKED BY MEAN READING ACROSS ALL 12 VERTICALS, WEIGHTED BY COVERAGE';
+        } else {
+          basisNote.textContent = 'RANKED BY CURRENT PULSE READING — FULL 12-VERTICAL RANKING TEMPORARILY UNAVAILABLE';
+        }
+        renderNowShowing(result.top20);
+        render();
+      } catch (e) {
+        console.warn('Living index unavailable:', e.message);
+        document.getElementById('ranking-basis-note').textContent = 'RANKING TEMPORARILY UNAVAILABLE';
+      }
+    }
+
+    async function loadMovement() {
       try {
         const resp = await fetch(
-          `${SUPABASE_URL}/rest/v1/readings?select=city_slug,vertical,value,fetched_at&order=fetched_at.desc&limit=4000`,
+          `${SUPABASE_URL}/rest/v1/readings?vertical=eq.pulse&select=city_slug,value,fetched_at&order=fetched_at.desc&limit=2000`,
           { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
         );
         if (!resp.ok) return;
         const rows = await resp.json();
-
-        const verticalsByCity = new Map();
         const pulseByCity = new Map();
+        rows.forEach(r => {
+          if (typeof r.value !== 'number') return;
+          if (!pulseByCity.has(r.city_slug)) pulseByCity.set(r.city_slug, []);
+          pulseByCity.get(r.city_slug).push(r);
+        });
         const dayMs = 86400000;
         const now = Date.now();
-
-        rows.forEach(r => {
-          if (!verticalsByCity.has(r.city_slug)) verticalsByCity.set(r.city_slug, new Set());
-          verticalsByCity.get(r.city_slug).add(r.vertical);
-
-          if (r.vertical === 'pulse' && typeof r.value === 'number') {
-            if (!pulseByCity.has(r.city_slug)) pulseByCity.set(r.city_slug, []);
-            pulseByCity.get(r.city_slug).push(r);
-          }
-        });
-
-        verticalsByCity.forEach((set, slug) => state.coverage.set(slug, set.size / VERTICAL_SLUGS.length));
-
         pulseByCity.forEach((readings, slug) => {
           const recent = readings.filter(r => now - new Date(r.fetched_at).getTime() < dayMs);
           const older = readings.filter(r => {
@@ -411,42 +629,18 @@
             state.movement.set(slug, avg(recent) - avg(older));
           }
         });
-
-        render();
+        if (state.sort === 'movement') render({ animateSort: true });
       } catch (e) {
-        // Live coverage/movement is an enhancement -- static mood-based
-        // cards already rendered, so failures here are silent by design.
-        console.warn('Coverage/movement fetch skipped:', e.message);
+        // Movement is an enhancement on top of an already-live directory;
+        // failures here are silent by design.
       }
-    }
-
-    function wireControls() {
-      document.getElementById('city-search').addEventListener('input', (e) => {
-        state.search = e.target.value;
-        render();
-      });
-      document.getElementById('region-filter').addEventListener('change', (e) => {
-        state.region = e.target.value;
-        render({ animateSort: true });
-      });
-      document.getElementById('sort-select').addEventListener('change', (e) => {
-        state.sort = e.target.value;
-        render({ animateSort: true });
-      });
-      document.querySelectorAll('.band-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-          document.querySelectorAll('.band-chip').forEach(c => c.removeAttribute('data-active'));
-          chip.setAttribute('data-active', 'true');
-          state.band = chip.getAttribute('data-band');
-          render({ animateSort: true });
-        });
-      });
     }
 
     buildRegionOptions();
     wireControls();
     render();
-    loadCoverageAndMovement();
+    loadRankingData();
+    loadMovement();
 
     const lang = localStorage.getItem('glotemp-lang') || 'en';
     document.documentElement.lang = lang;

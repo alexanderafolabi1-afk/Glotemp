@@ -2167,17 +2167,30 @@ function applyWeatherToSlot(slotEl, category) {
 }
 
 // Barometer rotation — 5 slots, staggered, session-shuffled
-const BAROMETER_DIM_LABELS = ["Mood","Economic","Nightlife","Study","Tourism","Safety","Health","Traffic","Events","Community","Weather","Innovation"];
-
-function setupBarometerRotation() {
+// Rotation pool: the top 20 cities by living index (see living-index.js) --
+// the same pool /explore's "Now showing" row draws from, so the homepage
+// and /explore never disagree about which cities are currently "hot".
+async function setupBarometerRotation() {
   const slots = document.querySelectorAll('.instrument-slot');
   if (!slots.length) return;
 
-  const allCities = (window.CITIES_DATA || []).filter(c => c.available !== false);
-  if (allCities.length < 5) return;
+  let pool = [];
+  try {
+    const ranking = await GlotempLivingIndex.getRanking();
+    const citiesBySlug = new Map((window.CITIES_DATA || []).map(c => [c.slug, c]));
+    pool = (ranking.top20 || []).map(c => citiesBySlug.get(c.slug) || c).filter(Boolean);
+  } catch (e) {
+    pool = [];
+  }
+  if (pool.length < 5) {
+    // Living index unavailable -- fall back to the full roster rather than
+    // leaving the barometers on their static placeholder images forever.
+    pool = (window.CITIES_DATA || []).filter(c => c.available !== false);
+  }
+  if (pool.length < 5) return;
 
   // Shuffle once per session
-  const shuffled = allCities.slice().sort(() => Math.random() - 0.5);
+  const shuffled = pool.slice().sort(() => Math.random() - 0.5);
   let cursor = 0;
 
   // Assign 5 unique starting cities
@@ -2224,24 +2237,6 @@ function setupBarometerRotation() {
     bandEl.textContent = band;
     bandEl.style.color = color;
 
-    // Dim tooltip: top-3 dims from `cities` global (loaded async) or fallback
-    let tip = slotEl.querySelector('.instr-dim-tip');
-    if (!tip) {
-      tip = document.createElement('div');
-      tip.className = 'instr-dim-tip';
-      slotEl.appendChild(tip);
-    }
-    const cityEntry = (typeof cities !== 'undefined') && cities[cityData.slug];
-    if (cityEntry && cityEntry.dims) {
-      const top3 = cityEntry.dims
-        .map((v, i) => ({ label: BAROMETER_DIM_LABELS[i] || i, val: v }))
-        .sort((a, b) => b.val - a.val)
-        .slice(0, 3);
-      tip.innerHTML = top3.map(d => `<span style="color:${color}">${d.label}</span> ${d.val.toFixed(1)}`).join(' · ');
-    } else {
-      tip.textContent = `Mood ${(cityData.mood || 7.0).toFixed(1)} · ${band}`;
-    }
-
     // Click-to-pin
     slotEl.dataset.citySlug = cityData.slug;
 
@@ -2266,7 +2261,7 @@ function setupBarometerRotation() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const STAGGER_MS   = 1400;  // gap between slot firings
-  const INTERVAL_MS  = 7000;  // each slot repeats every 7s
+  const INTERVAL_MS  = 8000;  // each slot repeats every 8s
   let paused = false;
 
   document.addEventListener('visibilitychange', () => { paused = document.hidden; });

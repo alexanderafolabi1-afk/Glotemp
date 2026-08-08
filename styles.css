@@ -22,6 +22,10 @@
   --ivory: #F0E0C8;
   --sand: #C9B79C;
 
+  /* Brass: nav hairline + dial rim accents */
+  --brass: #B08D57;
+  --brass-dim: rgba(176, 141, 87, 0.35);
+
   /* Band colors (mood/reading state, used everywhere a band appears) */
   --band-low: #4FD8E8;
   --band-restrained: #6BA8F5;
@@ -621,6 +625,7 @@ body::after {
 
 .instrument-label {
   margin-top: 0.75rem;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -632,6 +637,16 @@ body::after {
   font-family: var(--font-display);
   font-size: 0.95rem;
   font-weight: var(--fw-light);
+  line-height: 1.2;
+  /* Reserves 2 lines' worth of height, and a stable full-bleed width, so
+     replacing the "—" placeholder with a real (possibly wrapping) city
+     name on first render doesn't shift its own box -- and therefore
+     nothing around it -- either vertically or horizontally. */
+  min-height: 2.4em;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--bone);
 }
 
@@ -642,15 +657,8 @@ body::after {
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: var(--ash);
-}
-
-.instr-dim-tip {
-  margin-top: 0.3rem;
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  letter-spacing: 0.03em;
-  color: var(--ash);
-  text-align: center;
+  display: block;
+  width: 100%;
 }
 
 /* Breathing animation on instrument slots */
@@ -944,13 +952,13 @@ body.scroll-reveals-enabled section.revealed {
   margin-bottom: 1.5rem;
   position: relative;
   z-index: 10;
-  background: transparent;
+  background: linear-gradient(180deg, rgba(30, 24, 17, 0.9) 0%, rgba(14, 12, 9, 0.55) 100%);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border: none;
   border-radius: 0;
   box-shadow: none;
-  border-bottom: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--brass-dim);
 }
 
 .logo-text {
@@ -985,17 +993,23 @@ body.scroll-reveals-enabled section.revealed {
 
 .nav-links a,
 .nav-links button {
-  color: var(--ash);
+  color: var(--sand);
+  opacity: 0.72;
   text-decoration: none;
   margin-left: 1.5rem;
   font-weight: var(--fw-bold);
   letter-spacing: 0.02em;
-  transition: color var(--transition);
+  transition: color var(--transition), opacity var(--transition);
 }
 
-.nav-links a.active,
 .nav-links a:hover {
-  color: var(--ion);
+  color: var(--sand);
+  opacity: 1;
+}
+
+.nav-links a.active {
+  color: var(--ivory);
+  opacity: 1;
 }
 
 .btn-icon {
@@ -3390,7 +3404,7 @@ button:hover:not(:focus-visible) {
   font-family: var(--font-display);
   font-weight: var(--fw-semibold);
   letter-spacing: 0.02em;
-  color: var(--ivory);
+  color: var(--sand);
   text-decoration: none;
   background: transparent;
   border: none;
@@ -3402,7 +3416,7 @@ button:hover:not(:focus-visible) {
 
 .nav-panel-links a:hover,
 .nav-panel-links a.active {
-  color: var(--band-equilibrium);
+  color: var(--ivory);
 }
 
 @media (prefers-reduced-motion: reduce) {
