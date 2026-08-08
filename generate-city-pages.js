@@ -109,9 +109,10 @@ function generateCityPage(city) {
         document.getElementById('city-metro-pop').textContent = \`👥 \${city.metro_pop.toLocaleString()} metro\`;
       }
 
-      const verticals = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
+      const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
 
-      for (const vertical of verticals) {
+      for (const vertical of verticalSlugs) {
+        const contentEl = document.getElementById(\`\${vertical}-content\`);
         try {
           const response = await fetch(
             \`\${SUPABASE_URL}/rest/v1/readings?city_slug=eq.\${citySlug}&vertical=eq.\${vertical}&order=fetched_at.desc&limit=50\`,
@@ -125,13 +126,13 @@ function generateCityPage(city) {
           );
 
           if (!response.ok) {
-            document.getElementById(\`\${vertical}-content\`).innerHTML = '<p>No data available</p>';
+            contentEl.innerHTML = '<div class="empty-state">No data available for this vertical yet.</div>';
             continue;
           }
 
           const readings = await response.json();
-          if (readings.length === 0) {
-            document.getElementById(\`\${vertical}-content\`).innerHTML = '<p>No readings yet for this city</p>';
+          if (!readings.length) {
+            contentEl.innerHTML = '<div class="empty-state">No readings yet for this city.</div>';
             continue;
           }
 
@@ -154,10 +155,10 @@ function generateCityPage(city) {
             </div>
           \`).join('');
 
-          document.getElementById(\`\${vertical}-content\`).innerHTML = content;
+          contentEl.innerHTML = content;
         } catch (error) {
           console.error(\`Error loading \${vertical} data:\`, error);
-          document.getElementById(\`\${vertical}-content\`).innerHTML = '<p>Error loading data</p>';
+          contentEl.innerHTML = '<div class="empty-state">Error loading data. Try again shortly.</div>';
         }
       }
     }

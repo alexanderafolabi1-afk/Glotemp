@@ -168,21 +168,20 @@ function loadPosts() {
         card.className = 'glass-card blog-card';
         card.dataset.city = post.city.toLowerCase();
 
-        // Render image or placeholder
+        // Image slot: plain <img> with a DOM-only error fallback (never writes a file).
+        // assets/art/ currently has no city art, so every story renders its
+        // typographic fallback panel until real artwork is uploaded by hand.
         let imageHtml = '';
         if (post.image) {
           const imageName = post.image;
-          imageHtml = `<picture class="card-media">
-            <source srcset="/assets/art/${imageName}-1200.avif 1200w, /assets/art/${imageName}-600.avif 600w" type="image/avif" />
-            <source srcset="/assets/art/${imageName}-1200.webp 1200w, /assets/art/${imageName}-600.webp 600w" type="image/webp" />
-            <img src="/assets/art/${imageName}-1200.png"
-                 srcset="/assets/art/${imageName}-1200.png 1200w, /assets/art/${imageName}-600.png 600w"
+          imageHtml = `<div class="card-media img-slot hover-lift">
+            <img src="/assets/art/${imageName}.png"
                  alt="${post.imageAlt || post.city}"
-                 width="1200"
-                 height="800"
                  loading="lazy"
-                 decoding="async" />
-          </picture>`;
+                 decoding="async"
+                 onerror="this.closest('.img-slot').classList.add('img-slot--broken'); this.remove();" />
+            <div class="img-slot-fallback"><span>${post.city}</span></div>
+          </div>`;
         } else {
           imageHtml = `<div class="card-placeholder">
             <div class="card-placeholder-content">
