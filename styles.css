@@ -3918,7 +3918,15 @@ button:hover:not(:focus-visible) {
   padding: 2rem 1.5rem 2.25rem;
   margin-bottom: 2rem;
   border: 1px solid var(--brass-dim);
+  /* #spin-section ships empty and is filled by glotemp-spin.js on mount.
+     Without a reserved box the fill pushes everything below it down --
+     measured as a real (if small) layout shift at 768px, where the fold
+     lands on a sliver of the next section. These values are the measured
+     rendered heights at each breakpoint. */
+  min-height: 815px;
 }
+@media (max-width: 900px) { .spin-section { min-height: 766px; } }
+@media (max-width: 600px) { .spin-section { min-height: 851px; } }
 .spin-inner { display: flex; flex-direction: column; align-items: center; text-align: center; }
 .spin-title {
   font-family: var(--font-display);
