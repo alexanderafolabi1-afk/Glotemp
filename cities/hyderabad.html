@@ -210,8 +210,6 @@
   <script src="/glotemp-core.js"></script>
   <script src="/verticals-engine.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
-  <script src="/stories.js"></script>
-  <script src="/seed-observations.js"></script>
   
   <script>
     // Load city data and populate verticals
@@ -379,8 +377,10 @@
     function renderObservationFeed() {
       const container = document.getElementById('city-observation-feed');
       if (!container) return;
-      const citySlug = 'hyderabad';
-      const checkins = (window.SEED_OBSERVATIONS || []).filter(o => o.city === citySlug).slice(0, 8);
+      // Pre-filtered to this city at generation time -- see
+      // observationsForCity() in generate-city-pages.js -- rather than
+      // shipping the full ~75KB seed-observations.js to every page.
+      const checkins = [];
 
       if (!checkins.length) {
         container.innerHTML = '<div class="empty-state">No observations yet for this city. Be the first.</div>';

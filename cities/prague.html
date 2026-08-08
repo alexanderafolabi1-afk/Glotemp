@@ -210,8 +210,6 @@
   <script src="/glotemp-core.js"></script>
   <script src="/verticals-engine.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
-  <script src="/stories.js"></script>
-  <script src="/seed-observations.js"></script>
   
   <script>
     // Load city data and populate verticals
@@ -379,8 +377,10 @@
     function renderObservationFeed() {
       const container = document.getElementById('city-observation-feed');
       if (!container) return;
-      const citySlug = 'prague';
-      const checkins = (window.SEED_OBSERVATIONS || []).filter(o => o.city === citySlug).slice(0, 8);
+      // Pre-filtered to this city at generation time -- see
+      // observationsForCity() in generate-city-pages.js -- rather than
+      // shipping the full ~75KB seed-observations.js to every page.
+      const checkins = [{"context":"Charles Bridge at sunrise — almost empty, golden and surreal.","language_lens":"visitor","created_at":"2026-08-07T21:54:08.676Z"},{"context":"Kavárna na Žižkově — klidné ráno, dobrá káva.","language_lens":"local","created_at":"2026-08-07T12:24:08.676Z"},{"context":"Vinohrady on a weekend night — locals, craft beer, no tourists.","language_lens":"visitor","created_at":"2026-08-07T03:24:08.676Z"},{"context":"Metro C, ráno normálně rušné. Všichni tiší a ospalí.","language_lens":"local","created_at":"2026-08-06T17:24:08.676Z"},{"context":"Holešovice neighbourhood — art, markets, a quiet revolution.","language_lens":"diaspora","created_at":"2026-08-06T05:24:08.676Z"}];
 
       if (!checkins.length) {
         container.innerHTML = '<div class="empty-state">No observations yet for this city. Be the first.</div>';

@@ -800,6 +800,9 @@ body.scroll-reveals-enabled section.revealed {
   color: var(--bone);
   font-size: 1.2rem;
   cursor: pointer;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .btn-outline {

@@ -210,8 +210,6 @@
   <script src="/glotemp-core.js"></script>
   <script src="/verticals-engine.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
-  <script src="/stories.js"></script>
-  <script src="/seed-observations.js"></script>
   
   <script>
     // Load city data and populate verticals
@@ -379,8 +377,10 @@
     function renderObservationFeed() {
       const container = document.getElementById('city-observation-feed');
       if (!container) return;
-      const citySlug = 'busan';
-      const checkins = (window.SEED_OBSERVATIONS || []).filter(o => o.city === citySlug).slice(0, 8);
+      // Pre-filtered to this city at generation time -- see
+      // observationsForCity() in generate-city-pages.js -- rather than
+      // shipping the full ~75KB seed-observations.js to every page.
+      const checkins = [{"context":"Haeundae beach at sunset — the whole city came to watch.","language_lens":"visitor","created_at":"2026-08-07T21:24:08.676Z"},{"context":"감천 문화마을 카페 — 조용하고 아름다운 부산의 다른 얼굴.","language_lens":"local","created_at":"2026-08-07T09:24:08.676Z"},{"context":"Seomyeon district at night — Korea's second city owns the night.","language_lens":"visitor","created_at":"2026-08-06T20:24:08.676Z"},{"context":"지하철 1호선 퇴근길 — 조용하고 질서정연.","language_lens":"local","created_at":"2026-08-06T08:24:08.676Z"}];
 
       if (!checkins.length) {
         container.innerHTML = '<div class="empty-state">No observations yet for this city. Be the first.</div>';

@@ -210,8 +210,6 @@
   <script src="/glotemp-core.js"></script>
   <script src="/verticals-engine.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
-  <script src="/stories.js"></script>
-  <script src="/seed-observations.js"></script>
   
   <script>
     // Load city data and populate verticals
@@ -379,8 +377,10 @@
     function renderObservationFeed() {
       const container = document.getElementById('city-observation-feed');
       if (!container) return;
-      const citySlug = 'rome';
-      const checkins = (window.SEED_OBSERVATIONS || []).filter(o => o.city === citySlug).slice(0, 8);
+      // Pre-filtered to this city at generation time -- see
+      // observationsForCity() in generate-city-pages.js -- rather than
+      // shipping the full ~75KB seed-observations.js to every page.
+      const checkins = [{"context":"Trastevere at golden hour — ochre walls, voices, aperitivo.","language_lens":"visitor","created_at":"2026-08-07T23:24:08.676Z"},{"context":"Caffè al bar sotto casa — l'espresso migliore della giornata.","language_lens":"local","created_at":"2026-08-07T17:24:08.676Z"},{"context":"Metro A affollatissima come sempre. Roma non cambia.","language_lens":"local","created_at":"2026-08-07T09:24:08.676Z"},{"context":"Campo de' Fiori morning market — still the heart of the city.","language_lens":"visitor","created_at":"2026-08-06T22:24:08.676Z"},{"context":"Pigneto neighbourhood buzzing — new Rome mixing with the old.","language_lens":"visitor","created_at":"2026-08-06T11:24:08.676Z"}];
 
       if (!checkins.length) {
         container.innerHTML = '<div class="empty-state">No observations yet for this city. Be the first.</div>';

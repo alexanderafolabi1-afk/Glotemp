@@ -3,6 +3,24 @@
 // Generate individual city profile pages from template
 const fs = require('fs');
 const path = require('path');
+const vm = require('vm');
+
+// Load the full seed-observations dataset once here in the generator,
+// not in the browser: each page only needs its own city's ~8 rows, so
+// inlining that slice avoids shipping the full ~75KB / 309-row file to
+// every one of the 150 pages just to filter it down client-side.
+const seedObservationsSource = fs.readFileSync('./seed-observations.js', 'utf8');
+const seedSandbox = { window: {}, Date };
+vm.createContext(seedSandbox);
+vm.runInContext(seedObservationsSource, seedSandbox);
+const ALL_SEED_OBSERVATIONS = seedSandbox.window.SEED_OBSERVATIONS || [];
+
+function observationsForCity(slug) {
+  return ALL_SEED_OBSERVATIONS
+    .filter(o => o.city === slug)
+    .slice(0, 8)
+    .map(o => ({ context: o.context, language_lens: o.language_lens, created_at: o.created_at }));
+}
 
 // Load cities data
 const citiesDataContent = fs.readFileSync('./cities-data.js', 'utf8');
@@ -261,8 +279,10 @@ function generateCityPage(city) {
     function renderObservationFeed() {
       const container = document.getElementById('city-observation-feed');
       if (!container) return;
-      const citySlug = '${city.slug}';
-      const checkins = (window.SEED_OBSERVATIONS || []).filter(o => o.city === citySlug).slice(0, 8);
+      // Pre-filtered to this city at generation time -- see
+      // observationsForCity() in generate-city-pages.js -- rather than
+      // shipping the full ~75KB seed-observations.js to every page.
+      const checkins = ${JSON.stringify(observationsForCity(city.slug))};
 
       if (!checkins.length) {
         container.innerHTML = '<div class="empty-state">No observations yet for this city. Be the first.</div>';

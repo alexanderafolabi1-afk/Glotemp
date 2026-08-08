@@ -210,8 +210,6 @@
   <script src="/glotemp-core.js"></script>
   <script src="/verticals-engine.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
-  <script src="/stories.js"></script>
-  <script src="/seed-observations.js"></script>
   
   <script>
     // Load city data and populate verticals
@@ -379,8 +377,10 @@
     function renderObservationFeed() {
       const container = document.getElementById('city-observation-feed');
       if (!container) return;
-      const citySlug = 'vancouver';
-      const checkins = (window.SEED_OBSERVATIONS || []).filter(o => o.city === citySlug).slice(0, 8);
+      // Pre-filtered to this city at generation time -- see
+      // observationsForCity() in generate-city-pages.js -- rather than
+      // shipping the full ~75KB seed-observations.js to every page.
+      const checkins = [{"context":"Gastown on a Saturday — mountains framing the skyline like a painting.","language_lens":"visitor","created_at":"2026-08-07T21:24:08.676Z"},{"context":"Commercial Drive coffee — the neighbourhood still refuses to gentrify.","language_lens":"local","created_at":"2026-08-07T09:24:08.676Z"},{"context":"Richmond night market — BC meets the world, warmly.","language_lens":"diaspora","created_at":"2026-08-06T20:24:08.676Z"},{"context":"SkyTrain Expo Line — clean, futuristic, smooth.","language_lens":"local","created_at":"2026-08-06T07:24:08.676Z"}];
 
       if (!checkins.length) {
         container.innerHTML = '<div class="empty-state">No observations yet for this city. Be the first.</div>';
