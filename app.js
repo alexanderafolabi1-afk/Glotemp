@@ -1837,39 +1837,66 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('install-banner').style.display = 'none';
   });
 
-  // Service worker registration and update handling
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-      .then(registration => {
-        let updateCheckNeeded = true;
+});
 
+// Service worker registration and update handling.
+//
+// TOP LEVEL, deliberately. This used to live at the end of the
+// DOMContentLoaded handler above -- which begins
+// `if (!document.getElementById('city-select')) return;`. That guard is
+// for the homepage compare widget, but it gated the service worker too,
+// so the worker was only ever registered and updated on pages carrying a
+// #city-select. Every city page, /feed, /about, /explore, /gem,
+// /methodology and /movers silently skipped registration entirely, and a
+// worker that is never updated from those pages is a worker that keeps
+// serving whatever it cached. Registration must not depend on any
+// page-specific element.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    // Absolute path + explicit root scope. The previous code registered
+    // 'sw.js' RELATIVE to the current page, so on /cities/tokyo.html it
+    // requested /cities/sw.js -- a 404. Between that and the guard above,
+    // nested pages had two independent reasons never to update the worker.
+    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+      .then(registration => {
+        // A worker that installs while another controls the page sits in
+        // "waiting" until every tab closes. Push it through immediately so
+        // a deploy takes effect on this visit, not the next one.
+        function promote(worker) {
+          if (worker) worker.postMessage({ type: 'SKIP_WAITING' });
+        }
+        if (registration.waiting) promote(registration.waiting);
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
+          if (!newWorker) return;
           newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller && updateCheckNeeded) {
-              updateCheckNeeded = false;
-              newWorker.postMessage({ type: 'SKIP_WAITING' });
-
-              // Reload page once to activate new service worker
-              let reloadScheduled = false;
-              navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (!reloadScheduled) {
-                  reloadScheduled = true;
-                  window.location.reload();
-                }
-              });
-            }
+            if (newWorker.state === 'installed') promote(newWorker);
           });
         });
 
-        // Check for updates periodically (every 10 seconds)
-        setInterval(() => {
-          registration.update();
-        }, 10000);
+        // Reload exactly once when a new build REPLACES the one that was
+        // controlling this page, so it is never left rendering markup from
+        // the build that just got replaced.
+        //
+        // The guard matters: on a first-ever visit there is no controller,
+        // the fresh worker calls clients.claim(), and controllerchange
+        // fires anyway. Reloading there would give every new visitor a
+        // gratuitous full page reload -- and the markup they already have
+        // IS the newest build, so there is nothing to correct.
+        const hadController = !!navigator.serviceWorker.controller;
+        let reloaded = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!hadController || reloaded) return;
+          reloaded = true;
+          window.location.reload();
+        });
+
+        registration.update();
+        setInterval(() => registration.update(), 60000);
       })
       .catch(error => console.error('ServiceWorker registration failed:', error));
-  }
-});
+  });
+}
 function getCurrentFeaturedStory() {
   const ROTATION_DAYS = 7;
   const stories = (typeof STORIES !== 'undefined' && Array.isArray(STORIES)) ? STORIES : [];

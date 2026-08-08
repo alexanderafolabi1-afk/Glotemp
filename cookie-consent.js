@@ -50,29 +50,40 @@
     var style = document.createElement('style');
     style.id = 'cookie-consent-style';
     style.textContent = [
+      // This banner is injected from JS, so it never inherited the site
+      // stylesheet's ground rules and was the last piece of the retired
+      // cyan-on-navy design still shipping: a rounded, drop-shadowed
+      // panel filled rgba(10,15,26,.75) with #00f2fe gradient buttons and
+      // cool-grey #a0b4c8 text, on every page. Rebuilt in the warm
+      // palette as a flush hairline strip -- no radius, no fill panel,
+      // no shadow.
       '#cookie-consent-banner {',
-      '  position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);',
-      '  width: calc(100% - 3rem); max-width: 680px; z-index: 9999;',
-      '  background: rgba(10,15,26,0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);',
-      '  border: 1px solid rgba(0,242,254,0.15); border-radius: 1rem;',
-      '  box-shadow: 0 8px 32px rgba(0,0,0,0.5); padding: 1.25rem 1.5rem;',
-      '  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;',
-      '  color: #e0e8f0; font-family: inherit; font-size: 0.9rem; line-height: 1.5;',
+      '  position: fixed; bottom: 0; left: 0; right: 0;',
+      '  width: 100%; z-index: 9999;',
+      '  background: #14100B; border-top: 1px solid rgba(176,141,87,0.22);',
+      '  border-radius: 0; box-shadow: none;',
+      '  padding: 1rem 1.5rem;',
+      '  display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap;',
+      '  color: #C9B79C; font-family: inherit; font-size: 0.85rem; line-height: 1.5;',
       '}',
-      '#cookie-consent-banner p { margin: 0; flex: 1; min-width: 200px; }',
-      '#cookie-consent-banner .cookie-btns { display: flex; gap: 0.75rem; flex-shrink: 0; }',
+      '#cookie-consent-banner p { margin: 0; flex: 1 1 260px; max-width: 60ch; }',
+      '#cookie-consent-banner .cookie-btns { display: flex; gap: 1.25rem; flex-shrink: 0; }',
       '#cookie-consent-banner .btn-cookie-accept {',
-      '  background: linear-gradient(135deg, #00f2fe, #4facfe);',
-      '  color: #0a0f1a; border: none; border-radius: 0.5rem;',
-      '  padding: 0.5rem 1.25rem; font-weight: 700; cursor: pointer; font-size: 0.9rem;',
+      '  background: transparent; color: #F0E0C8;',
+      '  border: 1px solid #B08D57; border-radius: 0;',
+      '  padding: 0.5rem 1.5rem; cursor: pointer; font-size: 0.8rem;',
+      '  font-variant-caps: small-caps; letter-spacing: 0.1em;',
+      '  transition: color 200ms ease, border-color 200ms ease;',
       '}',
-      '#cookie-consent-banner .btn-cookie-accept:hover { opacity: 0.85; }',
+      '#cookie-consent-banner .btn-cookie-accept:hover { color: #B08D57; }',
       '#cookie-consent-banner .btn-cookie-settings {',
-      '  background: transparent; color: #a0b4c8;',
-      '  border: 1px solid rgba(160,180,200,0.3); border-radius: 0.5rem;',
-      '  padding: 0.5rem 1.25rem; cursor: pointer; font-size: 0.9rem;',
+      '  background: transparent; color: #C9B79C;',
+      '  border: none; border-bottom: 1px solid rgba(176,141,87,0.22); border-radius: 0;',
+      '  padding: 0.5rem 0.25rem; cursor: pointer; font-size: 0.8rem;',
+      '  font-variant-caps: small-caps; letter-spacing: 0.1em;',
+      '  transition: color 200ms ease, border-color 200ms ease;',
       '}',
-      '#cookie-consent-banner .btn-cookie-settings:hover { border-color: rgba(0,242,254,0.5); color: #00f2fe; }'
+      '#cookie-consent-banner .btn-cookie-settings:hover { border-bottom-color: #B08D57; color: #F0E0C8; }'
     ].join('\n');
     document.head.appendChild(style);
   }

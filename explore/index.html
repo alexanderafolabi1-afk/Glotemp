@@ -91,9 +91,12 @@
       transition: all var(--transition);
       min-height: 44px;
     }
+    /* Selected reads as the band's own colour in the ink and the hairline,
+       not as a filled pill. The fill is stripped site-wide by the no-boxes
+       rules, and the inverted `color: var(--obsidian)` left behind painted
+       the selected chip obsidian-on-obsidian -- invisible. */
     .band-chip[data-active="true"] {
-      color: var(--obsidian);
-      background: var(--chip-color, var(--band-equilibrium));
+      color: var(--chip-color, var(--band-equilibrium));
       border-color: var(--chip-color, var(--band-equilibrium));
     }
     .cities-meta-row {

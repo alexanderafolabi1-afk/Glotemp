@@ -3735,10 +3735,13 @@ button:hover:not(:focus-visible) {
   transition: all var(--transition);
 }
 .checkin-mode:hover { color: var(--ivory); border-color: var(--brass); }
+/* Selected state is a brighter hairline and brighter ink, NOT an inverted
+   fill. The fill was removed site-wide when the boxes went, and an
+   inverted `color: var(--obsidian)` left on top of that painted obsidian
+   text on the obsidian ground -- the selected chip was invisible. */
 .checkin-mode[aria-pressed="true"] {
-  background: var(--ivory);
   border-color: var(--ivory);
-  color: var(--obsidian);
+  color: var(--ivory);
 }
 
 .checkin-label {
@@ -3991,10 +3994,10 @@ button:hover:not(:focus-visible) {
   transition: all var(--transition);
 }
 .spin-variant:hover { color: var(--ivory); border-color: var(--brass); }
+/* Same as .checkin-mode above: brighter hairline and ink, no fill. */
 .spin-variant[aria-pressed="true"] {
-  background: var(--ivory);
   border-color: var(--ivory);
-  color: var(--obsidian);
+  color: var(--ivory);
 }
 
 .spin-stage { display: flex; flex-direction: column; align-items: center; gap: 1.15rem; }
@@ -4007,22 +4010,25 @@ button:hover:not(:focus-visible) {
 .spin-dial-svg { display: block; width: 100%; height: 100%; }
 .spin-rotor { transform-origin: 110px 110px; }
 
+/* Brass hairline, not a filled slab. This was the last solid rectangle
+   with a drop shadow on the homepage; it stays the most prominent
+   control through scale, tracking and the 260px dial above it, without
+   being a box. */
 .spin-go {
   min-height: 52px;
   padding: 0.85rem 2.6rem;
-  background: var(--brass);
-  color: var(--obsidian);
-  border: none;
-  border-radius: 999px;
+  background: transparent;
+  color: var(--brass);
+  border: 1px solid var(--brass);
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
   font-size: 1.05rem;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.14em;
   cursor: pointer;
-  transition: transform var(--transition), opacity var(--transition);
-  box-shadow: 0 6px 18px rgba(176, 141, 87, 0.28);
+  transition: color var(--transition), border-color var(--transition), opacity var(--transition);
+  box-shadow: none;
 }
-.spin-go:hover:not(:disabled) { transform: translateY(-2px); }
+.spin-go:hover:not(:disabled) { color: var(--ivory); border-color: var(--ivory); }
 .spin-go:disabled { opacity: 0.55; cursor: wait; }
 
 .spin-sentence {
@@ -4033,10 +4039,26 @@ button:hover:not(:focus-visible) {
   color: var(--ivory);
   max-width: 30ch;
   margin: 1.6rem auto 0;
-  /* Two lines reserved: the sentence swaps in after the spin settles,
-     and without this the affiliate rows below would jump. */
-  min-height: 2.8em;
+  /* FOUR lines reserved, not two. The sentence swaps in after the spin
+     settles; the longest one it can build is
+     "Go to Ho Chi Minh City. It is restrained, it is Wednesday in the
+     small hours, and the workshops are open." -- 104 characters, which
+     wraps to four lines inside 30ch at 375px. Reserving two lines meant
+     the real sentence grew the block by ~25px and shoved the affiliate
+     rows down, which measured as CLS 0.0167 on the homepage. The empty
+     space before a spin is deliberate. */
+  min-height: 5.6em;
   transition: opacity 300ms ease;
+  /* .spin-inner is a column flex container with align-items: center, so
+     its children are shrink-to-fit, NOT stretched. That made this
+     paragraph's own box 95px wide at x=140 while it held the short
+     placeholder and 255px wide at x=60 once the real sentence arrived --
+     the box itself moved, which is what the Layout Instability API was
+     scoring. width:100% pins the box; max-width + auto margins still
+     centre it. text-align:left then pins the glyph origin inside it, so
+     neither the box nor the first line moves when the text swaps. */
+  width: 100%;
+  text-align: left;
 }
 .spin-sentence.is-settling { opacity: 0.35; }
 
@@ -4252,7 +4274,7 @@ time, .instr-clock, .tonight-modelled {
 .spin-section { min-height: 0 !important; padding: 2.5rem 0 2rem !important; border: none !important; border-top: 1px solid var(--hairline) !important; }
 .spin-dial { width: clamp(132px, 22vw, 172px); }
 .spin-title { font-size: clamp(22px, 2.6vw, 32px); margin-bottom: 0.9rem; }
-.spin-sentence { font-size: clamp(17px, 1.9vw, 22px); margin-top: 1.1rem; min-height: 2.7em; }
+.spin-sentence { font-size: clamp(17px, 1.9vw, 22px); margin-top: 1.1rem; min-height: 5.6em; }
 .spin-go { min-height: 46px; padding: 0.7rem 2rem; font-size: 0.95rem; }
 .spin-variant { min-height: 40px; padding: 0.4rem 0.85rem; font-size: 0.8rem; }
 .spin-affiliates { margin-top: 1rem; }
@@ -4304,3 +4326,153 @@ time, .instr-clock, .tonight-modelled {
 .showcase { min-height: 147px; }
 @media (max-width: 900px) { .spin-section { min-height: 634px !important; } .showcase { min-height: 132px; } }
 @media (max-width: 600px) { .spin-section { min-height: 756px !important; } }
+
+/* ===== GUARANTEED SECTION CLEARANCE (global root-cause fix) =====
+   After the box removal, .glass-card lost its margin-bottom and section
+   separation came to depend ENTIRELY on each section's own padding. That
+   is not a guarantee: several rules zero that padding (inline
+   style="padding:0", and !important overrides such as .spin-section), and
+   any future one can too. When padding goes, clearance goes with it and
+   neighbours meet.
+
+   Two rules fix it once, for every section on every page, instead of
+   patching individual sections:
+
+   1. Clearance lives on the GAP between siblings, not inside them, so no
+      change to a section's own padding can remove it.
+   2. Every top-level section becomes a positioning context, so the 23
+      `position: absolute` descendants in this stylesheet resolve against
+      their own section and can no longer paint over the next one. */
+:root { --section-gap: 1.75rem; }
+
+main > * + *,
+#app > section + section,
+#app > section + div,
+#app > div + section,
+body > main + section,
+.page-main > * + *,
+.page-content > * + * {
+  margin-top: var(--section-gap);
+}
+
+main > *,
+#app > section,
+.page-main > *,
+.page-content > * {
+  position: relative;   /* contain absolutely-positioned descendants */
+  min-height: 0;        /* never let a stale min-height force an overlap */
+}
+
+/* Overlay layers are intentionally out of flow -- they must NOT be given
+   flow clearance or a containing block by the rules above. */
+#nav-panel,
+#install-banner,
+.gt-auth-overlay,
+.city-hover-preview {
+  margin-top: 0 !important;
+}
+
+@media (max-width: 600px) { :root { --section-gap: 1.25rem; } }
+
+/* ===== NO REMAINING BOXES (global) =====
+   A sweep of the rendered pages still found rounded containers the design
+   pass missed: .dial-wrap (r16), .tonight-mode (r14), .mood-btn /
+   .mood-emoji / .comment-input / .cities-select (r12), .pagination-btn
+   (r10), .empty-state (r8), .vertical-link / .instrument-visual (r6),
+   .affiliate-btn (r20), plus the cookie buttons.
+
+   Rather than chase each one, radius is zeroed globally and only genuine
+   CIRCLES are allowed back. The dial is its own container -- and it is
+   drawn as SVG <circle>, which border-radius does not touch, so it is
+   unaffected by this rule by construction. */
+/* !important is load-bearing here, not laziness: the universal selector
+   has the lowest possible specificity (0,0,0), so every `.card { border-
+   radius: 12px }` in this file outranks it and a plain `* { border-radius:
+   0 }` silently does nothing. Verified: without !important the sweep still
+   reported dial-wrap r16, mood-btn r12, vertical-link r6 and the rest. */
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
+
+/* The only permitted curves: things that are actually round. The dial is
+   drawn with SVG <circle>, which border-radius never touched anyway. */
+.nav-logo,
+.pulse-dot,
+.feed-live-dot,
+.snowflake,
+.gem-die,
+.spin-dial,
+.dial-face-outer,
+.logo-img,
+.nav-panel-close,
+.gt-auth-close {
+  border-radius: 50% !important;
+}
+
+/* Filled control surfaces become hairline-and-ground instead of panels. */
+.mood-btn,
+.mood-emoji,
+.checkin-mode,
+.band-chip,
+.spin-variant,
+.pagination-btn,
+.cities-select,
+.cities-search-input,
+.comment-input,
+.checkin-note,
+.gt-auth-input,
+.filter-select,
+.filter-input,
+.affiliate-btn,
+.vertical-link,
+.empty-state,
+.tonight-mode,
+.dial-wrap,
+.instrument-visual,
+.reading,
+.ranking-item,
+.city-card,
+.vertical-card,
+.stat-card,
+.obs-card,
+.feed-item,
+.checkin-item,
+.mini-panel,
+.system-card {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Where a boundary is genuinely needed it is one brass hairline. */
+.mood-btn, .mood-emoji, .checkin-mode, .band-chip, .spin-variant,
+.pagination-btn, .affiliate-btn, .vertical-link {
+  border: 1px solid var(--brass-dim);
+}
+
+/* Text inputs read as a single ruled line, not a filled field. */
+.cities-select, .cities-search-input, .comment-input, .checkin-note,
+.gt-auth-input, .filter-select, .filter-input {
+  border: none;
+  border-bottom: 1px solid var(--brass-dim);
+  padding-left: 0;
+}
+.cities-select:focus, .cities-search-input:focus, .comment-input:focus,
+.checkin-note:focus, .gt-auth-input:focus, .filter-select:focus, .filter-input:focus {
+  outline: none;
+  border-bottom-color: var(--brass);
+}
+
+/* Content blocks sit on the ground, separated by a rule above. */
+.tonight-mode, .reading, .ranking-item, .city-card, .vertical-card,
+.stat-card, .obs-card, .feed-item, .checkin-item, .mini-panel, .system-card,
+.empty-state {
+  border: none;
+  border-top: 1px solid var(--hairline);
+}
+.dial-wrap, .instrument-visual { border: none; }
+/* The band-coloured left edge on Tonight and observations is a light
+   source, not a container -- keep it. */
+.tonight-mode { border-left: 2px solid var(--tonight-band, var(--brass-dim)); }
+.obs-row { border-left: 2px solid var(--obs-band, var(--brass-dim)); }
