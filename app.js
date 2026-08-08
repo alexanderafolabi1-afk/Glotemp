@@ -2209,6 +2209,16 @@ function setupLiveTicker() {
 
   ticker.innerHTML = `<div class="ticker-track" aria-live="off">${items}</div>`;
 
+  // Pace the loop to a constant, readable speed regardless of how much
+  // seed data there is — a fixed animation-duration would either crawl
+  // (too few items) or blur past (hundreds of items, as with the full seed set).
+  const track = ticker.querySelector('.ticker-track');
+  if (track) {
+    const halfWidth = track.scrollWidth / 2;
+    const PX_PER_SEC = 60;
+    track.style.animationDuration = `${Math.max(halfWidth / PX_PER_SEC, 20)}s`;
+  }
+
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     // Show first item statically
     const first = obs[0];
