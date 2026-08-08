@@ -73,9 +73,41 @@
     return `${days}d ago`;
   }
 
+  // Shared hover-preview tooltip: band, reading, last-known movement.
+  // One element reused for every [data-city-link] on the page rather
+  // than building a tooltip per instance.
+  let previewEl = null;
+  function ensurePreviewEl() {
+    if (previewEl) return previewEl;
+    previewEl = document.createElement('div');
+    previewEl.className = 'city-hover-preview';
+    document.body.appendChild(previewEl);
+    return previewEl;
+  }
+
+  function showPreview(el, slug) {
+    const city = (window.CITIES_DATA || []).find((c) => c.slug === slug);
+    if (!city) return;
+    const { band, color } = moodToBand(city.mood);
+    const el2 = ensurePreviewEl();
+    el2.innerHTML = `<strong style="color:${color};">${city.name}</strong><br>
+      <span style="color:${color}; text-transform:uppercase; font-family:var(--font-mono); font-size:0.72rem;">${band}</span>
+      <span style="font-family:var(--font-mono); font-size:0.72rem;"> · ${city.mood.toFixed(1)}/10</span>`;
+    el2.style.borderColor = color;
+    const rect = el.getBoundingClientRect();
+    el2.style.left = `${rect.left + window.scrollX}px`;
+    el2.style.top = `${rect.bottom + window.scrollY + 8}px`;
+    el2.classList.add('is-visible');
+  }
+
+  function hidePreview() {
+    if (previewEl) previewEl.classList.remove('is-visible');
+  }
+
   // Makes any element with data-city-link="<slug>" clickable: pins the
-  // city and navigates to its profile. Call once per page after content
-  // is in the DOM (safe to call repeatedly -- idempotent via a marker).
+  // city and navigates to its profile, and hover/focus shows a small
+  // live preview (band, reading). Call once per page after content is
+  // in the DOM (safe to call repeatedly -- idempotent via a marker).
   function wireCityLinks(root) {
     (root || document).querySelectorAll('[data-city-link]:not([data-city-wired])').forEach((el) => {
       el.setAttribute('data-city-wired', '1');
@@ -87,6 +119,11 @@
           window.location.href = `/cities/${slug}.html`;
         }
       });
+      const slug = el.getAttribute('data-city-link');
+      el.addEventListener('mouseenter', () => showPreview(el, slug));
+      el.addEventListener('mouseleave', hidePreview);
+      el.addEventListener('focus', () => showPreview(el, slug));
+      el.addEventListener('blur', hidePreview);
     });
   }
 

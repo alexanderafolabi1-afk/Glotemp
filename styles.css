@@ -3187,6 +3187,38 @@ button:hover:not(:focus-visible) {
   text-align: center;
 }
 
+/* ===== Shared city hover-preview tooltip ===== */
+.city-hover-preview {
+  position: absolute;
+  z-index: 3000;
+  background: var(--basalt-raised);
+  border: 1px solid var(--band-equilibrium);
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.85rem;
+  color: var(--ivory);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 180ms ease, transform 180ms ease;
+  max-width: 220px;
+}
+
+.city-hover-preview.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .city-hover-preview { transition: none; }
+}
+
+@media (max-width: 768px) {
+  /* Hover previews add nothing on touch devices and can trap taps. */
+  .city-hover-preview { display: none; }
+}
+
 .hiw-image-slot {
   aspect-ratio: 4 / 3;
   border-radius: 16px;
