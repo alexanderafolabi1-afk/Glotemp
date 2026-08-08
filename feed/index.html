@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#06060A" />
+  <meta name="description" content="A live stream of human check-ins from across all 150 cities Glotemp tracks. Sampled continuously, weighted toward the cities moving fastest." />
+  <meta property="og:title" content="Feed — Glotemp" />
+  <meta property="og:description" content="A live stream of human check-ins from across all 150 cities Glotemp tracks." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://glo-temp.com/feed" />
+  <meta property="og:image" content="https://glo-temp.com/assets/logo.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://glo-temp.com/feed" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <title>Feed — Glotemp</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=14" />
+
+  <style>
+    .feed-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding: 0 1.5rem 1rem;
+      font-family: var(--font-mono);
+      font-variant-caps: small-caps;
+      font-size: 0.8rem;
+      color: var(--sand);
+    }
+    .feed-live-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--band-warm);
+      margin-right: 0.45rem;
+      vertical-align: middle;
+      animation: feed-pulse 2s ease-in-out infinite;
+    }
+    @keyframes feed-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+    .feed-stream {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      padding: 0 1.5rem 1.5rem;
+      /* Reserved so the first async fill and every 60s refresh swap
+         content without shifting the footer. */
+      min-height: 420px;
+    }
+    .feed-item {
+      border: 1px solid var(--hairline);
+      border-radius: 14px;
+      padding: 1rem 1.1rem;
+      background: rgba(23, 25, 38, 0.4);
+      transition: border-color var(--transition);
+    }
+    .feed-item:hover { border-color: var(--brass-dim); }
+    .feed-item-head {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.4rem;
+    }
+    .feed-city {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      color: var(--ivory);
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+    .feed-city:hover { color: var(--brass); }
+    .feed-name { font-family: var(--font-body); font-size: 0.86rem; color: var(--sand); }
+    .feed-mode {
+      font-family: var(--font-mono);
+      font-variant-caps: small-caps;
+      font-size: 0.76rem;
+      letter-spacing: 0.06em;
+      color: var(--brass);
+    }
+    .feed-intensity { font-family: var(--font-mono); font-size: 0.76rem; color: var(--sand); }
+    .feed-note { color: var(--sand); font-size: 0.92rem; line-height: 1.55; margin-bottom: 0.35rem; max-width: none; }
+    .feed-time { font-family: var(--font-mono); font-size: 0.72rem; color: var(--sand); opacity: 0.75; }
+    .feed-empty { color: var(--sand); font-family: var(--font-mono); font-size: 0.88rem; padding: 1.5rem 0; }
+    .feed-pinned-note {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--brass);
+      min-height: 1.2em;
+      padding: 0 1.5rem 0.5rem;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .feed-live-dot { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar glass">
+    <div class="nav-brand">
+      <img src="/assets/logo.png" alt="Glotemp" class="nav-logo">
+      <span class="logo-text">Glotemp</span>
+      <span class="pulse-dot" aria-hidden="true">❤️</span>
+    </div>
+    <div class="nav-links">
+      <a href="/">Pulse</a>
+      <a href="/about">About</a>
+      <a href="/explore">Explore</a>
+      <a href="/feed" class="active">Feed</a>
+      <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
+    </div>
+  </nav>
+
+  <main class="page-main">
+    <section class="glass-card page-header">
+      <p class="eyebrow">Live across 150 cities</p>
+      <h1>The feed</h1>
+      <p class="section-copy" style="color:var(--sand); max-width:64ch;">Human check-ins sampled continuously from every city Glotemp tracks. Higher-ranked cities surface more often, but no city is ever excluded. Tap any city name to pin it everywhere else you go.</p>
+      <p class="section-copy" style="color:var(--sand); max-width:64ch; margin-top:0.75rem;">Looking for long-form? Read the <a href="/blog" style="color:var(--brass);">Stories archive</a>.</p>
+    </section>
+
+    <section class="glass-card" style="padding:1.5rem 0 0;">
+      <div class="feed-meta-row">
+        <span><span class="feed-live-dot" aria-hidden="true"></span>Live — refreshes every 60s</span>
+        <span id="feed-count">Sampling…</span>
+      </div>
+      <p class="feed-pinned-note" id="feed-pinned-note">&nbsp;</p>
+      <div class="feed-stream" id="feed-stream" aria-live="polite">
+        <p class="feed-empty">Loading check-ins…</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer glass">
+    <p>© 2026 RenviaIT Ltd. All rights reserved.</p>
+    <p class="small-print">
+      <a href="/privacy">Privacy Policy</a> |
+      <a href="/terms">Terms of Service</a> |
+      <a href="#" id="cookie-settings">Cookie Settings</a>
+    </p>
+    <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
+  </footer>
+
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
+  <script src="/living-index.js"></script>
+  <script src="/glotemp-auth.js"></script>
+  <script>
+    const SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
+    const REFRESH_MS = 60000;
+    const STREAM_SIZE = 24;
+    const MODE_LABELS = { eat: 'Eat', drink: 'Drink', watch: 'Watch', move: 'Move', make: 'Make' };
+
+    let cityWeights = new Map();  // slug -> weight (always >= 1)
+    let refreshTimer = null;
+
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function cityName(slug) {
+      const c = (window.CITIES_DATA || []).find(x => x.slug === slug);
+      return c ? c.name : slug;
+    }
+
+    // Weight every city by its living index, floored at 1 so that a city
+    // ranked last still has a nonzero chance of being sampled -- the
+    // brief is explicit that weighting must never exclude a city.
+    async function buildWeights() {
+      try {
+        const ranking = await GlotempLivingIndex.getRanking();
+        const values = ranking.cities.map(c => c.livingIndex);
+        const min = Math.min.apply(null, values);
+        const max = Math.max.apply(null, values);
+        ranking.cities.forEach(c => {
+          const norm = max === min ? 0.5 : (c.livingIndex - min) / (max - min);
+          cityWeights.set(c.slug, 1 + norm * 3); // range [1, 4]
+        });
+      } catch (e) {
+        (window.CITIES_DATA || []).forEach(c => cityWeights.set(c.slug, 1));
+      }
+    }
+
+    // Weighted sample without replacement across whichever cities have
+    // check-ins in the fetched window.
+    function weightedSample(rowsByCity, n) {
+      const pool = [];
+      rowsByCity.forEach((rows, slug) => {
+        pool.push({ slug, rows: rows.slice(), weight: cityWeights.get(slug) || 1 });
+      });
+      const picked = [];
+      while (picked.length < n && pool.length) {
+        const total = pool.reduce((s, p) => s + p.weight, 0);
+        let r = Math.random() * total;
+        let idx = 0;
+        for (let i = 0; i < pool.length; i++) {
+          r -= pool[i].weight;
+          if (r <= 0) { idx = i; break; }
+          idx = i;
+        }
+        const entry = pool[idx];
+        picked.push(entry.rows.shift());
+        if (!entry.rows.length) pool.splice(idx, 1);
+      }
+      return picked;
+    }
+
+    function itemHTML(row) {
+      const name = (row.profiles && row.profiles.display_name) ? row.profiles.display_name : 'Anonymous';
+      const slug = row.city_slug;
+      return `
+        <article class="feed-item">
+          <div class="feed-item-head">
+            <a class="feed-city" href="/cities/${esc(slug)}.html" data-city-link="${esc(slug)}" data-city-nav="false">${esc(cityName(slug))}</a>
+            <span class="feed-name">${esc(name)}</span>
+            <span class="feed-mode">${esc(MODE_LABELS[row.mode] || row.mode)}</span>
+            <span class="feed-intensity">${Number(row.intensity)}/10</span>
+          </div>
+          ${row.note ? `<p class="feed-note">${esc(row.note)}</p>` : ''}
+          <time class="feed-time" datetime="${esc(row.created_at)}">${esc(GlotempCore.getTimeAgo(new Date(row.created_at)))}</time>
+        </article>`;
+    }
+
+    async function loadFeed() {
+      const stream = document.getElementById('feed-stream');
+      const countEl = document.getElementById('feed-count');
+      try {
+        const resp = await fetch(
+          `${SUPABASE_URL}/rest/v1/observations?select=id,city_slug,mode,intensity,note,created_at,profiles(display_name)&order=created_at.desc&limit=400`,
+          { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
+        );
+        if (!resp.ok) throw new Error('fetch failed');
+        const rows = await resp.json();
+        if (!rows.length) {
+          stream.innerHTML = '<p class="feed-empty">No check-ins yet. Be the first — open any city and check in.</p>';
+          countEl.textContent = '0 check-ins';
+          return;
+        }
+        const byCity = new Map();
+        rows.forEach(r => {
+          if (!byCity.has(r.city_slug)) byCity.set(r.city_slug, []);
+          byCity.get(r.city_slug).push(r);
+        });
+        const sampled = weightedSample(byCity, Math.min(STREAM_SIZE, rows.length));
+        stream.innerHTML = sampled.map(itemHTML).join('');
+        countEl.textContent = `${sampled.length} shown from ${byCity.size} ${byCity.size === 1 ? 'city' : 'cities'}`;
+        wirePins();
+      } catch (e) {
+        stream.innerHTML = '<p class="feed-empty">The feed is unavailable right now. It will retry shortly.</p>';
+        countEl.textContent = 'Reconnecting…';
+      }
+    }
+
+    function wirePins() {
+      const note = document.getElementById('feed-pinned-note');
+      document.querySelectorAll('.feed-city').forEach(el => {
+        el.addEventListener('click', (e) => {
+          e.preventDefault();
+          const slug = el.getAttribute('data-city-link');
+          GlotempCore.setPinnedCity(slug);
+          note.textContent = `Pinned ${cityName(slug)} — it will follow you across the site.`;
+        });
+      });
+      if (window.GlotempCore && GlotempCore.wireCityLinks) {
+        GlotempCore.wireCityLinks(document.getElementById('feed-stream'));
+      }
+    }
+
+    function startRefresh() {
+      if (refreshTimer) return;
+      refreshTimer = setInterval(() => {
+        if (document.hidden) return;   // paused on hidden tab
+        loadFeed();
+      }, REFRESH_MS);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      // Catch up immediately on return rather than waiting out the
+      // remainder of an interval that ticked past while hidden.
+      if (!document.hidden) loadFeed();
+    });
+
+    (async function init() {
+      await buildWeights();
+      await loadFeed();
+      startRefresh();
+      const lang = localStorage.getItem('glotemp-lang') || 'en';
+      document.documentElement.lang = lang;
+    })();
+  </script>
+  <script src="/cookie-consent.js" defer></script>
+</body>
+</html>
