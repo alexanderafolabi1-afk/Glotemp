@@ -2065,6 +2065,107 @@ function loadCoverageStats() {
   }).catch(() => {});
 }
 
+// ===== Live weather backdrop for homepage barometers =====
+// Open-Meteo is free, keyless, and CORS-friendly — good fit for a purely
+// decorative client-side effect. Every city already carries lat/lon in
+// cities-data.js. Failures/timeouts resolve to null so callers fall back
+// to the neutral .instrument-weather background instead of guessing.
+const WEATHER_CACHE_KEY = 'glotemp-weather-cache';
+const WEATHER_TTL_MS = 30 * 60 * 1000;
+const weatherMemoryCache = new Map();
+const weatherInflight = new Map();
+let weatherCacheLoaded = false;
+
+function loadWeatherCacheFromStorage() {
+  weatherCacheLoaded = true;
+  try {
+    const raw = localStorage.getItem(WEATHER_CACHE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    Object.keys(parsed).forEach(slug => weatherMemoryCache.set(slug, parsed[slug]));
+  } catch (e) { /* corrupt/unavailable cache -- ignore, start fresh */ }
+}
+
+function persistWeatherCache() {
+  try {
+    const obj = {};
+    weatherMemoryCache.forEach((v, k) => { obj[k] = v; });
+    localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify(obj));
+  } catch (e) { /* storage full/unavailable -- non-fatal, just skip persistence */ }
+}
+
+// WMO weather codes -> a small set of visual categories.
+function weatherCodeToCategory(code, isDay) {
+  if (code === 0 || code === 1) return isDay ? 'clear-day' : 'clear-night';
+  if (code === 2 || code === 3) return 'cloudy';
+  if (code === 45 || code === 48) return 'fog';
+  if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return 'rain';
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return 'snow';
+  if ([95, 96, 99].includes(code)) return 'thunderstorm';
+  return isDay ? 'clear-day' : 'clear-night';
+}
+
+async function getCityWeatherCategory(city) {
+  if (!weatherCacheLoaded) loadWeatherCacheFromStorage();
+
+  const cached = weatherMemoryCache.get(city.slug);
+  if (cached && (Date.now() - cached.fetchedAt) < WEATHER_TTL_MS) {
+    return cached.category;
+  }
+  if (weatherInflight.has(city.slug)) return weatherInflight.get(city.slug);
+
+  const promise = (async () => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=weather_code,is_day&timezone=auto`;
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (!res.ok) throw new Error('weather fetch failed: ' + res.status);
+      const data = await res.json();
+      const code = data && data.current ? data.current.weather_code : undefined;
+      const isDay = !(data && data.current && data.current.is_day === 0);
+      const category = weatherCodeToCategory(code, isDay);
+      weatherMemoryCache.set(city.slug, { category, fetchedAt: Date.now() });
+      persistWeatherCache();
+      return category;
+    } catch (e) {
+      return null;
+    } finally {
+      weatherInflight.delete(city.slug);
+    }
+  })();
+
+  weatherInflight.set(city.slug, promise);
+  return promise;
+}
+
+function renderSnowflakes(container, count) {
+  for (let i = 0; i < count; i++) {
+    const flake = document.createElement('span');
+    flake.className = 'snowflake';
+    flake.style.setProperty('--flake-left', `${Math.random() * 100}%`);
+    flake.style.setProperty('--flake-size', `${2 + Math.random() * 3}px`);
+    flake.style.setProperty('--flake-duration', `${4 + Math.random() * 4}s`);
+    flake.style.setProperty('--flake-delay', `${(Math.random() * -8).toFixed(2)}s`);
+    flake.style.setProperty('--flake-drift', `${Math.round(Math.random() * 30 - 15)}px`);
+    container.appendChild(flake);
+  }
+}
+
+// Apply a resolved weather category (or null for the neutral fallback) to
+// a barometer slot's backdrop layer, skipping the rebuild if unchanged.
+function applyWeatherToSlot(slotEl, category) {
+  const weatherEl = slotEl.querySelector('.instrument-weather');
+  if (!weatherEl) return;
+  const key = category || 'none';
+  if (weatherEl.dataset.category === key) return;
+  weatherEl.dataset.category = key;
+  weatherEl.className = 'instrument-weather' + (category ? ` weather-${category}` : '');
+  weatherEl.innerHTML = '';
+  if (category === 'snow') renderSnowflakes(weatherEl, 14);
+}
+
 // Barometer rotation — 5 slots, staggered, session-shuffled
 const BAROMETER_DIM_LABELS = ["Mood","Economic","Nightlife","Study","Tourism","Safety","Health","Traffic","Events","Community","Weather","Innovation"];
 
@@ -2143,6 +2244,12 @@ function setupBarometerRotation() {
 
     // Click-to-pin
     slotEl.dataset.citySlug = cityData.slug;
+
+    // Live weather backdrop (best-effort; discarded if this slot has already
+    // rotated to a different city by the time the fetch resolves).
+    getCityWeatherCategory(cityData).then(category => {
+      if (slotEl.dataset.citySlug === cityData.slug) applyWeatherToSlot(slotEl, category);
+    });
   }
 
   // Initial render

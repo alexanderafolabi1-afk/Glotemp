@@ -393,17 +393,230 @@ body::after {
   animation-play-state: paused;
 }
 
-.instrument-image {
+/* Weather backdrop system.
+   The barometer PNGs are flattened onto an opaque white background (real
+   uploaded artwork -- can't be touched/re-exported with transparency). We
+   fake transparency with mix-blend-mode: multiply on the image: pure-white
+   pixels multiply out to whatever is painted behind them, so the live
+   weather layer in .instrument-weather shows through the "empty" area
+   while the bottle artwork itself stays visible. isolation: isolate keeps
+   that blending contained to this card instead of the whole page. */
+.instrument-visual {
+  position: relative;
+  isolation: isolate;
   width: 100%;
   max-width: 180px;
-  height: auto;
+  aspect-ratio: 384 / 688;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.instrument-weather {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: linear-gradient(160deg, #4A4E68 0%, #2A2C3D 100%);
+  transition: background 900ms ease;
+}
+
+.instrument-image {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   opacity: 1;
+  mix-blend-mode: multiply;
   transition: opacity 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .instrument-image.instrument-fading {
   opacity: 0;
+}
+
+/* ----- Weather variants ----- */
+.weather-clear-day {
+  background: radial-gradient(circle at 50% 32%, #FFD9A0 0%, #F5A25A 35%, #C97A4A 65%, #6B5A6E 100%);
+}
+
+.weather-clear-day::before {
+  content: '';
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  width: 25%;
+  aspect-ratio: 1;
+  margin-left: -12.5%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #FFF6E0 0%, #FFD9A0 55%, transparent 78%);
+  box-shadow: 0 0 30px 8px rgba(255, 217, 160, 0.55);
+  animation: sun-glow 4s ease-in-out infinite;
+}
+
+@keyframes sun-glow {
+  0%, 100% { transform: scale(1); opacity: 0.92; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+.weather-clear-night {
+  background: radial-gradient(circle at 50% 22%, #6F5FA8 0%, #453A6B 45%, #2B2645 100%);
+}
+
+.weather-clear-night::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.6px 1.6px at 20% 22%, #FFFFFF 55%, transparent 100%),
+    radial-gradient(1.6px 1.6px at 72% 16%, #FFFFFF 55%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 42% 38%, #FFFFFF 55%, transparent 100%),
+    radial-gradient(1.6px 1.6px at 85% 48%, #FFFFFF 55%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 14% 58%, #FFFFFF 55%, transparent 100%),
+    radial-gradient(1.6px 1.6px at 58% 12%, #FFFFFF 55%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 30% 72%, #FFFFFF 55%, transparent 100%);
+  animation: star-twinkle 3s ease-in-out infinite;
+}
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
+.weather-cloudy {
+  background: linear-gradient(180deg, #8B93A8 0%, #565C74 55%, #33364A 100%);
+}
+
+.weather-cloudy::before,
+.weather-cloudy::after {
+  content: '';
+  position: absolute;
+  width: 95px;
+  height: 30px;
+  background: rgba(233, 231, 240, 0.65);
+  border-radius: 50px;
+  filter: blur(3px);
+  animation: cloud-drift 15s linear infinite;
+}
+
+.weather-cloudy::before { top: 22%; animation-duration: 17s; }
+.weather-cloudy::after { top: 48%; width: 65px; height: 22px; animation-duration: 12s; animation-delay: -5s; }
+
+@keyframes cloud-drift {
+  from { transform: translateX(-130%); }
+  to { transform: translateX(230%); }
+}
+
+.weather-fog {
+  background: linear-gradient(180deg, #9298A8 0%, #565A6C 60%, #3B3E4E 100%);
+}
+
+.weather-fog::before {
+  content: '';
+  position: absolute;
+  inset: -20% -50%;
+  background: repeating-linear-gradient(
+    4deg,
+    rgba(233, 231, 240, 0.14) 0px,
+    rgba(233, 231, 240, 0.14) 8px,
+    transparent 8px,
+    transparent 46px
+  );
+  filter: blur(6px);
+  animation: fog-drift 10s ease-in-out infinite;
+}
+
+@keyframes fog-drift {
+  0%, 100% { transform: translateX(0); opacity: 0.55; }
+  50% { transform: translateX(6%); opacity: 0.85; }
+}
+
+.weather-rain {
+  background: linear-gradient(180deg, #7A93B8 0%, #4A5570 55%, #2E3345 100%);
+}
+
+.weather-rain::before {
+  content: '';
+  position: absolute;
+  inset: -20% -20%;
+  background-image: repeating-linear-gradient(
+    100deg,
+    transparent 0px,
+    transparent 5px,
+    rgba(220, 235, 255, 0.4) 5px,
+    rgba(220, 235, 255, 0.55) 5.6px,
+    transparent 6.4px,
+    transparent 13px
+  );
+  animation: rain-fall 0.35s linear infinite;
+}
+
+@keyframes rain-fall {
+  from { background-position: 0 0; }
+  to { background-position: -6px 34px; }
+}
+
+.weather-thunderstorm {
+  background: linear-gradient(180deg, #6B5FA0 0%, #423A66 55%, #211D33 100%);
+}
+
+.weather-thunderstorm::before {
+  content: '';
+  position: absolute;
+  inset: -20% -20%;
+  background-image: repeating-linear-gradient(
+    100deg,
+    transparent 0px,
+    transparent 5px,
+    rgba(220, 235, 255, 0.4) 5px,
+    rgba(220, 235, 255, 0.55) 5.6px,
+    transparent 6.4px,
+    transparent 13px
+  );
+  animation: rain-fall 0.3s linear infinite;
+}
+
+.weather-thunderstorm::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #E9E7F0;
+  opacity: 0;
+  animation: lightning-flash 6s ease-in-out infinite;
+}
+
+@keyframes lightning-flash {
+  0%, 91%, 100% { opacity: 0; }
+  92% { opacity: 0.85; }
+  93% { opacity: 0.1; }
+  94% { opacity: 0.6; }
+  95% { opacity: 0; }
+}
+
+.weather-snow {
+  background: linear-gradient(180deg, #6E7B94 0%, #454C64 55%, #282C3C 100%);
+}
+
+.snowflake {
+  position: absolute;
+  top: -8%;
+  left: var(--flake-left, 50%);
+  width: var(--flake-size, 4px);
+  height: var(--flake-size, 4px);
+  background: #FFFFFF;
+  border-radius: 50%;
+  opacity: 0;
+  animation: snow-fall var(--flake-duration, 6s) linear infinite;
+  animation-delay: var(--flake-delay, 0s);
+}
+
+/* top/left (not transform) so the fall distance is relative to the card,
+   not to the flake's own few-pixel size -- transform: translate(%) would
+   barely move an element this small. */
+@keyframes snow-fall {
+  0% { top: -8%; opacity: 0; transform: translateX(0) rotate(0deg); }
+  8% { opacity: 0.9; }
+  100% { top: 108%; opacity: 0.4; transform: translateX(var(--flake-drift, 10px)) rotate(180deg); }
 }
 
 .instrument-label {
@@ -473,7 +686,7 @@ body::after {
     scroll-snap-stop: always;
   }
 
-  .instrument-image {
+  .instrument-visual {
     max-width: 140px;
   }
 }
