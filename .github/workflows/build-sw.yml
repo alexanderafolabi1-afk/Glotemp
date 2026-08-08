@@ -1,0 +1,49 @@
+name: Stamp service worker build hash
+
+# glo-temp.com is served by GitHub Pages straight from this branch, with no
+# build step. That means sw.js is deployed exactly as committed -- so if
+# nobody runs `node build-sw.js` before pushing, the cache name does not
+# change and the new deploy is invisible to anyone holding the old one.
+# Depending on a human to remember is what produced the stale-build bug in
+# the first place, so this runs it for them on every push.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-sw-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  stamp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # A shallow checkout is enough; we only ever add one commit.
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Regenerate sw.js from sw.js.template
+        run: node build-sw.js
+
+      - name: Commit if the hash changed
+        run: |
+          if git diff --quiet -- sw.js; then
+            echo "sw.js already carries the current build hash; nothing to do."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sw.js
+          git commit -m "Stamp service worker build hash"
+          # The resulting push re-triggers this workflow, but the second run
+          # finds sw.js already current and exits at the check above, so it
+          # settles after one extra no-op run rather than looping.
+          git push
