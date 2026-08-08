@@ -2,8 +2,12 @@
 // Fetches, caches, and renders multi-vertical data from Supabase
 // Per-source TTL caching to avoid redundant API calls
 
-const SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
+// var, not const: this file and tempo-economy.js both define these same
+// two globals, and pages increasingly load both. var redeclaration across
+// classic <script> tags is a legal no-op; const/let redeclaration throws
+// and silently kills whichever script runs second.
+var SUPABASE_URL = SUPABASE_URL || 'https://hnysztednzqfzbmiqqgl.supabase.co';
+var SUPABASE_ANON_KEY = SUPABASE_ANON_KEY || 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
 
 // Cache configuration: source → TTL in milliseconds
 const CACHE_TTL = {

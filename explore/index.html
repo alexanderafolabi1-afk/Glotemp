@@ -4,29 +4,182 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#06060A" />
-  <meta name="description" content="Explore Glotemp — discover real-time city energy, travel insights, and urban intelligence all in one place." />
-  <meta name="keywords" content="explore cities, city insights, travel intelligence, urban energy, real-time mood" />
-  <meta property="og:title" content="Explore Glotemp" />
-  <meta property="og:description" content="Explore Glotemp — discover real-time city energy, travel insights, and urban intelligence all in one place." />
+  <meta name="description" content="Every city Glotemp tracks in one live directory: current band, reading, and coverage across all 12 verticals. Search, filter, and sort 150 cities in real time." />
+  <meta name="keywords" content="city directory, city rankings, live city data, explore cities, city mood index" />
+  <meta property="og:title" content="Cities — Glotemp" />
+  <meta property="og:description" content="Every city Glotemp tracks in one live directory: current band, reading, and coverage across all 12 verticals." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/explore" />
+  <meta property="og:image" content="https://glo-temp.com/assets/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Explore Glotemp" />
-  <meta name="twitter:description" content="Explore Glotemp — discover real-time city energy, travel insights, and urban intelligence all in one place." />
+  <meta name="twitter:title" content="Cities — Glotemp" />
+  <meta name="twitter:description" content="Every city Glotemp tracks in one live directory: current band, reading, and coverage across all 12 verticals." />
   <link rel="canonical" href="https://glo-temp.com/explore" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <title>Glotemp – Explore</title>
+  <title>Cities — Glotemp</title>
 
-  <!-- Type system: Fraunces (display), Manrope (body), IBM Plex Mono (data) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Glotemp Cities Directory",
+    "description": "Every city Glotemp tracks, with live band, reading, and coverage across 12 verticals.",
+    "url": "https://glo-temp.com/explore"
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=12" />
 
-  <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=5" />
+  <style>
+    /* Page-scoped styles for the Cities index. Kept inline so this page
+       is a self-contained rebuild rather than growing the shared
+       stylesheet with one-off rules before the pattern proves out. */
+    .cities-toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1.5rem;
+    }
+    .cities-search-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .cities-search-input {
+      flex: 1 1 260px;
+      background: rgba(233, 231, 240, 0.05);
+      border: 1px solid rgba(233, 231, 240, 0.09);
+      border-radius: 12px;
+      color: var(--ivory);
+      padding: 0.85rem 1rem;
+      font: inherit;
+      min-height: 44px;
+    }
+    .cities-select {
+      background: rgba(233, 231, 240, 0.05);
+      border: 1px solid rgba(233, 231, 240, 0.09);
+      border-radius: 12px;
+      color: var(--ivory);
+      padding: 0.85rem 1rem;
+      font: inherit;
+      min-height: 44px;
+    }
+    .band-filter-row {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .band-chip {
+      border: 1px solid var(--hairline);
+      background: transparent;
+      color: var(--sand);
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all var(--transition);
+      min-height: 44px;
+    }
+    .band-chip[data-active="true"] {
+      color: var(--obsidian);
+      background: var(--chip-color, var(--band-equilibrium));
+      border-color: var(--chip-color, var(--band-equilibrium));
+    }
+    .cities-meta-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--sand);
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+    }
+    .cities-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      padding: 1.5rem;
+      transition: opacity 250ms ease;
+    }
+    .cities-grid.is-sorting { opacity: 0.4; }
+    @media (max-width: 900px) {
+      .cities-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .cities-grid { grid-template-columns: 1fr; }
+    }
+    .city-card {
+      display: block;
+      text-decoration: none;
+      border: 1px solid var(--hairline);
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(23, 25, 38, 0.5);
+      cursor: pointer;
+    }
+    .city-card .img-slot {
+      aspect-ratio: 3 / 2;
+    }
+    .city-card .img-slot-fallback {
+      font-size: 1.4rem;
+      color: var(--card-band, var(--band-equilibrium));
+    }
+    .city-card-body {
+      padding: 1.1rem;
+    }
+    .city-card-name {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--card-band, var(--ivory));
+      margin-bottom: 0.2rem;
+    }
+    .city-card-country {
+      color: var(--sand);
+      font-size: 0.85rem;
+      margin-bottom: 0.8rem;
+    }
+    .city-card-band-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--card-band, var(--sand));
+      margin-bottom: 0.5rem;
+    }
+    .city-card-bar-track {
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(233, 231, 240, 0.08);
+      overflow: hidden;
+      margin-bottom: 0.6rem;
+    }
+    .city-card-bar-fill {
+      height: 100%;
+      background: var(--card-band, var(--band-equilibrium));
+      border-radius: 3px;
+      width: 0%;
+      transition: width 600ms cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .city-card-coverage {
+      font-size: 0.78rem;
+      color: var(--sand);
+      font-family: var(--font-mono);
+    }
+    .cities-empty {
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: var(--sand);
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar glass">
@@ -38,209 +191,265 @@
     <div class="nav-links">
       <a href="/">Pulse</a>
       <a href="/about">About</a>
-      <a href="/explore" class="active">Explore</a>
-      <a href="/blog">Stories</a>
+      <a href="/explore" class="active">Cities</a>
+      <a href="/blog">Feed</a>
       <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
     </div>
   </nav>
 
   <main class="page-main">
-    <section class="glass-card prose-section">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">The instrument</p>
-          <h1 data-i18n="explore_title">Explore the Pulse</h1>
-        </div>
-      </div>
-      <p data-i18n="explore_subtitle">Dive deeper into how Glotemp works, discover the cities we track, and learn how real-time mood intelligence transforms travel and urban experience.</p>
+    <section class="glass-card page-header">
+      <p class="eyebrow">150 cities, live</p>
+      <h1>Every city, right now</h1>
+      <p class="section-copy" style="color:var(--sand); max-width:64ch;">The working directory behind every ranking on this site. Search, filter and sort — click any city to pin it everywhere else you go.</p>
     </section>
 
-    <section class="observatory-systems glass-card">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">What it gives you</p>
-          <h2>Three readings</h2>
+    <section class="glass-card" style="padding:0; overflow:hidden;">
+      <div class="cities-toolbar">
+        <div class="cities-search-row">
+          <input type="text" id="city-search" class="cities-search-input" placeholder="Search city or country…" aria-label="Search cities">
+          <select id="region-filter" class="cities-select" aria-label="Filter by region">
+            <option value="">All regions</option>
+          </select>
+          <select id="sort-select" class="cities-select" aria-label="Sort cities">
+            <option value="mood-desc">Sort: Mood (high to low)</option>
+            <option value="mood-asc">Sort: Mood (low to high)</option>
+            <option value="movement">Sort: 24h movement</option>
+            <option value="coverage">Sort: Coverage</option>
+            <option value="name">Sort: Name (A–Z)</option>
+          </select>
         </div>
-      </div>
-      <div class="systems-grid">
-        <article class="system-card glass-card">
-          <h3 data-i18n="explore_feature1">Cities Tracking</h3>
-          <p data-i18n="explore_feature1_desc">Real-time mood data from major cities worldwide. See how your destination truly feels right now.</p>
-        </article>
-        <article class="system-card glass-card">
-          <h3 data-i18n="explore_feature2">Travel Intelligence</h3>
-          <p data-i18n="explore_feature2_desc">Make better travel decisions informed by authentic, real-time sentiment from fellow travelers.</p>
-        </article>
-        <article class="system-card glass-card">
-          <h3 data-i18n="explore_feature3">Urban Insights</h3>
-          <p data-i18n="explore_feature3_desc">Understand neighborhood energy, event resonance, and true community sentiment in real time.</p>
-        </article>
+        <div class="band-filter-row" id="band-filter-row">
+          <button class="band-chip" data-band="" data-active="true" style="--chip-color: var(--band-equilibrium);">All bands</button>
+          <button class="band-chip" data-band="charged" style="--chip-color: var(--band-charged);">Charged</button>
+          <button class="band-chip" data-band="warm" style="--chip-color: var(--band-warm);">Warm</button>
+          <button class="band-chip" data-band="equilibrium" style="--chip-color: var(--band-equilibrium);">Equilibrium</button>
+          <button class="band-chip" data-band="restrained" style="--chip-color: var(--band-restrained);">Restrained</button>
+          <button class="band-chip" data-band="low" style="--chip-color: var(--band-low);">Low</button>
+        </div>
+        <div class="cities-meta-row">
+          <span id="cities-count">150 cities</span>
+          <span>Coverage across 12 verticals</span>
+        </div>
       </div>
     </section>
 
-    <section class="observatory-systems glass-card">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Method</p>
-          <h2 data-i18n="explore_how_works">How It Works</h2>
-        </div>
-      </div>
-      <div class="products-grid">
-        <article class="product-card">
-          <h3 data-i18n="explore_step1">1. Check In</h3>
-          <p data-i18n="explore_step1_desc">Share how you're feeling about a city with just a tap. It's quick, simple, and completely voluntary.</p>
-        </article>
-        <article class="product-card">
-          <h3 data-i18n="explore_step2">2. Aggregate</h3>
-          <p data-i18n="explore_step2_desc">Thousands of real-time contributions create a living picture of each city's current energy and atmosphere.</p>
-        </article>
-        <article class="product-card">
-          <h3 data-i18n="explore_step3">3. Discover</h3>
-          <p data-i18n="explore_step3_desc">Explore cities with confidence, informed by authentic sentiment from people like you experiencing them right now.</p>
-        </article>
-      </div>
-    </section>
+    <div id="cities-grid" class="cities-grid" aria-live="polite"></div>
+    <div id="cities-empty" class="cities-empty" style="display:none;">No cities match that search.</div>
   </main>
 
   <footer class="footer glass">
-    <p>© 2025 RenviaIT Ltd. All rights reserved.</p>
+    <p>© 2026 RenviaIT Ltd. All rights reserved.</p>
     <p class="small-print">
-      <a href="/privacy" data-i18n="privacy_policy">Privacy Policy</a> |
-      <a href="/terms" data-i18n="terms_of_service">Terms of Service</a> |
-      <a href="#" id="cookie-settings" data-i18n="cookie_settings">Cookie Settings</a>
+      <a href="/privacy">Privacy Policy</a> |
+      <a href="/terms">Terms of Service</a> |
+      <a href="#" id="cookie-settings">Cookie Settings</a>
     </p>
     <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
   </footer>
 
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
   <script>
-    const translationsExplore = {
-      en: {
-        explore_title: "Explore the Pulse",
-        explore_subtitle: "Dive deeper into how Glotemp works, discover the cities we track, and learn how real-time mood intelligence transforms travel and urban experience.",
-        explore_feature1: "Cities Tracking",
-        explore_feature1_desc: "Real-time mood data from major cities worldwide. See how your destination truly feels right now.",
-        explore_feature2: "Travel Intelligence",
-        explore_feature2_desc: "Make better travel decisions informed by authentic, real-time sentiment from fellow travelers.",
-        explore_feature3: "Urban Insights",
-        explore_feature3_desc: "Understand neighborhood energy, event resonance, and true community sentiment in real time.",
-        explore_how_works: "How It Works",
-        explore_step1: "1. Check In",
-        explore_step1_desc: "Share how you're feeling about a city with just a tap. It's quick, simple, and completely voluntary.",
-        explore_step2: "2. Aggregate",
-        explore_step2_desc: "Thousands of real-time contributions create a living picture of each city's current energy and atmosphere.",
-        explore_step3: "3. Discover",
-        explore_step3_desc: "Explore cities with confidence, informed by authentic sentiment from people like you experiencing them right now.",
-        privacy_policy: "Privacy Policy",
-        terms_of_service: "Terms of Service",
-        cookie_settings: "Cookie Settings"
-      },
-      es: {
-        explore_title: "Explora el Pulso",
-        explore_subtitle: "Profundiza en cómo funciona Glotemp, descubre las ciudades que rastreamos y aprende cómo la inteligencia de estado de ánimo en tiempo real transforma los viajes y la experiencia urbana.",
-        explore_feature1: "Seguimiento de Ciudades",
-        explore_feature1_desc: "Datos de estado de ánimo en tiempo real de las principales ciudades del mundo. Descubre cómo se siente verdaderamente tu destino ahora.",
-        explore_feature2: "Inteligencia de Viajes",
-        explore_feature2_desc: "Toma mejores decisiones de viaje informadas por el sentimiento auténtico y en tiempo real de otros viajeros.",
-        explore_feature3: "Perspectivas Urbanas",
-        explore_feature3_desc: "Comprende la energía del barrio, la resonancia de eventos y el verdadero sentimiento comunitario en tiempo real.",
-        explore_how_works: "Cómo Funciona",
-        explore_step1: "1. Registra",
-        explore_step1_desc: "Comparte cómo te sientes acerca de una ciudad con un simple toque. Es rápido, simple y completamente voluntario.",
-        explore_step2: "2. Agregación",
-        explore_step2_desc: "Miles de contribuciones en tiempo real crean una imagen viva de la energía y atmósfera actual de cada ciudad.",
-        explore_step3: "3. Descubre",
-        explore_step3_desc: "Explora ciudades con confianza, informado por el sentimiento auténtico de personas como tú que las experimentan ahora.",
-        privacy_policy: "Política de Privacidad",
-        terms_of_service: "Términos de Servicio",
-        cookie_settings: "Configuración de Cookies"
-      },
-      fr: {
-        explore_title: "Explorez le Pouls",
-        explore_subtitle: "Explorez plus profondément comment fonctionne Glotemp, découvrez les villes que nous suivons et apprenez comment l'intelligence d'humeur en temps réel transforme les voyages et l'expérience urbaine.",
-        explore_feature1: "Suivi des Villes",
-        explore_feature1_desc: "Données d'humeur en temps réel de grandes villes du monde entier. Découvrez comment votre destination se sent vraiment maintenant.",
-        explore_feature2: "Intelligence de Voyage",
-        explore_feature2_desc: "Prenez de meilleures décisions de voyage informées par le sentiment authentique en temps réel d'autres voyageurs.",
-        explore_feature3: "Perspectives Urbaines",
-        explore_feature3_desc: "Comprenez l'énergie du quartier, la résonance des événements et le vrai sentiment communautaire en temps réel.",
-        explore_how_works: "Comment ça Marche",
-        explore_step1: "1. Enregistrez",
-        explore_step1_desc: "Partagez comment vous vous sentez à propos d'une ville en un seul geste. C'est rapide, simple et entièrement volontaire.",
-        explore_step2: "2. Agrégation",
-        explore_step2_desc: "Des milliers de contributions en temps réel créent une image vivante de l'énergie et de l'atmosphère actuelles de chaque ville.",
-        explore_step3: "3. Découvrez",
-        explore_step3_desc: "Explorez les villes en toute confiance, informées par le sentiment authentique des gens comme vous qui les découvrent maintenant.",
-        privacy_policy: "Politique de Confidentialité",
-        terms_of_service: "Conditions d'Utilisation",
-        cookie_settings: "Paramètres des Cookies"
-      },
-      de: {
-        explore_title: "Erkunden Sie den Puls",
-        explore_subtitle: "Tauchen Sie tiefer ein, wie Glotemp funktioniert, entdecken Sie die Städte, die wir verfolgen, und erfahren Sie, wie intelligente Stimmung in Echtzeit Reisen und städtische Erfahrung transformiert.",
-        explore_feature1: "Stadtverfolgung",
-        explore_feature1_desc: "Echtzeitstimmungsdaten aus Großstädten weltweit. Sehen Sie, wie sich Ihr Reiseziel wirklich anfühlt.",
-        explore_feature2: "Reiseintelligenz",
-        explore_feature2_desc: "Treffen Sie bessere Reiseentscheidungen informiert durch authentische Echtzeit-Gefühle anderer Reisender.",
-        explore_feature3: "Urbane Einblicke",
-        explore_feature3_desc: "Verstehen Sie Nachbarschaftsenergie, Veranstaltungsresonanz und echte Gemeinschaftsstimmung in Echtzeit.",
-        explore_how_works: "Wie Es Funktioniert",
-        explore_step1: "1. Einchecken",
-        explore_step1_desc: "Teilen Sie mit einem Tastendruck mit, wie Sie sich in einer Stadt fühlen. Es ist schnell, einfach und vollständig freiwillig.",
-        explore_step2: "2. Aggregation",
-        explore_step2_desc: "Tausende von Echtzeitbeiträgen schaffen ein lebendiges Bild der aktuellen Energie und Atmosphäre jeder Stadt.",
-        explore_step3: "3. Entdecken",
-        explore_step3_desc: "Erkunden Sie Städte mit Zuversicht, informiert durch authentische Gefühle von Menschen wie Ihnen, die sie gerade erleben.",
-        privacy_policy: "Datenschutzrichtlinie",
-        terms_of_service: "Nutzungsbedingungen",
-        cookie_settings: "Cookie-Einstellungen"
-      },
-      pt: {
-        explore_title: "Explore o Pulso",
-        explore_subtitle: "Mergulhe mais fundo em como Glotemp funciona, descubra as cidades que rastreamos e aprenda como a inteligência de humor em tempo real transforma viagens e experiência urbana.",
-        explore_feature1: "Rastreamento de Cidades",
-        explore_feature1_desc: "Dados de humor em tempo real das principais cidades do mundo. Veja como seu destino realmente se sente agora.",
-        explore_feature2: "Inteligência de Viagem",
-        explore_feature2_desc: "Tome melhores decisões de viagem informadas pelo sentimento autêntico em tempo real de outros viajantes.",
-        explore_feature3: "Perspectivas Urbanas",
-        explore_feature3_desc: "Compreenda a energia do bairro, a ressonância de eventos e o verdadeiro sentimento comunitário em tempo real.",
-        explore_how_works: "Como Funciona",
-        explore_step1: "1. Check-in",
-        explore_step1_desc: "Compartilhe como você se sente sobre uma cidade com um toque. É rápido, simples e completamente voluntário.",
-        explore_step2: "2. Agregação",
-        explore_step2_desc: "Milhares de contribuições em tempo real criam uma imagem viva da energia e atmosfera atual de cada cidade.",
-        explore_step3: "3. Descubra",
-        explore_step3_desc: "Explore cidades com confiança, informado pelo sentimento autêntico de pessoas como você que as experimentam agora.",
-        privacy_policy: "Política de Privacidade",
-        terms_of_service: "Termos de Serviço",
-        cookie_settings: "Configurações de Cookies"
-      },
-      ja: {
-        explore_title: "パルスを探索",
-        explore_subtitle: "Glotempの仕組みをより深く理解し、追跡している都市を発見し、リアルタイムの気分インテリジェンスが旅と都市体験をどのように変換するかを学びます。",
-        explore_feature1: "都市追跡",
-        explore_feature1_desc: "世界中の主要都市からのリアルタイム気分データ。目的地が今どのように感じているかを確認してください。",
-        explore_feature2: "旅行インテリジェンス",
-        explore_feature2_desc: "他の旅行者からの本物のリアルタイムセンチメントで、より良い旅行決定を下してください。",
-        explore_feature3: "都市洞察",
-        explore_feature3_desc: "近所のエネルギー、イベントの共鳴、リアルタイムの真のコミュニティセンチメントを理解します。",
-        explore_how_works: "仕組み",
-        explore_step1: "1. チェックイン",
-        explore_step1_desc: "タップで都市についてあなたの気持ちを共有してください。すばやく、シンプル、完全に自発的です。",
-        explore_step2: "2. 集約",
-        explore_step2_desc: "数千のリアルタイム貢献が、各都市の現在のエネルギーと雰囲気の生きた画像を作成します。",
-        explore_step3: "3. 発見",
-        explore_step3_desc: "あなたのような人々が今経験している本物のセンチメントで、自信を持って都市を探索します。",
-        privacy_policy: "プライバシーポリシー",
-        terms_of_service: "利用規約",
-        cookie_settings: "Cookieの設定"
-      }
+    const VERTICAL_SLUGS = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
+    // var, not const: tempo-economy.js (loaded below) also declares
+    // these; var redeclaration across scripts is a safe no-op.
+    var SUPABASE_URL = SUPABASE_URL || 'https://hnysztednzqfzbmiqqgl.supabase.co';
+    var SUPABASE_ANON_KEY = SUPABASE_ANON_KEY || 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
+
+    const state = {
+      search: '',
+      region: '',
+      band: '',
+      sort: 'mood-desc',
+      coverage: new Map(),   // slug -> 0..1
+      movement: new Map(),   // slug -> signed number (24h delta, best-effort)
     };
+
+    function buildRegionOptions() {
+      const regions = [...new Set(CITIES_DATA.map(c => c.region))].sort();
+      const sel = document.getElementById('region-filter');
+      regions.forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r;
+        opt.textContent = r;
+        sel.appendChild(opt);
+      });
+    }
+
+    function filteredSortedCities() {
+      let list = CITIES_DATA.filter(c => c.available !== false);
+      if (state.search) {
+        const q = state.search.toLowerCase();
+        list = list.filter(c => c.name.toLowerCase().includes(q) || c.country.toLowerCase().includes(q));
+      }
+      if (state.region) list = list.filter(c => c.region === state.region);
+      if (state.band) list = list.filter(c => GlotempCore.moodToBand(c.mood).band === state.band);
+
+      list = [...list];
+      if (state.sort === 'mood-desc') list.sort((a, b) => b.mood - a.mood);
+      else if (state.sort === 'mood-asc') list.sort((a, b) => a.mood - b.mood);
+      else if (state.sort === 'name') list.sort((a, b) => a.name.localeCompare(b.name));
+      else if (state.sort === 'coverage') list.sort((a, b) => (state.coverage.get(b.slug) || 0) - (state.coverage.get(a.slug) || 0));
+      else if (state.sort === 'movement') list.sort((a, b) => Math.abs(state.movement.get(b.slug) || 0) - Math.abs(state.movement.get(a.slug) || 0));
+      return list;
+    }
+
+    function cardHTML(city, index) {
+      const { band, color } = GlotempCore.moodToBand(city.mood);
+      const coverage = state.coverage.has(city.slug) ? Math.round(state.coverage.get(city.slug) * 100) : null;
+      const movement = state.movement.get(city.slug);
+      const moveLabel = (movement === undefined) ? '' :
+        (movement > 0.05 ? `▲ ${movement.toFixed(1)}` : movement < -0.05 ? `▼ ${Math.abs(movement).toFixed(1)}` : '— steady');
+
+      return `
+        <a class="city-card hover-lift reveal-on-scroll" href="/cities/${city.slug}.html"
+           data-city-link="${city.slug}" data-city-nav="false"
+           style="--card-band:${color}; --reveal-index:${index % 12};">
+          ${GlotempCore.imgSlotHTML(`/assets/city-${city.slug}.png`, city.name, city.name)}
+          <div class="city-card-body">
+            <div class="city-card-name">${city.name}</div>
+            <div class="city-card-country">${city.country} · ${city.region}</div>
+            <div class="city-card-band-row">
+              <span>${band}</span>
+              <span>${city.mood.toFixed(1)} / 10 ${moveLabel}</span>
+            </div>
+            <div class="city-card-bar-track"><div class="city-card-bar-fill" style="width:${city.mood * 10}%;"></div></div>
+            <div class="city-card-coverage">${coverage === null ? 'Coverage: —' : `Coverage: ${coverage}% of verticals`}</div>
+          </div>
+        </a>`;
+    }
+
+    function render({ animateSort } = {}) {
+      const grid = document.getElementById('cities-grid');
+      const empty = document.getElementById('cities-empty');
+      const list = filteredSortedCities();
+
+      document.getElementById('cities-count').textContent = `${list.length} ${list.length === 1 ? 'city' : 'cities'}`;
+
+      if (!list.length) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      const draw = () => {
+        grid.innerHTML = list.map(cardHTML).join('');
+        grid.classList.remove('is-sorting');
+        wireReveal();
+        GlotempCore.wireCityLinks(grid);
+        grid.querySelectorAll('.city-card').forEach(card => {
+          card.addEventListener('click', () => {
+            window.location.href = card.getAttribute('href');
+          });
+        });
+      };
+
+      if (animateSort) {
+        grid.classList.add('is-sorting');
+        setTimeout(draw, 220);
+      } else {
+        draw();
+      }
+    }
+
+    let revealObserver;
+    function wireReveal() {
+      if (!revealObserver) {
+        revealObserver = ('IntersectionObserver' in window)
+          ? new IntersectionObserver((entries) => {
+              entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('is-visible');
+                  revealObserver.unobserve(entry.target);
+                }
+              });
+            }, { rootMargin: '0px 0px -40px 0px' })
+          : null;
+      }
+      document.querySelectorAll('.reveal-on-scroll:not(.is-visible)').forEach(el => {
+        if (revealObserver) revealObserver.observe(el);
+        else el.classList.add('is-visible'); // no IO support: show immediately
+      });
+    }
+
+    async function loadCoverageAndMovement() {
+      try {
+        const resp = await fetch(
+          `${SUPABASE_URL}/rest/v1/readings?select=city_slug,vertical,value,fetched_at&order=fetched_at.desc&limit=4000`,
+          { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
+        );
+        if (!resp.ok) return;
+        const rows = await resp.json();
+
+        const verticalsByCity = new Map();
+        const pulseByCity = new Map();
+        const dayMs = 86400000;
+        const now = Date.now();
+
+        rows.forEach(r => {
+          if (!verticalsByCity.has(r.city_slug)) verticalsByCity.set(r.city_slug, new Set());
+          verticalsByCity.get(r.city_slug).add(r.vertical);
+
+          if (r.vertical === 'pulse' && typeof r.value === 'number') {
+            if (!pulseByCity.has(r.city_slug)) pulseByCity.set(r.city_slug, []);
+            pulseByCity.get(r.city_slug).push(r);
+          }
+        });
+
+        verticalsByCity.forEach((set, slug) => state.coverage.set(slug, set.size / VERTICAL_SLUGS.length));
+
+        pulseByCity.forEach((readings, slug) => {
+          const recent = readings.filter(r => now - new Date(r.fetched_at).getTime() < dayMs);
+          const older = readings.filter(r => {
+            const age = now - new Date(r.fetched_at).getTime();
+            return age >= dayMs && age < dayMs * 2;
+          });
+          if (recent.length && older.length) {
+            const avg = (arr) => arr.reduce((s, r) => s + r.value, 0) / arr.length;
+            state.movement.set(slug, avg(recent) - avg(older));
+          }
+        });
+
+        render();
+      } catch (e) {
+        // Live coverage/movement is an enhancement -- static mood-based
+        // cards already rendered, so failures here are silent by design.
+        console.warn('Coverage/movement fetch skipped:', e.message);
+      }
+    }
+
+    function wireControls() {
+      document.getElementById('city-search').addEventListener('input', (e) => {
+        state.search = e.target.value;
+        render();
+      });
+      document.getElementById('region-filter').addEventListener('change', (e) => {
+        state.region = e.target.value;
+        render({ animateSort: true });
+      });
+      document.getElementById('sort-select').addEventListener('change', (e) => {
+        state.sort = e.target.value;
+        render({ animateSort: true });
+      });
+      document.querySelectorAll('.band-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('.band-chip').forEach(c => c.removeAttribute('data-active'));
+          chip.setAttribute('data-active', 'true');
+          state.band = chip.getAttribute('data-band');
+          render({ animateSort: true });
+        });
+      });
+    }
+
+    buildRegionOptions();
+    wireControls();
+    render();
+    loadCoverageAndMovement();
 
     const lang = localStorage.getItem('glotemp-lang') || 'en';
     document.documentElement.lang = lang;
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      el.textContent = translationsExplore[lang]?.[el.dataset.i18n] || translationsExplore.en[el.dataset.i18n] || el.textContent;
-    });
   </script>
   <script src="/cookie-consent.js" defer></script>
   <script src="/tempo-economy.js" defer></script>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#06060A" />
+  <meta name="description" content="Food in Sofia: Where should you eat and explore cuisine? Live readings, updated as new signal arrives.">
+  <meta property="og:title" content="Food in Sofia — Glotemp" />
+  <meta property="og:description" content="Where should you eat and explore cuisine?" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://glo-temp.com/cities/sofia/food/" />
+  <meta property="og:image" content="https://glo-temp.com/assets/city-sofia.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://glo-temp.com/cities/sofia/food/" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <title>Food in Sofia — Glotemp</title>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "name": "Food in Sofia",
+    "description": "Where should you eat and explore cuisine?",
+    "url": "https://glo-temp.com/cities/sofia/food/",
+    "spatialCoverage": "Sofia, Bulgaria"
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=12" />
+</head>
+<body>
+  <nav class="navbar glass">
+    <div class="nav-brand">
+      <img src="/assets/logo.png" alt="Glotemp" class="nav-logo">
+      <span class="logo-text">Glotemp</span>
+      <span class="pulse-dot"></span>
+    </div>
+    <div class="nav-links">
+      <a href="/">Pulse</a>
+      <a href="/about">About</a>
+      <a href="/explore">Cities</a>
+      <a href="/blog">Feed</a>
+      <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
+    </div>
+  </nav>
+
+  <main class="page-main">
+    <section class="glass-card page-header">
+      <p class="eyebrow"><a href="/cities/sofia.html" data-city-link="sofia" data-city-nav="false" style="color:var(--sand);">Sofia, Bulgaria</a> · Food</p>
+      <h1>Food in Sofia</h1>
+      <p class="section-copy" style="color:var(--sand); max-width:64ch;">Where should you eat and explore cuisine?</p>
+    </section>
+
+    <section id="food" class="vertical-section glass-card">
+      <div id="food-content" class="vertical-content"></div>
+    </section>
+
+    <section class="glass-card" style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; padding:2rem; text-align:center;">
+      <a href="/cities/sofia.html" class="btn-neon" style="text-decoration:none; display:inline-block;">Full Sofia profile</a>
+      <a href="/rankings/food/" class="btn-neon" style="text-decoration:none; display:inline-block;">Food rankings, all cities</a>
+    </section>
+  </main>
+
+  <footer class="footer glass">
+    <p>© 2026 RenviaIT Ltd. All rights reserved.</p>
+    <p class="small-print">
+      <a href="/privacy">Privacy Policy</a> | <a href="/terms">Terms of Service</a> | <a href="#" id="cookie-settings">Cookie Settings</a>
+    </p>
+  </footer>
+
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
+  <script src="/verticals-engine.js" defer></script>
+  <script>
+    // SUPABASE_URL / SUPABASE_ANON_KEY come from verticals-engine.js
+    // (deferred, but resolved by the time DOMContentLoaded fires below) --
+    // redeclaring them here would collide with that script's top-level
+    // const and throw, since classic <script> tags share one scope.
+
+    async function loadVerticalContent() {
+      const contentEl = document.getElementById('food-content');
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/readings?city_slug=eq.sofia&vertical=eq.food&order=fetched_at.desc&limit=50`,
+          { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
+        );
+        if (!response.ok) {
+          contentEl.innerHTML = '<div class="empty-state">No data available for this vertical yet.</div>';
+          return;
+        }
+        const readings = await response.json();
+        if (!readings.length) {
+          contentEl.innerHTML = '<div class="empty-state">No readings yet for Sofia.</div>';
+          return;
+        }
+        contentEl.innerHTML = readings.slice(0, 15).map(reading => `
+          <div class="reading glass-card">
+            <div class="reading-header">
+              <span class="reading-metric">${reading.metric}</span>
+              <span class="reading-confidence" title="Data confidence: ${(reading.confidence * 100).toFixed(0)}%">${verticals.getConfidenceLabel(reading.confidence)}</span>
+            </div>
+            <div class="reading-value">
+              ${reading.value !== null ? `<span class="value">${reading.value}${reading.label ? ` ${reading.label}` : ''}</span>` : ''}
+              <span class="reading-label">${reading.label || ''}</span>
+            </div>
+            <div class="reading-footer">
+              <span class="reading-source">${reading.source}</span>
+              <time class="reading-time" datetime="${reading.fetched_at}">${verticals.getTimeAgo(new Date(reading.fetched_at))}</time>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error loading food data:', error);
+        contentEl.innerHTML = '<div class="empty-state">Error loading data. Try again shortly.</div>';
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadVerticalContent);
+    } else {
+      loadVerticalContent();
+    }
+    GlotempCore.wireCityLinks(document);
+    const lang = localStorage.getItem('glotemp-lang') || 'en';
+    document.documentElement.lang = lang;
+  </script>
+  <script src="/cookie-consent.js" defer></script>
+  <script src="/tempo-economy.js" defer></script>
+</body>
+</html>

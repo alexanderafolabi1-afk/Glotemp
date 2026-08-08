@@ -4,29 +4,171 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#06060A" />
-  <meta name="description" content="About Glotemp — the world's first real-time mood infrastructure, turning the collective feeling of cities into living intelligence for travellers, businesses and communities." />
-  <meta name="keywords" content="about Glotemp, city mood infrastructure, urban intelligence, collective feeling" />
-  <meta property="og:title" content="About Glotemp" />
-  <meta property="og:description" content="About Glotemp — the world's first real-time mood infrastructure, turning the collective feeling of cities into living intelligence for travellers, businesses and communities." />
+  <meta name="description" content="How Glotemp computes a reading: live coverage figures, the confidence ramp from first check-in to established signal, and the modelled-vs-observed split, shown as it stands right now." />
+  <meta name="keywords" content="about Glotemp, methodology, how it works, confidence score, modelled vs observed" />
+  <meta property="og:title" content="How it works — Glotemp" />
+  <meta property="og:description" content="How Glotemp computes a reading: live coverage figures, the confidence ramp, and the modelled-vs-observed split, shown as it stands right now." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/about" />
+  <meta property="og:image" content="https://glo-temp.com/assets/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="About Glotemp" />
-  <meta name="twitter:description" content="About Glotemp — the world's first real-time mood infrastructure, turning the collective feeling of cities into living intelligence for travellers, businesses and communities." />
+  <meta name="twitter:title" content="How it works — Glotemp" />
+  <meta name="twitter:description" content="Live coverage figures, the confidence ramp, and the modelled-vs-observed split, shown as it stands right now." />
   <link rel="canonical" href="https://glo-temp.com/about" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <title>Glotemp – About</title>
+  <title>How it works — Glotemp</title>
 
-  <!-- Type system: Fraunces (display), Manrope (body), IBM Plex Mono (data) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "How Glotemp works",
+    "description": "Methodology: how a reading is computed, how signals are weighted, and the modelled-vs-observed split.",
+    "url": "https://glo-temp.com/about"
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=12" />
 
-  <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=5" />
+  <style>
+    .proof-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      padding: 1.5rem;
+    }
+    @media (max-width: 768px) {
+      .proof-stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .proof-stat {
+      text-align: center;
+      padding: 1.2rem 0.5rem;
+    }
+    .proof-stat-value {
+      font-family: var(--font-mono);
+      font-size: 2.4rem;
+      color: var(--band-equilibrium);
+      font-variant-numeric: tabular-nums;
+    }
+    .proof-stat-label {
+      color: var(--sand);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 0.4rem;
+    }
+    .instrument-mini {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      padding: 2rem;
+      flex-wrap: wrap;
+    }
+    .instrument-mini img {
+      width: 100px;
+      height: 179px;
+      transition: opacity 400ms ease;
+    }
+    .instrument-mini-readout {
+      flex: 1 1 260px;
+    }
+    .instrument-mini-band {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.3rem;
+    }
+    .instrument-mini-city {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      color: var(--ivory);
+      margin-bottom: 0.3rem;
+    }
+    .instrument-mini-note {
+      color: var(--sand);
+      font-size: 0.9rem;
+    }
+    .confidence-ramp {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.4rem;
+      height: 80px;
+      padding: 1.5rem;
+      padding-top: 0;
+    }
+    .confidence-bar {
+      flex: 1;
+      background: var(--band-equilibrium);
+      opacity: 0.25;
+      border-radius: 3px 3px 0 0;
+      transition: height 800ms cubic-bezier(0.25,0.46,0.45,0.94), opacity 400ms;
+      height: 4px;
+    }
+    .split-bar-track {
+      height: 28px;
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      background: rgba(233, 231, 240, 0.06);
+      margin: 1rem 1.5rem;
+    }
+    .split-bar-modelled, .split-bar-observed {
+      transition: width 800ms cubic-bezier(0.25,0.46,0.45,0.94);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--obsidian);
+      width: 50%;
+    }
+    .split-bar-modelled { background: var(--band-restrained); }
+    .split-bar-observed { background: var(--band-warm); }
+    .split-legend {
+      display: flex;
+      gap: 1.5rem;
+      padding: 0 1.5rem 1.5rem;
+      font-size: 0.85rem;
+      color: var(--sand);
+      flex-wrap: wrap;
+    }
+    .split-legend span::before {
+      content: '●';
+      margin-right: 0.4rem;
+    }
+    .split-legend .modelled::before { color: var(--band-restrained); }
+    .split-legend .observed::before { color: var(--band-warm); }
+    .methodology-block {
+      padding: 0 2.5rem 2.5rem;
+    }
+    .methodology-block h3 {
+      color: var(--ivory);
+      font-weight: var(--fw-regular);
+      margin: 1.75rem 0 0.6rem;
+    }
+    .methodology-block p {
+      color: var(--sand);
+      line-height: 1.75;
+      margin-bottom: 1rem;
+    }
+    .cta-closing {
+      text-align: center;
+      padding: 3rem 1.5rem;
+    }
+    .cta-closing p {
+      color: var(--sand);
+      max-width: 56ch;
+      margin: 0 auto 1.5rem;
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar glass">
@@ -38,86 +180,235 @@
     <div class="nav-links">
       <a href="/">Pulse</a>
       <a href="/about" class="active">About</a>
-      <a href="/explore">Explore</a>
-      <a href="/blog">Stories</a>
+      <a href="/explore">Cities</a>
+      <a href="/blog">Feed</a>
       <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
     </div>
   </nav>
 
   <main class="page-main">
     <section class="glass-card page-header">
-      <p class="eyebrow" data-i18n="about_eyebrow">Observatory</p>
-      <h1 data-i18n="about_title">About Glotemp</h1>
+      <p class="eyebrow">The proof, not the pitch</p>
+      <h1>How a reading gets made</h1>
+      <p class="section-copy" style="color:var(--sand); max-width:64ch;">Every number below is queried live, not written into this page. What follows is the actual mechanism — the same one behind every band, bar and ranking on this site.</p>
     </section>
 
-    <section class="prose-section">
-      <p data-i18n="about_intro">Every city breathes with its own rhythm. In the streets, in the cafés, in the transit hubs, there exists an invisible current of collective energy that shapes the character of urban spaces. This is the heartbeat of a city. And until now, it has remained invisible to those who long to understand it.</p>
+    <section class="glass-card" style="padding:0; overflow:hidden;">
+      <div class="proof-stats-grid" id="proof-stats">
+        <div class="proof-stat">
+          <div class="proof-stat-value count-up" data-target="150" id="stat-cities">0</div>
+          <div class="proof-stat-label">Cities tracked</div>
+        </div>
+        <div class="proof-stat">
+          <div class="proof-stat-value count-up" data-target="0" id="stat-countries">0</div>
+          <div class="proof-stat-label">Countries represented</div>
+        </div>
+        <div class="proof-stat">
+          <div class="proof-stat-value count-up" data-target="12" id="stat-verticals">0</div>
+          <div class="proof-stat-label">Verticals live</div>
+        </div>
+        <div class="proof-stat">
+          <div class="proof-stat-value count-up" data-target="0" id="stat-readings">0</div>
+          <div class="proof-stat-label">Readings recorded</div>
+        </div>
+      </div>
+    </section>
 
-      <h2>The moment</h2>
-      <p>Imagine knowing the true pulse of a destination before you arrive. Not through algorithms that predict based on history, but through the living, breathing sentiment of thousands of people sharing their experience in real time. That moment, when expectation meets reality, when data becomes wisdom, is Glotemp.</p>
+    <section class="glass-card" style="padding:0; overflow:hidden;">
+      <div class="section-heading" style="padding:1.5rem 1.5rem 0;">
+        <div>
+          <p class="eyebrow">The instrument</p>
+          <h2>Not described. Demonstrated.</h2>
+        </div>
+      </div>
+      <div class="instrument-mini">
+        <img id="mini-barometer-img" src="/assets/barometer-equilibrium.png" alt="Live barometer instrument">
+        <div class="instrument-mini-readout">
+          <div class="instrument-mini-band" id="mini-band-label" style="color:var(--band-equilibrium);">Equilibrium</div>
+          <div class="instrument-mini-city" id="mini-city-label">Pin a city to see it move here</div>
+          <p class="instrument-mini-note">This is the exact widget every city page uses — the needle moves because the underlying number moved, nothing more.</p>
+        </div>
+      </div>
+    </section>
 
-      <h2>For travellers</h2>
-      <p>Travel is about discovery and connection. Glotemp changes the way you experience cities by revealing their true energy. Rather than following curated guides or outdated reviews, you tap into the collective consciousness of a city happening now. Should you visit that neighbourhood tonight? Is the city welcoming? What is the true vibe? These answers come not from algorithms, but from the authentic experiences of your fellow travellers.</p>
+    <section class="glass-card" style="padding:0; overflow:hidden;">
+      <div class="section-heading" style="padding:1.5rem 1.5rem 0;">
+        <div>
+          <p class="eyebrow">Confidence</p>
+          <h2>Why the first check-in barely moves anything</h2>
+        </div>
+      </div>
+      <p style="padding:0 1.5rem; color:var(--sand);">A single signal starts a reading at roughly half confidence. Confidence climbs with volume, not certainty of any one voice — this is the actual ramp used across every vertical's edge function:</p>
+      <div class="confidence-ramp" id="confidence-ramp"></div>
+      <div class="split-legend" style="padding-top:0;">
+        <span style="color:var(--sand); font-size:0.78rem; font-family:var(--font-mono);">1 signal → ~50% confidence · 50 signals → ~90% confidence, the practical ceiling</span>
+      </div>
+    </section>
 
-      <h2>For cities and communities</h2>
-      <p>Urban planners, hospitality leaders and community organisers have always operated on incomplete data. Event organisers wonder if their gathering resonates. City authorities seek to understand neighbourhood sentiment. Local businesses want to know if they are truly serving their community. Glotemp closes this gap, turning anonymous check-ins into actionable intelligence that helps cities understand and serve their people better.</p>
+    <section class="glass-card" style="padding:0; overflow:hidden;">
+      <div class="section-heading" style="padding:1.5rem 1.5rem 0;">
+        <div>
+          <p class="eyebrow">Right now</p>
+          <h2>Modelled vs. observed</h2>
+        </div>
+      </div>
+      <p style="padding:0 1.5rem; color:var(--sand);">Some readings come from seed data used to bootstrap a city before real signal arrives. The rest come from a live API call or a human check-in. This is the current split, queried on load:</p>
+      <div class="split-bar-track" id="split-bar">
+        <div class="split-bar-modelled" id="split-modelled" style="width:50%;">—</div>
+        <div class="split-bar-observed" id="split-observed" style="width:50%;">—</div>
+      </div>
+      <div class="split-legend">
+        <span class="modelled">Modelled (seed / low-confidence fallback)</span>
+        <span class="observed">Observed (live API or human check-in)</span>
+      </div>
+    </section>
 
-      <h2>The philosophy</h2>
-      <p>This is not surveillance. This is permission-based transparency. Every contribution is voluntary, a moment when someone chooses to share how a place makes them feel. Aggregated across thousands of voices, these moments reveal patterns that matter. The collective mood becomes a resource: for travellers seeking authenticity, for cities seeking understanding, for communities seeking connection.</p>
+    <section class="glass-card">
+      <div class="methodology-block" style="padding-top:1.5rem;">
+        <p class="eyebrow">Methodology</p>
+        <h2 style="margin-top:0;">The plain version</h2>
 
-      <p class="pull-quote">Glotemp is the infrastructure that turns the feeling of cities into intelligence. Real time. Real people. Real value.</p>
+        <h3>How a reading is computed</h3>
+        <p>Every observation — a human check-in, a GDELT sentiment pull, a World Bank indicator, an air-quality reading — lands in one append-only table, tagged with a city, a vertical, a value, a source, and a confidence score. A city's current reading for a vertical is the confidence-weighted average of everything recorded for it in the trailing window, not a single latest value. Nothing is ever overwritten; old readings age out of the average, they aren't deleted.</p>
+
+        <h3>How signals are weighted</h3>
+        <p>Two things move a signal's weight: how confident the source is in it, and how recent it is. A same-hour GDELT pull carries more weight than a three-day-old one. A reading built from fifty check-ins carries more weight than one built from a single check-in — see the ramp above.</p>
+
+        <h3>Why a first check-in counts less than a hundredth</h3>
+        <p>One person's read on a city is real, but it's one data point in a place that never stops changing. The confidence formula treats volume as the thing that converts a single observation into a trustworthy reading — not because the first voice is wrong, but because a hundred voices are harder to be wrong together.</p>
+      </div>
+    </section>
+
+    <section class="prose-section glass-card">
+      <p class="pull-quote" style="margin-top:0; padding-top:0; border-top:none;">Glotemp is the infrastructure that turns the feeling of cities into intelligence. Real time. Real people. Real value.</p>
+    </section>
+
+    <section class="glass-card cta-closing">
+      <h2>Add the next signal</h2>
+      <p>The mechanism above only works because someone checks in. Be the next data point.</p>
+      <a href="/#observation-form" class="btn-neon" style="--btn-band: var(--band-warm); display:inline-block; text-decoration:none;">Add your first observation</a>
     </section>
   </main>
 
   <footer class="footer glass">
-    <p>© 2025 RenviaIT Ltd. All rights reserved.</p>
+    <p>© 2026 RenviaIT Ltd. All rights reserved.</p>
     <p class="small-print">
-      <a href="/privacy" data-i18n="privacy_policy">Privacy Policy</a> |
-      <a href="/terms" data-i18n="terms_of_service">Terms of Service</a> |
-      <a href="#" id="cookie-settings" data-i18n="cookie_settings">Cookie Settings</a>
+      <a href="/privacy">Privacy Policy</a> |
+      <a href="/terms">Terms of Service</a> |
+      <a href="#" id="cookie-settings">Cookie Settings</a>
     </p>
     <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
   </footer>
 
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
   <script>
-    // minimal i18n inject
-    const translationsAbout = {
-      en: {
-        about_title: "About Glotemp",
-        about_intro: "Every city breathes with its own rhythm. In the streets, in the cafés, in the transit hubs, there exists an invisible current of collective energy that shapes the character of urban spaces. This is the heartbeat of a city. And until now, it has remained invisible to those who long to understand it.",
-        privacy_policy: "Privacy Policy", terms_of_service: "Terms of Service", cookie_settings: "Cookie Settings"
-      },
-      es: {
-        about_title: "Acerca de Glotemp",
-        about_intro: "Cada ciudad respira con su propio ritmo. En las calles, en los cafés, en los centros de tránsito, existe una corriente invisible de energía colectiva que da forma al carácter de los espacios urbanos. Este es el latido de una ciudad. Y hasta ahora, ha permanecido invisible para quienes anhelan entenderla.",
-        privacy_policy: "Política de Privacidad", terms_of_service: "Términos de Servicio", cookie_settings: "Configuración de Cookies"
-      },
-      fr: {
-        about_title: "À propos de Glotemp",
-        about_intro: "Chaque ville respire avec son propre rythme. Dans les rues, dans les cafés, dans les centres de transit, existe un courant invisible d'énergie collective qui façonne le caractère des espaces urbains. C'est le pouls d'une ville. Et jusqu'à présent, il est resté invisible pour ceux qui aspirent à le comprendre.",
-        privacy_policy: "Politique de Confidentialité", terms_of_service: "Conditions d'Utilisation", cookie_settings: "Paramètres des Cookies"
-      },
-      de: {
-        about_title: "Über Glotemp",
-        about_intro: "Jede Stadt atmet in ihrem eigenen Rhythmus. In den Straßen, in den Cafés, in den Transitknoten existiert ein unsichtbarer Strom kollektiver Energie, der den Charakter urbaner Räume prägt. Das ist der Herzschlag einer Stadt. Und bis jetzt ist er für diejenigen unsichtbar geblieben, die ihn verstehen möchten.",
-        privacy_policy: "Datenschutzrichtlinie", terms_of_service: "Nutzungsbedingungen", cookie_settings: "Cookie-Einstellungen"
-      },
-      pt: {
-        about_title: "Sobre o Glotemp",
-        about_intro: "Cada cidade respira com seu próprio ritmo. Nas ruas, nos cafés, nos centros de trânsito, existe uma corrente invisível de energia coletiva que molda o caráter dos espaços urbanos. Este é o pulso de uma cidade. E até agora, permaneceu invisível para quem anseia compreendê-la.",
-        privacy_policy: "Política de Privacidade", terms_of_service: "Termos de Serviço", cookie_settings: "Configurações de Cookies"
-      },
-      ja: {
-        about_title: "Glotempについて",
-        about_intro: "すべての都市は独自のリズムで呼吸しています。街路、カフェ、交通拠点には、都市空間の性質を形作る集合的エネルギーの見えない流れが存在します。これが都市のパルスです。そして今まで、それを理解したいと願う人々には見えないままです。",
-        privacy_policy: "プライバシーポリシー", terms_of_service: "利用規約", cookie_settings: "Cookieの設定"
+    // var, not const: tempo-economy.js (loaded below) also declares
+    // these; var redeclaration across scripts is a safe no-op.
+    var SUPABASE_URL = SUPABASE_URL || 'https://hnysztednzqfzbmiqqgl.supabase.co';
+    var SUPABASE_ANON_KEY = SUPABASE_ANON_KEY || 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
+
+    function countUp(el, target, duration) {
+      const start = 0;
+      const startTime = performance.now();
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) { el.textContent = target.toLocaleString(); return; }
+      function tick(now) {
+        const progress = Math.min(1, (now - startTime) / duration);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(start + (target - start) * eased).toLocaleString();
+        if (progress < 1) requestAnimationFrame(tick);
       }
-    };
+      requestAnimationFrame(tick);
+    }
+
+    function renderConfidenceRamp() {
+      const container = document.getElementById('confidence-ramp');
+      const points = [1, 3, 6, 10, 15, 22, 30, 40, 50];
+      container.innerHTML = points.map(n => {
+        const confidence = Math.min(0.9, n / 50);
+        return `<div class="confidence-bar" data-target-height="${confidence * 100}%" title="${n} signal${n > 1 ? 's' : ''} → ${(confidence * 100).toFixed(0)}% confidence"></div>`;
+      }).join('');
+      requestAnimationFrame(() => {
+        container.querySelectorAll('.confidence-bar').forEach(bar => {
+          bar.style.height = bar.getAttribute('data-target-height');
+          bar.style.opacity = '1';
+        });
+      });
+    }
+
+    function renderMiniInstrument() {
+      const slug = GlotempCore.getPinnedCity();
+      const city = slug && window.CITIES_DATA.find(c => c.slug === slug);
+      if (!city) return;
+      const { band, color, img } = GlotempCore.moodToBand(city.mood);
+      document.getElementById('mini-barometer-img').src = img;
+      document.getElementById('mini-band-label').textContent = band;
+      document.getElementById('mini-band-label').style.color = color;
+      document.getElementById('mini-city-label').textContent = `${city.name} · ${city.mood.toFixed(1)} / 10`;
+    }
+
+    async function loadLiveStats() {
+      const countries = new Set(window.CITIES_DATA.map(c => c.country)).size;
+      countUp(document.getElementById('stat-cities'), window.CITIES_DATA.length, 900);
+      countUp(document.getElementById('stat-countries'), countries, 900);
+      countUp(document.getElementById('stat-verticals'), 12, 900);
+
+      try {
+        const countResp = await fetch(`${SUPABASE_URL}/rest/v1/readings?select=id`, {
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            Prefer: 'count=exact',
+            Range: '0-0',
+          },
+        });
+        const range = countResp.headers.get('content-range'); // "0-0/12345"
+        const total = range ? parseInt(range.split('/')[1], 10) : null;
+        if (total !== null && !Number.isNaN(total)) {
+          countUp(document.getElementById('stat-readings'), total, 1200);
+        } else {
+          document.getElementById('stat-readings').textContent = '—';
+        }
+      } catch (e) {
+        document.getElementById('stat-readings').textContent = '—';
+      }
+
+      try {
+        const resp = await fetch(`${SUPABASE_URL}/rest/v1/readings?select=source,confidence&limit=4000`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' },
+        });
+        if (!resp.ok) throw new Error('split fetch failed');
+        const rows = await resp.json();
+        if (!rows.length) throw new Error('no rows');
+        let modelled = 0, observed = 0;
+        rows.forEach(r => {
+          const isModelled = r.source === 'seed' || (typeof r.confidence === 'number' && r.confidence < 0.6);
+          if (isModelled) modelled++; else observed++;
+        });
+        const total = modelled + observed;
+        const modelledPct = Math.round((modelled / total) * 100);
+        const observedPct = 100 - modelledPct;
+        const mEl = document.getElementById('split-modelled');
+        const oEl = document.getElementById('split-observed');
+        mEl.style.width = modelledPct + '%';
+        oEl.style.width = observedPct + '%';
+        mEl.textContent = modelledPct + '%';
+        oEl.textContent = observedPct + '%';
+      } catch (e) {
+        console.warn('Modelled/observed split unavailable:', e.message);
+        document.getElementById('split-modelled').textContent = '—';
+        document.getElementById('split-observed').textContent = '—';
+      }
+    }
+
+    renderConfidenceRamp();
+    renderMiniInstrument();
+    loadLiveStats();
+    document.addEventListener('glotemp:city-pinned', renderMiniInstrument);
+
     const lang = localStorage.getItem('glotemp-lang') || 'en';
     document.documentElement.lang = lang;
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      el.textContent = translationsAbout[lang]?.[el.dataset.i18n] || translationsAbout.en[el.dataset.i18n] || el.textContent;
-    });
   </script>
   <script src="/cookie-consent.js" defer></script>
   <script src="/tempo-economy.js" defer></script>

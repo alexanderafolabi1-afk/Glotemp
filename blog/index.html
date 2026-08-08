@@ -4,371 +4,564 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#06060A" />
-  <meta name="description" content="Glotemp – City Stories: Discover the real-time mood and energy of cities through daily pulse updates and local stories." />
-  <meta name="keywords" content="city stories, urban mood, collective feeling, city pulse, travel insights" />
-  <meta property="og:title" content="Glotemp – City Stories" />
-  <meta property="og:description" content="Glotemp – City Stories: Discover the real-time mood and energy of cities through daily pulse updates and local stories." />
+  <meta name="description" content="The live feed: every signal Glotemp records across all 12 verticals — Pulse, Tech, Finance, Work, Property, Education, Sport, Entertainment, Fashion, Food, Health and Transport — as it arrives." />
+  <meta name="keywords" content="live city feed, city signals, real-time data feed, city intelligence feed" />
+  <meta property="og:title" content="The Feed — Glotemp" />
+  <meta property="og:description" content="Every signal Glotemp records across all 12 verticals, as it arrives." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/blog" />
+  <meta property="og:image" content="https://glo-temp.com/assets/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Glotemp – City Stories" />
-  <meta name="twitter:description" content="Glotemp – City Stories: Discover the real-time mood and energy of cities through daily pulse updates and local stories." />
+  <meta name="twitter:title" content="The Feed — Glotemp" />
+  <meta name="twitter:description" content="Every signal Glotemp records across all 12 verticals, as it arrives." />
   <link rel="canonical" href="https://glo-temp.com/blog" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <!-- Type system: Fraunces (display), Manrope (body), IBM Plex Mono (data) -->
+  <title>The Feed — Glotemp</title>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Glotemp Live Feed",
+    "description": "Every signal Glotemp records across all 12 verticals, as it arrives.",
+    "url": "https://glo-temp.com/blog"
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
-  <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=5" />
-  <title>Glotemp – City Stories</title>
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=12" />
+
+  <style>
+    .feed-toolbar {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .feed-controls-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .feed-search-input, .feed-select {
+      background: rgba(233, 231, 240, 0.05);
+      border: 1px solid rgba(233, 231, 240, 0.09);
+      border-radius: 12px;
+      color: var(--ivory);
+      padding: 0.85rem 1rem;
+      font: inherit;
+      min-height: 44px;
+    }
+    .feed-search-input { flex: 1 1 220px; }
+
+    .vertical-filter-row {
+      display: flex;
+      gap: 0.6rem;
+      overflow-x: auto;
+      padding-bottom: 0.4rem;
+      scrollbar-width: thin;
+    }
+    @media (max-width: 768px) {
+      .vertical-filter-row {
+        scroll-snap-type: x mandatory;
+        flex-wrap: nowrap;
+      }
+      .vertical-chip { scroll-snap-align: start; }
+    }
+    .vertical-chip {
+      flex-shrink: 0;
+      border: 1px solid var(--hairline);
+      background: transparent;
+      color: var(--sand);
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: all var(--transition);
+      min-height: 44px;
+      white-space: nowrap;
+    }
+    .vertical-chip[data-active="true"] {
+      color: var(--obsidian);
+      background: var(--active-band, var(--band-equilibrium));
+      border-color: var(--active-band, var(--band-equilibrium));
+    }
+
+    .feed-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      padding: 1.5rem;
+    }
+    .feed-item {
+      display: block;
+      padding: 1.1rem 1.3rem;
+      border: 1px solid var(--hairline);
+      border-left: 3px solid var(--item-band, var(--band-equilibrium));
+      border-radius: 10px;
+      background: rgba(23, 25, 38, 0.4);
+      text-decoration: none;
+    }
+    .feed-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .feed-item-vertical {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--item-band, var(--sand));
+    }
+    .feed-item-city {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--item-band, var(--sand));
+      font-weight: 600;
+    }
+    .feed-item-headline {
+      color: var(--ivory);
+      font-size: 1.05rem;
+      margin-bottom: 0.3rem;
+      font-family: var(--font-display);
+    }
+    .feed-item-context {
+      color: var(--sand);
+      font-size: 0.92rem;
+      margin-bottom: 0.6rem;
+      line-height: 1.5;
+    }
+    .feed-item-bottom {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--sand);
+      opacity: 0.8;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .feed-item-source {
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .feed-item-source a {
+      color: inherit;
+      text-decoration: underline;
+    }
+    .feed-empty-state {
+      padding: 2.5rem;
+      text-align: center;
+      color: var(--sand);
+      border: 2px dashed var(--hairline);
+      border-radius: 12px;
+    }
+    .feed-load-more {
+      display: block;
+      margin: 0 auto;
+    }
+    .feed-live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--sand);
+    }
+    .feed-live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--band-equilibrium);
+      animation: pulseDot 2s ease-in-out infinite;
+    }
+    @keyframes pulseDot { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+    @media (prefers-reduced-motion: reduce) {
+      .feed-live-dot { animation: none; }
+    }
+  </style>
 </head>
 <body>
-  <div id="app">
-    <nav class="navbar glass">
-      <div class="nav-brand">
-        <img src="/assets/logo.png" alt="Glotemp" class="nav-logo">
-        <span class="logo-text">Glotemp</span>
-        <span class="pulse-dot"></span>
-      </div>
-      <div class="nav-links">
-        <a href="/">Pulse</a>
-        <a href="/about">About</a>
-        <a href="/explore">Explore</a>
-        <a href="/blog" class="active">Stories</a>
-        <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
-      </div>
-    </nav>
+  <nav class="navbar glass">
+    <div class="nav-brand">
+      <img src="/assets/logo.png" alt="Glotemp" class="nav-logo">
+      <span class="logo-text">Glotemp</span>
+      <span class="pulse-dot"></span>
+    </div>
+    <div class="nav-links">
+      <a href="/">Pulse</a>
+      <a href="/about">About</a>
+      <a href="/explore">Cities</a>
+      <a href="/blog" class="active">Feed</a>
+      <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
+    </div>
+  </nav>
 
-    <main class="blog-main" style="max-width:1200px; margin:0 auto; padding:2rem 1rem;">
-      <div class="blog-header glass-card">
-        <h1 data-i18n="blog_title">City Stories</h1>
-        <input type="text" id="blog-search" class="city-dropdown blog-search-input" data-i18n-placeholder="search_placeholder" placeholder="Search city...">
-      </div>
+  <main class="page-main">
+    <section class="glass-card page-header">
+      <p class="eyebrow">All 12 verticals, one stream</p>
+      <h1>The Feed</h1>
+      <p class="section-copy" style="color:var(--sand); max-width:64ch;">Every signal as it lands — news sentiment, market data, sport, fashion, transit, human check-ins. Filter to one vertical or one city, or watch it all move.</p>
+    </section>
 
-      <div id="blog-posts-grid" class="blog-grid">
-        <!-- Cards injected here -->
+    <section class="glass-card" style="padding:0; overflow:hidden;">
+      <div class="feed-toolbar">
+        <div class="feed-controls-row">
+          <input type="text" id="feed-search" class="feed-search-input" placeholder="Filter by city or country…" aria-label="Filter feed by city">
+          <select id="feed-city-select" class="feed-select" aria-label="Filter by city">
+            <option value="">All cities</option>
+          </select>
+          <span class="feed-live-badge"><span class="feed-live-dot"></span> Live, refreshes every 60s</span>
+        </div>
+        <div class="vertical-filter-row" id="vertical-filter-row"></div>
       </div>
-      <div id="blog-empty" class="blog-status">
-        <p class="blog-status-emoji">📝</p>
-        <p data-i18n="no_stories">No stories found. Check back soon!</p>
-      </div>
-    </main>
+    </section>
 
-    <footer class="footer glass">
-      <p>© 2025 RenviaIT Ltd. All rights reserved.</p>
-      <p class="small-print">
-        <a href="/privacy">Privacy Policy</a> |
-        <a href="/terms">Terms of Service</a> |
-        <a href="#" id="cookie-settings">Cookie Settings</a>
-      </p>
-      <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
-    </footer>
-  </div>
+    <div id="feed-list" class="feed-list"></div>
+    <div id="feed-empty" class="feed-empty-state" style="display:none;"></div>
+    <div style="text-align:center; padding: 0 0 2rem;">
+      <button id="feed-load-more" class="btn-neon feed-load-more" style="display:none;">Load more</button>
+    </div>
+  </main>
 
+  <footer class="footer glass">
+    <p>© 2026 RenviaIT Ltd. All rights reserved.</p>
+    <p class="small-print">
+      <a href="/privacy">Privacy Policy</a> |
+      <a href="/terms">Terms of Service</a> |
+      <a href="#" id="cookie-settings">Cookie Settings</a>
+    </p>
+    <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
+  </footer>
+
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
   <script src="/stories.js"></script>
   <script>
-    // Minimal i18n for blog page (same translations as app.js but scoped)
-    const translationsBlog = {
-      en: {
-        blog_title: "City Stories",
-        search_placeholder: "Search city...",
-        no_stories: "No stories found. Check back soon!",
-        read_full: "Read full story",
-        trivia: "Trivia",
-        history: "History",
-        close: "Close"
-      },
-      es: {
-        blog_title: "Historias de la ciudad",
-        search_placeholder: "Buscar ciudad...",
-        no_stories: "No se encontraron historias. ¡Vuelve pronto!",
-        read_full: "Leer historia completa",
-        trivia: "Curiosidades",
-        history: "Historia",
-        close: "Cerrar"
-      },
-      fr: {
-        blog_title: "Histoires de ville",
-        search_placeholder: "Rechercher une ville...",
-        no_stories: "Aucune histoire trouvée. Revenez bientôt!",
-        read_full: "Lire l'histoire complète",
-        trivia: "Anecdotes",
-        history: "Histoire",
-        close: "Fermer"
-      },
-      de: {
-        blog_title: "Stadtgeschichten",
-        search_placeholder: "Stadt suchen...",
-        no_stories: "Keine Geschichten gefunden. Bald wieder vorbeischauen!",
-        read_full: "Ganze Geschichte lesen",
-        trivia: "Wissenswertes",
-        history: "Geschichte",
-        close: "Schließen"
-      },
-      pt: {
-        blog_title: "Histórias da cidade",
-        search_placeholder: "Buscar cidade...",
-        no_stories: "Nenhuma história encontrada. Volte em breve!",
-        read_full: "Ler história completa",
-        trivia: "Curiosidades",
-        history: "História",
-        close: "Fechar"
-      },
-      ja: {
-        blog_title: "都市の物語",
-        search_placeholder: "都市を検索...",
-        no_stories: "物語が見つかりません。また後で！",
-        read_full: "全文を読む",
-        trivia: "豆知識",
-        history: "歴史",
-        close: "閉じる"
-      }
+    // var, not const: tempo-economy.js (loaded below) also declares
+    // these; var redeclaration across scripts is a safe no-op.
+    var SUPABASE_URL = SUPABASE_URL || 'https://hnysztednzqfzbmiqqgl.supabase.co';
+    var SUPABASE_ANON_KEY = SUPABASE_ANON_KEY || 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
+    const VERTICALS = [
+      { slug: 'pulse', label: 'Pulse' },
+      { slug: 'tech', label: 'Tech' },
+      { slug: 'finance', label: 'Finance' },
+      { slug: 'work', label: 'Work' },
+      { slug: 'property', label: 'Property' },
+      { slug: 'education', label: 'Education' },
+      { slug: 'sport', label: 'Sport' },
+      { slug: 'entertainment', label: 'Entertainment' },
+      { slug: 'fashion', label: 'Fashion' },
+      { slug: 'food', label: 'Food' },
+      { slug: 'health', label: 'Health' },
+      { slug: 'transport', label: 'Transport' },
+    ];
+    const PAGE_SIZE = 20;
+    const REFRESH_MS = 60000;
+
+    const state = {
+      vertical: '',
+      city: '',
+      search: '',
+      pool: [],       // all fetched/merged feed items, sorted desc by time
+      shown: 0,       // how many of the filtered pool are currently rendered
+      lastFetchAt: null,
     };
 
-    const currentLang = localStorage.getItem('glotemp-lang') || (navigator.language || 'en').split('-')[0];
-    const t = (key) => translationsBlog[currentLang]?.[key] || translationsBlog.en[key] || key;
-
-    function applyBlogTranslations() {
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        el.textContent = t(el.dataset.i18n);
-      });
-      const searchInput = document.getElementById('blog-search');
-      if (searchInput) searchInput.placeholder = t('search_placeholder');
+    function citySlugFor(name) {
+      const c = window.CITIES_DATA.find(c => c.name === name || c.slug === name);
+      return c ? c.slug : null;
     }
 
-function loadPosts() {
-  try {
-    const stories = (typeof STORIES !== 'undefined' && Array.isArray(STORIES)) ? STORIES : [];
-    const sorted = [...stories].sort((a, b) => new Date(b.date) - new Date(a.date));
-    renderPosts(sorted);
-  } catch (err) {
-    renderPosts([]); // show empty state
-  }
-}
-    function renderPosts(posts) {
-      const grid = document.getElementById('blog-posts-grid');
-      const empty = document.getElementById('blog-empty');
-      grid.innerHTML = '';
+    function cityBandColor(slug) {
+      const c = window.CITIES_DATA.find(c => c.slug === slug);
+      return c ? GlotempCore.moodToBand(c.mood).color : 'var(--band-equilibrium)';
+    }
 
-      if (!posts.length) {
-        grid.style.display = 'none';
-        empty.style.display = 'block';
+    // ---- Build the toolbar ----
+    function buildVerticalFilters() {
+      const row = document.getElementById('vertical-filter-row');
+      const chips = [{ slug: '', label: 'All' }, ...VERTICALS];
+      row.innerHTML = chips.map(v =>
+        `<button class="vertical-chip" data-vertical="${v.slug}" data-active="${v.slug === '' ? 'true' : 'false'}">${v.label}</button>`
+      ).join('');
+      row.querySelectorAll('.vertical-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          row.querySelectorAll('.vertical-chip').forEach(c => c.setAttribute('data-active', 'false'));
+          chip.setAttribute('data-active', 'true');
+          state.vertical = chip.getAttribute('data-vertical');
+          applyActiveBandColor();
+          renderFiltered();
+        });
+      });
+      applyActiveBandColor();
+    }
+
+    function applyActiveBandColor() {
+      const pinned = GlotempCore.getPinnedCity();
+      const color = pinned ? cityBandColor(pinned) : 'var(--band-equilibrium)';
+      document.querySelectorAll('.vertical-chip[data-active="true"]').forEach(chip => {
+        chip.style.setProperty('--active-band', color);
+      });
+    }
+
+    function buildCitySelect() {
+      const sel = document.getElementById('feed-city-select');
+      const sorted = [...window.CITIES_DATA].sort((a, b) => a.name.localeCompare(b.name));
+      sorted.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.slug;
+        opt.textContent = c.name;
+        sel.appendChild(opt);
+      });
+      const pinned = GlotempCore.getPinnedCity();
+      if (pinned) { sel.value = pinned; state.city = pinned; }
+      sel.addEventListener('change', () => {
+        state.city = sel.value;
+        renderFiltered();
+      });
+    }
+
+    // ---- Data sources merged into one pool ----
+    function storiesAsFeedItems() {
+      if (!window.STORIES) return [];
+      return window.STORIES.map(story => {
+        const slug = (story.image || '').replace(/^city-/, '');
+        return {
+          vertical: 'pulse',
+          citySlug: slug,
+          cityName: story.city,
+          headline: story.title,
+          context: story.excerpt || (story.content || '').slice(0, 140),
+          timestamp: story.date,
+          source: 'Glotemp Editorial',
+          sourceUrl: null,
+          kind: 'story',
+        };
+      });
+    }
+
+    function checkinsAsFeedItems() {
+      if (!window.SEED_OBSERVATIONS) return [];
+      return window.SEED_OBSERVATIONS.slice(0, 60).map(obs => ({
+        vertical: 'pulse',
+        citySlug: obs.city,
+        cityName: obs.cityName,
+        headline: `A human check-in from ${obs.cityName}`,
+        context: obs.context,
+        timestamp: obs.created_at,
+        source: 'Human check-in',
+        sourceUrl: null,
+        kind: 'checkin',
+      }));
+    }
+
+    function readingsAsFeedItems(rows) {
+      return rows.map(r => ({
+        vertical: r.vertical,
+        citySlug: r.city_slug,
+        cityName: (window.CITIES_DATA.find(c => c.slug === r.city_slug) || {}).name || r.city_slug,
+        headline: `${r.metric.replace(/_/g, ' ')}${r.value !== null && r.value !== undefined ? `: ${r.value}` : ''}`,
+        context: r.label || '',
+        timestamp: r.fetched_at,
+        source: r.source,
+        sourceUrl: r.source_url,
+        confidence: r.confidence,
+        kind: 'reading',
+      }));
+    }
+
+    async function fetchReadings() {
+      try {
+        const resp = await fetch(
+          `${SUPABASE_URL}/rest/v1/readings?select=city_slug,vertical,metric,value,label,source,source_url,confidence,fetched_at&order=fetched_at.desc&limit=500`,
+          { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
+        );
+        if (!resp.ok) return [];
+        return await resp.json();
+      } catch (e) {
+        console.warn('Feed: readings fetch failed, showing local sources only:', e.message);
+        return [];
+      }
+    }
+
+    function mergePool(readingRows) {
+      const merged = [
+        ...readingsAsFeedItems(readingRows),
+        ...storiesAsFeedItems(),
+        ...checkinsAsFeedItems(),
+      ];
+      merged.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      state.pool = merged;
+    }
+
+    // ---- Rendering ----
+    function filteredPool() {
+      let list = state.pool;
+      if (state.vertical) list = list.filter(i => i.vertical === state.vertical);
+      if (state.city) list = list.filter(i => i.citySlug === state.city);
+      if (state.search) {
+        const q = state.search.toLowerCase();
+        list = list.filter(i => (i.cityName || '').toLowerCase().includes(q));
+      }
+      return list;
+    }
+
+    function itemHTML(item) {
+      const color = item.citySlug ? cityBandColor(item.citySlug) : 'var(--band-equilibrium)';
+      const time = GlotempCore.getTimeAgo(new Date(item.timestamp));
+      const verticalLabel = (VERTICALS.find(v => v.slug === item.vertical) || { label: item.vertical }).label;
+      const sourceHTML = item.sourceUrl
+        ? `<a href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer">${item.source}</a>`
+        : item.source;
+      const cityLink = item.citySlug ? `data-city-link="${item.citySlug}"` : '';
+
+      return `
+        <article class="feed-item hover-lift reveal-on-scroll" style="--item-band:${color};">
+          <div class="feed-item-top">
+            <span class="feed-item-vertical">${verticalLabel}</span>
+            <span class="feed-item-city" ${cityLink} style="cursor:${item.citySlug ? 'pointer' : 'default'};">${item.cityName || 'Unknown city'}</span>
+          </div>
+          <div class="feed-item-headline">${item.headline}</div>
+          ${item.context ? `<div class="feed-item-context">${item.context}</div>` : ''}
+          <div class="feed-item-bottom">
+            <span class="feed-item-source">${sourceHTML}</span>
+            <time datetime="${item.timestamp}">${time}</time>
+          </div>
+        </article>`;
+    }
+
+    function emptyStateMessage() {
+      if (state.vertical) {
+        const label = (VERTICALS.find(v => v.slug === state.vertical) || {}).label || state.vertical;
+        return `No ${label} signal yet${state.city ? ' for this city' : ''}. Check back shortly, or try another vertical.`;
+      }
+      return 'No signals match this filter yet.';
+    }
+
+    function renderFiltered({ reset = true } = {}) {
+      const list = filteredPool();
+      const listEl = document.getElementById('feed-list');
+      const emptyEl = document.getElementById('feed-empty');
+      const loadMoreBtn = document.getElementById('feed-load-more');
+
+      if (reset) state.shown = 0;
+
+      if (!list.length) {
+        listEl.innerHTML = '';
+        emptyEl.style.display = 'block';
+        emptyEl.textContent = emptyStateMessage();
+        loadMoreBtn.style.display = 'none';
         return;
       }
+      emptyEl.style.display = 'none';
 
-      grid.style.display = 'grid';
-      empty.style.display = 'none';
+      state.shown = Math.min(list.length, state.shown === 0 ? PAGE_SIZE : Math.max(state.shown, PAGE_SIZE));
+      listEl.innerHTML = list.slice(0, state.shown).map(itemHTML).join('');
+      loadMoreBtn.style.display = state.shown < list.length ? 'inline-block' : 'none';
 
-      posts.forEach(post => {
-        const card = document.createElement('div');
-        card.className = 'glass-card blog-card';
-        card.dataset.city = post.city.toLowerCase();
-
-        // Render image or placeholder
-        let imageHtml = '';
-        if (post.image) {
-          const imageName = post.image;
-          imageHtml = `<picture class="card-media">
-            <source srcset="/assets/art/${imageName}-1200.avif 1200w, /assets/art/${imageName}-600.avif 600w" type="image/avif" />
-            <source srcset="/assets/art/${imageName}-1200.webp 1200w, /assets/art/${imageName}-600.webp 600w" type="image/webp" />
-            <img src="/assets/art/${imageName}-1200.png"
-                 srcset="/assets/art/${imageName}-1200.png 1200w, /assets/art/${imageName}-600.png 600w"
-                 alt="${post.imageAlt || post.city}"
-                 width="1200"
-                 height="800"
-                 loading="lazy"
-                 decoding="async" />
-          </picture>`;
-        } else {
-          imageHtml = `<div class="card-placeholder">
-            <div class="card-placeholder-content">
-              <div class="card-placeholder-name">${post.city}</div>
-            </div>
-          </div>`;
-        }
-
-        card.innerHTML = `
-          ${imageHtml}
-          <div class="blog-city">${post.city}</div>
-          <h3 class="blog-title">${post.title}</h3>
-          <p class="blog-excerpt">${(post.excerpt || post.content || '').substring(0, 200)}</p>
-          <div class="blog-date">${new Date(post.date).toLocaleDateString(currentLang, { year:'numeric', month:'long', day:'numeric' })}</div>
-          <button class="btn-neon blog-read-btn">${t('read_full')}</button>
-          <div class="blog-full-content">
-            <p>${post.content}</p>
-            <div class="blog-toggles">
-              <button class="btn-text trivia-toggle">${t('trivia')}</button>
-              <div class="trivia-content" style="white-space:pre-line;">${post.trivia || ''}</div>
-              <button class="btn-text history-toggle">${t('history')}</button>
-              <div class="history-content" style="white-space:pre-line;">${post.history_nugget || ''}</div>
-            </div>
-            <div class="comment-section" data-city="${post.city_slug || post.city.toLowerCase()}"></div>
-          </div>
-        `;
-
-        // Toggle full story
-        const readBtn = card.querySelector('.blog-read-btn');
-        const fullContent = card.querySelector('.blog-full-content');
-        readBtn.addEventListener('click', () => {
-          const isOpen = fullContent.style.display === 'block';
-          fullContent.style.display = isOpen ? 'none' : 'block';
-          readBtn.textContent = isOpen ? t('read_full') : t('close');
-          if (fullContent.style.display === 'block' && fullContent.querySelector('.comment-section').innerHTML === '') {
-            initCommentSection(fullContent.querySelector('.comment-section'));
-          }
+      wireReveal();
+      GlotempCore.wireCityLinks(listEl);
+      listEl.querySelectorAll('[data-city-link]').forEach(el => {
+        el.setAttribute('data-city-nav', 'false');
+        el.addEventListener('click', (e) => {
+          const slug = el.getAttribute('data-city-link');
+          if (slug) window.location.href = `/cities/${slug}.html`;
         });
-
-        // Trivia toggle
-        card.querySelector('.trivia-toggle').addEventListener('click', function() {
-          const content = this.nextElementSibling;
-          content.style.display = content.style.display === 'none' ? 'block' : 'none';
-        });
-        // History toggle
-        card.querySelector('.history-toggle').addEventListener('click', function() {
-          const content = this.nextElementSibling;
-          content.style.display = content.style.display === 'none' ? 'block' : 'none';
-        });
-
-        grid.appendChild(card);
       });
     }
 
-    // Search filter
-    document.addEventListener('input', function(e) {
-      if (e.target.id === 'blog-search') {
-        const term = e.target.value.toLowerCase();
-        document.querySelectorAll('.blog-card').forEach(card => {
-          const city = card.dataset.city || '';
-          card.style.display = city.includes(term) ? 'block' : 'none';
-        });
+    let revealObserver;
+    function wireReveal() {
+      if (!revealObserver && 'IntersectionObserver' in window) {
+        revealObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        }, { rootMargin: '0px 0px -40px 0px' });
       }
-    });
-
-    // Language switch (same as in app.js, but simplified)
-    document.getElementById('lang-switch').addEventListener('click', () => {
-      const langs = Object.keys(translationsBlog);
-      const currentIdx = langs.indexOf(currentLang);
-      const nextLang = langs[(currentIdx + 1) % langs.length];
-      localStorage.setItem('glotemp-lang', nextLang);
-      location.reload(); // quick refresh for demo; later you can make it dynamic
-    });
-
-    function initCommentSection(container) {
-      const citySlug = container.dataset.city;
-      container.innerHTML = `
-        <div class="comment-section">
-          <h4>City Pulse Comments</h4>
-          <div class="comment-input-wrap">
-            <textarea class="comment-input" placeholder="Share the vibe (max 280 chars)..." maxlength="280"></textarea>
-            <div class="mood-picker">
-              <button class="mood-emoji" data-mood="🔥" title="Energized">▲</button>
-              <button class="mood-emoji" data-mood="😊" title="Good">◆</button>
-              <button class="mood-emoji" data-mood="😐" title="Neutral">●</button>
-              <button class="mood-emoji" data-mood="😞" title="Low">▼</button>
-              <button class="mood-emoji" data-mood="😡" title="Cautious">◇</button>
-            </div>
-            <button class="btn-neon comment-submit">Post Comment</button>
-          </div>
-          <div class="comment-list"></div>
-        </div>
-      `;
-
-      let selectedMood = '😐';
-      const moodBtns = container.querySelectorAll('.mood-emoji');
-      const textarea = container.querySelector('.comment-input');
-      const submitBtn = container.querySelector('.comment-submit');
-      const commentList = container.querySelector('.comment-list');
-
-      moodBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          moodBtns.forEach(b => b.style.opacity = '0.5');
-          btn.style.opacity = '1';
-          selectedMood = btn.dataset.mood;
-        });
-        if (btn.dataset.mood === selectedMood) btn.style.opacity = '1';
-        else btn.style.opacity = '0.5';
-      });
-
-      submitBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const text = textarea.value.trim();
-        if (!text) return;
-
-        try {
-          submitBtn.disabled = true;
-          submitBtn.textContent = 'Posting...';
-          await submitComment(citySlug, text, selectedMood);
-          textarea.value = '';
-          selectedMood = '😐';
-          moodBtns.forEach(b => { b.style.opacity = b.dataset.mood === '😐' ? '1' : '0.5'; });
-          loadComments(citySlug, commentList);
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Post Comment';
-        } catch (err) {
-          console.error('Error submitting comment:', err);
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Post Comment';
-        }
-      });
-
-      loadComments(citySlug, commentList);
-    }
-
-    function loadComments(citySlug, container) {
-      getComments(citySlug).then(comments => {
-        container.innerHTML = '';
-        if (comments.length === 0) {
-          const emptyMsg = document.createElement('p');
-          emptyMsg.className = 'inline-feedback';
-          emptyMsg.textContent = 'No comments yet. Be first to share!';
-          container.appendChild(emptyMsg);
-          return;
-        }
-        comments.slice(0, 10).forEach(comment => {
-          const time = new Date(comment.created_at).toLocaleString(currentLang, { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
-          const item = document.createElement('div');
-          item.className = 'comment-item';
-          const flexDiv = document.createElement('div');
-          flexDiv.style.display = 'flex';
-          flexDiv.style.gap = '0.5rem';
-          flexDiv.style.alignItems = 'flex-start';
-
-          const moodDiv = document.createElement('div');
-          moodDiv.style.fontSize = '1.5rem';
-          moodDiv.style.flexShrink = '0';
-          moodDiv.textContent = comment.mood_emoji;
-
-          const contentDiv = document.createElement('div');
-          contentDiv.style.flex = '1';
-          contentDiv.style.minWidth = '0';
-
-          const p = document.createElement('p');
-          p.textContent = comment.text;
-
-          const small = document.createElement('small');
-          small.textContent = time;
-
-          contentDiv.appendChild(p);
-          contentDiv.appendChild(small);
-          flexDiv.appendChild(moodDiv);
-          flexDiv.appendChild(contentDiv);
-          item.appendChild(flexDiv);
-          container.appendChild(item);
-        });
+      document.querySelectorAll('.reveal-on-scroll:not(.is-visible)').forEach(el => {
+        if (revealObserver) revealObserver.observe(el);
+        else el.classList.add('is-visible');
       });
     }
 
-    // Init
-    document.addEventListener('DOMContentLoaded', () => {
-      applyBlogTranslations();
-      loadPosts();
+    document.getElementById('feed-load-more').addEventListener('click', () => {
+      state.shown += PAGE_SIZE;
+      renderFiltered({ reset: false });
     });
+
+    document.getElementById('feed-search').addEventListener('input', (e) => {
+      state.search = e.target.value;
+      renderFiltered();
+    });
+
+    document.addEventListener('glotemp:city-pinned', (e) => {
+      document.getElementById('feed-city-select').value = e.detail.slug;
+      state.city = e.detail.slug;
+      applyActiveBandColor();
+      renderFiltered();
+    });
+
+    // ---- Live refresh, paused when tab hidden ----
+    let refreshTimer = null;
+    async function refreshPool() {
+      const rows = await fetchReadings();
+      if (rows.length) {
+        mergePool(rows);
+        renderFiltered({ reset: false });
+        state.shown = Math.max(state.shown, PAGE_SIZE);
+      }
+      state.lastFetchAt = Date.now();
+    }
+
+    function startRefreshLoop() {
+      if (refreshTimer) return;
+      refreshTimer = setInterval(() => {
+        if (!document.hidden) refreshPool();
+      }, REFRESH_MS);
+    }
+
+    function stopRefreshLoop() {
+      if (refreshTimer) { clearInterval(refreshTimer); refreshTimer = null; }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopRefreshLoop();
+      else startRefreshLoop();
+    });
+
+    async function init() {
+      buildVerticalFilters();
+      buildCitySelect();
+      mergePool([]); // stories + check-ins render immediately, no network wait
+      renderFiltered();
+      await refreshPool();
+      startRefreshLoop();
+    }
+
+    init();
+
+    const lang = localStorage.getItem('glotemp-lang') || 'en';
+    document.documentElement.lang = lang;
   </script>
+  <script src="/cookie-consent.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
 </body>
 </html>

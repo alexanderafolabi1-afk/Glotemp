@@ -3,6 +3,24 @@
 // Generate individual city profile pages from template
 const fs = require('fs');
 const path = require('path');
+const vm = require('vm');
+
+// Load the full seed-observations dataset once here in the generator,
+// not in the browser: each page only needs its own city's ~8 rows, so
+// inlining that slice avoids shipping the full ~75KB / 309-row file to
+// every one of the 150 pages just to filter it down client-side.
+const seedObservationsSource = fs.readFileSync('./seed-observations.js', 'utf8');
+const seedSandbox = { window: {}, Date };
+vm.createContext(seedSandbox);
+vm.runInContext(seedObservationsSource, seedSandbox);
+const ALL_SEED_OBSERVATIONS = seedSandbox.window.SEED_OBSERVATIONS || [];
+
+function observationsForCity(slug) {
+  return ALL_SEED_OBSERVATIONS
+    .filter(o => o.city === slug)
+    .slice(0, 8)
+    .map(o => ({ context: o.context, language_lens: o.language_lens, created_at: o.created_at }));
+}
 
 // Load cities data
 const citiesDataContent = fs.readFileSync('./cities-data.js', 'utf8');
@@ -109,9 +127,10 @@ function generateCityPage(city) {
         document.getElementById('city-metro-pop').textContent = \`👥 \${city.metro_pop.toLocaleString()} metro\`;
       }
 
-      const verticals = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
+      const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
 
-      for (const vertical of verticals) {
+      for (const vertical of verticalSlugs) {
+        const contentEl = document.getElementById(\`\${vertical}-content\`);
         try {
           const response = await fetch(
             \`\${SUPABASE_URL}/rest/v1/readings?city_slug=eq.\${citySlug}&vertical=eq.\${vertical}&order=fetched_at.desc&limit=50\`,
@@ -125,13 +144,13 @@ function generateCityPage(city) {
           );
 
           if (!response.ok) {
-            document.getElementById(\`\${vertical}-content\`).innerHTML = '<p>No data available</p>';
+            contentEl.innerHTML = '<div class="empty-state">No data available for this vertical yet.</div>';
             continue;
           }
 
           const readings = await response.json();
-          if (readings.length === 0) {
-            document.getElementById(\`\${vertical}-content\`).innerHTML = '<p>No readings yet for this city</p>';
+          if (!readings.length) {
+            contentEl.innerHTML = '<div class="empty-state">No readings yet for this city.</div>';
             continue;
           }
 
@@ -154,10 +173,10 @@ function generateCityPage(city) {
             </div>
           \`).join('');
 
-          document.getElementById(\`\${vertical}-content\`).innerHTML = content;
+          contentEl.innerHTML = content;
         } catch (error) {
           console.error(\`Error loading \${vertical} data:\`, error);
-          document.getElementById(\`\${vertical}-content\`).innerHTML = '<p>Error loading data</p>';
+          contentEl.innerHTML = '<div class="empty-state">Error loading data. Try again shortly.</div>';
         }
       }
     }
@@ -166,6 +185,210 @@ function generateCityPage(city) {
       document.addEventListener('DOMContentLoaded', loadCityData);
     } else {
       loadCityData();
+    }
+
+    // ---- Affiliate row ----
+    (function renderAffiliateLinks() {
+      const container = document.getElementById('city-affiliate-links');
+      if (!container) return;
+      const cityName = encodeURIComponent('${city.name}');
+      container.innerHTML = \`
+        <a href="https://www.booking.com/searchresults.html?ss=\${cityName}" target="_blank" rel="noopener noreferrer" class="affiliate-btn"><span>Book a Hotel in ${city.name}</span></a>
+        <a href="https://www.skyscanner.net/transport/flights/anywhere/\${cityName}/" target="_blank" rel="noopener noreferrer" class="affiliate-btn"><span>Find Flights to ${city.name}</span></a>
+        <a href="https://www.insuremytrip.com/" target="_blank" rel="noopener noreferrer" class="affiliate-btn"><span>Get Travel Insurance</span></a>
+      \`;
+    })();
+
+    // ---- Watch this city ----
+    (function wireWatch() {
+      const btn = document.getElementById('watch-city-btn');
+      const panel = document.getElementById('watch-email-panel');
+      const emailInput = document.getElementById('watch-email-input');
+      const submitBtn = document.getElementById('watch-email-submit');
+      const statusEl = document.getElementById('watch-email-status');
+      if (!btn || typeof GlotempCore === 'undefined') return;
+      const citySlug = '${city.slug}';
+
+      function refreshLabel() {
+        btn.textContent = GlotempCore.isWatched(citySlug) ? 'Watching this city ✓' : 'Watch this city';
+      }
+      refreshLabel();
+
+      btn.addEventListener('click', () => {
+        const nowWatching = GlotempCore.toggleWatch(citySlug);
+        refreshLabel();
+        if (panel) panel.style.display = nowWatching ? 'block' : 'none';
+      });
+
+      if (submitBtn && emailInput) {
+        submitBtn.addEventListener('click', async () => {
+          const email = emailInput.value.trim();
+          if (!email || !email.includes('@')) {
+            statusEl.textContent = 'Enter a valid email.';
+            return;
+          }
+          submitBtn.disabled = true;
+          try {
+            await fetch(\`\${SUPABASE_URL}/rest/v1/city_watchers\`, {
+              method: 'POST',
+              headers: {
+                apikey: SUPABASE_ANON_KEY,
+                Authorization: \`Bearer \${SUPABASE_ANON_KEY}\`,
+                'Content-Type': 'application/json',
+                Prefer: 'return=minimal',
+              },
+              body: JSON.stringify({ city_slug: citySlug, email }),
+            });
+            statusEl.textContent = "You're on the list -- we'll notify " + email + '.';
+            emailInput.value = '';
+          } catch (e) {
+            statusEl.textContent = "Saved locally -- we'll sync this once you're back online.";
+          }
+          submitBtn.disabled = false;
+        });
+      }
+    })();
+
+    // ---- Share ----
+    (function wireShare() {
+      const btn = document.getElementById('share-city-btn');
+      if (!btn) return;
+      btn.addEventListener('click', async () => {
+        const cityRec = window.CITIES_DATA.find(c => c.slug === '${city.slug}');
+        const band = cityRec ? GlotempCore.moodToBand(cityRec.mood) : null;
+        const text = cityRec && band
+          ? \`\${cityRec.name} is reading \${band.band} right now (\${cityRec.mood.toFixed(1)}/10) on Glotemp.\`
+          : 'Check out this city on Glotemp.';
+        const url = window.location.href;
+        if (navigator.share) {
+          try { await navigator.share({ title: 'Glotemp', text, url }); } catch (e) { /* user cancelled */ }
+        } else if (navigator.clipboard) {
+          await navigator.clipboard.writeText(\`\${text} \${url}\`);
+          const original = btn.textContent;
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.textContent = original; }, 2000);
+        }
+      });
+    })();
+
+    // ---- Live observation feed for this city ----
+    // Uses GlotempCore.getTimeAgo (loaded non-deferred, synchronously
+    // available) rather than verticals.getTimeAgo -- this runs
+    // immediately below, before verticals-engine.js's deferred script
+    // has executed.
+    function renderObservationFeed() {
+      const container = document.getElementById('city-observation-feed');
+      if (!container) return;
+      // Pre-filtered to this city at generation time -- see
+      // observationsForCity() in generate-city-pages.js -- rather than
+      // shipping the full ~75KB seed-observations.js to every page.
+      const checkins = ${JSON.stringify(observationsForCity(city.slug))};
+
+      if (!checkins.length) {
+        container.innerHTML = '<div class="empty-state">No observations yet for this city. Be the first.</div>';
+        return;
+      }
+
+      container.innerHTML = checkins.map(obs => \`
+        <div class="reading glass-card">
+          <div class="reading-header">
+            <span class="reading-metric">Human check-in</span>
+          </div>
+          <div class="reading-value"><span class="reading-label">\${obs.context}</span></div>
+          <div class="reading-footer">
+            <span class="reading-source">\${obs.language_lens || 'visitor'}</span>
+            <time class="reading-time" datetime="\${obs.created_at}">\${GlotempCore.getTimeAgo(new Date(obs.created_at))}</time>
+          </div>
+        </div>
+      \`).join('');
+    }
+    renderObservationFeed();
+
+    // ---- Comments ----
+    // getComments/submitComment come from tempo-economy.js, which is
+    // deferred -- gate init behind DOMContentLoaded like loadCityData,
+    // not an immediate IIFE, or the typeof guard below would silently
+    // skip forever (it runs once, before that script has executed).
+    function initCityComments() {
+      const container = document.getElementById('city-comment-section');
+      if (!container || typeof getComments === 'undefined') return;
+      const citySlug = '${city.slug}';
+
+      container.innerHTML = \`
+        <div class="comment-input-wrap">
+          <textarea class="comment-input" placeholder="Share the vibe (max 280 chars)..." maxlength="280"></textarea>
+          <div class="mood-picker">
+            <button class="mood-emoji" data-mood="🔥" title="Energized">▲</button>
+            <button class="mood-emoji" data-mood="😊" title="Good">◆</button>
+            <button class="mood-emoji" data-mood="😐" title="Neutral">●</button>
+            <button class="mood-emoji" data-mood="😞" title="Low">▼</button>
+            <button class="mood-emoji" data-mood="😡" title="Cautious">◇</button>
+          </div>
+          <button class="btn-neon comment-submit">Post Comment</button>
+        </div>
+        <div class="comment-list"></div>
+      \`;
+
+      let selectedMood = '😐';
+      const moodBtns = container.querySelectorAll('.mood-emoji');
+      const textarea = container.querySelector('.comment-input');
+      const submitBtn = container.querySelector('.comment-submit');
+      const commentList = container.querySelector('.comment-list');
+
+      moodBtns.forEach(btn => {
+        btn.style.opacity = btn.dataset.mood === selectedMood ? '1' : '0.5';
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          moodBtns.forEach(b => b.style.opacity = '0.5');
+          btn.style.opacity = '1';
+          selectedMood = btn.dataset.mood;
+        });
+      });
+
+      function loadCityComments() {
+        getComments(citySlug).then(comments => {
+          if (!comments.length) {
+            commentList.innerHTML = '<p class="inline-feedback">No comments yet. Be first to share!</p>';
+            return;
+          }
+          commentList.innerHTML = comments.slice(0, 10).map(c => \`
+            <div class="comment-item">
+              <div style="display:flex; gap:0.5rem; align-items:flex-start;">
+                <div style="font-size:1.5rem; flex-shrink:0;">\${c.mood_emoji}</div>
+                <div style="flex:1; min-width:0;">
+                  <p>\${c.text}</p>
+                  <small>\${new Date(c.created_at).toLocaleString()}</small>
+                </div>
+              </div>
+            </div>
+          \`).join('');
+        });
+      }
+
+      submitBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const text = textarea.value.trim();
+        if (!text) return;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Posting...';
+        try {
+          await submitComment(citySlug, text, selectedMood);
+          textarea.value = '';
+          loadCityComments();
+        } catch (err) {
+          console.error('Comment submission failed:', err);
+        }
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Post Comment';
+      });
+
+      loadCityComments();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCityComments);
+    } else {
+      initCityComments();
     }
   </script>
   `;
