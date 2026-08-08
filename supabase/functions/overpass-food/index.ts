@@ -30,52 +30,61 @@ const cityBounds: Record<string, { south: number; west: number; north: number; e
 };
 
 async function fetchFoodData(city: string, bounds: any) {
-  try {
-    // Overpass API: Query for restaurants/cafes
-    const query = `[bbox:${bounds.south},${bounds.west},${bounds.north},${bounds.east}];
-      (
-        node["amenity"="restaurant"];
-        way["amenity"="restaurant"];
-        node["amenity"="cafe"];
-        way["amenity"="cafe"];
-      );
-      out count;`;
+  const mirrors = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.openstreetmap.ru/api/interpreter",
+  ];
+  const timeoutMs = 25000; // 25s timeout, function limit is 30s
 
-    const response = await fetch("https://overpass-api.de/api/interpreter", {
-      method: "POST",
-      body: query,
-    });
+  for (const url of mirrors) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-    if (!response.ok) {
-      return {
-        restaurant_count: 100 + Math.random() * 2000,
-        michelin_stars: Math.random() * 50,
-        culinary_diversity: 6 + Math.random() * 3.5,
-        confidence: 0.5,
-      };
+      const query = `[bbox:${bounds.south},${bounds.west},${bounds.north},${bounds.east}];
+        (
+          node["amenity"="restaurant"];
+          way["amenity"="restaurant"];
+          node["amenity"="cafe"];
+          way["amenity"="cafe"];
+        );
+        out count;`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        body: query,
+        signal: controller.signal,
+        headers: {
+          "User-Agent": "glo-temp.com/1.0 (+https://glo-temp.com)",
+        },
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const text = await response.text();
+        const countMatch = text.match(/Count: (\d+)/);
+        const restaurantCount = countMatch ? parseInt(countMatch[1]) : 500;
+
+        return {
+          restaurant_count: Math.min(2100, Math.max(100, restaurantCount)),
+          michelin_stars: Math.floor(Math.random() * 50),
+          culinary_diversity: 6 + Math.random() * 3.5,
+          confidence: Math.min(0.8, restaurantCount / 1000),
+        };
+      }
+
+      if (response.status === 429) {
+        console.warn(`${url} rate limited for ${city}, trying fallback`);
+        continue;
+      }
+    } catch (error) {
+      console.warn(`Mirror ${url} failed for ${city}: ${error.message}`);
+      continue;
     }
-
-    const text = await response.text();
-    // Parse OSM count from response
-    const countMatch = text.match(/Count: (\d+)/);
-    const restaurantCount = countMatch ? parseInt(countMatch[1]) : 500;
-
-    return {
-      restaurant_count: Math.min(2100, Math.max(100, restaurantCount)),
-      michelin_stars: Math.floor(Math.random() * 50),
-      culinary_diversity: 6 + Math.random() * 3.5,
-      confidence: Math.min(0.8, restaurantCount / 1000),
-    };
-  } catch (error) {
-    console.error(`Error fetching food data for ${city}:`, error);
-    // Return synthetic data on error
-    return {
-      restaurant_count: 100 + Math.random() * 2000,
-      michelin_stars: Math.random() * 50,
-      culinary_diversity: 6 + Math.random() * 3.5,
-      confidence: 0.5,
-    };
   }
+
+  return null;
 }
 
 async function insertReading(
@@ -106,12 +115,15 @@ Deno.serve(async (req: Request) => {
 
     for (const [city, bounds] of Object.entries(cityBounds)) {
       const result = await fetchFoodData(city, bounds);
-      if (result) {
-        await insertReading(city, "restaurant_count", result.restaurant_count, "Restaurants and dining venues", result.confidence);
-        await insertReading(city, "michelin_stars", result.michelin_stars, "Michelin-starred restaurants", result.confidence);
-        await insertReading(city, "culinary_diversity", result.culinary_diversity, "Culinary diversity score", result.confidence);
-        successCount++;
+      if (!result) {
+        console.warn(`No valid data for ${city}, skipping inserts`);
+        continue;
       }
+
+      await insertReading(city, "restaurant_count", result.restaurant_count, "Restaurants and dining venues", result.confidence);
+      await insertReading(city, "michelin_stars", result.michelin_stars, "Michelin-starred restaurants", result.confidence);
+      await insertReading(city, "culinary_diversity", result.culinary_diversity, "Culinary diversity score", result.confidence);
+      successCount++;
     }
 
     return new Response(
