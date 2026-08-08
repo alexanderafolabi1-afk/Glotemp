@@ -721,6 +721,8 @@ body.scroll-reveals-enabled section.revealed {
 }
 
 /* ===== NAVIGATION ===== */
+/* Flush top bar -- intentionally NOT .glass/.glass-card here: no pill/oval
+   container, just a hairline to separate it from page content. */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -729,6 +731,13 @@ body.scroll-reveals-enabled section.revealed {
   margin-bottom: 1.5rem;
   position: relative;
   z-index: 10;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  border-bottom: 1px solid var(--hairline);
 }
 
 .logo-text {
@@ -740,10 +749,10 @@ body.scroll-reveals-enabled section.revealed {
 
 .nav-logo {
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
+  width: 60px;
+  height: 60px;
   object-fit: cover;
-  margin-right: 0.5rem;
+  margin-right: 0.6rem;
   vertical-align: middle;
 }
 
@@ -752,20 +761,13 @@ body.scroll-reveals-enabled section.revealed {
   align-items: center;
 }
 
+/* Small beating heart next to the wordmark (replaces the old pulse-dot ping) */
 .pulse-dot {
-  width: 10px;
-  height: 10px;
-  background: var(--ion);
-  border-radius: 50%;
   display: inline-block;
   margin-left: 6px;
-  animation: pulse-dot 1.8s infinite;
-}
-
-@keyframes pulse-dot {
-  0% { box-shadow: 0 0 0 0 rgba(79, 216, 232, 0.7); }
-  70% { box-shadow: 0 0 0 12px rgba(79, 216, 232, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(79, 216, 232, 0); }
+  font-size: 0.85rem;
+  line-height: 1;
+  transform-origin: center;
 }
 
 .nav-links a,
@@ -773,7 +775,8 @@ body.scroll-reveals-enabled section.revealed {
   color: var(--ash);
   text-decoration: none;
   margin-left: 1.5rem;
-  font-weight: var(--fw-medium);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.02em;
   transition: color var(--transition);
 }
 
@@ -2129,8 +2132,11 @@ small {
 }
 
 @keyframes heartbeat {
-  0%, 49%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.1); }
+  0%, 100% { transform: scale(1); }
+  15% { transform: scale(1.3); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.2); }
+  60% { transform: scale(1); }
 }
 
 .barometer-fluid {
@@ -3138,6 +3144,8 @@ button:hover:not(:focus-visible) {
 .nav-panel-lang {
   font-size: 24px;
   font-family: var(--font-display);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.02em;
   color: var(--ivory);
   text-decoration: none;
   background: transparent;
