@@ -359,7 +359,7 @@ body::after {
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
-  gap: 24px;
+  gap: 16px;
   margin-bottom: 2rem;
 }
 
@@ -368,9 +368,9 @@ body::after {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 220px;
-  padding: 1.5rem 1rem 2.5rem;
-  border-radius: calc(var(--radius) * 1.5);
+  width: 156px;
+  padding: 1rem 0.75rem 1.5rem;
+  border-radius: var(--radius);
   background: linear-gradient(135deg, rgba(23, 25, 38, 0.8) 0%, rgba(23, 25, 38, 0.6) 100%);
   border: 1px solid rgba(233, 231, 240, 0.06);
   box-shadow:
@@ -405,9 +405,9 @@ body::after {
   position: relative;
   isolation: isolate;
   width: 100%;
-  max-width: 180px;
+  max-width: 120px;
   aspect-ratio: 384 / 688;
-  border-radius: 14px;
+  border-radius: 10px;
   overflow: hidden;
 }
 
@@ -620,35 +620,35 @@ body::after {
 }
 
 .instrument-label {
-  margin-top: 1rem;
+  margin-top: 0.75rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.2rem;
   text-align: center;
 }
 
 .instrument-city-name {
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: var(--fw-light);
   color: var(--bone);
 }
 
 .instrument-band-name {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   font-weight: var(--fw-medium);
   text-transform: uppercase;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.16em;
   color: var(--ash);
 }
 
 .instr-dim-tip {
-  margin-top: 0.4rem;
+  margin-top: 0.3rem;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.05em;
+  font-size: 0.6rem;
+  letter-spacing: 0.03em;
   color: var(--ash);
   text-align: center;
 }
@@ -680,14 +680,14 @@ body::after {
 
   .instrument-slot {
     flex: 0 0 auto;
-    width: 168px;
-    padding: 1rem 0.75rem 2rem;
+    width: 130px;
+    padding: 0.85rem 0.6rem 1.25rem;
     scroll-snap-align: center;
     scroll-snap-stop: always;
   }
 
   .instrument-visual {
-    max-width: 140px;
+    max-width: 100px;
   }
 }
 
@@ -1616,41 +1616,41 @@ textarea:focus:not(:focus-visible) {
   margin: 1rem 0;
 }
 
+/* Shared "chip" style for both mood pickers on the homepage (the check-in
+   form's .mood-btn and the per-city comment box's .mood-emoji) -- a
+   rounded rect instead of a full circle, and the same visual language in
+   both places instead of two different-looking pickers. */
 .mood-btn {
   position: relative;
-  font-size: 1.8rem;
-  background-color: rgba(233, 231, 240, 0.04);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  mix-blend-mode: lighten;
+  font-size: 1.35rem;
+  background-color: rgba(233, 231, 240, 0.05);
   border: 1px solid var(--hairline);
-  border-radius: 50%;
-  width: 64px;
-  height: 64px;
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all var(--transition);
-  min-width: 64px;
-  min-height: 64px;
+  min-width: 48px;
+  min-height: 48px;
   color: var(--bone);
-  opacity: 0.65;
+  opacity: 0.6;
   font-weight: var(--fw-light);
 }
 
 .mood-btn:hover {
   opacity: 1;
-  transform: scale(1.08);
+  transform: translateY(-2px);
   border-color: rgba(79, 216, 232, 0.3);
 }
 
 .mood-btn.active {
   opacity: 1;
   border-color: var(--ion);
-  border-width: 2px;
-  box-shadow: 0 0 0 2px var(--obsidian), 0 0 0 3px var(--ion);
+  background-color: rgba(79, 216, 232, 0.08);
+  box-shadow: 0 0 0 1px var(--ion);
 }
 
 .observation-form,
@@ -1961,28 +1961,46 @@ textarea:focus:not(:focus-visible) {
   color: var(--ash);
 }
 
-.mood-picker {
+.mood-picker,
+.comment-mood-row {
   display: flex;
-  gap: 0;
+  gap: 0.5rem;
   flex-wrap: wrap;
+  margin-bottom: 0.75rem;
 }
 
+/* Same chip shape as .mood-btn (see above) so the two mood pickers on this
+   page read as one consistent control instead of two different styles.
+   Selection state is toggled via inline style by app.js, not a class. */
 .mood-emoji {
-  background: transparent;
-  border: none;
+  font-size: 1.35rem;
+  background-color: rgba(233, 231, 240, 0.05);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  opacity: 0.5;
   transition: all var(--transition);
-  font-size: 1.5rem;
-  padding: 0.5rem;
   min-width: 44px;
   min-height: 44px;
+  color: var(--bone);
+  opacity: 0.6;
 }
 
-.mood-emoji:hover,
+.mood-emoji:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+  border-color: rgba(79, 216, 232, 0.3);
+}
+
 .mood-emoji[style*="opacity: 1"] {
   opacity: 1;
-  transform: scale(1.15);
+  border-color: var(--ion);
+  background-color: rgba(79, 216, 232, 0.08);
+  box-shadow: 0 0 0 1px var(--ion);
 }
 
 .comment-submit {
@@ -2126,24 +2144,34 @@ textarea:focus:not(:focus-visible) {
 }
 
 /* ===== FOOTER ===== */
+/* Same fix as .navbar: don't inherit the .glass/.glass-card pill treatment
+   (blurred background, rounded corners, drop shadow) -- just a flush,
+   compact strip with a top hairline, uniform on every page. */
 .footer {
   text-align: center;
-  padding: 1rem 1.5rem;
+  padding: 0.85rem 1.5rem;
   margin-top: 3rem;
-  border-top: 1px solid var(--hairline);
   max-width: 68ch;
   margin-left: auto;
   margin-right: auto;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  border-top: 1px solid var(--hairline);
 }
 
 .footer p {
   margin-left: auto;
   margin-right: auto;
-  font-size: var(--small-size);
+  font-family: var(--font-mono);
+  font-size: 12px;
   color: var(--ash);
-  opacity: 0.75;
-  line-height: 1.4;
-  margin-bottom: 0.5rem;
+  opacity: 0.7;
+  line-height: 1.5;
+  margin-bottom: 0.4rem;
 }
 
 .footer p:first-child {
@@ -2151,11 +2179,11 @@ textarea:focus:not(:focus-visible) {
 }
 
 .footer .small-print {
-  font-size: calc(var(--small-size) - 2px);
+  font-size: 11px;
   color: var(--ash);
-  opacity: 0.7;
-  line-height: 1.3;
-  margin-top: 0.75rem;
+  opacity: 0.65;
+  line-height: 1.4;
+  margin-top: 0.5rem;
 }
 
 .footer .small-print a {
@@ -2562,6 +2590,7 @@ small {
 }
 
 .stat-card .stat-label {
+  font-family: var(--font-mono);
   font-size: 0.875rem;
   color: var(--ash);
   text-transform: uppercase;
@@ -2571,6 +2600,7 @@ small {
 }
 
 .stat-card .stat-value {
+  font-family: var(--font-mono);
   font-size: 2.5rem;
   font-weight: 500;
   color: var(--ion);
@@ -2780,6 +2810,7 @@ button:hover:not(:focus-visible) {
 }
 
 .stat-label {
+  font-family: var(--font-mono);
   color: var(--ash);
   font-size: 0.75rem;
   text-transform: uppercase;
