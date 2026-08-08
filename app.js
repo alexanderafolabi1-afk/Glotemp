@@ -2426,6 +2426,19 @@ function getMoodEmoji(moodScore) {
 
 // Scroll reveal animations
 function setupScrollReveals() {
+  // Pre-mark everything already on screen as revealed BEFORE enabling the
+  // hidden state. Otherwise adding .scroll-reveals-enabled drops sections
+  // that are already visible to opacity:0 / translateY(12px) and the
+  // IntersectionObserver reveals them a frame later -- a real layout shift
+  // for anything sitting on the fold (measured as CLS 0.00006 at 768px,
+  // where a 2px sliver of .hero-section sat exactly on the viewport edge).
+  const targets = Array.from(document.querySelectorAll('.glass-card, section'));
+  const vh = window.innerHeight || document.documentElement.clientHeight;
+  targets.forEach(el => {
+    const r = el.getBoundingClientRect();
+    if (r.top < vh && r.bottom > 0) el.classList.add('revealed');
+  });
+
   document.body.classList.add('scroll-reveals-enabled');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -2436,8 +2449,8 @@ function setupScrollReveals() {
     });
   }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-  document.querySelectorAll('.glass-card, section').forEach(el => {
-    observer.observe(el);
+  targets.forEach(el => {
+    if (!el.classList.contains('revealed')) observer.observe(el);
   });
 }
 

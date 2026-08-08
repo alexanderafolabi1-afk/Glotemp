@@ -1,0 +1,52 @@
+# Supabase project config.
+#
+# This file did not exist. Without it the data-collection edge functions
+# default to verify_jwt = true, so any caller without a end-user JWT --
+# including a scheduler -- is rejected before the handler runs. These
+# functions take no user input and write only public, published data, so
+# they are explicitly opened to keyless invocation and scheduled from
+# pg_cron (see 20260808150000_schedule_edge_functions.sql).
+
+project_id = "hnysztednzqfzbmiqqgl"
+
+[functions.gdelt-sentiment]
+verify_jwt = false
+
+[functions.github-tech-activity]
+verify_jwt = false
+
+[functions.world-bank-finance]
+verify_jwt = false
+
+[functions.remotive-work-data]
+verify_jwt = false
+
+[functions.overpass-property]
+verify_jwt = false
+
+[functions.overpass-food]
+verify_jwt = false
+
+[functions.hipolabs-education]
+verify_jwt = false
+
+[functions.sportsdb-sport]
+verify_jwt = false
+
+[functions.ticketmaster-entertainment]
+verify_jwt = false
+
+[functions.gdelt-fashion]
+verify_jwt = false
+
+[functions.waqi-health]
+verify_jwt = false
+
+[functions.transitland-transport]
+verify_jwt = false
+
+[functions.aggregate-city-mood]
+verify_jwt = false
+
+[functions.tonight-layer]
+verify_jwt = false

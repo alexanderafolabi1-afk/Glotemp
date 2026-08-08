@@ -1,3 +1,7 @@
+-- NOTE: this file originally used `create policy if not exists` and
+-- `drop trigger if not exists`. Neither is valid PostgreSQL, so the whole
+-- file aborted on apply and every table below it was silently never
+-- created. Corrected to the supported drop-then-create idiom.
 -- Glotemp City Mood Infrastructure Schema
 -- Idempotent migration for comment system and mood aggregation
 
@@ -21,11 +25,14 @@ create index if not exists idx_reporters_created_at on reporters(created_at);
 
 -- RLS for reporters: users can read and update their own data
 alter table reporters enable row level security;
-create policy if not exists "reporters_insert" on reporters
+drop policy if exists "reporters_insert" on reporters;
+create policy "reporters_insert" on reporters
   for insert with check (true);
-create policy if not exists "reporters_select" on reporters
+drop policy if exists "reporters_select" on reporters;
+create policy "reporters_select" on reporters
   for select using (true);
-create policy if not exists "reporters_update" on reporters
+drop policy if exists "reporters_update" on reporters;
+create policy "reporters_update" on reporters
   for update using (true)
   with check (true);
 
@@ -50,11 +57,14 @@ create index if not exists idx_city_comments_created_at on city_comments(created
 
 -- RLS for city_comments: anyone can insert, all can read aggregated data
 alter table city_comments enable row level security;
-create policy if not exists "city_comments_insert" on city_comments
+drop policy if exists "city_comments_insert" on city_comments;
+create policy "city_comments_insert" on city_comments
   for insert with check (true);
-create policy if not exists "city_comments_select" on city_comments
+drop policy if exists "city_comments_select" on city_comments;
+create policy "city_comments_select" on city_comments
   for select using (true);
-create policy if not exists "city_comments_update" on city_comments
+drop policy if exists "city_comments_update" on city_comments;
+create policy "city_comments_update" on city_comments
   for update using (true)
   with check (true);
 
@@ -75,11 +85,14 @@ create index if not exists idx_city_pulse_cache_updated_at on city_pulse_cache(u
 
 -- RLS for city_pulse_cache: all can read, only functions can write
 alter table city_pulse_cache enable row level security;
-create policy if not exists "city_pulse_cache_select" on city_pulse_cache
+drop policy if exists "city_pulse_cache_select" on city_pulse_cache;
+create policy "city_pulse_cache_select" on city_pulse_cache
   for select using (true);
-create policy if not exists "city_pulse_cache_insert" on city_pulse_cache
+drop policy if exists "city_pulse_cache_insert" on city_pulse_cache;
+create policy "city_pulse_cache_insert" on city_pulse_cache
   for insert with check (true);
-create policy if not exists "city_pulse_cache_update" on city_pulse_cache
+drop policy if exists "city_pulse_cache_update" on city_pulse_cache;
+create policy "city_pulse_cache_update" on city_pulse_cache
   for update using (true)
   with check (true);
 
@@ -144,7 +157,7 @@ begin
 end;
 $$ language plpgsql;
 
-drop trigger if not exists trigger_update_reporter_stats on city_comments;
+drop trigger if exists trigger_update_reporter_stats on city_comments;
 create trigger trigger_update_reporter_stats
 after insert on city_comments
 for each row
