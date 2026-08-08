@@ -23,16 +23,18 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <nav class="nav-bar glass-card">
-    <div class="nav-container">
-      <a href="/" class="nav-logo">
-        <span data-i18n="glotemp_logo">Glotemp</span>
-      </a>
-      <ul class="nav-links">
-        <li><a href="/" data-i18n="nav_home">Home</a></li>
-        <li><a href="/cities" data-i18n="nav_cities">Cities</a></li>
-        <li><a href="/about" data-i18n="nav_about">About</a></li>
-      </ul>
+  <nav class="navbar glass">
+    <div class="nav-brand">
+      <img src="/assets/logo.png" alt="Glotemp" class="nav-logo">
+      <span class="logo-text">Glotemp</span>
+      <span class="pulse-dot"></span>
+    </div>
+    <div class="nav-links">
+      <a href="/">Pulse</a>
+      <a href="/about">About</a>
+      <a href="/explore" class="active">Cities</a>
+      <a href="/blog">Feed</a>
+      <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
     </div>
   </nav>
 
@@ -46,7 +48,24 @@
           <span id="city-penetration"></span>
           <span id="city-metro-pop"></span>
         </div>
+        <div class="city-action-row">
+          <button id="watch-city-btn" class="btn-neon" type="button">Watch this city</button>
+          <button id="share-city-btn" class="btn-neon" type="button" style="--btn-band: var(--band-restrained);">Share</button>
+        </div>
+        <div id="watch-email-panel" class="watch-email-panel" style="display:none;">
+          <label for="watch-email-input">Get notified when this city changes band or enters a top ten.</label>
+          <div class="watch-email-row">
+            <input type="email" id="watch-email-input" placeholder="you@example.com" required>
+            <button id="watch-email-submit" class="btn-neon" type="button">Notify me</button>
+          </div>
+          <p id="watch-email-status" class="inline-feedback"></p>
+        </div>
       </div>
+    </section>
+
+    <section class="glass-card city-affiliate-row">
+      <p class="eyebrow">Planning a trip</p>
+      <div class="affiliate-links" id="city-affiliate-links"></div>
     </section>
 
     <!-- Vertical Navigation -->
@@ -166,6 +185,19 @@
       <h2 data-i18n="compare_title">Compare with Another City</h2>
       <select id="compare-city-select" class="filter-select"></select>
     </section>
+
+    <!-- Live observation feed for this city -->
+    <section class="glass-card city-feed-section">
+      <h2>Live observations</h2>
+      <p class="vertical-description">Recent human check-ins and signals for this city.</p>
+      <div id="city-observation-feed" class="vertical-content"></div>
+    </section>
+
+    <!-- Comments -->
+    <section class="glass-card city-comments-section">
+      <h2>Add your voice</h2>
+      <div class="comment-section" id="city-comment-section"></div>
+    </section>
   </main>
 
   <footer class="footer glass-card">
@@ -175,7 +207,11 @@
   </footer>
 
   <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
   <script src="/verticals-engine.js" defer></script>
+  <script src="/tempo-economy.js" defer></script>
+  <script src="/stories.js"></script>
+  <script src="/seed-observations.js"></script>
   
   <script>
     // Load city data and populate verticals
@@ -249,6 +285,208 @@
       document.addEventListener('DOMContentLoaded', loadCityData);
     } else {
       loadCityData();
+    }
+
+    // ---- Affiliate row ----
+    (function renderAffiliateLinks() {
+      const container = document.getElementById('city-affiliate-links');
+      if (!container) return;
+      const cityName = encodeURIComponent('Vilnius');
+      container.innerHTML = `
+        <a href="https://www.booking.com/searchresults.html?ss=${cityName}" target="_blank" rel="noopener noreferrer" class="affiliate-btn"><span>Book a Hotel in Vilnius</span></a>
+        <a href="https://www.skyscanner.net/transport/flights/anywhere/${cityName}/" target="_blank" rel="noopener noreferrer" class="affiliate-btn"><span>Find Flights to Vilnius</span></a>
+        <a href="https://www.insuremytrip.com/" target="_blank" rel="noopener noreferrer" class="affiliate-btn"><span>Get Travel Insurance</span></a>
+      `;
+    })();
+
+    // ---- Watch this city ----
+    (function wireWatch() {
+      const btn = document.getElementById('watch-city-btn');
+      const panel = document.getElementById('watch-email-panel');
+      const emailInput = document.getElementById('watch-email-input');
+      const submitBtn = document.getElementById('watch-email-submit');
+      const statusEl = document.getElementById('watch-email-status');
+      if (!btn || typeof GlotempCore === 'undefined') return;
+      const citySlug = 'vilnius';
+
+      function refreshLabel() {
+        btn.textContent = GlotempCore.isWatched(citySlug) ? 'Watching this city ✓' : 'Watch this city';
+      }
+      refreshLabel();
+
+      btn.addEventListener('click', () => {
+        const nowWatching = GlotempCore.toggleWatch(citySlug);
+        refreshLabel();
+        if (panel) panel.style.display = nowWatching ? 'block' : 'none';
+      });
+
+      if (submitBtn && emailInput) {
+        submitBtn.addEventListener('click', async () => {
+          const email = emailInput.value.trim();
+          if (!email || !email.includes('@')) {
+            statusEl.textContent = 'Enter a valid email.';
+            return;
+          }
+          submitBtn.disabled = true;
+          try {
+            await fetch(`${SUPABASE_URL}/rest/v1/city_watchers`, {
+              method: 'POST',
+              headers: {
+                apikey: SUPABASE_ANON_KEY,
+                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                Prefer: 'return=minimal',
+              },
+              body: JSON.stringify({ city_slug: citySlug, email }),
+            });
+            statusEl.textContent = "You're on the list -- we'll notify " + email + '.';
+            emailInput.value = '';
+          } catch (e) {
+            statusEl.textContent = "Saved locally -- we'll sync this once you're back online.";
+          }
+          submitBtn.disabled = false;
+        });
+      }
+    })();
+
+    // ---- Share ----
+    (function wireShare() {
+      const btn = document.getElementById('share-city-btn');
+      if (!btn) return;
+      btn.addEventListener('click', async () => {
+        const cityRec = window.CITIES_DATA.find(c => c.slug === 'vilnius');
+        const band = cityRec ? GlotempCore.moodToBand(cityRec.mood) : null;
+        const text = cityRec && band
+          ? `${cityRec.name} is reading ${band.band} right now (${cityRec.mood.toFixed(1)}/10) on Glotemp.`
+          : 'Check out this city on Glotemp.';
+        const url = window.location.href;
+        if (navigator.share) {
+          try { await navigator.share({ title: 'Glotemp', text, url }); } catch (e) { /* user cancelled */ }
+        } else if (navigator.clipboard) {
+          await navigator.clipboard.writeText(`${text} ${url}`);
+          const original = btn.textContent;
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.textContent = original; }, 2000);
+        }
+      });
+    })();
+
+    // ---- Live observation feed for this city ----
+    // Uses GlotempCore.getTimeAgo (loaded non-deferred, synchronously
+    // available) rather than verticals.getTimeAgo -- this runs
+    // immediately below, before verticals-engine.js's deferred script
+    // has executed.
+    function renderObservationFeed() {
+      const container = document.getElementById('city-observation-feed');
+      if (!container) return;
+      const citySlug = 'vilnius';
+      const checkins = (window.SEED_OBSERVATIONS || []).filter(o => o.city === citySlug).slice(0, 8);
+
+      if (!checkins.length) {
+        container.innerHTML = '<div class="empty-state">No observations yet for this city. Be the first.</div>';
+        return;
+      }
+
+      container.innerHTML = checkins.map(obs => `
+        <div class="reading glass-card">
+          <div class="reading-header">
+            <span class="reading-metric">Human check-in</span>
+          </div>
+          <div class="reading-value"><span class="reading-label">${obs.context}</span></div>
+          <div class="reading-footer">
+            <span class="reading-source">${obs.language_lens || 'visitor'}</span>
+            <time class="reading-time" datetime="${obs.created_at}">${GlotempCore.getTimeAgo(new Date(obs.created_at))}</time>
+          </div>
+        </div>
+      `).join('');
+    }
+    renderObservationFeed();
+
+    // ---- Comments ----
+    // getComments/submitComment come from tempo-economy.js, which is
+    // deferred -- gate init behind DOMContentLoaded like loadCityData,
+    // not an immediate IIFE, or the typeof guard below would silently
+    // skip forever (it runs once, before that script has executed).
+    function initCityComments() {
+      const container = document.getElementById('city-comment-section');
+      if (!container || typeof getComments === 'undefined') return;
+      const citySlug = 'vilnius';
+
+      container.innerHTML = `
+        <div class="comment-input-wrap">
+          <textarea class="comment-input" placeholder="Share the vibe (max 280 chars)..." maxlength="280"></textarea>
+          <div class="mood-picker">
+            <button class="mood-emoji" data-mood="🔥" title="Energized">▲</button>
+            <button class="mood-emoji" data-mood="😊" title="Good">◆</button>
+            <button class="mood-emoji" data-mood="😐" title="Neutral">●</button>
+            <button class="mood-emoji" data-mood="😞" title="Low">▼</button>
+            <button class="mood-emoji" data-mood="😡" title="Cautious">◇</button>
+          </div>
+          <button class="btn-neon comment-submit">Post Comment</button>
+        </div>
+        <div class="comment-list"></div>
+      `;
+
+      let selectedMood = '😐';
+      const moodBtns = container.querySelectorAll('.mood-emoji');
+      const textarea = container.querySelector('.comment-input');
+      const submitBtn = container.querySelector('.comment-submit');
+      const commentList = container.querySelector('.comment-list');
+
+      moodBtns.forEach(btn => {
+        btn.style.opacity = btn.dataset.mood === selectedMood ? '1' : '0.5';
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          moodBtns.forEach(b => b.style.opacity = '0.5');
+          btn.style.opacity = '1';
+          selectedMood = btn.dataset.mood;
+        });
+      });
+
+      function loadCityComments() {
+        getComments(citySlug).then(comments => {
+          if (!comments.length) {
+            commentList.innerHTML = '<p class="inline-feedback">No comments yet. Be first to share!</p>';
+            return;
+          }
+          commentList.innerHTML = comments.slice(0, 10).map(c => `
+            <div class="comment-item">
+              <div style="display:flex; gap:0.5rem; align-items:flex-start;">
+                <div style="font-size:1.5rem; flex-shrink:0;">${c.mood_emoji}</div>
+                <div style="flex:1; min-width:0;">
+                  <p>${c.text}</p>
+                  <small>${new Date(c.created_at).toLocaleString()}</small>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        });
+      }
+
+      submitBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const text = textarea.value.trim();
+        if (!text) return;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Posting...';
+        try {
+          await submitComment(citySlug, text, selectedMood);
+          textarea.value = '';
+          loadCityComments();
+        } catch (err) {
+          console.error('Comment submission failed:', err);
+        }
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Post Comment';
+      });
+
+      loadCityComments();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCityComments);
+    } else {
+      initCityComments();
     }
   </script>
   

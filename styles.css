@@ -190,17 +190,33 @@ body::after {
   z-index: 1;
 }
 
+/* .page-content: the city-profile pages' main wrapper -- had no CSS at
+   all (unlike .page-main used by every other inner page), so it never
+   got a max-width/centering pass, and its sections had no guaranteed
+   clearance from each other either. */
+.page-content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1rem 1rem 3rem;
+  position: relative;
+  z-index: 1;
+}
+
 /* Guarantee vertical clearance between stacked top-level sections so
    short/loading content in one section can never visually overlap the next. */
 #app > section,
 .page-main > section,
-.page-main > .glass-card {
+.page-main > .glass-card,
+.page-content > section,
+.page-content > .glass-card {
   margin-bottom: 2rem;
 }
 
 #app > section:last-child,
 .page-main > section:last-child,
-.page-main > .glass-card:last-child {
+.page-main > .glass-card:last-child,
+.page-content > section:last-child,
+.page-content > .glass-card:last-child {
   margin-bottom: 0;
 }
 
@@ -3127,6 +3143,48 @@ button:hover:not(:focus-visible) {
   .nav-hamburger {
     display: flex;
   }
+}
+
+/* ===== City page: action row, watch panel, affiliate row ===== */
+.city-action-row {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.watch-email-panel {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--hairline);
+}
+
+.watch-email-panel label {
+  display: block;
+  color: var(--sand);
+  font-size: 0.85rem;
+  margin-bottom: 0.6rem;
+}
+
+.watch-email-row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.watch-email-row input {
+  flex: 1 1 220px;
+  background: rgba(233, 231, 240, 0.05);
+  border: 1px solid rgba(233, 231, 240, 0.09);
+  border-radius: 10px;
+  color: var(--ivory);
+  padding: 0.7rem 1rem;
+  font: inherit;
+  min-height: 44px;
+}
+
+.city-affiliate-row {
+  text-align: center;
 }
 
 .hiw-image-slot {
