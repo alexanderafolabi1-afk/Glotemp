@@ -3815,3 +3815,236 @@ button:hover:not(:focus-visible) {
   .checkin-modes { gap: 0.4rem; }
   .checkin-mode { padding: 0.5rem 0.7rem; font-size: 0.8rem; }
 }
+
+/* ===== TONIGHT: THE THIRTEENTH LAYER ===== */
+.tonight-head { margin-bottom: 1.25rem; }
+
+.tonight-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+@media (min-width: 640px) { .tonight-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1100px) { .tonight-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.tonight-mode {
+  border: 1px solid var(--hairline);
+  border-left: 2px solid var(--tonight-band, var(--brass-dim));
+  border-radius: 14px;
+  padding: 1.1rem 1.15rem;
+  background: rgba(23, 25, 38, 0.42);
+  /* Reserved so filling a card from the network never shifts the grid. */
+  min-height: 236px;
+}
+.tonight-mode--empty,
+.tonight-mode--loading { border-left-color: var(--brass-dim); }
+
+.tonight-mode-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+.tonight-mode-name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: var(--fw-light);
+  color: var(--ivory);
+}
+.tonight-mode-reading {
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  color: var(--tonight-band, var(--ivory));
+}
+.tonight-of { font-size: 0.72rem; opacity: 0.6; margin-left: 1px; }
+.tonight-mode-status {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.75rem;
+  color: var(--sand);
+  opacity: 0.75;
+}
+.tonight-mode-blurb {
+  color: var(--sand);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  margin-bottom: 0.85rem;
+  max-width: none;
+}
+.tonight-curve { display: block; width: 100%; height: 56px; margin-bottom: 0.6rem; }
+.tonight-now {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--sand);
+  margin-bottom: 0.35rem;
+  max-width: none;
+}
+.tonight-now strong { color: var(--tonight-band, var(--ivory)); }
+.tonight-facts {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--sand);
+  opacity: 0.85;
+  line-height: 1.5;
+  margin-bottom: 0.35rem;
+  max-width: none;
+}
+.tonight-prov {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--sand);
+  opacity: 0.7;
+  line-height: 1.45;
+  max-width: none;
+}
+.tonight-modelled {
+  color: var(--brass);
+  border: 1px solid var(--brass-dim);
+  border-radius: 4px;
+  padding: 0 0.3rem;
+  font-variant-caps: small-caps;
+}
+.tonight-empty-copy {
+  color: var(--sand);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  opacity: 0.8;
+  max-width: none;
+}
+
+/* ===== SPIN DIAL (homepage centrepiece) ===== */
+.spin-section {
+  padding: 2rem 1.5rem 2.25rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--brass-dim);
+}
+.spin-inner { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.spin-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: var(--fw-light);
+  color: var(--ivory);
+  margin-bottom: 1.1rem;
+  line-height: 1.1;
+}
+.spin-variants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+.spin-variant {
+  min-height: 44px;
+  padding: 0.55rem 1.05rem;
+  background: rgba(233, 231, 240, 0.05);
+  border: 1px solid var(--brass-dim);
+  border-radius: 999px;
+  color: var(--sand);
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.spin-variant:hover { color: var(--ivory); border-color: var(--brass); }
+.spin-variant[aria-pressed="true"] {
+  background: var(--ivory);
+  border-color: var(--ivory);
+  color: var(--obsidian);
+}
+
+.spin-stage { display: flex; flex-direction: column; align-items: center; gap: 1.15rem; }
+.spin-dial {
+  width: clamp(200px, 42vw, 260px);
+  aspect-ratio: 1;
+  cursor: pointer;
+  filter: drop-shadow(0 14px 34px rgba(0, 0, 0, 0.55));
+}
+.spin-dial-svg { display: block; width: 100%; height: 100%; }
+.spin-rotor { transform-origin: 110px 110px; }
+
+.spin-go {
+  min-height: 52px;
+  padding: 0.85rem 2.6rem;
+  background: var(--brass);
+  color: var(--obsidian);
+  border: none;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: transform var(--transition), opacity var(--transition);
+  box-shadow: 0 6px 18px rgba(176, 141, 87, 0.28);
+}
+.spin-go:hover:not(:disabled) { transform: translateY(-2px); }
+.spin-go:disabled { opacity: 0.55; cursor: wait; }
+
+.spin-sentence {
+  font-family: var(--font-display);
+  font-size: clamp(19px, 2.4vw, 27px);
+  font-weight: var(--fw-light);
+  line-height: 1.4;
+  color: var(--ivory);
+  max-width: 30ch;
+  margin: 1.6rem auto 0;
+  /* Two lines reserved: the sentence swaps in after the spin settles,
+     and without this the affiliate rows below would jump. */
+  min-height: 2.8em;
+  transition: opacity 300ms ease;
+}
+.spin-sentence.is-settling { opacity: 0.35; }
+
+.spin-affiliates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+  margin-top: 1.35rem;
+  min-height: 52px;
+}
+.spin-aff {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 48px;
+  padding: 0.65rem 1.15rem;
+  border: 1px solid var(--brass-dim);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--ivory);
+  font-size: 0.9rem;
+  transition: all var(--transition);
+}
+.spin-aff:hover { border-color: var(--brass); background: rgba(176, 141, 87, 0.08); }
+.spin-aff-kind {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.72rem;
+  color: var(--brass);
+  letter-spacing: 0.06em;
+}
+.spin-prov {
+  margin-top: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--sand);
+  opacity: 0.8;
+  min-height: 1.2em;
+  max-width: none;
+}
+
+@media (max-width: 480px) {
+  .spin-section { padding: 1.5rem 1rem 1.75rem; }
+  .spin-variant { padding: 0.5rem 0.8rem; font-size: 0.8rem; }
+  .spin-aff { width: 100%; justify-content: center; }
+  .spin-affiliates { min-height: 156px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin-rotor { transition: none !important; }
+  .spin-sentence { transition: none; }
+}
