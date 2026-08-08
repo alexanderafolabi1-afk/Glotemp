@@ -44,7 +44,7 @@
     <div class="nav-links">
       <a href="/">Pulse</a>
       <a href="/about">About</a>
-      <a href="/explore" class="active">Cities</a>
+      <a href="/explore" class="active">Explore</a>
       <a href="/blog">Feed</a>
       <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
     </div>
@@ -101,7 +101,7 @@
         });
 
         listEl.innerHTML = filtered.map(city => `
-          <a href="/cities/${city.slug}" class="city-card glass-card">
+          <a href="/cities/${city.slug}.html" class="city-card glass-card">
             <div class="city-card-header">
               <h2>${city.name}</h2>
               <span class="city-country">${city.country}</span>
