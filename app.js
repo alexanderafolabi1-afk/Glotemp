@@ -924,7 +924,9 @@ applyTranslations();
   modal.appendChild(list);
   modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
   document.body.appendChild(modal);
-  document.getElementById('lang-switch').onclick = () => modal.style.display = 'flex';
+  document.querySelectorAll('#lang-switch, #lang-switch-mobile').forEach(btn => {
+    btn.onclick = () => modal.style.display = 'flex';
+  });
 })();
 
 // ----- Observatory System -----
@@ -1910,6 +1912,7 @@ function renderStoryImage(story) {
 function loadDailyStory() {
   const storySection = document.getElementById('story-content');
   const fallback = document.getElementById('story-fallback');
+  if (!storySection || !fallback) return; // page has no daily-story widget (e.g. city/vertical pages)
 
   try {
     const story = getCurrentFeaturedStory();
