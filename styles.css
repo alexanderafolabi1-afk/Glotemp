@@ -1748,10 +1748,10 @@ textarea:focus:not(:focus-visible) {
   text-transform: uppercase;
   letter-spacing: 0.2em;
   color: var(--ash);
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.75rem;
   display: block;
   width: 100%;
-  padding-bottom: 0.75rem;
+  padding-bottom: 1.1rem;
   border-bottom: 1px solid var(--hairline);
 }
 
@@ -4476,6 +4476,48 @@ a:hover .city-landmark-photo,
   margin: 0;
 }
 
+/* Live observations: one rotating snippet -- city, quote, done -- instead
+   of a scrollable wall of cards for a single fixed city. A plain button so
+   it's keyboard/tap-accessible (clicking it opens that city), styled as
+   text-on-ground like everything else, never a filled panel. */
+.obs-snippet {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 1.25rem 0;
+  margin-top: 1.1rem;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  transition: opacity 300ms ease;
+}
+.obs-snippet.is-fading { opacity: 0; }
+.obs-snippet-pin {
+  flex: none;
+  color: var(--obs-band, var(--brass));
+  margin-top: 0.2rem;
+}
+.obs-snippet-body { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+.obs-snippet-city {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--obs-band, var(--ivory));
+}
+.obs-snippet-text {
+  color: var(--sand);
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+.obs-snippet:hover .obs-snippet-city { color: var(--brass); }
+
+/* The check-in composer names the city it's recording for, right in the
+   heading, so "share the pulse" is never an abstract or random act. */
+.checkin-city { color: var(--brass); font-weight: var(--fw-regular); }
+
 /* ===== SPIN DIAL (homepage centrepiece) ===== */
 .spin-section {
   padding: 2rem 1.5rem 2.25rem;
@@ -4774,7 +4816,7 @@ time, .instr-clock, .tonight-modelled {
 .empty-recruit .empty-cta { color: var(--brass); }
 
 /* ===== TRIP ENGINE / AD-READY SLOT ===== */
-.trip-slot { padding: 2rem 0; border-top: 1px solid var(--hairline); }
+.trip-slot { padding: 2.75rem 0; border-top: 1px solid var(--hairline); }
 /* Two columns on wide screens so the verdict sentence -- deliberately
    capped at a readable measure, not stretched across a full-bleed page
    -- has somewhere real to sit beside it, instead of leaving most of a
@@ -4795,6 +4837,7 @@ time, .instr-clock, .tonight-modelled {
   line-height: 1.35;
   max-width: 34ch;
   min-height: 2.7em;
+  margin-top: 0.5rem;
 }
 .trip-reading {
   flex: 0 0 auto;
@@ -4901,7 +4944,7 @@ time, .instr-clock, .tonight-modelled {
 .live-ticker { border: none !important; border-top: 1px solid var(--hairline) !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; padding: 1rem 0 !important; }
 
 /* Check-in composer: three fields, on the ground. */
-.check-in { padding: 2.5rem 0 2rem; }
+.check-in { padding: 3rem 0 2.5rem; }
 .checkin-composer, .comment-input-wrap { border: none !important; border-radius: 0 !important; background: transparent !important; padding: 0 !important; }
 .form-grid { grid-template-columns: 1fr !important; max-width: 34rem; }
 .observation-form input, .observation-form select, .observation-form textarea {

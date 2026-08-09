@@ -79,15 +79,16 @@ const translations = {
     no_observations: "Be the first to share an observation. Check in now.",
     checkin_eyebrow: "Your turn",
     checkin_intro: "How does your city feel right now? Pick a mood, add a note if you like, and you'll shape the next reading.",
-    add_voice_copy: "Want to add your own read on this city?",
+    add_voice_copy: "Want to add your own read on a city?",
     add_voice_btn: "Add your voice ↑",
     intensity_label: "Intensity",
-    scene_label: "Scene",
-    scene_street: "Street",
+    scene_label: "Where are you?",
+    scene_street: "Out and about",
     scene_work: "Work",
-    scene_campus: "Campus",
-    scene_cafe: "Café",
-    scene_nightlife: "Nightlife",
+    scene_school: "School / campus",
+    scene_restaurant: "Restaurant / café",
+    scene_concert: "Concert / nightlife",
+    scene_sport: "Gym / sport",
     scene_transit: "Transit",
     scene_home: "Home",
     language_label: "Language lens",
@@ -1371,17 +1372,23 @@ function recordObservation(event) {
   }
   const note = document.getElementById('context-note').value.trim();
   const selectedMood = activeMood.dataset.label;
+  // The scene picker ties a check-in to real place-in-the-world context --
+  // school, restaurant, concert -- which map straight onto Glotemp's own
+  // vertical taxonomy (education, food, entertainment...), so a check-in
+  // is never just a mood in the abstract. It replaces a hardcoded 'street'
+  // default that used to stand in for every check-in regardless of where
+  // the person actually was.
+  const sceneEl = document.getElementById('scene-select');
+  const scene = sceneEl ? sceneEl.value : 'street';
+  const citySlug = document.getElementById('city-select')?.value || 'nyc';
   const observation = {
     mood: selectedMood,
     intensity: Number(document.getElementById('intensity-range').value),
-    // Scene / language lens / contribution cadence were removed from the
-    // composer -- nobody understood them. Kept as stable defaults so the
-    // stored shape does not change under existing readers.
-    scene: 'street',
+    scene,
     lens: 'global',
     cadence: 'midday',
     note,
-    city: cities[document.getElementById('city-select')?.value || 'nyc']?.name || 'New York',
+    city: cities[citySlug]?.name || 'New York',
     createdAt: new Date().toISOString()
   };
   observatoryState.observations.unshift(observation);
@@ -1390,9 +1397,9 @@ function recordObservation(event) {
   addStars(note ? 18 : 12);
   renderSignalPanels();
   document.getElementById('observation-feedback').textContent = t('observation_saved');
-  // Refresh the feed to show the new observation
-  const currentCity = document.getElementById('city-select')?.value || 'nyc';
-  renderObservations(currentCity, false);
+  // Fold the new check-in into the rotating snippet pool and show it now,
+  // so submitting feels like it landed somewhere instead of vanishing.
+  if (typeof refreshObsSnippetPool === 'function') refreshObsSnippetPool(citySlug);
   // Update the live observation count
   const obsEl = document.getElementById('obs-count');
   if (obsEl) {
@@ -1560,6 +1567,10 @@ function updateCity(selected) {
   if (cityNameEl) cityNameEl.textContent = city.name;
   const tripCityEl = document.getElementById('trip-city');
   if (tripCityEl) tripCityEl.textContent = city.name;
+  // The check-in composer always names the city it's recording for --
+  // never a hidden default the visitor can't see.
+  const checkinCityEl = document.getElementById('checkin-city-name');
+  if (checkinCityEl) checkinCityEl.textContent = `— ${city.name}`;
 
   // dimensions
   const dimNames = t('dimensions');
@@ -1596,19 +1607,6 @@ function updateCity(selected) {
     updateAffiliateLinks(city.name);
   }
 
-  // Update observations section with loading state
-  const obsTitleEl = document.getElementById('obs-title-text');
-  if (obsTitleEl) {
-    obsTitleEl.textContent = t('obs_title').replace('{city}', city.name);
-  }
-
-  // Show loading state while fetching
-  renderObservations(selected, true);
-
-  // Simulate API call (would be real in production)
-  setTimeout(() => {
-    renderObservations(selected, false);
-  }, 300);
 }
 
 // Observations / Comments
@@ -1657,60 +1655,95 @@ function formatTimeAgo(timestamp) {
   return `${diffD} day${diffD === 1 ? '' : 's'} ago`;
 }
 
-function renderObservations(citySlug, loading = false) {
-  const grid = document.getElementById('observations-grid');
+// ----- Homepage observation snippet rotator -----
+// Used to be a grid that dumped every stored note for whichever one city
+// happened to be selected -- a dozen-plus cards, always the same city
+// until you changed the dropdown. Replaced with a single rotating line
+// that cycles across many cities, one snippet at a time: the same
+// "show a little, not everything" pattern the Daily Pulse showcase above
+// it already uses, so the section reads as a live signal, not a feed to
+// scroll through.
+const OBS_PIN_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-7.5 7-12a7 7 0 10-14 0c0 4.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.3"/></svg>';
+let obsSnippetPool = [];
+let obsSnippetIndex = 0;
+let obsSnippetTimer = null;
 
-  if (!grid) return;
+function buildObsSnippetPool() {
+  const bySlug = new Map();
+  // Freshly submitted check-ins go in first (newest first, since
+  // observatoryState.observations is unshifted on submit) so a visitor's
+  // own note for a city always outranks the static seed sample for that
+  // same city, rather than being silently dropped from the pool.
+  observatoryState.observations.forEach(o => {
+    // cities[slug] objects don't carry their own slug key, so look it up
+    // by matching name across entries instead of reading a field that
+    // isn't there (that gap used to silently drop every fresh check-in
+    // from this pool under an `undefined` key).
+    const slugEntry = Object.entries(cities || {}).find(([, c]) => c.name === o.city);
+    if (!slugEntry || bySlug.has(slugEntry[0])) return;
+    const sentiment = o.mood === 'Energized' ? 0.9 : o.mood === 'Good' ? 0.7 : o.mood === 'Neutral' ? 0.5 : o.mood === 'Low' ? 0.3 : 0.2;
+    bySlug.set(slugEntry[0], { city: slugEntry[0], sentiment, text: o.note || `${o.mood}, ${o.scene}`, created_at: 'just now' });
+  });
+  (window.SEED_OBSERVATIONS || []).forEach(o => {
+    if (o.city && !bySlug.has(o.city)) bySlug.set(o.city, o);
+  });
+  obsSnippetPool = Array.from(bySlug.values());
+}
 
-  if (loading) {
-    grid.innerHTML = '<div class="obs-loading"></div><div class="obs-loading"></div><div class="obs-loading"></div>';
-    return;
-  }
+function renderObsSnippet() {
+  const el = document.getElementById('obs-snippet');
+  if (!el || !obsSnippetPool.length) return;
+  const obs = obsSnippetPool[obsSnippetIndex % obsSnippetPool.length];
+  const cityData = cities[obs.city];
+  const cityName = cityData ? cityData.name : obs.city;
+  const bandInfo = moodToBand((obs.sentiment || 0.5) * 10);
+  const text = (obs.context || obs.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  el.style.setProperty('--obs-band', bandInfo.color);
+  el.innerHTML = `<span class="obs-snippet-pin" aria-hidden="true">${OBS_PIN_SVG}</span><span class="obs-snippet-body"><span class="obs-snippet-city">${cityName}</span><span class="obs-snippet-text">&ldquo;${text}&rdquo;</span></span>`;
+  el.dataset.citySlug = obs.city;
+}
 
-  // Merge local observations (for this city name) with seed observations
-  const cityData = cities[citySlug];
-  const cityName = cityData ? cityData.name : '';
-  const localObs = observatoryState.observations
-    .filter(o => o.city === cityName)
-    .map(o => ({
-      sentiment: o.mood === 'Energized' ? 0.9 : o.mood === 'Good' ? 0.7 : o.mood === 'Neutral' ? 0.5 : o.mood === 'Low' ? 0.3 : 0.2,
-      text: o.note || `${o.mood} · ${o.scene}`,
-      intensity: Math.round(o.intensity / 10),
-      created_at: 'just now'
-    }));
-  const seedObs = (window.SEED_OBSERVATIONS || []).filter(o => o.city === citySlug);
-  const observations = [...localObs, ...seedObs];
+// (Re)starts the rotation timer from now -- called on init and again
+// after a fresh check-in jumps the display, so a pending tick from the
+// old schedule can't immediately overwrite the city just jumped to.
+function startObsSnippetTimer() {
+  const el = document.getElementById('obs-snippet');
+  if (obsSnippetTimer) clearInterval(obsSnippetTimer);
+  if (!el || window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  obsSnippetTimer = setInterval(() => {
+    obsSnippetIndex++;
+    el.classList.add('is-fading');
+    setTimeout(() => { renderObsSnippet(); el.classList.remove('is-fading'); }, 300);
+  }, 5000);
+}
 
-  if (observations.length === 0) {
-    grid.innerHTML = '';
-    return;
-  }
+function initObsSnippetRotator() {
+  buildObsSnippetPool();
+  const el = document.getElementById('obs-snippet');
+  if (!el) return;
+  if (!obsSnippetPool.length) { el.hidden = true; return; }
+  el.hidden = false;
+  renderObsSnippet();
+  el.addEventListener('click', () => {
+    const slug = el.dataset.citySlug;
+    if (slug && typeof loadCityBySlug === 'function') loadCityBySlug(slug);
+  });
+  startObsSnippetTimer();
+}
 
-  // Rows sit on the ground, tinted by the city's band colour and
-  // separated by a hairline -- no grey grid cards.
-  grid.className = 'obs-list';
-  grid.innerHTML = observations.map((obs) => {
-    const intensity = obs.intensity || 5;
-    const text = (obs.context || obs.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const timeStr = formatTimeAgo(obs.created_at);
-    const bandInfo = moodToBand(obs.sentiment * 10);
-    // The old tag read POSITIVE on literally every row because it came
-    // from sentiment, which the seed data sets high across the board.
-    // Derive it from intensity instead, so it actually varies and means
-    // something the reader can check against the number beside it.
-    const tag = intensity >= 8 ? 'Charged' : intensity >= 6 ? 'Lively'
-      : intensity >= 4 ? 'Steady' : intensity >= 2 ? 'Low key' : 'Still';
-    return `
-      <article class="obs-row" style="--obs-band:${bandInfo.color}">
-        <div class="obs-head">
-          <span class="obs-meta">${tag}</span>
-          <span class="obs-intensity">${intensity}/10</span>
-          <span class="obs-meta">${timeStr}</span>
-        </div>
-        <p class="obs-text">${text}</p>
-      </article>
-    `;
-  }).join('');
+// Called right after a check-in is recorded: fold the new note into the
+// pool and jump the rotator to show it immediately, so submitting feels
+// like it landed somewhere instead of vanishing into local storage.
+function refreshObsSnippetPool(prioritySlug) {
+  buildObsSnippetPool();
+  const el = document.getElementById('obs-snippet');
+  if (!el) return;
+  el.hidden = !obsSnippetPool.length;
+  if (!obsSnippetPool.length) return;
+  const idx = obsSnippetPool.findIndex(o => o.city === prioritySlug);
+  obsSnippetIndex = idx >= 0 ? idx : obsSnippetIndex;
+  renderObsSnippet();
+  startObsSnippetTimer();
 }
 
 // Check-in & Stars
@@ -1798,6 +1831,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   resizeCanvas();
   drawPulse();
   updateCity('nyc');
+  initObsSnippetRotator();
 
   const citySelect = document.getElementById('city-select');
   if (citySelect) {

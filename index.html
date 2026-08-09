@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=35" />
+  <link rel="stylesheet" href="/styles.css?v=36" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
@@ -208,9 +208,9 @@
       <div class="section-heading">
         <div>
           <p class="eyebrow" data-i18n="checkin_eyebrow">Observation intake</p>
-          <h2 data-i18n="checkin_title">Share the pulse</h2>
+          <h2><span data-i18n="checkin_title">Share the pulse</span> <span class="checkin-city" id="checkin-city-name">— New York</span></h2>
         </div>
-        <p class="section-copy" data-i18n="checkin_intro">Offer a quiet signal from where you stand. Richer observations deepen the atlas while keeping the ritual gentle.</p>
+        <p class="section-copy" data-i18n="checkin_intro">How does your city feel right now? Pick a mood, add a note if you like, and you'll shape the next reading.</p>
       </div>
       <div class="mood-buttons" role="group" aria-label="How does your city feel right now?">
         <button class="mood-btn" data-mood="▲" data-band="charged"     data-label="Energized" title="Energized"><span class="mood-btn-icon" aria-hidden="true">▲</span><span class="mood-btn-label">Energized</span></button>
@@ -225,6 +225,19 @@
             <span data-i18n="intensity_label">Intensity</span>
             <input id="intensity-range" type="range" min="10" max="100" step="5" value="65" />
             <strong id="intensity-value">65</strong>
+          </label>
+          <label>
+            <span data-i18n="scene_label">Where are you?</span>
+            <select id="scene-select">
+              <option value="street" data-i18n="scene_street">Out and about</option>
+              <option value="work" data-i18n="scene_work">Work</option>
+              <option value="education" data-i18n="scene_school">School / campus</option>
+              <option value="food" data-i18n="scene_restaurant">Restaurant / café</option>
+              <option value="entertainment" data-i18n="scene_concert">Concert / nightlife</option>
+              <option value="sport" data-i18n="scene_sport">Gym / sport</option>
+              <option value="transport" data-i18n="scene_transit">Transit</option>
+              <option value="property" data-i18n="scene_home">Home</option>
+            </select>
           </label>
         </div>
         <label class="full-width">
@@ -251,20 +264,14 @@
       </div>
     </section>
 
-    <!-- Recent Observations / Comments Section -->
+    <!-- Live observations: one rotating snippet, not a wall of cards. -->
     <section id="observations-section" class="glass-card">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow" data-i18n="obs_eyebrow">Live observations</p>
-          <h2 id="obs-title-text">Recent pulse from New York</h2>
-        </div>
-        <p class="section-copy" data-i18n="obs_intro">See what fellow observers are feeling right now in this city. Each note shapes the collective mood.</p>
-      </div>
+      <p class="eyebrow" data-i18n="obs_eyebrow">Live observations</p>
+      <button type="button" class="obs-snippet" id="obs-snippet" aria-live="polite"></button>
       <div class="add-voice-row">
-        <p class="add-voice-copy" data-i18n="add_voice_copy">Want to add your own read on this city?</p>
+        <p class="add-voice-copy" data-i18n="add_voice_copy">Want to add your own read on a city?</p>
         <button type="button" class="btn-neon" id="add-voice-btn" data-i18n="add_voice_btn">Add your voice ↑</button>
       </div>
-      <div id="observations-grid" class="observations-grid"></div>
     </section>
 
     <footer class="footer glass">
