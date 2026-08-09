@@ -295,11 +295,14 @@ body.ambient-night::before   { filter: hue-rotate(var(--mood-hue, 0deg)) saturat
 }
 
 /* ===== PAGE + PROSE LAYOUT ===== */
-/* about.html, explore.html and blog.html have no #app wrapper */
+/* about.html, explore.html, blog.html, and every generated page (city x
+   vertical, compare, rankings) use this wrapper instead of #app -- it
+   must be kept in step with #app/.page-content's padding by hand, since
+   there's no shared variable backing all three. */
 .page-main {
   width: 100%;
   margin: 0 auto;
-  padding: 1rem clamp(1.75rem, 5vw, 6rem) 3rem;
+  padding: 1rem clamp(2.25rem, 6vw, 6rem) 3rem;
   position: relative;
   z-index: 1;
 }
@@ -2496,9 +2499,10 @@ small {
   }
 
   .page-main {
-    /* Kept in step with the base clamp()'s 1.75rem (28px) floor above --
-       this override used to undercut it on phones/tablets under 768px. */
-    padding: 0.5rem 1.75rem 2rem;
+    /* Kept in step with the base clamp()'s 2.25rem (36px) floor above --
+       this override was hardcoded to the old, smaller 1.75rem (28px) and
+       silently undercut it on every phone/tablet under 768px. */
+    padding: 0.5rem 2.25rem 2rem;
   }
 
   .nav-links a {
@@ -3752,6 +3756,7 @@ a:hover .city-landmark-photo,
   align-items: center;
   justify-content: center;
   gap: 2rem;
+  padding: 1.5rem 2.25rem;
   opacity: 0;
   pointer-events: none;
   transform: translateY(-8px);
