@@ -61,11 +61,9 @@
 
     mount.className = 'navbar glass';
     mount.innerHTML =
-      '<div class="nav-brand">' +
+      '<a href="/" class="nav-brand" aria-label="Glotemp home">' +
         '<img src="/assets/logo.png" alt="Glotemp" class="nav-logo">' +
-        '<span class="logo-text">Glotemp</span>' +
-        '<span class="pulse-dot" aria-hidden="true">❤️</span>' +
-      '</div>' +
+      '</a>' +
       '<div class="nav-links" id="nav-links-desktop">\n        ' +
         linksHTML(active) +
       '\n      </div>' +

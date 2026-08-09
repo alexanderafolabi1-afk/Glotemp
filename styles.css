@@ -1016,6 +1016,7 @@ body.scroll-reveals-enabled section.revealed {
 .nav-brand {
   display: flex;
   align-items: center;
+  text-decoration: none;
 }
 
 /* Small beating heart next to the wordmark (replaces the old pulse-dot ping) */
@@ -3567,6 +3568,38 @@ button:hover:not(:focus-visible) {
   font-family: var(--font-mono);
   color: var(--band-equilibrium);
   opacity: 0.6;
+}
+
+/* .hiw-steps had no layout rule at all -- its three .hiw-step children
+   fell back to default block stacking, collapsing "Three steps, one
+   reading" into a single narrow column and leaving most of a full-bleed
+   page empty. Three columns when there's room, one when there isn't. */
+.hiw-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+.hiw-step {
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--hairline);
+}
+.hiw-numeral {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--brass);
+  margin-bottom: 0.5rem;
+}
+.hiw-title {
+  font-size: 1.25rem;
+  font-weight: var(--fw-light);
+  margin-bottom: 0.4rem;
+}
+.hiw-copy {
+  color: var(--sand);
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 /* ===== AUTH MODAL ===== */
