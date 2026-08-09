@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=28">
+  <link rel="stylesheet" href="/styles.css?v=29">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -245,12 +245,23 @@
 
       const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
 
+      if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('Sofia', 'Bulgaria');
+
+      // Wikipedia section-matching and World Bank indicators both get a
+      // turn per vertical; whatever's still empty afterward -- Fashion
+      // and Pulse always are, since neither has a real per-vertical
+      // source -- falls back to the general Wikipedia summary so no
+      // vertical ever renders completely empty.
+      const contextLoaders = [];
       if (typeof GlotempWiki !== 'undefined') {
-        GlotempWiki.loadCityWiki('Sofia', 'Bulgaria');
-        GlotempWiki.loadAllVerticalContexts('Sofia', 'Bulgaria', verticalSlugs);
+        contextLoaders.push(GlotempWiki.loadAllVerticalContexts('Sofia', 'Bulgaria', verticalSlugs));
       }
       if (typeof GlotempWorldBank !== 'undefined') {
-        verticalSlugs.forEach(v => GlotempWorldBank.loadVerticalIndicator('BG', v, 'Bulgaria'));
+        contextLoaders.push(...verticalSlugs.map(v => GlotempWorldBank.loadVerticalIndicator('BG', v, 'Bulgaria')));
+      }
+      await Promise.all(contextLoaders);
+      if (typeof GlotempWiki !== 'undefined') {
+        await GlotempWiki.fillEmptyVerticalContexts('Sofia', 'Bulgaria', verticalSlugs);
       }
 
       for (const vertical of verticalSlugs) {

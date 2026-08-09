@@ -17,6 +17,22 @@
     return data;
   }
 
+  // Same title-then-title,country fallback as loadCityWiki, memoized so
+  // the per-vertical fallback pass below can reuse the same fetch
+  // instead of re-requesting Wikipedia once per empty vertical.
+  const summaryCache = new Map();
+  function getSummaryCached(cityName, country) {
+    const key = `${cityName}|${country || ''}`;
+    if (summaryCache.has(key)) return summaryCache.get(key);
+    const promise = (async () => {
+      let data = await fetchSummary(cityName);
+      if (!data && country) data = await fetchSummary(`${cityName}, ${country}`);
+      return data;
+    })();
+    summaryCache.set(key, promise);
+    return promise;
+  }
+
   function escapeHTML(s) {
     return String(s || '').replace(/[&<>"']/g, (c) => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
@@ -62,8 +78,7 @@
     if (!container || !cityName) return;
     renderLoading(container);
     try {
-      let data = await fetchSummary(cityName);
-      if (!data && country) data = await fetchSummary(`${cityName}, ${country}`);
+      const data = await getSummaryCached(cityName, country);
       if (!data) {
         renderError(container, cityName);
         return;
@@ -189,15 +204,52 @@
   }
 
   function loadAllVerticalContexts(cityName, country, verticalSlugs) {
-    (verticalSlugs || Object.keys(VERTICAL_SECTIONS)).forEach((v) => {
-      loadVerticalContext(cityName, country, v);
+    return Promise.all(
+      (verticalSlugs || Object.keys(VERTICAL_SECTIONS)).map((v) => loadVerticalContext(cityName, country, v))
+    );
+  }
+
+  // Some verticals (Fashion, Pulse) have no real per-vertical source at
+  // all -- no matching Wikipedia section, no World Bank indicator -- so
+  // they'd otherwise render completely empty on every single city. Once
+  // the section-specific and World Bank passes have both had their turn,
+  // this fills whatever's left with the general Wikipedia lead summary
+  // (the same real, sourced text already fetched for the top-of-page
+  // panel), honestly labeled as general city context rather than
+  // pretending to be vertical-specific data. If Wikipedia genuinely has
+  // nothing for this city either, the vertical stays empty -- still no
+  // invented content, just a narrower set of cities that hit it.
+  async function fillEmptyVerticalContexts(cityName, country, verticalSlugs) {
+    if (!cityName) return;
+    const targets = (verticalSlugs || []).filter((v) => {
+      const mount = document.getElementById(`${v}-context`);
+      return mount && mount.children.length === 0;
     });
+    if (!targets.length) return;
+    try {
+      const data = await getSummaryCached(cityName, country);
+      if (!data || !data.extract) return;
+      const excerpt = trimExcerpt(data.extract, 420);
+      if (!excerpt) return;
+      targets.forEach((v) => {
+        const mount = document.getElementById(`${v}-context`);
+        if (!mount || mount.children.length > 0) return;
+        mount.insertAdjacentHTML('beforeend', `
+          <div class="context-block context-wikipedia context-general">
+            <span class="context-tag">About ${escapeHTML(cityName)} &middot; Wikipedia</span>
+            <p class="context-fact">${escapeHTML(excerpt)}</p>
+          </div>
+        `);
+        if (window.GlotempCore) GlotempCore.reconcileVerticalOrder(v);
+      });
+    } catch (e) { /* still no invented content -- just leave it empty */ }
   }
 
   window.GlotempWiki = {
     loadCityWiki,
     loadVerticalContext,
     loadAllVerticalContexts,
+    fillEmptyVerticalContexts,
     _renderSummary: renderSummary,
     _renderError: renderError,
   };

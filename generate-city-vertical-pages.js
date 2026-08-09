@@ -66,7 +66,7 @@ function pageHTML(city, v) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=28" />
+  <link rel="stylesheet" href="/styles.css?v=29" />
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -122,9 +122,18 @@ function pageHTML(city, v) {
     // indicator where this vertical has a defensible one. Neither
     // replaces the live reading above; both render nothing if there's no
     // honest match, same rule as every empty state on the site.
-    document.addEventListener('DOMContentLoaded', function () {
-      if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadVerticalContext('${city.name}', '${city.country}', '${v.slug}');
-      if (typeof GlotempWorldBank !== 'undefined') GlotempWorldBank.loadVerticalIndicator('${city.iso}', '${v.slug}', '${city.country}');
+    document.addEventListener('DOMContentLoaded', async function () {
+      const loaders = [];
+      if (typeof GlotempWiki !== 'undefined') loaders.push(GlotempWiki.loadVerticalContext('${city.name}', '${city.country}', '${v.slug}'));
+      if (typeof GlotempWorldBank !== 'undefined') loaders.push(GlotempWorldBank.loadVerticalIndicator('${city.iso}', '${v.slug}', '${city.country}'));
+      await Promise.all(loaders);
+      // Fashion and Pulse (and any city whose article lacks this
+      // vertical's section) have no per-vertical source at all -- fall
+      // back to the general Wikipedia summary so this page is never left
+      // with nothing but an empty reading.
+      if (typeof GlotempWiki !== 'undefined') {
+        await GlotempWiki.fillEmptyVerticalContexts('${city.name}', '${city.country}', ['${v.slug}']);
+      }
     });
 
     async function loadVerticalContent() {

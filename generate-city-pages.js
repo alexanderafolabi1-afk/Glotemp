@@ -132,12 +132,23 @@ function generateCityPage(city) {
 
       const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
 
+      if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('${city.name}', '${city.country}');
+
+      // Wikipedia section-matching and World Bank indicators both get a
+      // turn per vertical; whatever's still empty afterward -- Fashion
+      // and Pulse always are, since neither has a real per-vertical
+      // source -- falls back to the general Wikipedia summary so no
+      // vertical ever renders completely empty.
+      const contextLoaders = [];
       if (typeof GlotempWiki !== 'undefined') {
-        GlotempWiki.loadCityWiki('${city.name}', '${city.country}');
-        GlotempWiki.loadAllVerticalContexts('${city.name}', '${city.country}', verticalSlugs);
+        contextLoaders.push(GlotempWiki.loadAllVerticalContexts('${city.name}', '${city.country}', verticalSlugs));
       }
       if (typeof GlotempWorldBank !== 'undefined') {
-        verticalSlugs.forEach(v => GlotempWorldBank.loadVerticalIndicator('${city.iso}', v, '${city.country}'));
+        contextLoaders.push(...verticalSlugs.map(v => GlotempWorldBank.loadVerticalIndicator('${city.iso}', v, '${city.country}')));
+      }
+      await Promise.all(contextLoaders);
+      if (typeof GlotempWiki !== 'undefined') {
+        await GlotempWiki.fillEmptyVerticalContexts('${city.name}', '${city.country}', verticalSlugs);
       }
 
       for (const vertical of verticalSlugs) {
