@@ -156,12 +156,14 @@ function generateCityPage(city) {
 
           if (!response.ok) {
             contentEl.innerHTML = '<div class="empty-state"><p>Nobody has spoken for ${city.name} today.</p><span class="empty-state-cta">Be the first.</span></div>';
+            if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
             continue;
           }
 
           const readings = await response.json();
           if (!readings.length) {
             contentEl.innerHTML = '<div class="empty-state"><p>Nobody has spoken for ${city.name} today.</p><span class="empty-state-cta">Be the first.</span></div>';
+            if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
             continue;
           }
 

@@ -173,10 +173,34 @@
     initAmbientMood();
   }
 
+  // A vertical with no live reading yet should still open on substance:
+  // if real sourced context (Wikipedia/World Bank -- see city-wiki.js,
+  // city-worldbank.js) exists for this vertical, it belongs ahead of the
+  // "nobody has spoken" invitation, not after it. Content and context
+  // load independently and async, in either order, so this is called
+  // from both sides and just re-checks live DOM state each time -- safe
+  // to call repeatedly, a no-op once already in the right order.
+  function reconcileVerticalOrder(verticalSlug) {
+    const content = document.getElementById(`${verticalSlug}-content`);
+    const context = document.getElementById(`${verticalSlug}-context`);
+    if (!content || !context) return;
+    const isEmpty = !!content.querySelector('.empty-state');
+    const hasContext = context.children.length > 0;
+    if (isEmpty && hasContext) {
+      content.classList.add('vertical-content--secondary');
+      if (content.previousElementSibling !== context) {
+        content.parentNode.insertBefore(context, content);
+      }
+    } else {
+      content.classList.remove('vertical-content--secondary');
+    }
+  }
+
   window.GlotempCore = {
     moodToBand,
     getPinnedCity,
     setPinnedCity,
+    reconcileVerticalOrder,
     getWatchedCities,
     isWatched,
     toggleWatch,
