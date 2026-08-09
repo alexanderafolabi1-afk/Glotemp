@@ -208,11 +208,23 @@
       cursor: pointer;
       padding: 0.6rem 0.4rem;
       border-radius: 16px;
-      transition: transform 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      /* Grid items default to min-width:auto, which floors their size at
+         the dial face's intrinsic 124px regardless of the 1fr track it's
+         given -- on narrow phones (<=340px-ish) that forced the whole
+         grid wider than the viewport. min-width:0 lets it actually honor
+         .dial-face-outer's max-width:100% and shrink with its column. */
+      min-width: 0;
+      /* A slight overshoot on the way up -- the dial settles into place
+         rather than just sliding, without tipping into cartoonish. */
+      transition: transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .dial-wrap:hover,
     .dial-wrap:focus-visible {
-      transform: translateY(-4px);
+      transform: translateY(-6px) scale(1.045);
+    }
+    .dial-wrap:active {
+      transform: translateY(-2px) scale(0.97);
+      transition-duration: 100ms;
     }
 
     .dial-face-outer {
@@ -229,9 +241,27 @@
     }
     .dial-wrap:hover .dial-face-outer,
     .dial-wrap:focus-visible .dial-face-outer {
-      filter: drop-shadow(0 5px 16px rgba(0, 0, 0, 0.45)) drop-shadow(0 0 10px var(--dial-glow, transparent));
+      filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 14px var(--dial-glow, transparent));
     }
     .dial-face-outer svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+    /* A quiet glass highlight across the upper-left of the face -- the
+       one purely "delight" touch, kept subtle enough to read as an
+       actual instrument rather than a sticker. */
+    .dial-face-outer::after {
+      content: '';
+      position: absolute;
+      inset: 9%;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 38%);
+      opacity: 0.55;
+      pointer-events: none;
+      transition: opacity 300ms ease;
+    }
+    .dial-wrap:hover .dial-face-outer::after,
+    .dial-wrap:focus-visible .dial-face-outer::after {
+      opacity: 0.9;
+    }
 
     @keyframes dial-breathe {
       0%, 100% { transform: scale(1); }
@@ -452,6 +482,28 @@
       }
     }
 
+    function cityMinuteAngle(timezone) {
+      try {
+        const parts = new Intl.DateTimeFormat('en-US', {
+          timeZone: timezone, hour12: false, minute: 'numeric'
+        }).formatToParts(new Date());
+        const minute = Number(parts.find(p => p.type === 'minute').value);
+        return (minute / 60) * 360;
+      } catch (e) {
+        return 0;
+      }
+    }
+
+    function formatCityTime(timezone) {
+      try {
+        return new Intl.DateTimeFormat('en-GB', {
+          timeZone: timezone, hour12: false, hour: '2-digit', minute: '2-digit',
+        }).format(new Date());
+      } catch (e) {
+        return '';
+      }
+    }
+
     function tickMarksSVG(coveragePercent) {
       const filled = coveragePercent === null ? 0 : Math.round((coveragePercent / 100) * 12);
       let out = '';
@@ -472,7 +524,8 @@
       const { band, color } = GlotempCore.moodToBand(city.reading);
       const arcWidth = BAND_ARC_WIDTH[band] || 3;
       const arcLen = ARC_CIRC * Math.max(0, Math.min(1, city.reading / 10));
-      const angle = cityHourAngle(city.timezone);
+      const hourAngle = cityHourAngle(city.timezone);
+      const minuteAngle = cityMinuteAngle(city.timezone);
       const readingLabel = `${city.name}, ${city.country} - reading ${city.reading.toFixed(1)} of 10, ${band} band, ${city.coveragePercent === null ? 'coverage unknown' : city.coveragePercent + '% coverage'}`;
       return `<svg viewBox="0 0 120 120" role="img" aria-label="${readingLabel.replace(/"/g, '&quot;')}">
         <g>${tickMarksSVG(city.coveragePercent)}</g>
@@ -482,10 +535,13 @@
           stroke-width="${arcWidth}" stroke-linecap="round"
           stroke-dasharray="${arcLen.toFixed(2)} ${(ARC_CIRC - arcLen).toFixed(2)}"
           transform="rotate(-90 ${CX} ${CY})" />
-        <line class="dial-hand" data-timezone="${city.timezone}" x1="${CX}" y1="${CY}" x2="${CX}" y2="${CY - 26}"
-          stroke="#3A2E22" stroke-width="2" stroke-linecap="round"
-          style="transform: rotate(${angle.toFixed(2)}deg); transform-origin: ${CX}px ${CY}px;" />
-        <circle cx="${CX}" cy="${CY}" r="2.5" fill="#3A2E22" />
+        <line class="dial-hand dial-hand--minute" data-timezone="${city.timezone}" x1="${CX}" y1="${CY}" x2="${CX}" y2="${CY - 28}"
+          stroke="#3A2E22" stroke-width="1.3" stroke-linecap="round"
+          style="transform: rotate(${minuteAngle.toFixed(2)}deg); transform-origin: ${CX}px ${CY}px;" />
+        <line class="dial-hand dial-hand--hour" data-timezone="${city.timezone}" x1="${CX}" y1="${CY}" x2="${CX}" y2="${CY - 18}"
+          stroke="#3A2E22" stroke-width="2.2" stroke-linecap="round"
+          style="transform: rotate(${hourAngle.toFixed(2)}deg); transform-origin: ${CX}px ${CY}px;" />
+        <circle cx="${CX}" cy="${CY}" r="2.5" fill="${color}" stroke="#3A2E22" stroke-width="1" />
       </svg>`;
     }
 
@@ -503,7 +559,7 @@
         </div>
         <div class="dial-name">${typeof GlotempLandmarks !== 'undefined' ? GlotempLandmarks.cityIconHTML(city.slug, { size: 14, className: 'city-landmark-icon' }) : ''}<span>${city.name}</span></div>
         <div class="dial-reading">${reading.toFixed(1)} &middot; ${band}</div>
-        <div class="dial-country">${city.country}</div>
+        <div class="dial-country">${city.country} &middot; <span class="dial-time" data-timezone="${city.timezone}">${formatCityTime(city.timezone)}</span></div>
       </a>`;
     }
 
@@ -511,9 +567,16 @@
     function startHandClock() {
       if (handTimer) return;
       handTimer = setInterval(() => {
-        document.querySelectorAll('.dial-hand[data-timezone]').forEach(el => {
+        document.querySelectorAll('.dial-hand--hour[data-timezone]').forEach(el => {
           const angle = cityHourAngle(el.getAttribute('data-timezone'));
           el.style.transform = `rotate(${angle.toFixed(2)}deg)`;
+        });
+        document.querySelectorAll('.dial-hand--minute[data-timezone]').forEach(el => {
+          const angle = cityMinuteAngle(el.getAttribute('data-timezone'));
+          el.style.transform = `rotate(${angle.toFixed(2)}deg)`;
+        });
+        document.querySelectorAll('.dial-time[data-timezone]').forEach(el => {
+          el.textContent = formatCityTime(el.getAttribute('data-timezone'));
         });
       }, 60000);
     }
