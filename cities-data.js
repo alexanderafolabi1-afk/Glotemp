@@ -2,7 +2,7 @@
 // Ranked by: Internet Penetration Rate × Metro Population
 // Source: ITU World Telecommunication Indicators, World Bank, UN Urbanization
 // Updated: 2026
-// Total: 150 cities across 80+ countries
+// Total: 151 cities across 80+ countries
 
 const CITIES_DATA = [
   { slug: 'tokyo', name: 'Tokyo', country: 'Japan', iso: 'JP', region: 'Asia-Pacific', timezone: 'Asia/Tokyo', lat: 35.6762, lon: 139.6503, metro_pop: 37400000, penetration: 0.94, rank: 1, mood: 8.4, available: true },
@@ -154,7 +154,8 @@ const CITIES_DATA = [
   { slug: 'muscat', name: 'Muscat', country: 'Oman', iso: 'OM', region: 'Middle East', timezone: 'Asia/Muscat', lat: 23.588, lon: 58.3829, metro_pop: 1421000, penetration: 0.94, rank: 147, mood: 7.2, available: true },
   { slug: 'kuwait-city', name: 'Kuwait City', country: 'Kuwait', iso: 'KW', region: 'Middle East', timezone: 'Asia/Kuwait', lat: 29.3759, lon: 47.9774, metro_pop: 3115000, penetration: 0.98, rank: 148, mood: 6.8, available: true },
   { slug: 'jeddah', name: 'Jeddah', country: 'Saudi Arabia', iso: 'SA', region: 'Middle East', timezone: 'Asia/Riyadh', lat: 21.4858, lon: 39.1925, metro_pop: 4697000, penetration: 0.92, rank: 149, mood: 6.8, available: true },
-  { slug: 'baghdad', name: 'Baghdad', country: 'Iraq', iso: 'IQ', region: 'Middle East', timezone: 'Asia/Baghdad', lat: 33.3152, lon: 44.3661, metro_pop: 7144000, penetration: 0.5, rank: 150, mood: 5.5, available: true }
+  { slug: 'baghdad', name: 'Baghdad', country: 'Iraq', iso: 'IQ', region: 'Middle East', timezone: 'Asia/Baghdad', lat: 33.3152, lon: 44.3661, metro_pop: 7144000, penetration: 0.5, rank: 150, mood: 5.5, available: true },
+  { slug: 'milton-keynes', name: 'Milton Keynes', country: 'UK', iso: 'GB', region: 'Europe', timezone: 'Europe/London', lat: 52.0406, lon: -0.7594, metro_pop: 287000, penetration: 0.96, rank: 151, mood: 6.7, available: true }
 ];
 
 // Export for use in app.js

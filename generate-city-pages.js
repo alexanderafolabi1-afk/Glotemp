@@ -175,6 +175,7 @@ function generateCityPage(city) {
                 <span class="reading-metric">\${reading.metric}</span>
                 <span class="reading-confidence" title="Data confidence: \${(reading.confidence * 100).toFixed(0)}%">
                   \${verticals.getConfidenceLabel(reading.confidence)}
+                  <span class="reading-confidence-track"><span class="reading-confidence-fill" style="width:\${Math.round(reading.confidence * 100)}%"></span></span>
                 </span>
               </div>
               <div class="reading-value">

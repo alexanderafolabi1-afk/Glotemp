@@ -3236,6 +3236,25 @@ button:hover:not(:focus-visible) {
 .reading-confidence {
   color: var(--sand);
   font-size: 0.8rem;
+  text-align: right;
+}
+
+.reading-confidence-track {
+  display: block;
+  margin-top: 0.3rem;
+  width: 56px;
+  height: 3px;
+  margin-left: auto;
+  background: var(--hairline);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.reading-confidence-fill {
+  display: block;
+  height: 100%;
+  background: var(--band-warm);
+  border-radius: 2px;
 }
 
 .reading-value {
@@ -3956,8 +3975,13 @@ button:hover:not(:focus-visible) {
 .checkin-modes { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
 
 .checkin-mode {
-  min-height: 44px;
-  padding: 0.55rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 64px;
+  min-width: 64px;
+  padding: 0.6rem 1rem;
   background: rgba(240, 224, 200, 0.05);
   border: 1px solid var(--brass-dim);
   border-radius: 12px;
@@ -3968,6 +3992,7 @@ button:hover:not(:focus-visible) {
   cursor: pointer;
   transition: all var(--transition);
 }
+.checkin-mode svg { flex: none; }
 .checkin-mode:hover { color: var(--ivory); border-color: var(--brass); }
 /* Selected state is a brighter hairline and brighter ink, NOT an inverted
    fill. The fill was removed site-wide when the boxes went, and an
@@ -4006,6 +4031,27 @@ button:hover:not(:focus-visible) {
   margin-bottom: 0.9rem;
 }
 .checkin-note:focus { outline: none; border-color: var(--brass); }
+
+.checkin-preview-label {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--sand);
+  opacity: 0.75;
+  margin-bottom: 0.4rem;
+}
+
+/* Reuses .checkin-item's own look so this preview is literally a
+   preview -- the same card the visitor will see appear in the list
+   below once they submit, not a description of what will happen. */
+.checkin-preview {
+  border: 1px dashed var(--brass-dim);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
 
 .checkin-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .checkin-status {
@@ -4483,6 +4529,18 @@ time, .instr-clock, .tonight-modelled {
 
 /* ===== TRIP ENGINE / AD-READY SLOT ===== */
 .trip-slot { padding: 2rem 0; border-top: 1px solid var(--hairline); }
+/* Two columns on wide screens so the verdict sentence -- deliberately
+   capped at a readable measure, not stretched across a full-bleed page
+   -- has somewhere real to sit beside it, instead of leaving most of a
+   wide section empty. The reading panel is the same synthesized mood
+   number/band already driving the verdict copy, not a second dataset. */
+.trip-body {
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.trip-text { flex: 1 1 380px; min-width: 0; }
 .trip-verdict-line {
   font-family: var(--font-display);
   font-size: clamp(20px, 2.6vw, 30px);
@@ -4491,6 +4549,39 @@ time, .instr-clock, .tonight-modelled {
   line-height: 1.35;
   max-width: 34ch;
   min-height: 2.7em;
+}
+.trip-reading {
+  flex: 0 0 auto;
+  text-align: center;
+  padding-left: 2.5rem;
+  border-left: 1px solid var(--hairline);
+  min-width: 140px;
+}
+.trip-reading-value {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 2.6rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--trip-band, var(--ivory));
+  line-height: 1;
+}
+.trip-reading-band {
+  display: block;
+  margin-top: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--trip-band, var(--sand));
+}
+.trip-reading-city {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.82rem;
+  color: var(--sand);
+}
+@media (max-width: 700px) {
+  .trip-reading { border-left: none; border-top: 1px solid var(--hairline); padding: 1.25rem 0 0; text-align: left; }
 }
 .trip-actions { display: flex; gap: 1.75rem; flex-wrap: wrap; margin-top: 1.4rem; min-height: 48px; }
 .trip-action {
