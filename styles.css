@@ -25,7 +25,7 @@
      and every pure white on the site in one move. */
   --bone: #F0E0C8;            /* was #F0E0C8 (cool white) */
   --ash: #C9B79C;             /* was #C9B79C (cool grey) */
-  --hairline: rgba(176, 141, 87, 0.22);   /* brass-tinted, never grey */
+  --hairline: rgba(176, 141, 87, 0.32);   /* brass-tinted, never grey; raised from 0.22 -- dividers and field borders were reading as barely-there */
 
   /* Warm text tokens (canonical names) */
   --ivory: #F0E0C8;
@@ -33,7 +33,7 @@
 
   /* Brass: nav hairline + dial rim accents */
   --brass: #B08D57;
-  --brass-dim: rgba(176, 141, 87, 0.35);
+  --brass-dim: rgba(176, 141, 87, 0.48);  /* raised from 0.35, same reason */
 
   /* Band colors (mood/reading state, used everywhere a band appears) */
   --band-low: #4FD8E8;
@@ -258,11 +258,11 @@ body.ambient-night::before   { filter: hue-rotate(var(--mood-hue, 0deg)) saturat
 #app {
   width: 100%;
   margin: 0 auto;
-  /* Floor raised to 1.75rem (28px) so content never sits closer than
+  /* Floor raised to 2.25rem (36px) so content never sits closer than
      that to the screen edge on any phone; scales faster with viewport
      width and caps at 6rem (96px) so large screens get noticeably more
      breathing room instead of flattening out at a modest 64px. */
-  padding: 1rem clamp(1.75rem, 5vw, 6rem);
+  padding: 1rem clamp(2.25rem, 6vw, 6rem);
   position: relative;
   z-index: 1;
 }
@@ -271,7 +271,7 @@ body.ambient-night::before   { filter: hue-rotate(var(--mood-hue, 0deg)) saturat
 .page-content {
   width: 100%;
   margin: 0 auto;
-  padding: 1rem clamp(1.75rem, 5vw, 6rem) 3rem;
+  padding: 1rem clamp(2.25rem, 6vw, 6rem) 3rem;
   position: relative;
   z-index: 1;
 }
@@ -1785,24 +1785,24 @@ textarea:focus:not(:focus-visible) {
 /* The homepage's one mood picker (the check-in composer's .mood-btn --
    the per-city comment box that used to duplicate this with unlabeled
    .mood-emoji glyphs has been folded into a single "Add your voice" link
-   back up to this control). Icon plus a visible text label, always on,
-   not a hover-only title tooltip a touch visitor would never see. */
+   back up to this control). Text plus icon, never a bordered box -- same
+   "text, not pills" language as .spin-variant: a hairline underline marks
+   the active choice, nothing else is ever drawn around it. */
 .mood-btn {
   position: relative;
-  background-color: rgba(240, 224, 200, 0.05);
-  border: 1px solid var(--hairline);
-  border-radius: 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.3rem;
-  padding: 0.6rem 0.7rem 0.5rem;
+  gap: 0.35rem;
+  padding: 0.5rem 0.7rem 0.6rem;
   min-width: 64px;
   cursor: pointer;
-  transition: all var(--transition);
-  color: var(--bone);
-  opacity: 0.7;
+  transition: color var(--transition), border-color var(--transition), transform var(--transition);
+  color: var(--sand);
   font-weight: var(--fw-light);
 }
 .mood-btn-icon { font-size: 1.3rem; line-height: 1; }
@@ -1814,16 +1814,13 @@ textarea:focus:not(:focus-visible) {
 }
 
 .mood-btn:hover {
-  opacity: 1;
+  color: var(--ivory);
   transform: translateY(-2px);
-  border-color: rgba(79, 216, 232, 0.3);
 }
 
 .mood-btn.active {
-  opacity: 1;
-  border-color: var(--ion);
-  background-color: rgba(79, 216, 232, 0.08);
-  box-shadow: 0 0 0 1px var(--ion);
+  color: var(--ivory);
+  border-bottom-color: var(--brass);
 }
 
 .observation-form,
@@ -5108,9 +5105,10 @@ main > *,
 }
 
 /* Where a boundary is genuinely needed it is one brass hairline.
-   .spin-variant is deliberately excluded -- mode options are plain text
-   with a hairline underline on the active one only, never a bordered box. */
-.mood-btn, .mood-emoji, .checkin-mode, .band-chip,
+   .spin-variant and .mood-btn are deliberately excluded -- mode/mood
+   options are plain text with a hairline underline on the active one
+   only, never a bordered box (see their own rules above). */
+.mood-emoji, .checkin-mode, .band-chip,
 .pagination-btn, .affiliate-btn, .vertical-link {
   border: 1px solid var(--brass-dim);
 }
