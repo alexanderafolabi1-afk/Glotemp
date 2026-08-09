@@ -1155,6 +1155,31 @@ body.scroll-reveals-enabled section.revealed {
   opacity: 1;
 }
 
+/* Secondary "go see more" navigation (profile links, rankings links at
+   the foot of a page) -- text with an underline, not a second row of
+   buttons next to the real CTA. Two or three of these side by side used
+   to render as a small grid of boxes; this reads as a simple link list. */
+.secondary-links-row {
+  display: flex;
+  gap: 1.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.secondary-link {
+  display: inline-block;
+  color: var(--sand);
+  text-decoration: none;
+  font-size: 0.98rem;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--brass-dim);
+  min-height: 44px;
+  transition: color var(--transition), border-color var(--transition);
+}
+.secondary-link:hover {
+  color: var(--ivory);
+  border-color: var(--brass);
+}
+
 .btn-text {
   background: transparent;
   border: none;
@@ -1360,25 +1385,29 @@ textarea:focus:not(:focus-visible) {
   padding: 1.5rem 0;
 }
 
+/* Text plus icon, underlined -- not a pill/box. Six of these can sit in
+   a row on a city page; six bordered pills read as a grid of buttons,
+   six underlined text links read as a simple list, which is the effect
+   wanted here. */
 .affiliate-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 0;
   background: transparent;
-  border: 1px solid var(--hairline);
-  border-radius: 20px;
-  color: var(--bone);
+  border: none;
+  border-bottom: 1px solid var(--brass-dim);
+  color: var(--sand);
   text-decoration: none;
   font-weight: var(--fw-medium);
-  transition: all var(--transition);
+  transition: color var(--transition), border-color var(--transition), transform var(--transition);
   cursor: pointer;
   min-height: 44px;
 }
 
 .affiliate-btn:hover {
-  border-color: var(--ion);
-  color: var(--ion);
+  border-color: var(--brass);
+  color: var(--ivory);
   transform: translateY(-2px);
 }
 
@@ -5110,11 +5139,11 @@ main > *,
 }
 
 /* Where a boundary is genuinely needed it is one brass hairline.
-   .spin-variant and .mood-btn are deliberately excluded -- mode/mood
-   options are plain text with a hairline underline on the active one
-   only, never a bordered box (see their own rules above). */
+   .spin-variant, .mood-btn and .affiliate-btn are deliberately excluded
+   -- those read as plain text with a hairline underline, never a
+   bordered box or pill (see their own rules above). */
 .mood-emoji, .checkin-mode, .band-chip,
-.pagination-btn, .affiliate-btn, .vertical-link {
+.pagination-btn, .vertical-link {
   border: 1px solid var(--brass-dim);
 }
 

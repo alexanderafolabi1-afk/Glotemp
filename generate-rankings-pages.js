@@ -9,18 +9,18 @@ const path = require('path');
 const SIGNAL_THRESHOLD = 2;
 
 const VERTICALS = [
-  { slug: 'pulse', label: 'Pulse', metric: 'sentiment_score', unit: '/ 10', desc: 'How every city feels right now, ranked.' },
-  { slug: 'tech', label: 'Tech', metric: 'developer_activity', unit: 'activity index', desc: 'Where the developer and startup activity is highest.' },
-  { slug: 'finance', label: 'Finance', metric: 'currency_strength', unit: '/ 10', desc: 'Currency stability and cost dynamics, ranked.' },
-  { slug: 'work', label: 'Work', metric: 'salary_competitiveness', unit: '/ 100', desc: 'Where salaries and work culture are most competitive.' },
-  { slug: 'property', label: 'Property', metric: 'property_appreciation', unit: '% annual', desc: 'Where real estate is appreciating fastest.' },
-  { slug: 'education', label: 'Education', metric: 'education_quality_score', unit: '/ 10', desc: 'University density and education quality, ranked.' },
-  { slug: 'sport', label: 'Sport', metric: 'active_participation', unit: '% participation', desc: 'Where sports participation and venues are strongest.' },
-  { slug: 'entertainment', label: 'Entertainment', metric: 'nightlife_score', unit: '/ 10', desc: 'Nightlife energy and cultural events, ranked.' },
-  { slug: 'fashion', label: 'Fashion', metric: 'style_influence', unit: '/ 10', desc: 'Global style influence and fashion presence, ranked.' },
-  { slug: 'food', label: 'Food', metric: 'culinary_diversity', unit: '/ 10', desc: 'Culinary diversity and dining scenes, ranked.' },
-  { slug: 'health', label: 'Health', metric: 'wellness_index', unit: '/ 10', desc: 'Wellness, air quality and healthcare, ranked.' },
-  { slug: 'transport', label: 'Transport', metric: 'transit_quality', unit: '/ 10', desc: 'Public transit and mobility quality, ranked.' },
+  { slug: 'pulse', label: '💓 Pulse', metric: 'sentiment_score', unit: '/ 10', desc: 'How every city feels right now, ranked.' },
+  { slug: 'tech', label: '💻 Tech', metric: 'developer_activity', unit: 'activity index', desc: 'Where the developer and startup activity is highest.' },
+  { slug: 'finance', label: '💰 Finance', metric: 'currency_strength', unit: '/ 10', desc: 'Currency stability and cost dynamics, ranked.' },
+  { slug: 'work', label: '💼 Work', metric: 'salary_competitiveness', unit: '/ 100', desc: 'Where salaries and work culture are most competitive.' },
+  { slug: 'property', label: '🏠 Property', metric: 'property_appreciation', unit: '% annual', desc: 'Where real estate is appreciating fastest.' },
+  { slug: 'education', label: '🎓 Education', metric: 'education_quality_score', unit: '/ 10', desc: 'University density and education quality, ranked.' },
+  { slug: 'sport', label: '⚽ Sport', metric: 'active_participation', unit: '% participation', desc: 'Where sports participation and venues are strongest.' },
+  { slug: 'entertainment', label: '🎭 Entertainment', metric: 'nightlife_score', unit: '/ 10', desc: 'Nightlife energy and cultural events, ranked.' },
+  { slug: 'fashion', label: '👗 Fashion', metric: 'style_influence', unit: '/ 10', desc: 'Global style influence and fashion presence, ranked.' },
+  { slug: 'food', label: '🍽️ Food', metric: 'culinary_diversity', unit: '/ 10', desc: 'Culinary diversity and dining scenes, ranked.' },
+  { slug: 'health', label: '🩺 Health', metric: 'wellness_index', unit: '/ 10', desc: 'Wellness, air quality and healthcare, ranked.' },
+  { slug: 'transport', label: '🚇 Transport', metric: 'transit_quality', unit: '/ 10', desc: 'Public transit and mobility quality, ranked.' },
 ];
 
 function pageHTML(v) {
@@ -58,7 +58,7 @@ function pageHTML(v) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=38" />
+  <link rel="stylesheet" href="/styles.css?v=39" />
   <style>
     .rank-row {
       display: flex;
@@ -103,7 +103,7 @@ function pageHTML(v) {
 
     <section class="glass-card" style="text-align:center; padding:2rem;">
       <p style="color:var(--sand); margin-bottom:1rem;">See every vertical for one city instead.</p>
-      <a href="/verticals/${v.slug}.html" class="btn-neon" style="text-decoration:none; display:inline-block;">Explore ${v.label} in detail</a>
+      <a href="/verticals/${v.slug}.html" class="secondary-link">Explore ${v.label} in detail</a>
     </section>
   </main>
 
