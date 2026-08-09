@@ -72,12 +72,15 @@ const translations = {
     history: "History",
     read_more: "Read more",
     show_less: "Show less",
-    pulse_eyebrow: "Live instruments",
-    pulse_title: "Instrument room",
-    pulse_intro: "Watch the mood of cities turning over in real time. Select any city to pin it and dive deeper.",
+    pulse_eyebrow: "Right now, live",
+    pulse_title: "How five cities feel today",
+    pulse_intro: "Five cities, chosen from what's moving right now.",
+    instrument_hint: "Tap any city below to see if today's the day to go.",
     no_observations: "Be the first to share an observation. Check in now.",
-    checkin_eyebrow: "Observation intake",
-    checkin_intro: "Offer a quiet signal from where you stand. Richer observations deepen the atlas while keeping the ritual gentle.",
+    checkin_eyebrow: "Your turn",
+    checkin_intro: "How does your city feel right now? Pick a mood, add a note if you like, and you'll shape the next reading.",
+    add_voice_copy: "Want to add your own read on this city?",
+    add_voice_btn: "Add your voice ↑",
     intensity_label: "Intensity",
     scene_label: "Scene",
     scene_street: "Street",
@@ -147,8 +150,8 @@ const translations = {
     constellation_moment_eyebrow: "Constellation Moment",
     prototype_counter_notice: "Prototype note: observatory counts and badge thresholds are local to this device until a server-backed verification layer is introduced.",
     obs_eyebrow: "Live observations",
-    obs_title: "Recent pulse from {city}",
-    obs_intro: "See what fellow observers are feeling right now in this city. Each note shapes the collective mood.",
+    obs_title: "What people are feeling in {city}",
+    obs_intro: "Real notes from people there right now.",
     obs_empty: "No observations yet. Be the first to share the pulse.",
     coverage_eyebrow: "Global pulse",
     coverage_title: "Cities in real time",
@@ -2344,7 +2347,17 @@ async function setupBarometerRotation() {
     slot.style.cursor = 'pointer';
     slot.addEventListener('click', () => {
       const slug = slot.dataset.citySlug;
-      if (slug && typeof loadCityBySlug === 'function') loadCityBySlug(slug);
+      if (!slug) return;
+      // Visible feedback at the point of click, not just an update far
+      // below the fold: mark this slot selected and carry the visitor to
+      // the "Should you go" verdict that just changed underneath them.
+      slots.forEach(s => s.classList.remove('is-selected'));
+      slot.classList.add('is-selected');
+      if (typeof loadCityBySlug === 'function') loadCityBySlug(slug);
+      const tripSlot = document.querySelector('.trip-slot');
+      if (tripSlot) {
+        setTimeout(() => tripSlot.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150);
+      }
     });
   });
 
@@ -2654,89 +2667,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 })();
 
-// ----- City comment box (under "Recent pulse from [city]") -----
-(function initCityCommentBox() {
+// ----- "Add your voice" (under "Recent pulse from [city]") -----
+// Used to be its own duplicate mood-picker + textarea, visually identical
+// to the check-in composer above but wired separately -- confusing on a
+// page that already asks the same question once. Now it's a single link
+// back up to that one composer, with a visible highlight so the
+// connection between "add your voice" and "the form up there" is obvious.
+(function initAddVoiceButton() {
   function setup() {
-    const picker = document.getElementById('comment-mood-picker');
-    const textEl = document.getElementById('comment-text');
-    const submitBtn = document.getElementById('comment-submit');
-    const feedbackEl = document.getElementById('comment-feedback');
-    if (!picker || !textEl || !submitBtn) return;
+    const btn = document.getElementById('add-voice-btn');
+    const checkinSection = document.querySelector('.check-in');
+    if (!btn || !checkinSection) return;
 
-    let selectedMood = null;
-
-    picker.querySelectorAll('.mood-emoji').forEach(btn => {
-      btn.addEventListener('click', () => {
-        picker.querySelectorAll('.mood-emoji').forEach(b => {
-          b.style.opacity = '0.5';
-          b.style.transform = '';
-        });
-        btn.style.opacity = '1';
-        btn.style.transform = 'scale(1.2)';
-        selectedMood = btn.getAttribute('data-label') || btn.getAttribute('data-band') || 'Neutral';
-      });
-    });
-
-    submitBtn.addEventListener('click', () => {
-      const note = textEl.value.trim();
-      if (!note) {
-        if (feedbackEl) feedbackEl.textContent = 'Write something first.';
-        return;
-      }
-      const mood = selectedMood || 'Neutral';
-      const citySelectEl = document.getElementById('city-select');
-      const citySlug = citySelectEl ? citySelectEl.value : 'nyc';
-      const cityData = (typeof cities !== 'undefined') ? cities[citySlug] : null;
-      const cityName = cityData ? cityData.name : 'New York';
-      const bandMap = { charged: 0.9, warm: 0.7, equilibrium: 0.5, restrained: 0.3, low: 0.2 };
-      const moodLabelToBand = {
-        Energized: 'charged', Good: 'warm', Neutral: 'equilibrium', Low: 'restrained', Cautious: 'low'
-      };
-      const band = moodLabelToBand[mood] || 'equilibrium';
-      const sentiment = bandMap[band] || 0.5;
-
-      const observation = {
-        mood,
-        intensity: 65,
-        scene: 'street',
-        lens: 'global',
-        cadence: 'midday',
-        note,
-        city: cityName,
-        createdAt: new Date().toISOString()
-      };
-      if (typeof observatoryState !== 'undefined') {
-        observatoryState.observations.unshift(observation);
-        observatoryState.observations = observatoryState.observations.slice(0, 24);
-        if (typeof saveObservatory === 'function') saveObservatory();
-      }
-
-      // Also inject into SEED_OBSERVATIONS so renderObservations picks it up
-      if (!window.SEED_OBSERVATIONS) window.SEED_OBSERVATIONS = [];
-      window.SEED_OBSERVATIONS.unshift({
-        city: citySlug,
-        cityName,
-        sentiment,
-        text: note,
-        context: note,
-        intensity: 7,
-        created_at: new Date().toISOString()
-      });
-
-      // Refresh feed
-      if (typeof renderObservations === 'function') renderObservations(citySlug, false);
-
-      // Feedback
-      if (feedbackEl) feedbackEl.textContent = 'Observation shared.';
-      textEl.value = '';
-      picker.querySelectorAll('.mood-emoji').forEach(b => {
-        b.style.opacity = '0.5';
-        b.style.transform = '';
-      });
-      selectedMood = null;
-
-      // Clear feedback after 3s
-      setTimeout(() => { if (feedbackEl) feedbackEl.textContent = ''; }, 3000);
+    btn.addEventListener('click', () => {
+      checkinSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      checkinSection.classList.remove('check-in-highlight');
+      void checkinSection.offsetWidth;
+      checkinSection.classList.add('check-in-highlight');
+      const firstMoodBtn = checkinSection.querySelector('.mood-btn');
+      if (firstMoodBtn) setTimeout(() => firstMoodBtn.focus(), 500);
+      setTimeout(() => checkinSection.classList.remove('check-in-highlight'), 2200);
     });
   }
 

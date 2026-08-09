@@ -495,6 +495,15 @@ main > .glass:first-child,
   animation-play-state: paused;
 }
 
+/* Immediate feedback at the point of click: without this, picking a city
+   here only changes something far below the fold, and the click reads as
+   having done nothing at all. */
+.instrument-slot.is-selected {
+  border-color: var(--slot-glow, var(--brass)) !important;
+  box-shadow: 0 0 0 1px var(--slot-glow, var(--brass)), 0 0 20px rgba(176, 141, 87, 0.3);
+  animation-play-state: paused;
+}
+
 /* Weather backdrop system.
    The barometer PNGs are flattened onto an opaque white background (real
    uploaded artwork -- can't be touched/re-exported with transparency). We
@@ -1756,6 +1765,14 @@ textarea:focus:not(:focus-visible) {
 .check-in {
   padding: 1.5rem;
   margin-bottom: 1.5rem;
+  transition: box-shadow 400ms ease;
+}
+
+/* Briefly marks the check-in section when "Add your voice" (further down
+   the page) scrolls the visitor back up to it, so the link between the
+   two reads as one action, not a jump into the void. */
+.check-in-highlight {
+  box-shadow: 0 0 0 1px var(--brass), 0 0 32px rgba(176, 141, 87, 0.25) !important;
 }
 
 .mood-buttons {
@@ -1765,28 +1782,35 @@ textarea:focus:not(:focus-visible) {
   margin: 1rem 0;
 }
 
-/* Shared "chip" style for both mood pickers on the homepage (the check-in
-   form's .mood-btn and the per-city comment box's .mood-emoji) -- a
-   rounded rect instead of a full circle, and the same visual language in
-   both places instead of two different-looking pickers. */
+/* The homepage's one mood picker (the check-in composer's .mood-btn --
+   the per-city comment box that used to duplicate this with unlabeled
+   .mood-emoji glyphs has been folded into a single "Add your voice" link
+   back up to this control). Icon plus a visible text label, always on,
+   not a hover-only title tooltip a touch visitor would never see. */
 .mood-btn {
   position: relative;
-  font-size: 1.35rem;
   background-color: rgba(240, 224, 200, 0.05);
   border: 1px solid var(--hairline);
   border-radius: 12px;
-  width: 48px;
-  height: 48px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.3rem;
+  padding: 0.6rem 0.7rem 0.5rem;
+  min-width: 64px;
   cursor: pointer;
   transition: all var(--transition);
-  min-width: 48px;
-  min-height: 48px;
   color: var(--bone);
-  opacity: 0.6;
+  opacity: 0.7;
   font-weight: var(--fw-light);
+}
+.mood-btn-icon { font-size: 1.3rem; line-height: 1; }
+.mood-btn-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .mood-btn:hover {
@@ -2605,8 +2629,8 @@ small {
 
   .mood-btn {
     width: 100%;
-    aspect-ratio: 1;
     min-width: 44px;
+    padding: 0.5rem 0.3rem 0.45rem;
   }
 
   .card-media {
@@ -2625,8 +2649,13 @@ small {
 
 @media (max-width: 414px) {
   .mood-btn {
-    font-size: 1.4rem;
     width: 100%;
+  }
+  .mood-btn-icon {
+    font-size: 1.15rem;
+  }
+  .mood-btn-label {
+    font-size: 0.58rem;
   }
 
   .form-grid {
@@ -2667,8 +2696,13 @@ small {
 
 @media (max-width: 375px) {
   .mood-btn {
-    font-size: 1.2rem;
-    padding: 0;
+    padding: 0.4rem 0.2rem 0.35rem;
+  }
+  .mood-btn-icon {
+    font-size: 1.05rem;
+  }
+  .mood-btn-label {
+    font-size: 0.55rem;
   }
 
   .form-grid {
@@ -4389,6 +4423,57 @@ a:hover .city-landmark-photo,
   line-height: 1.55;
   opacity: 0.8;
   max-width: none;
+}
+
+/* ===== HOMEPAGE OPENER: says what the site is before asking the visitor
+   to spin, pick a mood, or click a city -- context before controls. ===== */
+.homepage-intro {
+  text-align: center;
+  padding: 1.5rem 0 0.5rem;
+  max-width: 56ch;
+  margin: 0 auto;
+}
+.homepage-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 4.4vw, 48px);
+  font-weight: var(--fw-light);
+  color: var(--ivory);
+  line-height: 1.15;
+  margin-bottom: 0.6rem;
+}
+.homepage-subhead {
+  color: var(--sand);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+/* Sits just above the instrument row: tells the visitor the barometers
+   are clickable before they wonder why nothing happened when they tried. */
+.instrument-hint {
+  text-align: center;
+  color: var(--sand);
+  font-size: 0.85rem;
+  opacity: 0.85;
+  margin: -0.5rem 0 1.1rem;
+}
+
+/* Replaces the old duplicate mood+comment box under "Recent observations":
+   a single line pointing back up at the one real check-in composer. */
+.add-voice-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1rem 0;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: 1.5rem;
+}
+.add-voice-copy {
+  color: var(--sand);
+  font-size: 0.95rem;
+  margin: 0;
 }
 
 /* ===== SPIN DIAL (homepage centrepiece) ===== */

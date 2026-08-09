@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=34" />
+  <link rel="stylesheet" href="/styles.css?v=35" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
@@ -46,6 +46,13 @@
 <script src="/nav-component.js"></script>
 
     
+    <!-- Plain-language opener: says what the site is before asking the
+         visitor to do anything, so the spin instrument below has context. -->
+    <section class="homepage-intro">
+      <h1 class="homepage-h1">Know how a city feels before you go.</h1>
+      <p class="homepage-subhead">Real people checking in, blended with live data, across 151 cities. Spin for an instant answer, or pick a city below.</p>
+    </section>
+
     <!-- Spin: most prominent interactive element on the page -->
     <section id="spin-section" class="glass-card spin-section"></section>
 
@@ -59,6 +66,7 @@
         <p class="section-copy" data-i18n="pulse_intro">Watch the mood of cities turning over in real time. Select any city to pin it and dive deeper.</p>
       </div>
 
+      <p class="instrument-hint" data-i18n="instrument_hint">Tap any city below to see if today's the day to go.</p>
       <div class="instrument-images" id="instrument-row">
         <div class="instrument-slot" data-slot="0">
           <div class="instrument-visual">
@@ -204,12 +212,12 @@
         </div>
         <p class="section-copy" data-i18n="checkin_intro">Offer a quiet signal from where you stand. Richer observations deepen the atlas while keeping the ritual gentle.</p>
       </div>
-      <div class="mood-buttons" role="group" aria-label="Mood choices">
-        <button class="mood-btn" data-mood="▲" data-band="charged"     data-label="Energized" title="Energized">▲</button>
-        <button class="mood-btn" data-mood="◆" data-band="warm"        data-label="Good"      title="Good">◆</button>
-        <button class="mood-btn" data-mood="●" data-band="equilibrium" data-label="Neutral"   title="Neutral">●</button>
-        <button class="mood-btn" data-mood="▼" data-band="restrained"  data-label="Low"       title="Low">▼</button>
-        <button class="mood-btn" data-mood="◇" data-band="low"         data-label="Cautious"  title="Cautious">◇</button>
+      <div class="mood-buttons" role="group" aria-label="How does your city feel right now?">
+        <button class="mood-btn" data-mood="▲" data-band="charged"     data-label="Energized" title="Energized"><span class="mood-btn-icon" aria-hidden="true">▲</span><span class="mood-btn-label">Energized</span></button>
+        <button class="mood-btn" data-mood="◆" data-band="warm"        data-label="Good"      title="Good"><span class="mood-btn-icon" aria-hidden="true">◆</span><span class="mood-btn-label">Good</span></button>
+        <button class="mood-btn" data-mood="●" data-band="equilibrium" data-label="Neutral"   title="Neutral"><span class="mood-btn-icon" aria-hidden="true">●</span><span class="mood-btn-label">Neutral</span></button>
+        <button class="mood-btn" data-mood="▼" data-band="restrained"  data-label="Low"       title="Low"><span class="mood-btn-icon" aria-hidden="true">▼</span><span class="mood-btn-label">Low</span></button>
+        <button class="mood-btn" data-mood="◇" data-band="low"         data-label="Cautious"  title="Cautious"><span class="mood-btn-icon" aria-hidden="true">◇</span><span class="mood-btn-label">Cautious</span></button>
       </div>
       <form id="observation-form" class="observation-form">
         <div class="form-grid">
@@ -252,26 +260,15 @@
         </div>
         <p class="section-copy" data-i18n="obs_intro">See what fellow observers are feeling right now in this city. Each note shapes the collective mood.</p>
       </div>
-      <!-- Comment / observation box -->
-      <div class="city-comment-form" id="city-comment-form">
-        <div class="comment-mood-row" id="comment-mood-picker" role="group" aria-label="Select mood">
-          <button class="mood-emoji" data-band="charged" data-label="Energized" type="button" title="Energized">▲</button>
-          <button class="mood-emoji" data-band="warm"    data-label="Good"      type="button" title="Good">◆</button>
-          <button class="mood-emoji" data-band="equilibrium" data-label="Neutral" type="button" title="Neutral">●</button>
-          <button class="mood-emoji" data-band="restrained"  data-label="Low"    type="button" title="Low">▼</button>
-          <button class="mood-emoji" data-band="low"     data-label="Cautious"  type="button" title="Cautious">◇</button>
-        </div>
-        <textarea class="comment-input" id="comment-text" rows="3" maxlength="280" placeholder="Share what you're feeling in this city right now…"></textarea>
-        <div class="comment-form-actions">
-          <button class="btn-neon comment-submit" id="comment-submit" type="button">Share observation</button>
-          <p id="comment-feedback" class="inline-feedback" aria-live="polite"></p>
-        </div>
+      <div class="add-voice-row">
+        <p class="add-voice-copy" data-i18n="add_voice_copy">Want to add your own read on this city?</p>
+        <button type="button" class="btn-neon" id="add-voice-btn" data-i18n="add_voice_btn">Add your voice ↑</button>
       </div>
       <div id="observations-grid" class="observations-grid"></div>
     </section>
 
     <footer class="footer glass">
-      <p>© 2025 RenviaIT Ltd. All rights reserved.</p>
+      <p>© 2026 RenviaIT Ltd. All rights reserved.</p>
       <p class="small-print">
         <a href="/privacy" data-i18n="privacy_policy">Privacy Policy</a> |
         <a href="/terms" data-i18n="terms_of_service">Terms of Service</a> |
