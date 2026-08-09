@@ -55,7 +55,8 @@ const VERTICALS = [
   { name: 'fashion', label: 'Fashion', desc: 'Where is the center of global style?' },
   { name: 'food', label: 'Food', desc: 'Where should you eat and explore cuisine?' },
   { name: 'health', label: 'Health', desc: 'Where is it healthiest to live?' },
-  { name: 'transport', label: 'Transport', desc: 'Which cities have the best mobility?' }
+  { name: 'transport', label: 'Transport', desc: 'Which cities have the best mobility?' },
+  { name: 'radio', label: '📻 Radio', desc: 'What is this city listening to right now?' }
 ];
 
 // Parse each city line
@@ -149,6 +150,13 @@ function generateCityPage(city) {
       await Promise.all(contextLoaders);
       if (typeof GlotempWiki !== 'undefined') {
         await GlotempWiki.fillEmptyVerticalContexts('${city.name}', '${city.country}', verticalSlugs);
+      }
+
+      // Radio is its own live source (Radio Browser, searched by this
+      // city's real coordinates) -- not a Supabase reading, so it's kept
+      // out of verticalSlugs above and loaded separately here.
+      if (typeof GlotempRadio !== 'undefined' && city) {
+        GlotempRadio.loadRadio(city.name, city.lat, city.lon);
       }
 
       for (const vertical of verticalSlugs) {
