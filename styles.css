@@ -1486,11 +1486,14 @@ textarea:focus:not(:focus-visible) {
    language as the rest of the site's honest empty states, just aimed
    at a commercial audience (local businesses, tourism boards, hotels,
    restaurants, experiences) instead of a visitor. */
+/* Dashed top rule, not a boxed placeholder -- marks this as a reserved
+   spot rather than filled content, the same visual language as
+   .checkin-preview's draft state. */
 .sponsor-slot {
   margin-top: 1.5rem;
-  padding: 1.1rem 1.25rem;
-  border: 1px dashed var(--brass-dim);
-  border-radius: 4px;
+  padding: 1.1rem 0 0;
+  border: none;
+  border-top: 1px dashed var(--brass-dim);
 }
 .sponsor-slot-tag {
   display: inline-block;
@@ -2280,7 +2283,7 @@ textarea:focus:not(:focus-visible) {
 .mood-emoji:hover {
   opacity: 1;
   transform: translateY(-2px);
-  border-color: rgba(79, 216, 232, 0.3);
+  border-color: var(--brass);
 }
 
 .mood-emoji[style*="opacity: 1"] {
@@ -2301,20 +2304,21 @@ textarea:focus:not(:focus-visible) {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
+/* A stacked list divided by a single rule, not a bordered card per
+   comment -- the "Add your voice" list on every city page. */
 .comment-item {
-  padding: 1rem;
-  background: rgba(240, 224, 200, 0.04);
-  border: 1px solid rgba(240, 224, 200, 0.08);
-  border-radius: 12px;
-  transition: all var(--transition);
+  padding: 1rem 0;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--hairline);
+  transition: border-color var(--transition);
 }
+.comment-item:first-child { border-top: none; }
 
 .comment-item:hover {
-  background: rgba(240, 224, 200, 0.08);
-  border-color: rgba(240, 224, 200, 0.15);
+  border-color: var(--brass-dim);
 }
 
 .comment-item p {
@@ -3070,25 +3074,27 @@ button:hover:not(:focus-visible) {
 /* ===== MULTI-VERTICAL PLATFORM STYLES ===== */
 
 /* Cities Directory */
+/* An index list divided by a single rule, not a grid of bordered tiles. */
 .cities-grid {
-  display: grid;
-  gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
   margin: 2rem 0;
+  border-top: 1px solid var(--hairline);
 }
 
 .city-card {
   display: block;
-  padding: 1.5rem;
-  border: 1px solid rgba(240, 224, 200, 0.1);
-  border-radius: 12px;
+  padding: 1.25rem 0;
+  border: none;
+  border-bottom: 1px solid var(--hairline);
   text-decoration: none;
   color: inherit;
-  transition: transform 300ms, border-color 300ms;
+  transition: border-color 300ms, padding-left 300ms;
 }
 
 .city-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--ion);
+  padding-left: 0.5rem;
+  border-color: var(--brass);
 }
 
 .city-card-header {
@@ -3275,24 +3281,26 @@ button:hover:not(:focus-visible) {
 .ranking-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
+/* A league table as a stacked list divided by a single rule, not a
+   bordered card per row. */
 .ranking-item {
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  padding: 1.5rem;
-  border: 1px solid rgba(240, 224, 200, 0.1);
-  border-radius: 8px;
+  padding: 1.25rem 0;
+  border: none;
+  border-top: 1px solid var(--hairline);
   text-decoration: none;
   color: inherit;
-  transition: all 300ms;
+  transition: border-color 300ms, padding-left 300ms;
 }
+.ranking-item:first-child { border-top: none; }
 
 .ranking-item:hover {
-  border-color: var(--ion);
-  transform: translateX(4px);
+  border-color: var(--brass);
+  padding-left: 0.5rem;
 }
 
 .ranking-position {
@@ -3573,13 +3581,15 @@ a:hover .city-landmark-photo,
 .reading-provenance--observed { color: var(--band-warm); }
 .reading-provenance--modelled { color: var(--sand); }
 
+/* A quiet typographic message, not a bordered placeholder box -- matches
+   how every other "nothing here yet" state on the site (Movers, the
+   feed, etc.) is handled: plain text, no container. */
 .empty-state {
-  padding: 1.75rem 1.5rem;
+  padding: 1.5rem 0;
   text-align: center;
   color: var(--sand);
-  border: 1px solid var(--brass-dim);
-  border-radius: 8px;
-  background: rgba(240, 224, 200, 0.03);
+  border: none;
+  background: none;
 }
 
 .empty-state p {
@@ -3743,10 +3753,6 @@ a:hover .city-landmark-photo,
 
 /* Responsive */
 @media (max-width: 768px) {
-  .cities-grid {
-    grid-template-columns: 1fr;
-  }
-
   .verticals-grid {
     grid-template-columns: 1fr;
   }
@@ -4035,8 +4041,6 @@ a:hover .city-landmark-photo,
   width: 200px;
   height: 150px;
   object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid var(--hairline);
 }
 .wiki-text { flex: 1 1 320px; min-width: 0; }
 .wiki-extract {
@@ -4488,12 +4492,13 @@ a:hover .city-landmark-photo,
 }
 
 /* Reuses .checkin-item's own look so this preview is literally a
-   preview -- the same card the visitor will see appear in the list
-   below once they submit, not a description of what will happen. */
+   preview -- the same row the visitor will see appear in the list below
+   once they submit, not a description of what will happen. Dashed
+   rather than solid marks it as draft/not-yet-posted. */
 .checkin-preview {
-  border: 1px dashed var(--brass-dim);
-  border-radius: 12px;
-  padding: 0.9rem 1rem;
+  border: none;
+  border-top: 1px dashed var(--brass-dim);
+  padding: 0.9rem 0 0;
   margin-bottom: 1rem;
   opacity: 0.9;
 }
@@ -4506,7 +4511,7 @@ a:hover .city-landmark-photo,
   min-height: 1.2em;
 }
 
-.checkin-list { display: flex; flex-direction: column; gap: 0.75rem; min-height: 96px; }
+.checkin-list { display: flex; flex-direction: column; min-height: 96px; }
 
 /* ===== INVESTOR PAGE: REVENUE PATHS ===== */
 .revenue-paths-list {
@@ -4523,12 +4528,18 @@ a:hover .city-landmark-photo,
 }
 .revenue-paths-list li:last-child { padding-bottom: 0; }
 
+/* A stacked list divided by a single rule -- not a bordered card per
+   check-in. This list sits directly under the "Check in to {City}"
+   composer, the single most prominent feature on every city page, so a
+   wall of boxes here would undercut the whole "editorial, not
+   dashboard" premise more than almost anywhere else on the site. */
 .checkin-item {
-  border: 1px solid var(--hairline);
-  border-radius: 12px;
-  padding: 0.9rem 1rem;
-  background: rgba(35, 28, 20, 0.4);
+  border: none;
+  border-top: 1px solid var(--hairline);
+  padding: 0.9rem 0;
+  background: none;
 }
+.checkin-item:first-child { border-top: none; }
 
 .checkin-item-head {
   display: flex;
@@ -4673,10 +4684,8 @@ a:hover .city-landmark-photo,
 }
 .tonight-modelled {
   color: var(--brass);
-  border: 1px solid var(--brass-dim);
-  border-radius: 4px;
-  padding: 0 0.3rem;
   font-variant-caps: small-caps;
+  font-style: italic;
 }
 .tonight-empty-copy {
   color: var(--sand);
