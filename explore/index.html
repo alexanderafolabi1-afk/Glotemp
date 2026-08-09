@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=33" />
+  <link rel="stylesheet" href="/styles.css?v=34" />
 
   <style>
     /* Page-scoped styles for the Cities index. Kept inline so this page
@@ -438,6 +438,7 @@
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
   <script src="/city-landmarks.js"></script>
+  <script src="/city-landmark-photos.js"></script>
   <script src="/living-index.js"></script>
   <script>
     // var, not const: tempo-economy.js (loaded below) also declares
@@ -563,6 +564,15 @@
       </a>`;
     }
 
+    function upgradeDialLandmarks(container) {
+      if (typeof GlotempLandmarkPhotos === 'undefined') return;
+      container.querySelectorAll('.dial-wrap').forEach(wrap => {
+        const slug = wrap.getAttribute('data-city-link');
+        const nameEl = wrap.querySelector('.dial-name');
+        if (slug && nameEl) GlotempLandmarkPhotos.upgrade(nameEl, slug, 14);
+      });
+    }
+
     let handTimer = null;
     function startHandClock() {
       if (handTimer) return;
@@ -650,6 +660,7 @@
         grid.innerHTML = pageItems.map(dialWrapHTML).join('');
         grid.classList.remove('is-sorting');
         GlotempCore.wireCityLinks(grid);
+        upgradeDialLandmarks(grid);
         startHandClock();
         renderPagination(fullList.length);
       };
@@ -672,6 +683,7 @@
         slug: c.slug, name: c.name, country: c.country, mood: c.mood, timezone: c.timezone
       })).join('');
       GlotempCore.wireCityLinks(strip);
+      upgradeDialLandmarks(strip);
       startHandClock();
     }
 

@@ -2320,6 +2320,7 @@ async function setupBarometerRotation() {
 
     if (typeof GlotempLandmarks !== 'undefined') {
       nameEl.innerHTML = GlotempLandmarks.cityIconHTML(cityData.slug, { size: 15, className: 'city-landmark-icon' }) + `<span>${cityData.name}</span>`;
+      if (typeof GlotempLandmarkPhotos !== 'undefined') GlotempLandmarkPhotos.upgrade(nameEl, cityData.slug, 15);
     } else {
       nameEl.textContent = cityData.name;
     }

@@ -3216,6 +3216,22 @@ a:hover .city-landmark-icon,
   transform: translateY(-1px) scale(1.06);
 }
 
+.city-landmark-photo {
+  flex: none;
+  display: inline-block;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--brass-dim);
+  opacity: 0.92;
+  transition: opacity 250ms ease, transform 250ms ease, border-color 250ms ease;
+}
+a:hover .city-landmark-photo,
+.dial-wrap:hover .city-landmark-photo {
+  opacity: 1;
+  border-color: var(--brass);
+  transform: translateY(-1px) scale(1.06);
+}
+
 .city-meta {
   display: flex;
   gap: 2rem;

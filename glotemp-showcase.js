@@ -30,6 +30,7 @@
     const l=line(city);
     if (typeof GlotempLandmarks !== 'undefined') {
       nameEl.innerHTML = GlotempLandmarks.cityIconHTML(city.slug, { size: 22, className: 'city-landmark-icon' }) + `<span>${esc(city.name)}</span>`;
+      if (typeof GlotempLandmarkPhotos !== 'undefined') GlotempLandmarkPhotos.upgrade(nameEl, city.slug, 22);
     } else {
       nameEl.textContent = city.name;
     }

@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=33">
+  <link rel="stylesheet" href="/styles.css?v=34">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -234,6 +234,7 @@
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
   <script src="/city-landmarks.js"></script>
+  <script src="/city-landmark-photos.js"></script>
   <script src="/glotemp-auth.js"></script>
   <script src="/glotemp-checkin.js"></script>
   <script src="/glotemp-tonight.js"></script>
@@ -254,6 +255,7 @@
         const nameEl = document.getElementById('city-name');
         if (typeof GlotempLandmarks !== 'undefined') {
           nameEl.innerHTML = GlotempLandmarks.cityIconHTML(city.slug, { size: 34, className: 'city-landmark-icon' }) + `<span>${city.name}</span>`;
+          if (typeof GlotempLandmarkPhotos !== 'undefined') GlotempLandmarkPhotos.upgrade(nameEl, city.slug, 34);
         } else {
           nameEl.textContent = city.name;
         }
@@ -475,7 +477,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Magnificent Mile at noon - wind off the lake, city in full stride.","language_lens":"visitor","created_at":"2026-08-09T07:05:30.174Z"},{"context":"Wicker Park on a Friday - live music bleeding out of every bar.","language_lens":"local","created_at":"2026-08-09T02:05:30.174Z"},{"context":"Logan Square brunch spot - relaxed Midwest energy at its best.","language_lens":"visitor","created_at":"2026-08-08T19:05:30.174Z"},{"context":"Pilsen murals on a Sunday afternoon - culture breathing loud.","language_lens":"diaspora","created_at":"2026-08-08T10:05:30.174Z"},{"context":"Red Line El train - city soundtrack, familiar and grounding.","language_lens":"local","created_at":"2026-08-07T22:05:30.174Z"},{"context":"Millennium Park on a summer evening - jazz, kids, the whole city gathered.","language_lens":"visitor","created_at":"2026-08-07T12:05:30.174Z"}];
+      const checkins = [{"context":"Magnificent Mile at noon - wind off the lake, city in full stride.","language_lens":"visitor","created_at":"2026-08-09T07:32:50.609Z"},{"context":"Wicker Park on a Friday - live music bleeding out of every bar.","language_lens":"local","created_at":"2026-08-09T02:32:50.609Z"},{"context":"Logan Square brunch spot - relaxed Midwest energy at its best.","language_lens":"visitor","created_at":"2026-08-08T19:32:50.609Z"},{"context":"Pilsen murals on a Sunday afternoon - culture breathing loud.","language_lens":"diaspora","created_at":"2026-08-08T10:32:50.609Z"},{"context":"Red Line El train - city soundtrack, familiar and grounding.","language_lens":"local","created_at":"2026-08-07T22:32:50.609Z"},{"context":"Millennium Park on a summer evening - jazz, kids, the whole city gathered.","language_lens":"visitor","created_at":"2026-08-07T12:32:50.609Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

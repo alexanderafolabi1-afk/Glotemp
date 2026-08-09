@@ -68,7 +68,7 @@ function pageHTML(a, b) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=33" />
+  <link rel="stylesheet" href="/styles.css?v=34" />
   <style>
     .compare-header-row {
       display: grid;
@@ -161,6 +161,8 @@ function pageHTML(a, b) {
 
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
+  <script src="/city-landmarks.js"></script>
+  <script src="/city-landmark-photos.js"></script>
   <script>
     // var, not const: tempo-economy.js (loaded below) also declares
     // these; var redeclaration across scripts is a safe no-op.
@@ -229,6 +231,10 @@ function pageHTML(a, b) {
 
     renderMood();
     loadComparison();
+    if (typeof GlotempLandmarkPhotos !== 'undefined') {
+      GlotempLandmarkPhotos.upgrade(document.getElementById('a-name'), CITY_A, 24);
+      GlotempLandmarkPhotos.upgrade(document.getElementById('b-name'), CITY_B, 24);
+    }
     GlotempCore.wireCityLinks(document);
     const lang = localStorage.getItem('glotemp-lang') || 'en';
     document.documentElement.lang = lang;

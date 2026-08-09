@@ -126,6 +126,7 @@ function generateCityPage(city) {
         const nameEl = document.getElementById('city-name');
         if (typeof GlotempLandmarks !== 'undefined') {
           nameEl.innerHTML = GlotempLandmarks.cityIconHTML(city.slug, { size: 34, className: 'city-landmark-icon' }) + \`<span>\${city.name}</span>\`;
+          if (typeof GlotempLandmarkPhotos !== 'undefined') GlotempLandmarkPhotos.upgrade(nameEl, city.slug, 34);
         } else {
           nameEl.textContent = city.name;
         }

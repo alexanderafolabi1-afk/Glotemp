@@ -58,7 +58,7 @@ function pageHTML(v) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=33" />
+  <link rel="stylesheet" href="/styles.css?v=34" />
   <style>
     .rank-row {
       display: flex;
@@ -120,6 +120,7 @@ function pageHTML(v) {
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
   <script src="/city-landmarks.js"></script>
+  <script src="/city-landmark-photos.js"></script>
   <script>
     // var, not const: tempo-economy.js (loaded below) also declares
     // these; var redeclaration across scripts is a safe no-op.
@@ -199,6 +200,11 @@ function pageHTML(v) {
             GlotempCore.setPinnedCity(slug);
             window.location.href = row.getAttribute('href');
           });
+          if (typeof GlotempLandmarkPhotos !== 'undefined') {
+            const slug = row.getAttribute('data-city-link');
+            const nameEl = row.querySelector('.rank-city-name');
+            if (slug && nameEl) GlotempLandmarkPhotos.upgrade(nameEl, slug, 15);
+          }
         });
       } catch (e) {
         console.warn('Rankings unavailable:', e.message);
