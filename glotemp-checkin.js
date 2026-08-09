@@ -70,7 +70,7 @@
           <label class="checkin-label" for="checkin-intensity">Intensity <span class="checkin-intensity-value" id="checkin-intensity-value">${INTENSITY_WORDS[5]} (5/10)</span></label>
           <input type="range" id="checkin-intensity" min="1" max="10" step="1" value="5" class="checkin-range">
           <label class="checkin-label" for="checkin-note">Note <span class="checkin-count" id="checkin-count">0/${NOTE_MAX}</span></label>
-          <textarea id="checkin-note" class="checkin-note" rows="2" maxlength="${NOTE_MAX}" placeholder="A short note — what does it feel like?"></textarea>
+          <textarea id="checkin-note" class="checkin-note" rows="2" maxlength="${NOTE_MAX}" placeholder="A short note - what does it feel like?"></textarea>
           <p class="checkin-preview-label">This is what will post</p>
           <div class="checkin-preview" id="checkin-preview">
             <div class="checkin-item-head">

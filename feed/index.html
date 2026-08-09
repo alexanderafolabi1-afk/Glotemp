@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#06060A" />
   <meta name="description" content="A live stream of human check-ins from across all 151 cities Glotemp tracks. Sampled continuously, weighted toward the cities moving fastest." />
-  <meta property="og:title" content="Feed — Glotemp" />
+  <meta property="og:title" content="Feed - Glotemp" />
   <meta property="og:description" content="A live stream of human check-ins from across all 151 cities Glotemp tracks." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/feed" />
@@ -16,13 +16,13 @@
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <title>Feed — Glotemp</title>
+  <title>Feed - Glotemp</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=30" />
+  <link rel="stylesheet" href="/styles.css?v=32" />
 
   <style>
     .feed-meta-row {
@@ -123,7 +123,7 @@
 
     <section class="glass-card" style="padding:1.5rem 0 0;">
       <div class="feed-meta-row">
-        <span><span class="feed-live-dot" aria-hidden="true"></span>Live — refreshes every 60s</span>
+        <span><span class="feed-live-dot" aria-hidden="true"></span>Live - refreshes every 60s</span>
         <span id="feed-count">Sampling…</span>
       </div>
       <p class="feed-pinned-note" id="feed-pinned-note">&nbsp;</p>
@@ -266,7 +266,7 @@
           e.preventDefault();
           const slug = el.getAttribute('data-city-link');
           GlotempCore.setPinnedCity(slug);
-          note.textContent = `Pinned ${cityName(slug)} — it will follow you across the site.`;
+          note.textContent = `Pinned ${cityName(slug)} - it will follow you across the site.`;
         });
       });
       if (window.GlotempCore && GlotempCore.wireCityLinks) {

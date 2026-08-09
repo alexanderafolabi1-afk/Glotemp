@@ -17,18 +17,18 @@ function buildTripLine(city, reading) {
   const dayPart = day ? `${day} ` : '';
 
   if (reading >= 8.2) {
-    return `Go to ${city.name}. It is running hot ${dayPart}${when} — book it before the good tables are gone.`;
+    return `Go to ${city.name}. It is running hot ${dayPart}${when} - book it before the good tables are gone.`;
   }
   if (reading >= 7.2) {
     return `${city.name} is warm and moving ${dayPart}${when}. This is the version of the city people come back for.`;
   }
   if (reading >= 6.2) {
-    return `${city.name} is holding steady ${dayPart}${when} — the calm, unhurried version, and the one worth having to yourself.`;
+    return `${city.name} is holding steady ${dayPart}${when} - the calm, unhurried version, and the one worth having to yourself.`;
   }
   if (reading >= 4.5) {
     return `${city.name} is quiet ${dayPart}${when}. Go for the long dinner and the empty streets, not the crowd.`;
   }
-  return `${city.name} has gone still ${dayPart}${when}. Go if you want it hushed — you will have the place almost alone.`;
+  return `${city.name} has gone still ${dayPart}${when}. Go if you want it hushed - you will have the place almost alone.`;
 }
 // ----- i18n Setup -----
 const translations = {
@@ -47,9 +47,9 @@ const translations = {
     stars_share: "Those who contribute most share in the city's reward.",
     footer_tagline: "Measuring the world's heartbeat.",
     about_title: "About Glotemp",
-    about_text: "We measure what cannot be seen on a map — the collective feeling of a city. Glotemp is the world's first real-time mood infrastructure. It turns the silent emotional current of urban life into clear, living intelligence for travellers, businesses and communities. Every check-in adds a heartbeat. Every city gains a voice.",
+    about_text: "We measure what cannot be seen on a map - the collective feeling of a city. Glotemp is the world's first real-time mood infrastructure. It turns the silent emotional current of urban life into clear, living intelligence for travellers, businesses and communities. Every check-in adds a heartbeat. Every city gains a voice.",
     invest_title: "Seed Round Open",
-    invest_text: "We are building the emotional layer of the internet of cities. A new category of location intelligence is forming — one based on collective human energy rather than static data. Early partners will help define it. Deck available on request.",
+    invest_text: "We are building the emotional layer of the internet of cities. A new category of location intelligence is forming - one based on collective human energy rather than static data. Early partners will help define it. Deck available on request.",
     privacy_policy: "Privacy Policy",
     terms_of_service: "Terms of Service",
     cookie_settings: "Cookie Settings",
@@ -129,7 +129,7 @@ const translations = {
     observatory_moment_title: "A new constellation has formed.",
     observatory_moment_subtitle: "We have reached {milestone} observers. The sky has changed.",
     observatory_moment_claimed: "Badge claimed. Welcome to the wall.",
-    social_caption_prefix: "I claimed the {title} badge on @Glotemp — a quiet record of how cities feel in motion.",
+    social_caption_prefix: "I claimed the {title} badge on @Glotemp - a quiet record of how cities feel in motion.",
     share_copied: "Caption copied for sharing.",
     automated_traffic_excluded: "Automated traffic excluded",
     select_mood_first: "Select a mood first.",
@@ -353,7 +353,7 @@ const translations = {
     observatory_moment_title: "Une nouvelle constellation s'est formée.",
     observatory_moment_subtitle: "Nous avons atteint {milestone} observateurs. Le ciel a changé.",
     observatory_moment_claimed: "Insigne réclamé. Bienvenue sur le mur.",
-    social_caption_prefix: "J'ai réclamé l'insigne {title} sur @Glotemp — un relevé discret de la manière dont les villes se sentent en mouvement.",
+    social_caption_prefix: "J'ai réclamé l'insigne {title} sur @Glotemp - un relevé discret de la manière dont les villes se sentent en mouvement.",
     share_copied: "Texte copié pour le partage.",
     automated_traffic_excluded: "Trafic automatisé exclu",
     select_mood_first: "Sélectionnez d'abord une humeur.",
@@ -464,7 +464,7 @@ const translations = {
     observatory_moment_title: "Eine neue Konstellation hat sich gebildet.",
     observatory_moment_subtitle: "Wir haben {milestone} Beobachter erreicht. Der Himmel hat sich verändert.",
     observatory_moment_claimed: "Abzeichen beansprucht. Willkommen an der Wand.",
-    social_caption_prefix: "Ich habe das Abzeichen {title} auf @Glotemp beansprucht — ein leiser Nachweis dafür, wie sich Städte in Bewegung anfühlen.",
+    social_caption_prefix: "Ich habe das Abzeichen {title} auf @Glotemp beansprucht - ein leiser Nachweis dafür, wie sich Städte in Bewegung anfühlen.",
     share_copied: "Text zum Teilen kopiert.",
     automated_traffic_excluded: "Automatisierter Traffic ausgeschlossen",
     select_mood_first: "Bitte zuerst eine Stimmung wählen.",
@@ -575,7 +575,7 @@ const translations = {
     observatory_moment_title: "Uma nova constelação se formou.",
     observatory_moment_subtitle: "Alcançámos {milestone} observadores. O céu mudou.",
     observatory_moment_claimed: "Insígnia reivindicada. Bem-vindo ao mural.",
-    social_caption_prefix: "Reivindiquei a insígnia {title} no @Glotemp — um registo sereno de como as cidades se sentem em movimento.",
+    social_caption_prefix: "Reivindiquei a insígnia {title} no @Glotemp - um registo sereno de como as cidades se sentem em movimento.",
     share_copied: "Texto copiado para partilha.",
     automated_traffic_excluded: "Tráfego automatizado excluído",
     select_mood_first: "Selecione primeiro um humor.",
@@ -1469,7 +1469,7 @@ function drawPulse() {
 // City data simulation
 let cities = {}; // Will be populated from data/cities.json
 
-// Load cities data — prefer CITIES_DATA (cities-data.js), fall back to JSON
+// Load cities data - prefer CITIES_DATA (cities-data.js), fall back to JSON
 async function loadCitiesData() {
   const src = (typeof window !== 'undefined' && window.CITIES_DATA) ? window.CITIES_DATA : null;
   if (src && src.length) {
@@ -2073,7 +2073,7 @@ function getRecentComments(limit) {
   return Promise.resolve(limit ? seed.slice(0, limit) : seed);
 }
 
-// Pin a city by slug — called from barometer and trending card clicks
+// Pin a city by slug - called from barometer and trending card clicks
 function loadCityBySlug(slug) {
   if (!cities[slug]) return;
   const select = document.getElementById('city-select');
@@ -2152,7 +2152,7 @@ function loadCoverageStats() {
 }
 
 // ===== Live weather backdrop for homepage barometers =====
-// Open-Meteo is free, keyless, and CORS-friendly — good fit for a purely
+// Open-Meteo is free, keyless, and CORS-friendly - good fit for a purely
 // decorative client-side effect. Every city already carries lat/lon in
 // cities-data.js. Failures/timeouts resolve to null so callers fall back
 // to the neutral .instrument-weather background instead of guessing.
@@ -2252,7 +2252,7 @@ function applyWeatherToSlot(slotEl, category) {
   if (category === 'snow') renderSnowflakes(weatherEl, 14);
 }
 
-// Barometer rotation — 5 slots, staggered, session-shuffled
+// Barometer rotation - 5 slots, staggered, session-shuffled
 // Rotation pool: the top 20 cities by living index (see living-index.js) --
 // the same pool /explore's "Now showing" row draws from, so the homepage
 // and /explore never disagree about which cities are currently "hot".
@@ -2365,7 +2365,7 @@ async function setupBarometerRotation() {
   });
 }
 
-// Live ticker — continuous scroll of seed observations
+// Live ticker - continuous scroll of seed observations
 function setupLiveTicker() {
   const ticker = document.getElementById('ticker-content');
   if (!ticker) return;
@@ -2392,13 +2392,13 @@ function setupLiveTicker() {
     const cityObj = (window.CITIES_DATA || []).find(c => c.slug === o.city);
     const mood = cityObj ? (cityObj.mood || 7.0) : 7.0;
     const { color } = moodToBand(mood);
-    return `<span class="ticker-item"><strong style="color:${color}">${city}</strong> — ${note}</span>`;
+    return `<span class="ticker-item"><strong style="color:${color}">${city}</strong> - ${note}</span>`;
   }).join('<span class="ticker-sep">·</span>');
 
   ticker.innerHTML = `<div class="ticker-track" aria-live="off">${items}</div>`;
 
   // Pace the loop to a constant, readable speed regardless of how much
-  // seed data there is — a fixed animation-duration would either crawl
+  // seed data there is - a fixed animation-duration would either crawl
   // (too few items) or blur past (hundreds of items, as with the full seed set).
   const track = ticker.querySelector('.ticker-track');
   if (track) {
@@ -2412,7 +2412,7 @@ function setupLiveTicker() {
     const first = obs[0];
     const fc = escTick(first.cityName || first.city);
     const fn = escTick((first.context || '').slice(0, 100));
-    ticker.innerHTML = `<p class="ticker-placeholder"><strong>${fc}</strong> — ${fn}</p>`;
+    ticker.innerHTML = `<p class="ticker-placeholder"><strong>${fc}</strong> - ${fn}</p>`;
   }
 }
 
@@ -2562,7 +2562,7 @@ function setupScrollReveals() {
   lateReveal.observe(document.body, { childList: true, subtree: true });
 }
 
-// Live ticker updates — implemented above in setupLiveTicker()
+// Live ticker updates - implemented above in setupLiveTicker()
 
 document.addEventListener('DOMContentLoaded', () => {
   // ... existing code like applyTranslations, resizeCanvas, etc.

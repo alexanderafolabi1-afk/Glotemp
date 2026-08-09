@@ -81,7 +81,7 @@
       nowPlaying.textContent = 'Pick a station to listen';
     });
     audio.addEventListener('error', () => {
-      nowPlaying.textContent = "Couldn't play that station — try another.";
+      nowPlaying.textContent = "Couldn't play that station - try another.";
       resetButtons();
       activeUuid = null;
     });
@@ -95,7 +95,7 @@
         if (activeUuid === uuid && !audio.paused) {
           audio.pause();
           btn.querySelector('.radio-station-play').innerHTML = '&#9654;';
-          nowPlaying.textContent = `Paused — ${station.name}`;
+          nowPlaying.textContent = `Paused - ${station.name}`;
           return;
         }
 
@@ -110,9 +110,9 @@
           activeUuid = uuid;
           btn.classList.add('is-playing');
           btn.querySelector('.radio-station-play').innerHTML = '&#10074;&#10074;';
-          nowPlaying.textContent = `Now playing — ${station.name}`;
+          nowPlaying.textContent = `Now playing - ${station.name}`;
         } catch (e) {
-          nowPlaying.textContent = `Couldn't play ${station.name} — try another station.`;
+          nowPlaying.textContent = `Couldn't play ${station.name} - try another station.`;
         }
       });
     });

@@ -31,7 +31,7 @@ function pageHTML(v) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#06060A" />
   <meta name="description" content="${v.desc} Live league table across every city Glotemp tracks, ranked by ${v.metric.replace(/_/g, ' ')}.">
-  <meta property="og:title" content="${v.label} Rankings — Glotemp" />
+  <meta property="og:title" content="${v.label} Rankings - Glotemp" />
   <meta property="og:description" content="${v.desc}" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/rankings/${v.slug}" />
@@ -42,7 +42,7 @@ function pageHTML(v) {
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <title>${v.label} Rankings — Glotemp</title>
+  <title>${v.label} Rankings - Glotemp</title>
 
   <script type="application/ld+json">
   {
@@ -58,7 +58,7 @@ function pageHTML(v) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=30" />
+  <link rel="stylesheet" href="/styles.css?v=32" />
   <style>
     .rank-row {
       display: flex;
@@ -178,8 +178,8 @@ function pageHTML(v) {
         listEl.innerHTML = ranked.map((r, i) => {
           const name = r.city ? r.city.name : r.slug;
           const country = r.city ? r.city.country : '';
-          const moveLabel = r.movement === null ? '—' :
-            (r.movement > 0.05 ? '▲ ' + r.movement.toFixed(1) : r.movement < -0.05 ? '▼ ' + Math.abs(r.movement).toFixed(1) : '— steady');
+          const moveLabel = r.movement === null ? '-' :
+            (r.movement > 0.05 ? '▲ ' + r.movement.toFixed(1) : r.movement < -0.05 ? '▼ ' + Math.abs(r.movement).toFixed(1) : '- steady');
           const color = r.city ? GlotempCore.moodToBand(r.city.mood).color : 'var(--band-equilibrium)';
           return \`<a class="rank-row hover-lift" href="/cities/\${r.slug}/${v.slug}/" data-city-link="\${r.slug}" data-city-nav="false" style="--hover-band:\${color};">
             <span class="rank-pos">#\${i + 1}</span>

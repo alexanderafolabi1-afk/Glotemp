@@ -6,20 +6,20 @@
   <meta name="theme-color" content="#06060A" />
   <meta name="description" content="Every city Glotemp tracks in one live directory: current band, reading, and coverage across all 12 verticals. Search, filter, and sort 151 cities in real time." />
   <meta name="keywords" content="city directory, city rankings, live city data, explore cities, city mood index" />
-  <meta property="og:title" content="Explore — Glotemp" />
+  <meta property="og:title" content="Explore - Glotemp" />
   <meta property="og:description" content="Every city Glotemp tracks in one live directory: current band, reading, and coverage across all 12 verticals." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/explore" />
   <meta property="og:image" content="https://glo-temp.com/assets/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Explore — Glotemp" />
+  <meta name="twitter:title" content="Explore - Glotemp" />
   <meta name="twitter:description" content="Every city Glotemp tracks in one live directory: current band, reading, and coverage across all 12 verticals." />
   <link rel="canonical" href="https://glo-temp.com/explore" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <title>Explore — Glotemp</title>
+  <title>Explore - Glotemp</title>
 
   <script type="application/ld+json">
   {
@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=30" />
+  <link rel="stylesheet" href="/styles.css?v=32" />
 
   <style>
     /* Page-scoped styles for the Cities index. Kept inline so this page
@@ -44,35 +44,62 @@
     .cities-toolbar {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-      padding: 1.5rem;
+      gap: 1.5rem;
+      padding: 2rem 1.5rem;
+      border-top: 1px solid var(--hairline);
+    }
+    .cities-control-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--sand);
+      margin-bottom: 0.4rem;
     }
     .cities-search-row {
       display: flex;
-      gap: 0.75rem;
+      gap: 1rem;
       flex-wrap: wrap;
+      align-items: flex-end;
     }
+    .cities-search-row > div { flex: 1 1 220px; }
     .cities-search-input {
-      flex: 1 1 260px;
-      background: rgba(233, 231, 240, 0.05);
-      border: 1px solid rgba(233, 231, 240, 0.09);
-      border-radius: 12px;
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--brass-dim);
+      border-radius: 0;
       color: var(--ivory);
-      padding: 0.85rem 1rem;
+      padding: 0.6rem 0.1rem;
       font: inherit;
       font-family: var(--font-body);
       min-height: 44px;
+      transition: border-color var(--transition);
     }
     .cities-select {
-      background: rgba(233, 231, 240, 0.05);
-      border: 1px solid rgba(233, 231, 240, 0.09);
-      border-radius: 12px;
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--brass-dim);
+      border-radius: 0;
       color: var(--ivory);
-      padding: 0.85rem 1rem;
+      padding: 0.6rem 0.1rem;
       font: inherit;
-      font-family: var(--font-body);
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
       min-height: 44px;
+      cursor: pointer;
+      transition: border-color var(--transition);
     }
+    .cities-search-input:hover,
+    .cities-search-input:focus,
+    .cities-select:hover,
+    .cities-select:focus {
+      outline: none;
+      border-bottom-color: var(--brass);
+    }
+    .cities-search-input::placeholder { color: var(--sand); opacity: 0.7; }
     .band-filter-row {
       display: flex;
       gap: 0.6rem;
@@ -82,15 +109,17 @@
       border: 1px solid var(--brass-dim);
       background: transparent;
       color: var(--sand);
-      padding: 0.5rem 1rem;
+      padding: 0.6rem 1.25rem;
       border-radius: 999px;
       font-family: var(--font-mono);
       font-variant-caps: small-caps;
       font-size: 0.85rem;
+      letter-spacing: 0.02em;
       cursor: pointer;
       transition: all var(--transition);
       min-height: 44px;
     }
+    .band-chip:hover { border-color: var(--brass); color: var(--ivory); }
     /* Selected reads as the band's own colour in the ink and the hairline,
        not as a filled pill. The fill is stripped site-wide by the no-boxes
        rules, and the inverted `color: var(--obsidian)` left behind painted
@@ -150,22 +179,26 @@
     }
     .now-showing-strip .dial-face-outer { width: 64px; }
     .now-showing-strip .dial-name { font-size: 0.72rem; max-width: 72px; }
+    .now-showing-strip .dial-reading { font-size: 0.62rem; }
 
     /* ===== Dial grid ===== */
     .dials-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 1.25rem 0.75rem;
-      padding: 1.5rem;
+      gap: 2.25rem 1.5rem;
+      padding: 2rem 1.5rem;
       transition: opacity 250ms ease;
       justify-items: center;
     }
     .dials-grid.is-sorting { opacity: 0.4; }
-    @media (min-width: 768px) {
+    @media (min-width: 600px) {
+      .dials-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (min-width: 900px) {
       .dials-grid { grid-template-columns: repeat(4, 1fr); }
     }
     @media (min-width: 1440px) {
-      .dials-grid { grid-template-columns: repeat(6, 1fr); }
+      .dials-grid { grid-template-columns: repeat(6, 1fr); gap: 2.5rem 1.75rem; }
     }
 
     .dial-wrap {
@@ -173,7 +206,7 @@
       text-decoration: none;
       text-align: center;
       cursor: pointer;
-      padding: 0.4rem;
+      padding: 0.6rem 0.4rem;
       border-radius: 16px;
       transition: transform 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
@@ -184,11 +217,19 @@
 
     .dial-face-outer {
       position: relative;
-      width: 108px;
+      width: 124px;
       max-width: 100%;
       aspect-ratio: 1;
       margin: 0 auto;
       animation: dial-breathe var(--dial-breathe-duration, 4.5s) ease-in-out infinite;
+      /* A soft, band-tinted lift off the page ground -- depth without
+         bringing back a filled panel behind the dial. */
+      filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.35));
+      transition: filter 300ms ease;
+    }
+    .dial-wrap:hover .dial-face-outer,
+    .dial-wrap:focus-visible .dial-face-outer {
+      filter: drop-shadow(0 5px 16px rgba(0, 0, 0, 0.45)) drop-shadow(0 0 10px var(--dial-glow, transparent));
     }
     .dial-face-outer svg { display: block; width: 100%; height: 100%; overflow: visible; }
 
@@ -207,12 +248,20 @@
     }
 
     .dial-name {
-      margin-top: 0.6rem;
+      margin-top: 0.75rem;
       font-family: var(--font-display);
-      font-size: 0.92rem;
+      font-size: 0.95rem;
       font-weight: var(--fw-light);
       color: var(--ivory);
-      line-height: 1.2;
+      line-height: 1.25;
+    }
+    .dial-reading {
+      margin-top: 0.15rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.03em;
+      text-transform: capitalize;
+      color: var(--dial-glow, var(--sand));
     }
     .dial-country {
       font-family: var(--font-mono);
@@ -227,7 +276,7 @@
     .dial-wrap:focus-visible .dial-country {
       opacity: 1;
       max-height: 1.2em;
-      margin-top: 0.1rem;
+      margin-top: 0.15rem;
     }
 
     /* ===== Pagination ===== */
@@ -286,29 +335,38 @@
     <section class="glass-card page-header">
       <p class="eyebrow">151 cities, live</p>
       <h1>Every city, right now</h1>
-      <p class="section-copy" style="color:var(--sand); max-width:64ch;">The working directory behind every ranking on this site. Search, filter and sort — click any city to pin it everywhere else you go.</p>
+      <p class="section-copy" style="color:var(--sand); max-width:64ch;">The working directory behind every ranking on this site. Search, filter and sort - click any city to pin it everywhere else you go.</p>
     </section>
 
     <section class="glass-card" style="padding:0; overflow:hidden;">
       <div class="now-showing">
-        <span class="now-showing-label">Now showing — top 20 by living index</span>
+        <span class="now-showing-label">Now showing - top 20 by living index</span>
         <div class="now-showing-strip" id="now-showing-strip" aria-label="Top 20 cities by living index"></div>
       </div>
-      <p class="ranking-basis-note" id="ranking-basis-note">RANKED BY MEAN READING ACROSS ALL 12 VERTICALS, WEIGHTED BY COVERAGE — LOADING…</p>
+      <p class="ranking-basis-note" id="ranking-basis-note">RANKED BY MEAN READING ACROSS ALL 12 VERTICALS, WEIGHTED BY COVERAGE - LOADING…</p>
 
       <div class="cities-toolbar">
         <div class="cities-search-row">
-          <input type="text" id="city-search" class="cities-search-input" placeholder="Search city or country…" aria-label="Search cities">
-          <select id="region-filter" class="cities-select" aria-label="Filter by region">
-            <option value="">All regions</option>
-          </select>
-          <select id="sort-select" class="cities-select" aria-label="Sort cities">
-            <option value="mood-desc">Sort: Reading (high to low)</option>
-            <option value="mood-asc">Sort: Reading (low to high)</option>
-            <option value="movement">Sort: 24h movement</option>
-            <option value="coverage">Sort: Coverage</option>
-            <option value="name">Sort: Name (A–Z)</option>
-          </select>
+          <div>
+            <label class="cities-control-label" for="city-search">Search</label>
+            <input type="text" id="city-search" class="cities-search-input" placeholder="City or country" aria-label="Search cities">
+          </div>
+          <div>
+            <label class="cities-control-label" for="region-filter">Region</label>
+            <select id="region-filter" class="cities-select" aria-label="Filter by region">
+              <option value="">All regions</option>
+            </select>
+          </div>
+          <div>
+            <label class="cities-control-label" for="sort-select">Sort</label>
+            <select id="sort-select" class="cities-select" aria-label="Sort cities">
+              <option value="mood-desc">Reading (high to low)</option>
+              <option value="mood-asc">Reading (low to high)</option>
+              <option value="movement">24h movement</option>
+              <option value="coverage">Coverage</option>
+              <option value="name">Name (A-Z)</option>
+            </select>
+          </div>
         </div>
         <div class="band-filter-row" id="band-filter-row">
           <button class="band-chip" data-band="" data-active="true" style="--chip-color: var(--band-equilibrium);">All bands</button>
@@ -410,7 +468,7 @@
       const arcWidth = BAND_ARC_WIDTH[band] || 3;
       const arcLen = ARC_CIRC * Math.max(0, Math.min(1, city.reading / 10));
       const angle = cityHourAngle(city.timezone);
-      const readingLabel = `${city.name}, ${city.country} — reading ${city.reading.toFixed(1)} of 10, ${band} band, ${city.coveragePercent === null ? 'coverage unknown' : city.coveragePercent + '% coverage'}`;
+      const readingLabel = `${city.name}, ${city.country} - reading ${city.reading.toFixed(1)} of 10, ${band} band, ${city.coveragePercent === null ? 'coverage unknown' : city.coveragePercent + '% coverage'}`;
       return `<svg viewBox="0 0 120 120" role="img" aria-label="${readingLabel.replace(/"/g, '&quot;')}">
         <g>${tickMarksSVG(city.coveragePercent)}</g>
         <circle cx="${CX}" cy="${CY}" r="${R_FACE}" fill="#F0E0C8" />
@@ -430,14 +488,16 @@
       const reading = state.reading.has(city.slug) ? state.reading.get(city.slug) : city.mood;
       const coveragePercent = state.coverage.has(city.slug) ? state.coverage.get(city.slug) : null;
       const dialCity = Object.assign({}, city, { reading, coveragePercent });
+      const { band, color } = GlotempCore.moodToBand(reading);
       // Breathe faster (2.5s) for a high reading, slower (6s) for a low one.
       const breatheDuration = (6 - (reading / 10) * 3.5).toFixed(2);
       return `<a class="dial-wrap hover-lift" href="/cities/${city.slug}.html"
-          data-city-link="${city.slug}" data-city-nav="false">
+          data-city-link="${city.slug}" data-city-nav="false" style="--dial-glow:${color};">
         <div class="dial-face-outer" style="--dial-breathe-duration:${breatheDuration}s;">
           ${dialSVG(dialCity)}
         </div>
         <div class="dial-name">${city.name}</div>
+        <div class="dial-reading">${reading.toFixed(1)} &middot; ${band}</div>
         <div class="dial-country">${city.country}</div>
       </a>`;
     }
@@ -586,7 +646,7 @@
         if (result.rankingBasis === 'readings') {
           basisNote.textContent = 'RANKED BY MEAN READING ACROSS ALL 12 VERTICALS, WEIGHTED BY COVERAGE';
         } else {
-          basisNote.textContent = 'RANKED BY CURRENT PULSE READING — FULL 12-VERTICAL RANKING TEMPORARILY UNAVAILABLE';
+          basisNote.textContent = 'RANKED BY CURRENT PULSE READING - FULL 12-VERTICAL RANKING TEMPORARILY UNAVAILABLE';
         }
         renderNowShowing(result.top20);
         render();

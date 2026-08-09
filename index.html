@@ -4,15 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#06060A" />
-  <meta name="description" content="Glotemp — the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
+  <meta name="description" content="Glotemp - the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
   <meta name="keywords" content="city mood, travel intelligence, urban energy, real-time city data, location intelligence, collective mood" />
   <meta property="og:title" content="Glotemp – Live City Pulse" />
-  <meta property="og:description" content="Glotemp — the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
+  <meta property="og:description" content="Glotemp - the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Glotemp – Live City Pulse" />
-  <meta name="twitter:description" content="Glotemp — the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
+  <meta name="twitter:description" content="Glotemp - the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
   <link rel="canonical" href="https://glo-temp.com/" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=30" />
+  <link rel="stylesheet" href="/styles.css?v=32" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
@@ -66,8 +66,8 @@
             <img class="instrument-image" src="/assets/barometer-equilibrium.png" alt="Barometer" width="300" height="537">
           </div>
           <div class="instrument-label">
-            <span class="instrument-city-name">—</span>
-            <span class="instrument-band-name">—</span>
+            <span class="instrument-city-name">-</span>
+            <span class="instrument-band-name">-</span>
           </div>
         </div>
         <div class="instrument-slot" data-slot="1">
@@ -76,8 +76,8 @@
             <img class="instrument-image" src="/assets/barometer-warm.png" alt="Barometer" width="300" height="537">
           </div>
           <div class="instrument-label">
-            <span class="instrument-city-name">—</span>
-            <span class="instrument-band-name">—</span>
+            <span class="instrument-city-name">-</span>
+            <span class="instrument-band-name">-</span>
           </div>
         </div>
         <div class="instrument-slot" data-slot="2">
@@ -86,8 +86,8 @@
             <img class="instrument-image" src="/assets/barometer-equilibrium.png" alt="Barometer" width="300" height="537">
           </div>
           <div class="instrument-label">
-            <span class="instrument-city-name">—</span>
-            <span class="instrument-band-name">—</span>
+            <span class="instrument-city-name">-</span>
+            <span class="instrument-band-name">-</span>
           </div>
         </div>
         <div class="instrument-slot" data-slot="3">
@@ -96,8 +96,8 @@
             <img class="instrument-image" src="/assets/barometer-low.png" alt="Barometer" width="300" height="537">
           </div>
           <div class="instrument-label">
-            <span class="instrument-city-name">—</span>
-            <span class="instrument-band-name">—</span>
+            <span class="instrument-city-name">-</span>
+            <span class="instrument-band-name">-</span>
           </div>
         </div>
         <div class="instrument-slot" data-slot="4">
@@ -106,8 +106,8 @@
             <img class="instrument-image" src="/assets/barometer-charged.png" alt="Barometer" width="300" height="537">
           </div>
           <div class="instrument-label">
-            <span class="instrument-city-name">—</span>
-            <span class="instrument-band-name">—</span>
+            <span class="instrument-city-name">-</span>
+            <span class="instrument-band-name">-</span>
           </div>
         </div>
       </div>
@@ -178,9 +178,9 @@
           <p class="trip-sponsor-note" id="trip-sponsor-note">This slot is reserved for a sponsor. Until then: <a href="#observation-form">be the signal that makes the next reading real</a>.</p>
         </div>
         <div class="trip-reading" id="trip-reading">
-          <span class="trip-reading-value">—</span>
-          <span class="trip-reading-band">—</span>
-          <span class="trip-reading-city">—</span>
+          <span class="trip-reading-value">-</span>
+          <span class="trip-reading-band">-</span>
+          <span class="trip-reading-city">-</span>
         </div>
       </div>
     </section>
@@ -317,7 +317,7 @@
         var placeholder = grid.querySelector('.fastest-placeholder');
         if (placeholder) {
           placeholder.classList.add('timed-out');
-          placeholder.textContent = 'No trending data yet — check back soon as more observations arrive.';
+          placeholder.textContent = 'No trending data yet - check back soon as more observations arrive.';
         }
       }, 8000);
     }());

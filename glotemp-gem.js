@@ -40,7 +40,7 @@
 
     const cow=cityOfWeek(list);
     const weekEl=document.getElementById('gem-week');
-    if(weekEl && cow) weekEl.textContent=`City of the week — ${cow.name}`;
+    if(weekEl && cow) weekEl.textContent=`City of the week - ${cow.name}`;
 
     const go=document.getElementById('gem-go');
     const roll=document.getElementById('gem-roll');
