@@ -4178,19 +4178,19 @@ time, .instr-clock, .tonight-modelled {
 }
 
 /* ===== NAV: HIDDEN GEM + FOOTER LANGUAGE =====
-   Hidden gem carries no special text color -- same sand/ivory rules as
-   every other nav item, per "all items identical weight and size". The
-   uploaded mark (assets/hidden-gem.png) sits inline before the label,
-   sized down so it reads as a small mark, not an illustration -- never
-   resized/converted/overwritten on disk, only displayed small here. */
+   Hidden gem is represented by the uploaded mark alone -- no visible
+   "Hidden gem" text -- so the icon carries the full weight of the nav
+   item by itself. Sized up slightly from when it sat beside a label,
+   still restrained next to the other four items. The image itself is
+   never resized/converted/overwritten on disk, only displayed at a
+   fixed CSS size here. */
 .nav-gem-icon {
-  height: 20px;
+  height: 26px;
   width: auto;
   vertical-align: middle;
-  margin-right: 0.35rem;
   object-fit: contain;
 }
-.nav-panel-links .nav-gem-icon { height: 26px; margin-right: 0.5rem; }
+.nav-panel-links .nav-gem-icon { height: 34px; }
 
 .footer-lang-row { margin-top: 0.6rem; }
 .footer-lang {
