@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=41" />
+  <link rel="stylesheet" href="/styles.css?v=43" />
 
   <style>
     .feed-meta-row {
@@ -41,19 +41,22 @@
     .feed-stream {
       display: flex;
       flex-direction: column;
-      gap: 0.85rem;
       padding: 0 1.5rem 1.5rem;
       /* Reserved so the first async fill and every 60s refresh swap
          content without shifting the footer. */
       min-height: 420px;
     }
+    /* A stacked list divided by a single rule, not a bordered card per
+       item -- four-sided borders on every entry in a column read as a
+       stack of boxes even without a fill. */
     .feed-item {
-      border: 1px solid var(--hairline);
-      border-radius: 14px;
-      padding: 1rem 1.1rem;
-      background: rgba(23, 25, 38, 0.4);
+      border: none;
+      border-top: 1px solid var(--hairline);
+      padding: 1rem 0;
+      background: none;
       transition: border-color var(--transition);
     }
+    .feed-item:first-child { border-top: none; }
     .feed-item:hover { border-color: var(--brass-dim); }
     .feed-item-head {
       display: flex;
@@ -136,6 +139,7 @@
   <script src="/glotemp-core.js"></script>
   <script src="/living-index.js"></script>
   <script src="/glotemp-auth.js"></script>
+  <script src="/seed-observations.js"></script>
   <script>
     const SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
@@ -199,6 +203,26 @@
       return picked;
     }
 
+    // The live observations table can be genuinely empty (a fresh launch
+    // with no check-ins posted yet) -- and an empty feed reads as a dead
+    // site, not a quiet one. Fall back to the same seed set the homepage
+    // and blog already draw on, reshaped into this page's own row shape.
+    // Real rows always win: this only runs when the live query comes
+    // back with nothing.
+    const SCENE_TO_MODE = { street: 'move', cafe: 'eat', nightlife: 'drink', transit: 'move', home: 'watch', work: 'make' };
+    function seedRows() {
+      if (!window.SEED_OBSERVATIONS) return [];
+      return window.SEED_OBSERVATIONS.map((obs, i) => ({
+        id: `seed-${i}`,
+        city_slug: obs.city,
+        mode: SCENE_TO_MODE[obs.scene] || 'watch',
+        intensity: obs.intensity,
+        note: obs.context,
+        created_at: obs.created_at,
+        profiles: null,
+      }));
+    }
+
     function itemHTML(row) {
       const name = (row.profiles && row.profiles.display_name) ? row.profiles.display_name : 'Anonymous';
       const slug = row.city_slug;
@@ -218,31 +242,33 @@
     async function loadFeed() {
       const stream = document.getElementById('feed-stream');
       const countEl = document.getElementById('feed-count');
+      // Live rows if the fetch succeeds and returns something; the seed
+      // set otherwise -- an empty table and an unreachable table both
+      // land here, since neither should ever leave the feed showing
+      // nothing.
+      let rows = [];
       try {
         const resp = await fetch(
           `${SUPABASE_URL}/rest/v1/observations?select=id,city_slug,mode,intensity,note,created_at,profiles(display_name)&order=created_at.desc&limit=400`,
           { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
         );
-        if (!resp.ok) throw new Error('fetch failed');
-        const rows = await resp.json();
-        if (!rows.length) {
-          stream.innerHTML = '';
-          countEl.textContent = '0 check-ins';
-          return;
-        }
-        const byCity = new Map();
-        rows.forEach(r => {
-          if (!byCity.has(r.city_slug)) byCity.set(r.city_slug, []);
-          byCity.get(r.city_slug).push(r);
-        });
-        const sampled = weightedSample(byCity, Math.min(STREAM_SIZE, rows.length));
-        stream.innerHTML = sampled.map(itemHTML).join('');
-        countEl.textContent = `${sampled.length} shown from ${byCity.size} ${byCity.size === 1 ? 'city' : 'cities'}`;
-        wirePins();
-      } catch (e) {
+        if (resp.ok) rows = await resp.json();
+      } catch (e) { /* falls through to the seed set below */ }
+      if (!rows.length) rows = seedRows();
+      if (!rows.length) {
         stream.innerHTML = '<p class="feed-empty">The feed is unavailable right now. It will retry shortly.</p>';
         countEl.textContent = 'Reconnecting…';
+        return;
       }
+      const byCity = new Map();
+      rows.forEach(r => {
+        if (!byCity.has(r.city_slug)) byCity.set(r.city_slug, []);
+        byCity.get(r.city_slug).push(r);
+      });
+      const sampled = weightedSample(byCity, Math.min(STREAM_SIZE, rows.length));
+      stream.innerHTML = sampled.map(itemHTML).join('');
+      countEl.textContent = `${sampled.length} shown from ${byCity.size} ${byCity.size === 1 ? 'city' : 'cities'}`;
+      wirePins();
     }
 
     function wirePins() {

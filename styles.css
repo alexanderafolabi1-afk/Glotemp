@@ -468,6 +468,11 @@ main > .glass:first-child,
   margin-bottom: 2rem;
 }
 
+/* No card chrome -- the barometer artwork sits directly on the page
+   ground, five instruments in a row rather than five boxes. The
+   mix-blend-mode transparency trick on .instrument-visual below is
+   self-contained (isolation: isolate), so it keeps working with no
+   background/border/shadow on this wrapper. */
 .instrument-slot {
   position: relative;
   display: flex;
@@ -475,14 +480,10 @@ main > .glass:first-child,
   align-items: center;
   width: 156px;
   padding: 1rem 0.75rem 1.5rem;
-  border-radius: var(--radius);
-  background: linear-gradient(135deg, rgba(35, 28, 20, 0.8) 0%, rgba(35, 28, 20, 0.6) 100%);
-  border: 1px solid rgba(240, 224, 200, 0.06);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.5),
-    inset 0 1px 1px rgba(240, 224, 200, 0.06),
-    inset -1px -1px 1px rgba(0, 0, 0, 0.3);
-  transition: transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 600ms ease-out;
+  background: none;
+  border: none;
+  box-shadow: none;
+  transition: transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   animation: instrument-breathe 6s ease-in-out infinite;
 }
 
@@ -494,17 +495,23 @@ main > .glass:first-child,
 .instrument-slot:hover,
 .instrument-slot:focus-within {
   transform: translateY(-2px);
-  border-color: var(--slot-glow, var(--ion));
   animation-play-state: paused;
+}
+/* The glow lives on the artwork itself (a drop-shadow, not clipped by
+   .instrument-visual's overflow:hidden) instead of a border around a box. */
+.instrument-slot:hover .instrument-visual,
+.instrument-slot:focus-within .instrument-visual {
+  filter: drop-shadow(0 0 14px var(--slot-glow, var(--ion)));
 }
 
 /* Immediate feedback at the point of click: without this, picking a city
    here only changes something far below the fold, and the click reads as
    having done nothing at all. */
 .instrument-slot.is-selected {
-  border-color: var(--slot-glow, var(--brass)) !important;
-  box-shadow: 0 0 0 1px var(--slot-glow, var(--brass)), 0 0 20px rgba(176, 141, 87, 0.3);
   animation-play-state: paused;
+}
+.instrument-slot.is-selected .instrument-visual {
+  filter: drop-shadow(0 0 16px var(--slot-glow, var(--brass)));
 }
 
 /* Weather backdrop system.
@@ -515,14 +522,21 @@ main > .glass:first-child,
    weather layer in .instrument-weather shows through the "empty" area
    while the bottle artwork itself stays visible. isolation: isolate keeps
    that blending contained to this card instead of the whole page. */
+/* Without the card that used to sit around it, the weather layer's own
+   rectangle -- necessary so the multiply-blend trick above has something
+   to blend against -- became the box: a hard-edged tinted rectangle
+   behind each bottle. A vignette mask fades that rectangle's edges to
+   transparent so it reads as a soft glow around the artwork instead of
+   a tile boundary. */
 .instrument-visual {
   position: relative;
   isolation: isolate;
   width: 100%;
   max-width: 120px;
   aspect-ratio: 384 / 688;
-  border-radius: 10px;
   overflow: hidden;
+  -webkit-mask-image: radial-gradient(ellipse 68% 62% at 50% 45%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 68% 62% at 50% 45%, #000 55%, transparent 100%);
 }
 
 .instrument-weather {
@@ -822,11 +836,17 @@ main > .glass:first-child,
   align-items: center;
 }
 
+/* A scrolling ticker mid-word at its own edges is normal for the genre --
+   but hard-clipped with no fade it reads as cut-off text rather than a
+   line in motion. The mask softens both edges so words dissolve out
+   instead of stopping mid-letter against the container boundary. */
 .ticker-content {
   flex: 1;
   display: flex;
   gap: 1rem;
   overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%);
 }
 
 /* setupLiveTicker() in app.js renders a single .ticker-track containing the
@@ -4183,6 +4203,11 @@ a:hover .city-landmark-photo,
   line-height: 1.6;
   margin-bottom: 1.4rem;
   max-width: none;
+}
+.gt-auth-microcopy {
+  margin-top: 0.9rem;
+  margin-bottom: 0;
+  font-size: 0.8rem;
 }
 
 .gt-auth-providers {

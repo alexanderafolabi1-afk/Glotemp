@@ -5,29 +5,19 @@
 // (twemoji) is decorative. Auth is not something to make dependent on a
 // third-party CDN being reachable, so this talks to /auth/v1/* itself.
 //
-// Providers: Google and Apple are primary, email magic-link is secondary.
-// Those three and nothing else. Note that Google/Apple must also be
-// enabled with client credentials in the Supabase dashboard
-// (Authentication -> Providers) -- that is project config, not code, and
-// cannot be committed here.
+// Email magic-link only. Google and Apple OAuth used to be offered here
+// too, but both require a client ID/secret configured in the Supabase
+// dashboard (Authentication -> Providers) -- project config, not code,
+// that was never actually done. Signing in with either produced a raw
+// GoTrue "Unsupported provider" error page instead of a check-in. Email
+// OTP needs no such per-provider setup, so it is the one path offered
+// until OAuth is properly configured server-side. signInWithOAuth is
+// kept below for that day, just not wired to any button.
 (function () {
   const SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
   const SESSION_KEY = 'glotemp-auth-session';
   const PROFILE_KEY = 'glotemp-auth-profile';
-
-  // Official brand marks, inline SVG -- no image files. The Google "G"
-  // uses its four brand colours and the Apple logotype its single-path
-  // silhouette, both drawn at the sizes the brand guidelines allow.
-  const GOOGLE_MARK = `<svg class="gt-auth-brand" width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
-    <path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.2-.4-4.7H24v8.9h11.8c-.5 2.7-2 5-4.4 6.6v5.5h7.1c4.1-3.8 6.6-9.4 6.6-16.3z"/>
-    <path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.2l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41.3 15.5 46 24 46z"/>
-    <path fill="#FBBC05" d="M11.8 28.4c-.4-1.3-.7-2.7-.7-4.4s.3-3.1.7-4.4v-5.7H4.5A22 22 0 002 24c0 3.6.9 6.9 2.5 9.9l7.3-5.5z"/>
-    <path fill="#EA4335" d="M24 10.4c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 3.9 29.9 2 24 2 15.5 2 8.1 6.7 4.5 13.9l7.3 5.7c1.7-5.2 6.5-9.2 12.2-9.2z"/>
-  </svg>`;
-  const APPLE_MARK = `<svg class="gt-auth-brand" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-    <path fill="#F0E0C8" d="M16.4 12.8c0-2.4 2-3.6 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.6.9-.7 0-1.9-.9-3.1-.8-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.5.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8 1.4 0 1.8.8 3.1.8 1.3 0 2.1-1.2 2.9-2.3.9-1.3 1.3-2.6 1.3-2.7 0 0-2.5-1-2.6-3.9zM14.1 5.3c.7-.8 1.1-1.9 1-3-1 0-2.2.7-2.9 1.5-.6.7-1.1 1.8-1 2.9 1.1.1 2.2-.6 2.9-1.4z"/>
-  </svg>`;
 
   let cachedProfile = null;
   let modalEl = null;
@@ -250,17 +240,13 @@
           <p class="eyebrow">Glotemp</p>
           <h2 class="gt-auth-title">Sign in to add your signal</h2>
           <p class="gt-auth-copy" id="gt-auth-reason">Browsing stays anonymous. Signing in is only needed to check in, comment, or watch a city.</p>
-          <div class="gt-auth-providers">
-            <button class="gt-auth-provider" type="button" data-provider="google">${GOOGLE_MARK}<span>Continue with Google</span></button>
-            <button class="gt-auth-provider" type="button" data-provider="apple">${APPLE_MARK}<span>Continue with Apple</span></button>
-          </div>
-          <div class="gt-auth-divider"><span>or</span></div>
           <form class="gt-auth-email-form" id="gt-auth-email-form">
             <label class="gt-auth-label" for="gt-auth-email">Email</label>
             <input class="gt-auth-input" type="email" id="gt-auth-email" placeholder="you@example.com" required autocomplete="email">
             <button class="btn-neon gt-auth-submit" type="submit">Email me a sign-in link</button>
           </form>
           <p class="gt-auth-status" id="gt-auth-status" role="status" aria-live="polite"></p>
+          <p class="gt-auth-copy gt-auth-microcopy">No password to remember -- we'll email you a one-time link, valid for this browser.</p>
         </div>
         <div data-step="profile" hidden>
           <p class="eyebrow">One last thing</p>
@@ -284,10 +270,6 @@
     modalEl.addEventListener('click', (e) => { if (e.target === modalEl) closeModal(false); });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && !modalEl.hidden) closeModal(false);
-    });
-
-    modalEl.querySelectorAll('.gt-auth-provider').forEach(btn => {
-      btn.addEventListener('click', () => signInWithOAuth(btn.getAttribute('data-provider')));
     });
 
     modalEl.querySelector('#gt-auth-email-form').addEventListener('submit', async (e) => {
@@ -358,7 +340,7 @@
     showStep(step || 'signin');
     modalEl.hidden = false;
     document.body.style.overflow = 'hidden';
-    const focusTarget = modalEl.querySelector(step === 'profile' ? '#gt-auth-display-name' : '.gt-auth-provider');
+    const focusTarget = modalEl.querySelector(step === 'profile' ? '#gt-auth-display-name' : '#gt-auth-email');
     if (focusTarget) focusTarget.focus();
   }
 
