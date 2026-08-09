@@ -13,7 +13,7 @@
     { key: 'feed', label: 'Feed', href: '/feed' },
     { key: 'cities', label: 'Cities', href: '/explore' },
     { key: 'about', label: 'About', href: '/about' },
-    { key: 'gem', label: 'Hidden gem', href: '/gem', extraClass: 'nav-gem' },
+    { key: 'gem', label: 'Hidden gem', href: '/gem', extraClass: 'nav-gem', icon: '/assets/hidden-gem.png' },
   ];
 
   function detectActive() {
@@ -32,13 +32,18 @@
     return String(s).replace(/"/g, '&quot;');
   }
 
+  function iconHTML(item) {
+    if (!item.icon) return '';
+    return '<img src="' + escapeAttr(item.icon) + '" alt="" class="nav-gem-icon">';
+  }
+
   function linksHTML(active) {
     return NAV_ITEMS.map(function (item) {
       var classes = [];
       if (item.extraClass) classes.push(item.extraClass);
       if (item.key === active) classes.push('active');
       var cls = classes.length ? ' class="' + classes.join(' ') + '"' : '';
-      return '<a href="' + escapeAttr(item.href) + '"' + cls + '>' + item.label + '</a>';
+      return '<a href="' + escapeAttr(item.href) + '"' + cls + '>' + iconHTML(item) + item.label + '</a>';
     }).join('\n        ');
   }
 
@@ -83,7 +88,7 @@
       '<nav class="nav-panel-links">\n        ' +
         NAV_ITEMS.map(function (item) {
           var cls = item.extraClass ? ' class="' + item.extraClass + '"' : '';
-          return '<a href="' + escapeAttr(item.href) + '"' + cls + '>' + item.label + '</a>';
+          return '<a href="' + escapeAttr(item.href) + '"' + cls + '>' + iconHTML(item) + item.label + '</a>';
         }).join('\n        ') +
       '\n      </nav>';
   }
