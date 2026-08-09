@@ -1665,7 +1665,7 @@ textarea:focus:not(:focus-visible) {
 
 .blog-date {
   font-size: 0.8rem;
-  opacity: 0.5;
+  color: var(--sand);
   margin-bottom: 1rem;
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
@@ -2236,7 +2236,6 @@ textarea:focus:not(:focus-visible) {
   color: var(--ember);
   font-weight: var(--fw-medium);
   letter-spacing: 1px;
-  opacity: 0.6;
   font-family: var(--font-mono);
 }
 
@@ -2280,7 +2279,6 @@ textarea:focus:not(:focus-visible) {
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--ash);
-  opacity: 0.7;
   line-height: 1.5;
   margin-bottom: 0.4rem;
 }
@@ -2292,7 +2290,6 @@ textarea:focus:not(:focus-visible) {
 .footer .small-print {
   font-size: 11px;
   color: var(--ash);
-  opacity: 0.65;
   line-height: 1.4;
   margin-top: 0.5rem;
 }
@@ -3389,7 +3386,6 @@ button:hover:not(:focus-visible) {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--sand);
-  opacity: 0.7;
   margin-bottom: 0.4rem;
 }
 .context-fact {
@@ -3404,7 +3400,78 @@ button:hover:not(:focus-visible) {
   font-family: var(--font-mono);
   font-size: 0.7rem;
   color: var(--sand);
-  opacity: 0.6;
+}
+
+/* ===== RADIO VERTICAL ===== */
+/* A quiet, elegant station list -- hairline rows, not filled cards, in
+   keeping with the rest of the site's "no boxes" language. One shared
+   player bar; clicking a row plays that station directly, no page nav. */
+.radio-player {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding-bottom: 1rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid var(--hairline);
+}
+.radio-now-playing {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--sand);
+}
+.radio-stations {
+  display: flex;
+  flex-direction: column;
+}
+.radio-station {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.85rem 0.25rem;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--hairline);
+  color: var(--ivory);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  transition: color 200ms ease, padding-left 200ms ease;
+}
+.radio-station:last-child { border-bottom: none; }
+.radio-station:hover,
+.radio-station:focus-visible { color: var(--brass); padding-left: 0.5rem; }
+.radio-station.is-playing { color: var(--band-warm); }
+.radio-station-play {
+  flex: none;
+  width: 1.4rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--brass);
+}
+.radio-station.is-playing .radio-station-play { color: var(--band-warm); }
+.radio-station-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.radio-station-tag {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sand);
+}
+.radio-status { color: var(--sand); font-size: 0.9rem; }
+.radio-attribution {
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--sand);
 }
 
 .compare-section {
@@ -3728,7 +3795,6 @@ button:hover:not(:focus-visible) {
   font-family: var(--font-mono);
   font-size: 0.7rem;
   color: var(--sand);
-  opacity: 0.6;
 }
 @media (max-width: 600px) {
   .wiki-panel-body { flex-direction: column; }
@@ -4602,7 +4668,7 @@ time, .instr-clock, .tonight-modelled {
 .trip-sponsor-note {
   margin-top: 1.25rem; font-family: var(--font-mono);
   font-variant-caps: small-caps; font-size: 0.7rem;
-  color: var(--sand); opacity: 0.6;
+  color: var(--sand);
 }
 .trip-sponsor-note a {
   color: var(--brass);

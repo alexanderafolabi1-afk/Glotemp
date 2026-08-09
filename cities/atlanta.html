@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=29">
+  <link rel="stylesheet" href="/styles.css?v=30">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -78,6 +78,7 @@
       <a href="#food" class="vertical-link" data-vertical="food">Food</a>
       <a href="#health" class="vertical-link" data-vertical="health">Health</a>
       <a href="#transport" class="vertical-link" data-vertical="transport">Transport</a>
+      <a href="#radio" class="vertical-link" data-vertical="radio">📻 Radio</a>
     </div>
 
     
@@ -188,6 +189,15 @@
       <div id="transport-context" class="vertical-context"></div>
     </section>
   
+
+    <!-- 📻 Radio Vertical -->
+    <section id="radio" class="vertical-section glass-card">
+      <h2>📻 Radio</h2>
+      <p class="vertical-description">What is this city listening to right now?</p>
+      <div id="radio-content" class="vertical-content"></div>
+      <div id="radio-context" class="vertical-context"></div>
+    </section>
+  
     <!-- Compare Section -->
     <section class="compare-section glass-card">
       <h2 data-i18n="compare_title">Compare with Another City</h2>
@@ -225,6 +235,7 @@
   <script src="/glotemp-features.js"></script>
   <script src="/city-wiki.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
+  <script src="/city-radio.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
   
@@ -262,6 +273,13 @@
       await Promise.all(contextLoaders);
       if (typeof GlotempWiki !== 'undefined') {
         await GlotempWiki.fillEmptyVerticalContexts('Atlanta', 'USA', verticalSlugs);
+      }
+
+      // Radio is its own live source (Radio Browser, searched by this
+      // city's real coordinates) -- not a Supabase reading, so it's kept
+      // out of verticalSlugs above and loaded separately here.
+      if (typeof GlotempRadio !== 'undefined' && city) {
+        GlotempRadio.loadRadio(city.name, city.lat, city.lon);
       }
 
       for (const vertical of verticalSlugs) {
