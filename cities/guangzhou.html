@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=28">
+  <link rel="stylesheet" href="/styles.css?v=29">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -245,12 +245,23 @@
 
       const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
 
+      if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('Guangzhou', 'China');
+
+      // Wikipedia section-matching and World Bank indicators both get a
+      // turn per vertical; whatever's still empty afterward -- Fashion
+      // and Pulse always are, since neither has a real per-vertical
+      // source -- falls back to the general Wikipedia summary so no
+      // vertical ever renders completely empty.
+      const contextLoaders = [];
       if (typeof GlotempWiki !== 'undefined') {
-        GlotempWiki.loadCityWiki('Guangzhou', 'China');
-        GlotempWiki.loadAllVerticalContexts('Guangzhou', 'China', verticalSlugs);
+        contextLoaders.push(GlotempWiki.loadAllVerticalContexts('Guangzhou', 'China', verticalSlugs));
       }
       if (typeof GlotempWorldBank !== 'undefined') {
-        verticalSlugs.forEach(v => GlotempWorldBank.loadVerticalIndicator('CN', v, 'China'));
+        contextLoaders.push(...verticalSlugs.map(v => GlotempWorldBank.loadVerticalIndicator('CN', v, 'China')));
+      }
+      await Promise.all(contextLoaders);
+      if (typeof GlotempWiki !== 'undefined') {
+        await GlotempWiki.fillEmptyVerticalContexts('Guangzhou', 'China', verticalSlugs);
       }
 
       for (const vertical of verticalSlugs) {
@@ -413,7 +424,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Shamian Island at dawn — French colonial calm amid the megacity.","language_lens":"visitor","created_at":"2026-08-09T03:19:40.863Z"},{"context":"早茶时间，大家齐聚茶楼——广州的灵魂在这里。","language_lens":"local","created_at":"2026-08-08T18:19:40.863Z"},{"context":"珠江新城周末晚上——城市精英和夜风。","language_lens":"local","created_at":"2026-08-08T06:19:40.863Z"},{"context":"地铁5号线，早班车，安静高效。","language_lens":"local","created_at":"2026-08-07T18:19:40.863Z"}];
+      const checkins = [{"context":"Shamian Island at dawn — French colonial calm amid the megacity.","language_lens":"visitor","created_at":"2026-08-09T03:31:16.374Z"},{"context":"早茶时间，大家齐聚茶楼——广州的灵魂在这里。","language_lens":"local","created_at":"2026-08-08T18:31:16.374Z"},{"context":"珠江新城周末晚上——城市精英和夜风。","language_lens":"local","created_at":"2026-08-08T06:31:16.374Z"},{"context":"地铁5号线，早班车，安静高效。","language_lens":"local","created_at":"2026-08-07T18:31:16.374Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

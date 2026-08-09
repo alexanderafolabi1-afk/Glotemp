@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=28">
+  <link rel="stylesheet" href="/styles.css?v=29">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -245,12 +245,23 @@
 
       const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
 
+      if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('Lima', 'Peru');
+
+      // Wikipedia section-matching and World Bank indicators both get a
+      // turn per vertical; whatever's still empty afterward -- Fashion
+      // and Pulse always are, since neither has a real per-vertical
+      // source -- falls back to the general Wikipedia summary so no
+      // vertical ever renders completely empty.
+      const contextLoaders = [];
       if (typeof GlotempWiki !== 'undefined') {
-        GlotempWiki.loadCityWiki('Lima', 'Peru');
-        GlotempWiki.loadAllVerticalContexts('Lima', 'Peru', verticalSlugs);
+        contextLoaders.push(GlotempWiki.loadAllVerticalContexts('Lima', 'Peru', verticalSlugs));
       }
       if (typeof GlotempWorldBank !== 'undefined') {
-        verticalSlugs.forEach(v => GlotempWorldBank.loadVerticalIndicator('PE', v, 'Peru'));
+        contextLoaders.push(...verticalSlugs.map(v => GlotempWorldBank.loadVerticalIndicator('PE', v, 'Peru')));
+      }
+      await Promise.all(contextLoaders);
+      if (typeof GlotempWiki !== 'undefined') {
+        await GlotempWiki.fillEmptyVerticalContexts('Lima', 'Peru', verticalSlugs);
       }
 
       for (const vertical of verticalSlugs) {
@@ -413,7 +424,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Miraflores en el atardecer — vista al mar, tranquilidad.","language_lens":"local","created_at":"2026-08-09T00:19:40.863Z"},{"context":"Barranco street art district — Lima's soul in colour.","language_lens":"visitor","created_at":"2026-08-08T21:19:40.863Z"},{"context":"Miraflores Larcomar un viernes por la noche — Lima cosmopolita.","language_lens":"local","created_at":"2026-08-07T19:19:40.863Z"}];
+      const checkins = [{"context":"Miraflores en el atardecer — vista al mar, tranquilidad.","language_lens":"local","created_at":"2026-08-09T00:31:16.374Z"},{"context":"Barranco street art district — Lima's soul in colour.","language_lens":"visitor","created_at":"2026-08-08T21:31:16.374Z"},{"context":"Miraflores Larcomar un viernes por la noche — Lima cosmopolita.","language_lens":"local","created_at":"2026-08-07T19:31:16.374Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

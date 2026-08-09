@@ -2538,6 +2538,28 @@ function setupScrollReveals() {
   targets.forEach(el => {
     if (!el.classList.contains('revealed')) observer.observe(el);
   });
+
+  // The IntersectionObserver above only ever sees the .glass-card/section
+  // elements that existed at this setup call. Every reading card, ranking
+  // row, and other .glass-card inserted later via an async fetch's
+  // innerHTML assignment matches the CSS rule that hides unrevealed cards
+  // (body.scroll-reveals-enabled .glass-card { opacity: 0 }) but is never
+  // registered with the observer -- so it was staying invisible forever,
+  // regardless of real data actually arriving. Content that just loaded
+  // should simply appear, not wait on a scroll-triggered reveal it can
+  // never receive.
+  const lateReveal = new MutationObserver((mutations) => {
+    mutations.forEach((m) => {
+      m.addedNodes.forEach((node) => {
+        if (node.nodeType !== 1) return;
+        if (node.matches && node.matches('.glass-card, section')) node.classList.add('revealed');
+        if (node.querySelectorAll) {
+          node.querySelectorAll('.glass-card, section').forEach((el) => el.classList.add('revealed'));
+        }
+      });
+    });
+  });
+  lateReveal.observe(document.body, { childList: true, subtree: true });
 }
 
 // Live ticker updates — implemented above in setupLiveTicker()
