@@ -85,7 +85,16 @@
     svg.replaceWith(img);
   }
 
-  const api = { upgrade, hasPhoto: (slug) => !!LANDMARK_TITLES[slug] };
+  // Thin public wrapper around the same cache/fetch used by upgrade(),
+  // for callers that just want the photo URL (or null) rather than a
+  // DOM swap -- e.g. the Trending cities cards, which build their own
+  // markup instead of starting from a .city-landmark-icon SVG.
+  function getPhotoUrl(slug) {
+    const title = LANDMARK_TITLES[slug];
+    return title ? fetchThumbnail(title) : Promise.resolve(null);
+  }
+
+  const api = { upgrade, hasPhoto: (slug) => !!LANDMARK_TITLES[slug], getPhotoUrl };
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = api;
   } else {

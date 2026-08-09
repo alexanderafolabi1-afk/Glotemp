@@ -2504,13 +2504,32 @@ function setupTrendingRotation() {
     const { band, color } = moodToBand(mood);
     const moodScore = mood.toFixed(1);
     card.dataset.slug = cityData.slug;
-    card.style.borderColor = color + '55';
     card.innerHTML = `
-      <h3 class="fastest-city-name" style="color:${color}">${cityData.name}</h3>
-      <p class="fastest-shift">${cityData.country || ''}</p>
-      <p class="fastest-shift" style="color:${color}">${band} · ${moodScore} / 10</p>
-      <div class="fastest-mood">${getMoodEmoji(mood)}</div>
+      <div class="fastest-card-body">
+        <h3 class="fastest-city-name" style="color:${color}">${cityData.name}</h3>
+        <p class="fastest-shift">${cityData.country || ''}</p>
+        <p class="fastest-shift" style="color:${color}">${band} - ${moodScore} / 10</p>
+      </div>
+      <div class="fastest-mood" style="--mood-color:${color}"></div>
     `;
+    // A real photo of the city where one exists (curated set in
+    // city-landmark-photos.js); the band-colour swatch above is the
+    // complete, honest state if it doesn't -- never an emoji standing in.
+    if (window.GlotempLandmarkPhotos) {
+      GlotempLandmarkPhotos.getPhotoUrl(cityData.slug).then(src => {
+        if (!src || !card.isConnected) return;
+        const swatch = card.querySelector('.fastest-mood');
+        if (!swatch) return;
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = '';
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.referrerPolicy = 'no-referrer';
+        img.className = 'fastest-mood-photo';
+        swatch.appendChild(img);
+      });
+    }
   }
 
   grid.innerHTML = '';
@@ -2555,14 +2574,6 @@ function setupTrendingRotation() {
 
   // Expose cleanup on grid for guard against re-init
   grid._trendingCleanup = () => intervalIds.forEach(id => { clearTimeout(id); clearInterval(id); });
-}
-
-function getMoodEmoji(moodScore) {
-  if (moodScore >= 8) return '🔥';
-  if (moodScore >= 6) return '😊';
-  if (moodScore >= 4) return '😐';
-  if (moodScore >= 2) return '😞';
-  return '😡';
 }
 
 // Scroll reveal animations

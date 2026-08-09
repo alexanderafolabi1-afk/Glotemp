@@ -63,7 +63,7 @@
     const name = cityName || 'this city';
     return `
       <div class="checkin-composer" id="checkin-composer">
-        <p class="eyebrow checkin-live-eyebrow">Check in</p>
+        <p class="eyebrow checkin-live-eyebrow live-mark">Check in</p>
         <h2 class="checkin-neon-title">Check in to <span class="checkin-glow">${esc(name)}</span></h2>
         <p class="checkin-subtext">What are you doing here right now?</p>
         <p class="checkin-rewards-note">✨ Daily check-ins put you in the running for this week's ${esc(name)} rewards.</p>
