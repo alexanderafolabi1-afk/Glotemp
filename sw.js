@@ -6,7 +6,7 @@
 // whole fix: the previous worker used a hand-bumped constant that nobody
 // bumped, so every deploy reused the same cache name, activate's cleanup
 // matched nothing, and the old build survived.
-const BUILD_HASH = 'dce3388a0e2d';
+const BUILD_HASH = '14b1ff1e62fd';
 const CACHE_NAME = `glotemp-${BUILD_HASH}`;
 
 // Only genuinely immutable things are precached. HTML never is.
@@ -82,7 +82,7 @@ self.addEventListener('fetch', (event) => {
       } catch (e) {
         const cached = await caches.match(req);
         if (cached) return cached;
-        return new Response('Offline - please check your connection.', {
+        return new Response('Offline — please check your connection.', {
           status: 503,
           headers: { 'Content-Type': 'text/plain' },
         });
