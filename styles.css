@@ -258,7 +258,9 @@ body.ambient-night::before   { filter: hue-rotate(var(--mood-hue, 0deg)) saturat
 #app {
   width: 100%;
   margin: 0 auto;
-  padding: 1rem clamp(1rem, 4vw, 4rem);
+  /* Floor raised from 1rem to 1.5rem (24px) so content never sits
+     closer than that to the screen edge, down to the smallest phones. */
+  padding: 1rem clamp(1.5rem, 4vw, 4rem);
   position: relative;
   z-index: 1;
 }
@@ -267,7 +269,7 @@ body.ambient-night::before   { filter: hue-rotate(var(--mood-hue, 0deg)) saturat
 .page-content {
   width: 100%;
   margin: 0 auto;
-  padding: 1rem clamp(1rem, 4vw, 4rem) 3rem;
+  padding: 1rem clamp(1.5rem, 4vw, 4rem) 3rem;
   position: relative;
   z-index: 1;
 }
@@ -295,7 +297,7 @@ body.ambient-night::before   { filter: hue-rotate(var(--mood-hue, 0deg)) saturat
 .page-main {
   width: 100%;
   margin: 0 auto;
-  padding: 1rem clamp(1rem, 4vw, 4rem) 3rem;
+  padding: 1rem clamp(1.5rem, 4vw, 4rem) 3rem;
   position: relative;
   z-index: 1;
 }
@@ -2436,7 +2438,10 @@ small {
   }
 
   .page-main {
-    padding: 0.5rem 0.75rem 2rem;
+    /* Horizontal inset raised from 0.75rem (12px) to 1.5rem (24px) --
+       content was sitting closer to the screen edge than the rest of
+       the site's wrappers on phones/tablets under 768px. */
+    padding: 0.5rem 1.5rem 2rem;
   }
 
   .nav-links a {
