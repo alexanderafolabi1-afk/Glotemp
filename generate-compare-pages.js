@@ -6,6 +6,7 @@
 // that every page has real signal behind it.
 const fs = require('fs');
 const path = require('path');
+const GlotempLandmarks = require('./city-landmarks.js');
 
 const TOP_N = 30;
 
@@ -67,7 +68,7 @@ function pageHTML(a, b) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=32" />
+  <link rel="stylesheet" href="/styles.css?v=33" />
   <style>
     .compare-header-row {
       display: grid;
@@ -122,13 +123,13 @@ function pageHTML(a, b) {
     <section class="glass-card" style="padding:0; overflow:hidden;">
       <div class="compare-header-row">
         <a class="compare-side" href="/cities/${a.slug}.html" data-city-link="${a.slug}" data-city-nav="false" style="text-decoration:none;">
-          <h2 id="a-name" style="color:var(--ivory);">${a.name}</h2>
+          <h2 id="a-name" style="color:var(--ivory); display:flex; align-items:center; justify-content:center; gap:0.5rem;">${GlotempLandmarks.cityIconHTML(a.slug, { size: 24, className: 'city-landmark-icon' })}<span>${a.name}</span></h2>
           <p>${a.country}</p>
           <p id="a-band" style="font-family:var(--font-mono); text-transform:uppercase; font-size:0.8rem;">-</p>
         </a>
         <span class="compare-vs">VS</span>
         <a class="compare-side" href="/cities/${b.slug}.html" data-city-link="${b.slug}" data-city-nav="false" style="text-decoration:none;">
-          <h2 id="b-name" style="color:var(--ivory);">${b.name}</h2>
+          <h2 id="b-name" style="color:var(--ivory); display:flex; align-items:center; justify-content:center; gap:0.5rem;">${GlotempLandmarks.cityIconHTML(b.slug, { size: 24, className: 'city-landmark-icon' })}<span>${b.name}</span></h2>
           <p>${b.country}</p>
           <p id="b-band" style="font-family:var(--font-mono); text-transform:uppercase; font-size:0.8rem;">-</p>
         </a>

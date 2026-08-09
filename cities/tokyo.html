@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=32">
+  <link rel="stylesheet" href="/styles.css?v=33">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -233,6 +233,7 @@
 
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
+  <script src="/city-landmarks.js"></script>
   <script src="/glotemp-auth.js"></script>
   <script src="/glotemp-checkin.js"></script>
   <script src="/glotemp-tonight.js"></script>
@@ -250,7 +251,12 @@
       const city = window.CITIES_DATA.find(c => c.slug === citySlug);
 
       if (city) {
-        document.getElementById('city-name').textContent = city.name;
+        const nameEl = document.getElementById('city-name');
+        if (typeof GlotempLandmarks !== 'undefined') {
+          nameEl.innerHTML = GlotempLandmarks.cityIconHTML(city.slug, { size: 34, className: 'city-landmark-icon' }) + `<span>${city.name}</span>`;
+        } else {
+          nameEl.textContent = city.name;
+        }
         document.getElementById('city-country-region').textContent = `${city.country} • ${city.region}`;
         document.getElementById('city-timezone').textContent = `📍 ${city.timezone}`;
         document.getElementById('city-penetration').textContent = `📡 ${(city.penetration * 100).toFixed(0)}% online`;
@@ -469,7 +475,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"渋谷のスクランブル交差点はいつもより人が多い。エネルギーが充電されている。","language_lens":"local","created_at":"2026-08-09T06:37:31.001Z"},{"context":"Perfect matcha in Shimokitazawa. The neighbourhood hums quietly.","language_lens":"visitor","created_at":"2026-08-09T02:37:31.001Z"},{"context":"Shibuya at 23h - the city never stops. Charged.","language_lens":"visitor","created_at":"2026-08-08T21:37:31.001Z"},{"context":"山手線は混雑しているが、秩序がある。普通の朝だ。","language_lens":"local","created_at":"2026-08-08T13:37:31.001Z"},{"context":"Akihabara on a weekend - neon, arcades, and beautiful obsession.","language_lens":"visitor","created_at":"2026-08-09T07:07:31.001Z"},{"context":"新宿の月曜朝-スーツの波。東京式の秩序。","language_lens":"local","created_at":"2026-08-08T07:37:31.001Z"},{"context":"Shimokitazawa record shop café - Tokyo's anti-Tokyo alive and well.","language_lens":"diaspora","created_at":"2026-08-07T19:37:31.001Z"}];
+      const checkins = [{"context":"渋谷のスクランブル交差点はいつもより人が多い。エネルギーが充電されている。","language_lens":"local","created_at":"2026-08-09T07:05:30.174Z"},{"context":"Perfect matcha in Shimokitazawa. The neighbourhood hums quietly.","language_lens":"visitor","created_at":"2026-08-09T03:05:30.174Z"},{"context":"Shibuya at 23h - the city never stops. Charged.","language_lens":"visitor","created_at":"2026-08-08T22:05:30.174Z"},{"context":"山手線は混雑しているが、秩序がある。普通の朝だ。","language_lens":"local","created_at":"2026-08-08T14:05:30.174Z"},{"context":"Akihabara on a weekend - neon, arcades, and beautiful obsession.","language_lens":"visitor","created_at":"2026-08-09T07:35:30.174Z"},{"context":"新宿の月曜朝-スーツの波。東京式の秩序。","language_lens":"local","created_at":"2026-08-08T08:05:30.174Z"},{"context":"Shimokitazawa record shop café - Tokyo's anti-Tokyo alive and well.","language_lens":"diaspora","created_at":"2026-08-07T20:05:30.174Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

@@ -58,7 +58,7 @@ function pageHTML(v) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=32" />
+  <link rel="stylesheet" href="/styles.css?v=33" />
   <style>
     .rank-row {
       display: flex;
@@ -77,7 +77,7 @@ function pageHTML(v) {
       flex-shrink: 0;
     }
     .rank-city { flex: 1; min-width: 0; }
-    .rank-city-name { color: var(--ivory); font-family: var(--font-display); font-size: 1.1rem; }
+    .rank-city-name { color: var(--ivory); font-family: var(--font-display); font-size: 1.1rem; display: inline-flex; align-items: center; gap: 0.35rem; }
     .rank-city-country { color: var(--sand); font-size: 0.8rem; }
     .rank-value { font-family: var(--font-mono); font-size: 1.2rem; text-align: right; flex-shrink: 0; }
     .rank-movement { font-family: var(--font-mono); font-size: 0.78rem; color: var(--sand); width: 4.5rem; text-align: right; flex-shrink: 0; }
@@ -119,6 +119,7 @@ function pageHTML(v) {
 
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
+  <script src="/city-landmarks.js"></script>
   <script>
     // var, not const: tempo-economy.js (loaded below) also declares
     // these; var redeclaration across scripts is a safe no-op.
@@ -184,7 +185,7 @@ function pageHTML(v) {
           return \`<a class="rank-row hover-lift" href="/cities/\${r.slug}/${v.slug}/" data-city-link="\${r.slug}" data-city-nav="false" style="--hover-band:\${color};">
             <span class="rank-pos">#\${i + 1}</span>
             <span class="rank-city">
-              <span class="rank-city-name" style="color:\${color};">\${name}</span><br>
+              <span class="rank-city-name" style="color:\${color};">\${typeof GlotempLandmarks !== 'undefined' ? GlotempLandmarks.cityIconHTML(r.slug, { size: 15, className: 'city-landmark-icon' }) : ''}\${name}</span><br>
               <span class="rank-city-country">\${country} · \${r.signals} signal\${r.signals === 1 ? '' : 's'}</span>
             </span>
             <span class="rank-value" style="color:\${color};">\${r.value.toFixed(1)} ${v.unit}</span>

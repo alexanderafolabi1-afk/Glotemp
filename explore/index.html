@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=32" />
+  <link rel="stylesheet" href="/styles.css?v=33" />
 
   <style>
     /* Page-scoped styles for the Cities index. Kept inline so this page
@@ -254,6 +254,10 @@
       font-weight: var(--fw-light);
       color: var(--ivory);
       line-height: 1.25;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
     }
     .dial-reading {
       margin-top: 0.15rem;
@@ -403,6 +407,7 @@
 
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
+  <script src="/city-landmarks.js"></script>
   <script src="/living-index.js"></script>
   <script>
     // var, not const: tempo-economy.js (loaded below) also declares
@@ -496,7 +501,7 @@
         <div class="dial-face-outer" style="--dial-breathe-duration:${breatheDuration}s;">
           ${dialSVG(dialCity)}
         </div>
-        <div class="dial-name">${city.name}</div>
+        <div class="dial-name">${typeof GlotempLandmarks !== 'undefined' ? GlotempLandmarks.cityIconHTML(city.slug, { size: 14, className: 'city-landmark-icon' }) : ''}<span>${city.name}</span></div>
         <div class="dial-reading">${reading.toFixed(1)} &middot; ${band}</div>
         <div class="dial-country">${city.country}</div>
       </a>`;

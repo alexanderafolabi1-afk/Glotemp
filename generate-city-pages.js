@@ -123,7 +123,12 @@ function generateCityPage(city) {
       const city = window.CITIES_DATA.find(c => c.slug === citySlug);
 
       if (city) {
-        document.getElementById('city-name').textContent = city.name;
+        const nameEl = document.getElementById('city-name');
+        if (typeof GlotempLandmarks !== 'undefined') {
+          nameEl.innerHTML = GlotempLandmarks.cityIconHTML(city.slug, { size: 34, className: 'city-landmark-icon' }) + \`<span>\${city.name}</span>\`;
+        } else {
+          nameEl.textContent = city.name;
+        }
         document.getElementById('city-country-region').textContent = \`\${city.country} • \${city.region}\`;
         document.getElementById('city-timezone').textContent = \`📍 \${city.timezone}\`;
         document.getElementById('city-penetration').textContent = \`📡 \${(city.penetration * 100).toFixed(0)}% online\`;

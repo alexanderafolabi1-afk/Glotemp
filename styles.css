@@ -736,6 +736,10 @@ main > .glass:first-child,
   font-size: 0.95rem;
   font-weight: var(--fw-light);
   line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
   /* Reserves 2 lines' worth of height, and a stable full-bleed width, so
      replacing the "-" placeholder with a real (possibly wrapping) city
      name on first render doesn't shift its own box -- and therefore
@@ -3190,6 +3194,26 @@ button:hover:not(:focus-visible) {
 .city-header-content h1 {
   margin-bottom: 0.5rem;
   color: var(--ivory);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* City landmark insignia: a small, quiet line-drawn mark next to the
+   city name -- a real landmark for cities we can draw one confidently
+   for, a plain honest skyline glyph everywhere else. Never a photo,
+   never a filled icon; matches the same brass/ivory hairline language
+   as every other icon on the site. */
+.city-landmark-icon {
+  flex: none;
+  color: var(--brass);
+  opacity: 0.85;
+  transition: color 250ms ease, transform 250ms ease;
+}
+a:hover .city-landmark-icon,
+.dial-wrap:hover .city-landmark-icon {
+  color: var(--ivory);
+  transform: translateY(-1px) scale(1.06);
 }
 
 .city-meta {
@@ -4767,7 +4791,7 @@ time, .instr-clock, .tonight-modelled {
 
 /* Daily Pulse -> showcase rotator */
 .showcase { padding: 0.5rem 0 0; min-height: 132px; }
-.showcase-city { font-family: var(--font-display); font-size: clamp(26px, 3.4vw, 40px); font-weight: var(--fw-light); line-height: 1.1; }
+.showcase-city { font-family: var(--font-display); font-size: clamp(26px, 3.4vw, 40px); font-weight: var(--fw-light); line-height: 1.1; display: flex; align-items: center; gap: 0.5rem; }
 .showcase-line { color: var(--sand); font-size: 1rem; margin-top: 0.5rem; min-height: 1.6em; max-width: 46ch; }
 .showcase-open { display: inline-block; margin-top: 0.9rem; min-height: 44px; color: var(--ivory); text-decoration: none; border-bottom: 1px solid var(--brass-dim); padding-bottom: 3px; }
 .showcase-open:hover { color: var(--brass); border-color: var(--brass); }

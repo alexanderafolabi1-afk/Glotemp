@@ -2318,7 +2318,11 @@ async function setupBarometerRotation() {
 
     slotEl.style.setProperty('--slot-glow', color);
 
-    nameEl.textContent = cityData.name;
+    if (typeof GlotempLandmarks !== 'undefined') {
+      nameEl.innerHTML = GlotempLandmarks.cityIconHTML(cityData.slug, { size: 15, className: 'city-landmark-icon' }) + `<span>${cityData.name}</span>`;
+    } else {
+      nameEl.textContent = cityData.name;
+    }
     nameEl.style.color = color;
     bandEl.textContent = band;
     bandEl.style.color = color;
