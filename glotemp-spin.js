@@ -27,6 +27,15 @@
   };
   const MODE_LABEL = { eat: 'Eat', drink: 'Drink', watch: 'Watch', move: 'Move', make: 'Make' };
 
+  // Inline brass line icons for the Flight/Room/Table affiliate row --
+  // no boxes, just the mark above the label, matching the dial's stroke
+  // style (fill: none; stroke: currentColor, set in CSS).
+  const AFF_ICONS = {
+    flight: '<span class="spin-aff-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></span>',
+    room: '<span class="spin-aff-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 17v-5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"/><path d="M13 13v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v5"/><path d="M3 17h18"/><path d="M3 17v2M21 17v2"/></svg></span>',
+    table: '<span class="spin-aff-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 2v6a2 2 0 0 0 4 0V2"/><path d="M9 8v14"/><path d="M17 2c-1.5 0-3 1.5-3 5s1.5 5 3 5v9"/></svg></span>',
+  };
+
   let pool = [];          // [{ city, mode, reading, curve, modelled }]
   let spinning = false;
   let rotation = 0;       // accumulated degrees, never reset (keeps motion one-way)
@@ -98,9 +107,9 @@
         </div>
         <p class="spin-sentence" id="spin-sentence" role="status" aria-live="polite">Give it a turn.</p>
         <div class="spin-affiliates" id="spin-affiliates" hidden>
-          <a class="spin-aff" id="spin-aff-flight" target="_blank" rel="noopener noreferrer"><span class="spin-aff-kind">Flight</span><span class="spin-aff-label"></span></a>
-          <a class="spin-aff" id="spin-aff-room" target="_blank" rel="noopener noreferrer"><span class="spin-aff-kind">Room</span><span class="spin-aff-label"></span></a>
-          <a class="spin-aff" id="spin-aff-table" target="_blank" rel="noopener noreferrer"><span class="spin-aff-kind">Table</span><span class="spin-aff-label"></span></a>
+          <a class="spin-aff" id="spin-aff-flight" target="_blank" rel="noopener noreferrer">${AFF_ICONS.flight}<span class="spin-aff-kind">Flight</span><span class="spin-aff-label"></span></a>
+          <a class="spin-aff" id="spin-aff-room" target="_blank" rel="noopener noreferrer">${AFF_ICONS.room}<span class="spin-aff-kind">Room</span><span class="spin-aff-label"></span></a>
+          <a class="spin-aff" id="spin-aff-table" target="_blank" rel="noopener noreferrer">${AFF_ICONS.table}<span class="spin-aff-kind">Table</span><span class="spin-aff-label"></span></a>
         </div>
         <p class="spin-prov" id="spin-prov"></p>
       </div>`;

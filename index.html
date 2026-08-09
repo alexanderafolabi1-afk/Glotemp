@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=16" />
+  <link rel="stylesheet" href="/styles.css?v=17" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
@@ -42,36 +42,10 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="navbar glass">
-      <div class="nav-brand">
-        <img src="/assets/logo.png" alt="Glotemp" class="nav-logo">
-        <span class="logo-text">Glotemp</span>
-        <span class="pulse-dot" aria-hidden="true">❤️</span>
-      </div>
-      <div class="nav-links" id="nav-links-desktop">
-      <a href="/" class="active">Pulse</a>
-      <a href="/feed">Feed</a>
-      <a href="/explore">Cities</a>
-      <a href="/about">About</a>
-      <a href="/gem" class="nav-gem">Hidden gem</a>
-    </div>
-      <button id="nav-hamburger" class="nav-hamburger" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-panel">
-        <span></span><span></span><span></span>
-      </button>
-    </nav>
+    <nav id="site-nav"></nav>
+<script src="/nav-component.js"></script>
 
-    <!-- Mobile full-screen nav panel -->
-    <div id="nav-panel" class="nav-panel" aria-hidden="true" role="dialog" aria-label="Navigation">
-      <button id="nav-panel-close" class="nav-panel-close" aria-label="Close navigation">✕</button>
-      <nav class="nav-panel-links">
-        <a href="/">Pulse</a>
-        <a href="/feed">Feed</a>
-        <a href="/explore">Cities</a>
-        <a href="/about">About</a>
-        <a href="/gem">Hidden gem</a>
-      </nav>
-    </div>
-
+    
     <!-- Spin: most prominent interactive element on the page -->
     <section id="spin-section" class="glass-card spin-section"></section>
 

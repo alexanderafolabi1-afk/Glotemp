@@ -2551,51 +2551,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ===== v11 MOBILE-FIRST ADDITIONS =====
-
-// ----- Hamburger Navigation -----
-(function initHamburger() {
-  const hamburger = document.getElementById('nav-hamburger');
-  const panel = document.getElementById('nav-panel');
-  const closeBtn = document.getElementById('nav-panel-close');
-  const langMobile = document.getElementById('lang-switch-mobile');
-  const langDesktop = document.getElementById('lang-switch');
-  if (!hamburger || !panel) return;
-
-  function openPanel() {
-    panel.classList.add('open');
-    panel.setAttribute('aria-hidden', 'false');
-    hamburger.setAttribute('aria-expanded', 'true');
-    document.body.style.overflow = 'hidden';
-    if (closeBtn) closeBtn.focus();
-  }
-
-  function closePanel() {
-    panel.classList.remove('open');
-    panel.setAttribute('aria-hidden', 'true');
-    hamburger.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = '';
-    hamburger.focus();
-  }
-
-  hamburger.addEventListener('click', openPanel);
-  if (closeBtn) closeBtn.addEventListener('click', closePanel);
-
-  panel.addEventListener('click', (e) => {
-    if (e.target === panel) closePanel();
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && panel.classList.contains('open')) closePanel();
-  });
-
-  // Wire mobile lang button to the same modal as desktop
-  if (langMobile && langDesktop) {
-    langMobile.addEventListener('click', () => {
-      closePanel();
-      langDesktop.click();
-    });
-  }
-})();
+// Hamburger nav + panel wiring now lives entirely in nav-component.js,
+// the single shared nav source every page mounts -- it builds and wires
+// #nav-hamburger/#nav-panel itself, so this file no longer needs to.
 
 // ----- Ticker tap-pause -----
 (function initTickerTapPause() {

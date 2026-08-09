@@ -58,7 +58,7 @@ function pageHTML(v) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=12" />
+  <link rel="stylesheet" href="/styles.css?v=17" />
   <style>
     .rank-row {
       display: flex;
@@ -85,20 +85,8 @@ function pageHTML(v) {
   </style>
 </head>
 <body>
-  <nav class="navbar glass">
-    <div class="nav-brand">
-      <img src="/assets/logo.png" alt="Glotemp" class="nav-logo">
-      <span class="logo-text">Glotemp</span>
-      <span class="pulse-dot"></span>
-    </div>
-    <div class="nav-links">
-      <a href="/">Pulse</a>
-      <a href="/about">About</a>
-      <a href="/explore">Cities</a>
-      <a href="/blog">Feed</a>
-      <button id="lang-switch" class="btn-icon" title="Change language">◉</button>
-    </div>
-  </nav>
+  <nav id="site-nav"></nav>
+  <script src="/nav-component.js"></script>
 
   <main class="page-main">
     <section class="glass-card page-header">
@@ -123,6 +111,9 @@ function pageHTML(v) {
     <p>© 2026 RenviaIT Ltd. All rights reserved.</p>
     <p class="small-print">
       <a href="/privacy">Privacy Policy</a> | <a href="/terms">Terms of Service</a> | <a href="#" id="cookie-settings">Cookie Settings</a>
+    </p>
+    <p class="small-print footer-lang-row">
+      <button type="button" id="lang-switch" class="footer-lang">Language</button>
     </p>
   </footer>
 
