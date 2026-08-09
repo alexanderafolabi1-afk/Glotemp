@@ -32,9 +32,15 @@
     return String(s).replace(/"/g, '&quot;');
   }
 
-  function iconHTML(item) {
-    if (!item.icon) return '';
-    return '<img src="' + escapeAttr(item.icon) + '" alt="" class="nav-gem-icon">';
+  // Items carrying an icon are represented by the mark alone -- no
+  // visible label -- but still need an accessible name for screen
+  // readers and title-attribute hover text, since there's no text left
+  // to supply one.
+  function itemInnerHTML(item) {
+    if (item.icon) {
+      return '<img src="' + escapeAttr(item.icon) + '" alt="' + escapeAttr(item.label) + '" class="nav-gem-icon">';
+    }
+    return item.label;
   }
 
   function linksHTML(active) {
@@ -43,7 +49,8 @@
       if (item.extraClass) classes.push(item.extraClass);
       if (item.key === active) classes.push('active');
       var cls = classes.length ? ' class="' + classes.join(' ') + '"' : '';
-      return '<a href="' + escapeAttr(item.href) + '"' + cls + '>' + iconHTML(item) + item.label + '</a>';
+      var title = item.icon ? ' title="' + escapeAttr(item.label) + '"' : '';
+      return '<a href="' + escapeAttr(item.href) + '"' + cls + title + '>' + itemInnerHTML(item) + '</a>';
     }).join('\n        ');
   }
 
@@ -54,11 +61,9 @@
 
     mount.className = 'navbar glass';
     mount.innerHTML =
-      '<div class="nav-brand">' +
+      '<a href="/" class="nav-brand" aria-label="Glotemp home">' +
         '<img src="/assets/logo.png" alt="Glotemp" class="nav-logo">' +
-        '<span class="logo-text">Glotemp</span>' +
-        '<span class="pulse-dot" aria-hidden="true">❤️</span>' +
-      '</div>' +
+      '</a>' +
       '<div class="nav-links" id="nav-links-desktop">\n        ' +
         linksHTML(active) +
       '\n      </div>' +
@@ -88,7 +93,8 @@
       '<nav class="nav-panel-links">\n        ' +
         NAV_ITEMS.map(function (item) {
           var cls = item.extraClass ? ' class="' + item.extraClass + '"' : '';
-          return '<a href="' + escapeAttr(item.href) + '"' + cls + '>' + iconHTML(item) + item.label + '</a>';
+          var title = item.icon ? ' title="' + escapeAttr(item.label) + '"' : '';
+          return '<a href="' + escapeAttr(item.href) + '"' + cls + title + '>' + itemInnerHTML(item) + '</a>';
         }).join('\n        ') +
       '\n      </nav>';
   }

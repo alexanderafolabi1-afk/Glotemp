@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=18">
+  <link rel="stylesheet" href="/styles.css?v=22">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -54,6 +54,14 @@
     <section class="glass-card city-affiliate-row">
       <p class="eyebrow">Planning a trip</p>
       <div class="affiliate-links" id="city-affiliate-links"></div>
+    </section>
+
+    <!-- Live from Wikipedia: fetched client-side on load, never stored --
+         see city-wiki.js. One general-knowledge summary per city; Wikipedia
+         has no per-vertical breakdown to source Tech/Finance/etc. from. -->
+    <section class="glass-card city-wiki-section">
+      <p class="eyebrow">About this city</p>
+      <div id="city-wiki-panel" class="city-wiki-panel"></div>
     </section>
 
     <!-- Vertical Navigation -->
@@ -203,6 +211,7 @@
   <script src="/glotemp-checkin.js"></script>
   <script src="/glotemp-tonight.js"></script>
   <script src="/glotemp-features.js"></script>
+  <script src="/city-wiki.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
   
@@ -218,6 +227,11 @@
         document.getElementById('city-timezone').textContent = `📍 ${city.timezone}`;
         document.getElementById('city-penetration').textContent = `📡 ${(city.penetration * 100).toFixed(0)}% online`;
         document.getElementById('city-metro-pop').textContent = `👥 ${city.metro_pop.toLocaleString()} metro`;
+        if (typeof GlotempCore !== 'undefined') GlotempCore.applyMoodBackground(city.mood);
+      }
+
+      if (typeof GlotempWiki !== 'undefined') {
+        GlotempWiki.loadCityWiki('Miami', 'USA');
       }
 
       const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
@@ -237,13 +251,13 @@
           );
 
           if (!response.ok) {
-            contentEl.innerHTML = '<div class="empty-state">No data available for this vertical yet.</div>';
+            contentEl.innerHTML = '<div class="empty-state"><p>Nobody has spoken for Miami today.</p><span class="empty-state-cta">Be the first.</span></div>';
             continue;
           }
 
           const readings = await response.json();
           if (!readings.length) {
-            contentEl.innerHTML = '<div class="empty-state">No readings yet for this city.</div>';
+            contentEl.innerHTML = '<div class="empty-state"><p>Nobody has spoken for Miami today.</p><span class="empty-state-cta">Be the first.</span></div>';
             continue;
           }
 
@@ -375,10 +389,10 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Wynwood murals on a Sunday — art under heat, bass from somewhere.","language_lens":"visitor","created_at":"2026-08-08T23:06:44.456Z"},{"context":"Calle Ocho at night — sabor cubano, dominos, rum, life.","language_lens":"local","created_at":"2026-08-08T16:06:44.456Z"},{"context":"Brickell avenue at sunset — money and ambition in the air.","language_lens":"diaspora","created_at":"2026-08-08T07:06:44.456Z"},{"context":"Little Havana café colada window — colada y cuatro palabras.","language_lens":"local","created_at":"2026-08-07T21:06:44.456Z"},{"context":"South Beach 2am — the night is barely started here.","language_lens":"visitor","created_at":"2026-08-07T11:06:44.456Z"}];
+      const checkins = [{"context":"Wynwood murals on a Sunday — art under heat, bass from somewhere.","language_lens":"visitor","created_at":"2026-08-09T00:12:17.862Z"},{"context":"Calle Ocho at night — sabor cubano, dominos, rum, life.","language_lens":"local","created_at":"2026-08-08T17:12:17.862Z"},{"context":"Brickell avenue at sunset — money and ambition in the air.","language_lens":"diaspora","created_at":"2026-08-08T08:12:17.862Z"},{"context":"Little Havana café colada window — colada y cuatro palabras.","language_lens":"local","created_at":"2026-08-07T22:12:17.862Z"},{"context":"South Beach 2am — the night is barely started here.","language_lens":"visitor","created_at":"2026-08-07T12:12:17.862Z"}];
 
       if (!checkins.length) {
-        container.innerHTML = '<div class="empty-state">No observations yet for this city. Be the first.</div>';
+        container.innerHTML = '<div class="empty-state"><p>Nobody has spoken for Miami today.</p><span class="empty-state-cta">Be the first.</span></div>';
         return;
       }
 

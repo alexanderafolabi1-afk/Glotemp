@@ -66,7 +66,7 @@ function pageHTML(city, v) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=18" />
+  <link rel="stylesheet" href="/styles.css?v=22" />
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -107,6 +107,12 @@ function pageHTML(city, v) {
     // (deferred, but resolved by the time DOMContentLoaded fires below) --
     // redeclaring them here would collide with that script's top-level
     // const and throw, since classic <script> tags share one scope.
+
+    // Override GlotempCore's pinned-city default with this page's own city.
+    (function () {
+      var rec = (window.CITIES_DATA || []).find(function (c) { return c.slug === '${city.slug}'; });
+      if (rec && typeof GlotempCore !== 'undefined') GlotempCore.applyMoodBackground(rec.mood);
+    })();
 
     async function loadVerticalContent() {
       const contentEl = document.getElementById('${v.slug}-content');
