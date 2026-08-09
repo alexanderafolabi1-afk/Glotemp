@@ -11,8 +11,8 @@ const citiesMatch = citiesDataContent.match(/const CITIES_DATA = \[([\s\S]*?)\];
 if (!citiesMatch) { console.error('Could not parse CITIES_DATA'); process.exit(1); }
 const cityLines = citiesMatch[1].split('\n').filter(l => l.includes('{ slug:'));
 const cities = cityLines.map(line => {
-  const m = line.match(/\{ slug: '([^']+)', name: '([^']+)', country: '([^']+)'/);
-  return m ? { slug: m[1], name: m[2], country: m[3] } : null;
+  const m = line.match(/\{ slug: '([^']+)', name: '([^']+)', country: '([^']+)', iso: '([^']+)'/);
+  return m ? { slug: m[1], name: m[2], country: m[3], iso: m[4] } : null;
 }).filter(Boolean);
 
 const VERTICALS = [
@@ -66,7 +66,7 @@ function pageHTML(city, v) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=22" />
+  <link rel="stylesheet" href="/styles.css?v=23" />
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -81,6 +81,7 @@ function pageHTML(city, v) {
 
     <section id="${v.slug}" class="vertical-section glass-card">
       <div id="${v.slug}-content" class="vertical-content"></div>
+      <div id="${v.slug}-context" class="vertical-context"></div>
     </section>
 
     <section class="glass-card" style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; padding:2rem; text-align:center;">
@@ -101,6 +102,8 @@ function pageHTML(city, v) {
 
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
+  <script src="/city-wiki.js" defer></script>
+  <script src="/city-worldbank.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
   <script>
     // SUPABASE_URL / SUPABASE_ANON_KEY come from verticals-engine.js
@@ -113,6 +116,16 @@ function pageHTML(city, v) {
       var rec = (window.CITIES_DATA || []).find(function (c) { return c.slug === '${city.slug}'; });
       if (rec && typeof GlotempCore !== 'undefined') GlotempCore.applyMoodBackground(rec.mood);
     })();
+
+    // Real, sourced context for this one vertical -- a Wikipedia section
+    // excerpt where a genuine one exists, plus a World Bank country
+    // indicator where this vertical has a defensible one. Neither
+    // replaces the live reading above; both render nothing if there's no
+    // honest match, same rule as every empty state on the site.
+    document.addEventListener('DOMContentLoaded', function () {
+      if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadVerticalContext('${city.name}', '${city.country}', '${v.slug}');
+      if (typeof GlotempWorldBank !== 'undefined') GlotempWorldBank.loadVerticalIndicator('${city.iso}', '${v.slug}', '${city.country}');
+    });
 
     async function loadVerticalContent() {
       const contentEl = document.getElementById('${v.slug}-content');
@@ -130,7 +143,9 @@ function pageHTML(city, v) {
           contentEl.innerHTML = '<div class="empty-state"><p>Nobody has spoken for ${city.name} today.</p><span class="empty-state-cta">Be the first.</span></div>';
           return;
         }
-        contentEl.innerHTML = readings.slice(0, 15).map(reading => \`
+        contentEl.innerHTML = readings.slice(0, 15).map(reading => {
+          const isModelled = reading.source === 'seed' || (typeof reading.confidence === 'number' && reading.confidence < 0.6);
+          return \`
           <div class="reading glass-card">
             <div class="reading-header">
               <span class="reading-metric">\${reading.metric}</span>
@@ -142,10 +157,12 @@ function pageHTML(city, v) {
             </div>
             <div class="reading-footer">
               <span class="reading-source">\${reading.source}</span>
+              <span class="reading-provenance reading-provenance--\${isModelled ? 'modelled' : 'observed'}">\${isModelled ? 'Modelled' : 'Observed'}</span>
               <time class="reading-time" datetime="\${reading.fetched_at}">\${verticals.getTimeAgo(new Date(reading.fetched_at))}</time>
             </div>
           </div>
-        \`).join('');
+        \`;
+        }).join('');
       } catch (error) {
         console.error('Error loading ${v.slug} data:', error);
         contentEl.innerHTML = '<div class="empty-state">Error loading data. Try again shortly.</div>';

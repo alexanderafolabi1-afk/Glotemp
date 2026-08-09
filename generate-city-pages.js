@@ -60,12 +60,13 @@ const VERTICALS = [
 
 // Parse each city line
 const cities = cityLines.map(line => {
-  const match = line.match(/\{ slug: '([^']+)', name: '([^']+)', country: '([^']+)'[^}]*}/);
+  const match = line.match(/\{ slug: '([^']+)', name: '([^']+)', country: '([^']+)', iso: '([^']+)'/);
   if (!match) return null;
   return {
     slug: match[1],
     name: match[2],
-    country: match[3]
+    country: match[3],
+    iso: match[4]
   };
 }).filter(Boolean);
 
@@ -85,6 +86,7 @@ function generateVerticalSections() {
       <h2>${v.label}</h2>
       <p class="vertical-description">${v.desc}</p>
       <div id="${v.name}-content" class="vertical-content"></div>
+      <div id="${v.name}-context" class="vertical-context"></div>
     </section>
   `).join('\n');
 }
@@ -128,11 +130,15 @@ function generateCityPage(city) {
         if (typeof GlotempCore !== 'undefined') GlotempCore.applyMoodBackground(city.mood);
       }
 
+      const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
+
       if (typeof GlotempWiki !== 'undefined') {
         GlotempWiki.loadCityWiki('${city.name}', '${city.country}');
+        GlotempWiki.loadAllVerticalContexts('${city.name}', '${city.country}', verticalSlugs);
       }
-
-      const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
+      if (typeof GlotempWorldBank !== 'undefined') {
+        verticalSlugs.forEach(v => GlotempWorldBank.loadVerticalIndicator('${city.iso}', v, '${city.country}'));
+      }
 
       for (const vertical of verticalSlugs) {
         const contentEl = document.getElementById(\`\${vertical}-content\`);
@@ -159,7 +165,9 @@ function generateCityPage(city) {
             continue;
           }
 
-          const content = readings.slice(0, 10).map(reading => \`
+          const content = readings.slice(0, 10).map(reading => {
+            const isModelled = reading.source === 'seed' || (typeof reading.confidence === 'number' && reading.confidence < 0.6);
+            return \`
             <div class="reading glass-card">
               <div class="reading-header">
                 <span class="reading-metric">\${reading.metric}</span>
@@ -173,10 +181,12 @@ function generateCityPage(city) {
               </div>
               <div class="reading-footer">
                 <span class="reading-source">\${reading.source}</span>
+                <span class="reading-provenance reading-provenance--\${isModelled ? 'modelled' : 'observed'}">\${isModelled ? 'Modelled' : 'Observed'}</span>
                 <time class="reading-time" datetime="\${reading.fetched_at}">\${verticals.getTimeAgo(new Date(reading.fetched_at))}</time>
               </div>
             </div>
-          \`).join('');
+          \`;
+          }).join('');
 
           contentEl.innerHTML = content;
         } catch (error) {

@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=22">
+  <link rel="stylesheet" href="/styles.css?v=23">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -86,6 +86,7 @@
       <h2>Pulse</h2>
       <p class="vertical-description">How does this city feel right now?</p>
       <div id="pulse-content" class="vertical-content"></div>
+      <div id="pulse-context" class="vertical-context"></div>
     </section>
   
 
@@ -94,6 +95,7 @@
       <h2>Tech</h2>
       <p class="vertical-description">Should I build or work here?</p>
       <div id="tech-content" class="vertical-content"></div>
+      <div id="tech-context" class="vertical-context"></div>
     </section>
   
 
@@ -102,6 +104,7 @@
       <h2>Finance</h2>
       <p class="vertical-description">Should I invest or trade here?</p>
       <div id="finance-content" class="vertical-content"></div>
+      <div id="finance-context" class="vertical-context"></div>
     </section>
   
 
@@ -110,6 +113,7 @@
       <h2>Work</h2>
       <p class="vertical-description">Where should you work and live?</p>
       <div id="work-content" class="vertical-content"></div>
+      <div id="work-context" class="vertical-context"></div>
     </section>
   
 
@@ -118,6 +122,7 @@
       <h2>Property</h2>
       <p class="vertical-description">Where should you invest in real estate?</p>
       <div id="property-content" class="vertical-content"></div>
+      <div id="property-context" class="vertical-context"></div>
     </section>
   
 
@@ -126,6 +131,7 @@
       <h2>Education</h2>
       <p class="vertical-description">Where should you study?</p>
       <div id="education-content" class="vertical-content"></div>
+      <div id="education-context" class="vertical-context"></div>
     </section>
   
 
@@ -134,6 +140,7 @@
       <h2>Sport</h2>
       <p class="vertical-description">Where should you play and watch sports?</p>
       <div id="sport-content" class="vertical-content"></div>
+      <div id="sport-context" class="vertical-context"></div>
     </section>
   
 
@@ -142,6 +149,7 @@
       <h2>Entertainment</h2>
       <p class="vertical-description">Where should you experience culture and nightlife?</p>
       <div id="entertainment-content" class="vertical-content"></div>
+      <div id="entertainment-context" class="vertical-context"></div>
     </section>
   
 
@@ -150,6 +158,7 @@
       <h2>Fashion</h2>
       <p class="vertical-description">Where is the center of global style?</p>
       <div id="fashion-content" class="vertical-content"></div>
+      <div id="fashion-context" class="vertical-context"></div>
     </section>
   
 
@@ -158,6 +167,7 @@
       <h2>Food</h2>
       <p class="vertical-description">Where should you eat and explore cuisine?</p>
       <div id="food-content" class="vertical-content"></div>
+      <div id="food-context" class="vertical-context"></div>
     </section>
   
 
@@ -166,6 +176,7 @@
       <h2>Health</h2>
       <p class="vertical-description">Where is it healthiest to live?</p>
       <div id="health-content" class="vertical-content"></div>
+      <div id="health-context" class="vertical-context"></div>
     </section>
   
 
@@ -174,6 +185,7 @@
       <h2>Transport</h2>
       <p class="vertical-description">Which cities have the best mobility?</p>
       <div id="transport-content" class="vertical-content"></div>
+      <div id="transport-context" class="vertical-context"></div>
     </section>
   
     <!-- Compare Section -->
@@ -212,6 +224,7 @@
   <script src="/glotemp-tonight.js"></script>
   <script src="/glotemp-features.js"></script>
   <script src="/city-wiki.js" defer></script>
+  <script src="/city-worldbank.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
   
@@ -230,11 +243,15 @@
         if (typeof GlotempCore !== 'undefined') GlotempCore.applyMoodBackground(city.mood);
       }
 
+      const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
+
       if (typeof GlotempWiki !== 'undefined') {
         GlotempWiki.loadCityWiki('Caracas', 'Venezuela');
+        GlotempWiki.loadAllVerticalContexts('Caracas', 'Venezuela', verticalSlugs);
       }
-
-      const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
+      if (typeof GlotempWorldBank !== 'undefined') {
+        verticalSlugs.forEach(v => GlotempWorldBank.loadVerticalIndicator('VE', v, 'Venezuela'));
+      }
 
       for (const vertical of verticalSlugs) {
         const contentEl = document.getElementById(`${vertical}-content`);
@@ -261,7 +278,9 @@
             continue;
           }
 
-          const content = readings.slice(0, 10).map(reading => `
+          const content = readings.slice(0, 10).map(reading => {
+            const isModelled = reading.source === 'seed' || (typeof reading.confidence === 'number' && reading.confidence < 0.6);
+            return `
             <div class="reading glass-card">
               <div class="reading-header">
                 <span class="reading-metric">${reading.metric}</span>
@@ -275,10 +294,12 @@
               </div>
               <div class="reading-footer">
                 <span class="reading-source">${reading.source}</span>
+                <span class="reading-provenance reading-provenance--${isModelled ? 'modelled' : 'observed'}">${isModelled ? 'Modelled' : 'Observed'}</span>
                 <time class="reading-time" datetime="${reading.fetched_at}">${verticals.getTimeAgo(new Date(reading.fetched_at))}</time>
               </div>
             </div>
-          `).join('');
+          `;
+          }).join('');
 
           contentEl.innerHTML = content;
         } catch (error) {

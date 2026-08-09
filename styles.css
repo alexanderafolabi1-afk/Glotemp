@@ -3277,6 +3277,18 @@ button:hover:not(:focus-visible) {
   white-space: nowrap;
 }
 
+/* Every reading says, in the reading itself, whether it's a live signal
+   or a modelled/seed fallback -- the same modelled-vs-observed split
+   /about computes, surfaced everywhere a number actually appears. */
+.reading-provenance {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.reading-provenance--observed { color: var(--band-warm); }
+.reading-provenance--modelled { color: var(--sand); opacity: 0.75; }
+
 .empty-state {
   padding: 1.75rem 1.5rem;
   text-align: center;
@@ -3293,12 +3305,60 @@ button:hover:not(:focus-visible) {
   margin-bottom: 0.4rem;
 }
 
+/* A waiting instrument, not a dead end: the CTA breathes gently between
+   brass and warm rather than sitting static. Respects the sitewide
+   reduced-motion override already in place. */
 .empty-state .empty-state-cta {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--band-warm);
+  display: inline-block;
+  animation: empty-state-breathe 3.2s ease-in-out infinite;
+}
+@keyframes empty-state-breathe {
+  0%, 100% { color: var(--band-warm); opacity: 0.75; }
+  50% { color: var(--brass); opacity: 1; }
+}
+
+/* ===== Real-world context (city-wiki.js / city-worldbank.js) =====
+   Supplementary, clearly-sourced facts sitting below a vertical's own
+   live reading -- never a replacement for it, never shown without a
+   genuine source match. */
+.vertical-context:empty { display: none; }
+.context-block {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--hairline);
+}
+.context-block + .context-block {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+}
+.context-tag {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--sand);
+  opacity: 0.7;
+  margin-bottom: 0.4rem;
+}
+.context-fact {
+  color: var(--sand);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.context-fact strong { color: var(--ivory); }
+.context-meta {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--sand);
+  opacity: 0.6;
 }
 
 .compare-section {
@@ -4426,6 +4486,13 @@ time, .instr-clock, .tonight-modelled {
   font-variant-caps: small-caps; font-size: 0.7rem;
   color: var(--sand); opacity: 0.6;
 }
+.trip-sponsor-note a {
+  color: var(--brass);
+  text-decoration: underline;
+  text-decoration-color: var(--brass-dim);
+  opacity: 1;
+}
+.trip-sponsor-note a:hover { color: var(--ivory); }
 
 /* ===== AUTH MODAL: hairlines, not stacked boxes ===== */
 .gt-auth-modal { border-radius: 0; border: 1px solid var(--brass-dim); background: var(--obsidian); }
