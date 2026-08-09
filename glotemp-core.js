@@ -145,6 +145,34 @@
   // wires #nav-hamburger/#nav-panel itself, so this module no longer
   // needs to duplicate that.
 
+  // Ties the ambient background to a real mood reading (0-10) so the
+  // page actually shows the temperature the product is named for,
+  // rather than sitting at a fixed neutral tone. --mood-hue/--mood-sat
+  // feed the rotating wash layer in styles.css's body::before.
+  function applyMoodBackground(mood) {
+    const m = typeof mood === 'number' && !Number.isNaN(mood) ? mood : 5.0;
+    const normalized = m / 10;
+    const hueShift = (normalized - 0.5) * 140; // cold/low -> -70deg, charged -> +70deg
+    const saturation = 0.9 + Math.abs(normalized - 0.5) * 0.7;
+    document.documentElement.style.setProperty('--mood-hue', `${hueShift.toFixed(1)}deg`);
+    document.documentElement.style.setProperty('--mood-saturation', saturation.toFixed(2));
+  }
+
+  // On load, tint the background using whatever mood is already known --
+  // the pinned city's, if one is set. Pages that know their own city more
+  // precisely (a city profile, the homepage selector) call
+  // applyMoodBackground again once they have it, overriding this default.
+  function initAmbientMood() {
+    const pinned = getPinnedCity();
+    const city = pinned && window.CITIES_DATA ? window.CITIES_DATA.find((c) => c.slug === pinned) : null;
+    applyMoodBackground(city ? city.mood : undefined);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAmbientMood);
+  } else {
+    initAmbientMood();
+  }
+
   window.GlotempCore = {
     moodToBand,
     getPinnedCity,
@@ -155,5 +183,6 @@
     getTimeAgo,
     wireCityLinks,
     imgSlotHTML,
+    applyMoodBackground,
   };
 })();

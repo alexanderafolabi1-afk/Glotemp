@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=20">
+  <link rel="stylesheet" href="/styles.css?v=22">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -54,6 +54,14 @@
     <section class="glass-card city-affiliate-row">
       <p class="eyebrow">Planning a trip</p>
       <div class="affiliate-links" id="city-affiliate-links"></div>
+    </section>
+
+    <!-- Live from Wikipedia: fetched client-side on load, never stored --
+         see city-wiki.js. One general-knowledge summary per city; Wikipedia
+         has no per-vertical breakdown to source Tech/Finance/etc. from. -->
+    <section class="glass-card city-wiki-section">
+      <p class="eyebrow">About this city</p>
+      <div id="city-wiki-panel" class="city-wiki-panel"></div>
     </section>
 
     <!-- Vertical Navigation -->
@@ -203,6 +211,7 @@
   <script src="/glotemp-checkin.js"></script>
   <script src="/glotemp-tonight.js"></script>
   <script src="/glotemp-features.js"></script>
+  <script src="/city-wiki.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
   
@@ -218,6 +227,11 @@
         document.getElementById('city-timezone').textContent = `📍 ${city.timezone}`;
         document.getElementById('city-penetration').textContent = `📡 ${(city.penetration * 100).toFixed(0)}% online`;
         document.getElementById('city-metro-pop').textContent = `👥 ${city.metro_pop.toLocaleString()} metro`;
+        if (typeof GlotempCore !== 'undefined') GlotempCore.applyMoodBackground(city.mood);
+      }
+
+      if (typeof GlotempWiki !== 'undefined') {
+        GlotempWiki.loadCityWiki('Doha', 'Qatar');
       }
 
       const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];

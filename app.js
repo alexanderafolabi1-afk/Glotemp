@@ -1768,14 +1768,23 @@ async function loadCitiesIntoSelector() {
   select.value = 'nyc';
 }
 
-// Initialize everything -- this whole block is homepage-specific (city
-// selector, pulse canvas, ambient lighting, install banner, etc.) and
-// assumes those elements exist unconditionally. app.js is also loaded on
-// city/vertical pages for shared utilities (translations, hamburger nav,
-// language modal, which live outside this handler), so guard on a marker
-// only the homepage has rather than let every getElementById(...) here
-// throw or silently overwrite that page's own content (e.g. this used to
-// stomp #city-name on every city page back to New York on every load).
+// Ambient lighting (time-of-day body class driving the background wash)
+// applies to every page that loads app.js, not just the homepage -- the
+// background should feel alive everywhere, not only where the city
+// selector lives.
+document.addEventListener('DOMContentLoaded', () => {
+  updateAmbientLighting();
+  setInterval(updateAmbientLighting, 3600000);
+});
+
+// Initialize everything else -- this block is homepage-specific (city
+// selector, pulse canvas, install banner, etc.) and assumes those
+// elements exist unconditionally. app.js is also loaded on city/vertical
+// pages for shared utilities (translations, hamburger nav, language
+// modal, which live outside this handler), so guard on a marker only the
+// homepage has rather than let every getElementById(...) here throw or
+// silently overwrite that page's own content (e.g. this used to stomp
+// #city-name on every city page back to New York on every load).
 document.addEventListener('DOMContentLoaded', async () => {
   if (!document.getElementById('city-select')) return;
   await loadCitiesData();
@@ -1783,10 +1792,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   resizeCanvas();
   drawPulse();
   updateCity('nyc');
-  updateAmbientLighting();
-
-  // Update ambient lighting periodically (every hour)
-  setInterval(updateAmbientLighting, 3600000);
 
   const citySelect = document.getElementById('city-select');
   if (citySelect) {

@@ -125,6 +125,11 @@ function generateCityPage(city) {
         document.getElementById('city-timezone').textContent = \`📍 \${city.timezone}\`;
         document.getElementById('city-penetration').textContent = \`📡 \${(city.penetration * 100).toFixed(0)}% online\`;
         document.getElementById('city-metro-pop').textContent = \`👥 \${city.metro_pop.toLocaleString()} metro\`;
+        if (typeof GlotempCore !== 'undefined') GlotempCore.applyMoodBackground(city.mood);
+      }
+
+      if (typeof GlotempWiki !== 'undefined') {
+        GlotempWiki.loadCityWiki('${city.name}', '${city.country}');
       }
 
       const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];

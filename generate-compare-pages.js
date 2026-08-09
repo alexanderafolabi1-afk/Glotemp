@@ -67,7 +67,7 @@ function pageHTML(a, b) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=20" />
+  <link rel="stylesheet" href="/styles.css?v=22" />
   <style>
     .compare-header-row {
       display: grid;
@@ -195,6 +195,7 @@ function pageHTML(a, b) {
         document.getElementById('b-band').textContent = band + ' · ' + b.mood.toFixed(1) + '/10';
         document.getElementById('b-band').style.color = color;
       }
+      if (a && b) GlotempCore.applyMoodBackground((a.mood + b.mood) / 2);
     }
 
     async function loadComparison() {
