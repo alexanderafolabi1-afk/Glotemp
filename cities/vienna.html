@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=39">
+  <link rel="stylesheet" href="/styles.css?v=41">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -29,6 +29,7 @@
   <main class="page-content">
     <section class="city-header glass-card">
       <div class="city-header-content">
+        <p class="city-live-badge checkin-live-eyebrow live-mark">Live</p>
         <h1 id="city-name"></h1>
         <p id="city-country-region"></p>
         <div class="city-meta">
@@ -49,6 +50,18 @@
           <p id="watch-email-status" class="inline-feedback"></p>
         </div>
       </div>
+    </section>
+
+    <!-- Check-in: the central brand action, given the first, most
+         prominent placement on the page -- right after the hero, before
+         anything else. glotemp-checkin.js finds #city-observation-feed by
+         id regardless of where it sits in the DOM, so moving it here is
+         safe; it replaces this section's contents with the live composer
+         (or, signed out, a sign-in prompt) and the recent check-ins list. -->
+    <section class="glass-card city-feed-section checkin-hero-section">
+      <h2>Human check-ins</h2>
+      <p class="vertical-description">Recent human check-ins and signals for this city.</p>
+      <div id="city-observation-feed" class="vertical-content"></div>
     </section>
 
     <section class="glass-card city-affiliate-row">
@@ -206,13 +219,6 @@
     <section class="compare-section glass-card">
       <h2 data-i18n="compare_title">Compare with Another City</h2>
       <select id="compare-city-select" class="filter-select"></select>
-    </section>
-
-    <!-- Live observation feed for this city -->
-    <section class="glass-card city-feed-section">
-      <h2>Live observations</h2>
-      <p class="vertical-description">Recent human check-ins and signals for this city.</p>
-      <div id="city-observation-feed" class="vertical-content"></div>
     </section>
 
     <!-- Comments -->
@@ -477,7 +483,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Kaffeehaus Querung - Melange und Zeitung, die Welt steht still.","language_lens":"local","created_at":"2026-08-09T16:19:55.726Z"},{"context":"Naschmarkt on Saturday - cheese, spice, and conversation.","language_lens":"visitor","created_at":"2026-08-09T10:19:55.726Z"},{"context":"U4 Karlsplatz - Studenten und Touristen, angenehme Stimmung.","language_lens":"local","created_at":"2026-08-09T01:19:55.726Z"},{"context":"Gürtel bar district late on Saturday - unexpected and alive.","language_lens":"visitor","created_at":"2026-08-08T15:19:55.726Z"},{"context":"Prater on a warm afternoon - jogging, chess, old Vienna charm.","language_lens":"diaspora","created_at":"2026-08-08T03:19:55.726Z"}];
+      const checkins = [{"context":"Kaffeehaus Querung - Melange und Zeitung, die Welt steht still.","language_lens":"local","created_at":"2026-08-09T17:45:51.728Z"},{"context":"Naschmarkt on Saturday - cheese, spice, and conversation.","language_lens":"visitor","created_at":"2026-08-09T11:45:51.728Z"},{"context":"U4 Karlsplatz - Studenten und Touristen, angenehme Stimmung.","language_lens":"local","created_at":"2026-08-09T02:45:51.728Z"},{"context":"Gürtel bar district late on Saturday - unexpected and alive.","language_lens":"visitor","created_at":"2026-08-08T16:45:51.728Z"},{"context":"Prater on a warm afternoon - jogging, chess, old Vienna charm.","language_lens":"diaspora","created_at":"2026-08-08T04:45:51.728Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

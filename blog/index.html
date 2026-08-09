@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=39" />
+  <link rel="stylesheet" href="/styles.css?v=41" />
 
   <style>
     .feed-toolbar {
@@ -149,7 +149,6 @@
       justify-content: space-between;
       font-size: 0.75rem;
       color: var(--sand);
-      opacity: 0.8;
       flex-wrap: wrap;
       gap: 0.5rem;
     }
@@ -181,17 +180,6 @@
       font-size: 0.75rem;
       color: var(--sand);
     }
-    .feed-live-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--band-equilibrium);
-      animation: pulseDot 2s ease-in-out infinite;
-    }
-    @keyframes pulseDot { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
-    @media (prefers-reduced-motion: reduce) {
-      .feed-live-dot { animation: none; }
-    }
   </style>
 </head>
 <body>
@@ -212,7 +200,7 @@
           <select id="feed-city-select" class="feed-select" aria-label="Filter by city">
             <option value="">All cities</option>
           </select>
-          <span class="feed-live-badge"><span class="feed-live-dot"></span> Live, refreshes every 60s</span>
+          <span class="feed-live-badge live-mark">Live, refreshes every 60s</span>
         </div>
         <div class="vertical-filter-row" id="vertical-filter-row"></div>
       </div>

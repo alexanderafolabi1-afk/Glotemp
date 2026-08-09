@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=39" />
+  <link rel="stylesheet" href="/styles.css?v=41" />
 
   <style>
     .feed-meta-row {
@@ -37,17 +37,6 @@
       font-size: 0.8rem;
       color: var(--sand);
     }
-    .feed-live-dot {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--band-warm);
-      margin-right: 0.45rem;
-      vertical-align: middle;
-      animation: feed-pulse 2s ease-in-out infinite;
-    }
-    @keyframes feed-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 
     .feed-stream {
       display: flex;
@@ -95,7 +84,7 @@
     }
     .feed-intensity { font-family: var(--font-mono); font-size: 0.76rem; color: var(--sand); }
     .feed-note { color: var(--sand); font-size: 0.92rem; line-height: 1.55; margin-bottom: 0.35rem; max-width: none; }
-    .feed-time { font-family: var(--font-mono); font-size: 0.72rem; color: var(--sand); opacity: 0.75; }
+    .feed-time { font-family: var(--font-mono); font-size: 0.72rem; color: var(--sand); }
     .feed-empty { color: var(--sand); font-family: var(--font-mono); font-size: 0.88rem; padding: 1.5rem 0; }
     .feed-pinned-note {
       font-family: var(--font-mono);
@@ -103,9 +92,6 @@
       color: var(--brass);
       min-height: 1.2em;
       padding: 0 1.5rem 0.5rem;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .feed-live-dot { animation: none; }
     }
   </style>
 </head>
@@ -123,7 +109,7 @@
 
     <section class="glass-card" style="padding:1.5rem 0 0;">
       <div class="feed-meta-row">
-        <span><span class="feed-live-dot" aria-hidden="true"></span>Live - refreshes every 60s</span>
+        <span class="live-mark">Live - refreshes every 60s</span>
         <span id="feed-count">Sampling…</span>
       </div>
       <p class="feed-pinned-note" id="feed-pinned-note">&nbsp;</p>

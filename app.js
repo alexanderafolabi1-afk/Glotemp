@@ -42,7 +42,7 @@ const translations = {
     trip_go_reason: "The streets are charged. Energy is high. The moment is right.",
     trip_maybe_reason: "It’s decent, but check the weather first.",
     trip_wait_reason: "Mood is low; maybe next weekend.",
-    checkin_title: "Share the pulse",
+    checkin_title: "Check in to",
     stars: "Stars",
     stars_share: "Those who contribute most share in the city's reward.",
     footer_tagline: "Measuring the world's heartbeat.",
@@ -77,7 +77,7 @@ const translations = {
     pulse_intro: "Five cities, chosen from what's moving right now.",
     instrument_hint: "Tap any city below to see if today's the day to go.",
     no_observations: "Be the first to share an observation. Check in now.",
-    checkin_eyebrow: "Your turn",
+    checkin_eyebrow: "Check in",
     checkin_intro: "How does your city feel right now? Pick a mood, add a note if you like, and you'll shape the next reading.",
     add_voice_copy: "Want to add your own read on a city?",
     add_voice_btn: "Add your voice ↑",
@@ -109,7 +109,7 @@ const translations = {
     cadence_label: "Contribution cadence",
     context_label: "Optional local note",
     context_placeholder: "A small observation, event note, or mood context.",
-    record_observation: "Record observation",
+    record_observation: "Check in",
     human_signal_verified: "Human signal verified",
     contribution_quality_title: "Quality of signal",
     contribution_quality_copy: "Subtle context, repeat observations, and cross-language notes increase the scientific value of each entry.",
@@ -1396,7 +1396,10 @@ function recordObservation(event) {
   saveObservatory();
   addStars(note ? 18 : 12);
   renderSignalPanels();
-  document.getElementById('observation-feedback').textContent = t('observation_saved');
+  const feedbackEl = document.getElementById('observation-feedback');
+  feedbackEl.textContent = `${t('observation_saved')} You're in the running for this week's ${observation.city} rewards.`;
+  feedbackEl.classList.add('checkin-status-reward');
+  setTimeout(() => feedbackEl.classList.remove('checkin-status-reward'), 6000);
   // Fold the new check-in into the rotating snippet pool and show it now,
   // so submitting feels like it landed somewhere instead of vanishing.
   if (typeof refreshObsSnippetPool === 'function') refreshObsSnippetPool(citySlug);
@@ -1570,7 +1573,7 @@ function updateCity(selected) {
   // The check-in composer always names the city it's recording for --
   // never a hidden default the visitor can't see.
   const checkinCityEl = document.getElementById('checkin-city-name');
-  if (checkinCityEl) checkinCityEl.textContent = `— ${city.name}`;
+  if (checkinCityEl) checkinCityEl.textContent = city.name;
 
   // dimensions
   const dimNames = t('dimensions');
@@ -2501,13 +2504,32 @@ function setupTrendingRotation() {
     const { band, color } = moodToBand(mood);
     const moodScore = mood.toFixed(1);
     card.dataset.slug = cityData.slug;
-    card.style.borderColor = color + '55';
     card.innerHTML = `
-      <h3 class="fastest-city-name" style="color:${color}">${cityData.name}</h3>
-      <p class="fastest-shift">${cityData.country || ''}</p>
-      <p class="fastest-shift" style="color:${color}">${band} · ${moodScore} / 10</p>
-      <div class="fastest-mood">${getMoodEmoji(mood)}</div>
+      <div class="fastest-card-body">
+        <h3 class="fastest-city-name" style="color:${color}">${cityData.name}</h3>
+        <p class="fastest-shift">${cityData.country || ''}</p>
+        <p class="fastest-shift" style="color:${color}">${band} - ${moodScore} / 10</p>
+      </div>
+      <div class="fastest-mood" style="--mood-color:${color}"></div>
     `;
+    // A real photo of the city where one exists (curated set in
+    // city-landmark-photos.js); the band-colour swatch above is the
+    // complete, honest state if it doesn't -- never an emoji standing in.
+    if (window.GlotempLandmarkPhotos) {
+      GlotempLandmarkPhotos.getPhotoUrl(cityData.slug).then(src => {
+        if (!src || !card.isConnected) return;
+        const swatch = card.querySelector('.fastest-mood');
+        if (!swatch) return;
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = '';
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.referrerPolicy = 'no-referrer';
+        img.className = 'fastest-mood-photo';
+        swatch.appendChild(img);
+      });
+    }
   }
 
   grid.innerHTML = '';
@@ -2552,14 +2574,6 @@ function setupTrendingRotation() {
 
   // Expose cleanup on grid for guard against re-init
   grid._trendingCleanup = () => intervalIds.forEach(id => { clearTimeout(id); clearInterval(id); });
-}
-
-function getMoodEmoji(moodScore) {
-  if (moodScore >= 8) return '🔥';
-  if (moodScore >= 6) return '😊';
-  if (moodScore >= 4) return '😐';
-  if (moodScore >= 2) return '😞';
-  return '😡';
 }
 
 // Scroll reveal animations

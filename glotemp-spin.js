@@ -37,6 +37,7 @@
   };
 
   let pool = [];          // [{ city, mode, reading, curve, modelled }]
+  let poolLoading = true; // true until loadPool() resolves, guards a click landing before there's anything to spin
   let spinning = false;
   let rotation = 0;       // accumulated degrees, never reset (keeps motion one-way)
   let variant = VARIANTS[0];
@@ -116,14 +117,31 @@
   }
 
   // ---------- data ----------
+  // The live "tonight" readings table (Supabase) can be empty, still
+  // materializing, or unreachable -- and the spin has to work regardless,
+  // since it is a homepage centerpiece, not an optional widget. If the
+  // live rows come back empty, fall back to a pool built straight from
+  // CITIES_DATA's own mood reading (always present client-side), across
+  // all five modes. It loses the per-hour curve, so scoring in pick()
+  // just weighs less on "right now" and more on the city's own reading --
+  // still a real, honestly-labelled ("modelled") result, never a dead
+  // click.
   async function loadPool() {
     const cities = new Map((window.CITIES_DATA || []).filter(c => c.available !== false).map(c => [c.slug, c]));
     const rows = window.GlotempTonight ? await GlotempTonight.fetchTopTonight(400) : null;
-    if (!rows || !rows.length) return [];
-    return rows
-      .map(r => ({ city: cities.get(r.city_slug), mode: r.mode, reading: Number(r.reading),
-                   curve: r.curve, modelled: !!r.modelled, seat_capacity: r.seat_capacity }))
-      .filter(x => x.city);
+    if (rows && rows.length) {
+      const live = rows
+        .map(r => ({ city: cities.get(r.city_slug), mode: r.mode, reading: Number(r.reading),
+                     curve: r.curve, modelled: !!r.modelled, seat_capacity: r.seat_capacity }))
+        .filter(x => x.city && Number.isFinite(x.reading) && x.reading > 0);
+      if (live.length) return live;
+    }
+    return Array.from(cities.values()).flatMap(city =>
+      Object.keys(MODE_VERB).map(mode => ({
+        city, mode, reading: typeof city.mood === 'number' ? city.mood : 5,
+        curve: null, modelled: true, seat_capacity: null,
+      }))
+    );
   }
 
   // Weighted pick: reading drives weight, and for a given mode the
@@ -177,7 +195,7 @@
 
   // ---------- the spin ----------
   function spin() {
-    if (spinning) return;
+    if (spinning || poolLoading) return;
     const sentenceEl = document.getElementById('spin-sentence');
     const provEl = document.getElementById('spin-prov');
 
@@ -245,10 +263,20 @@
         variant = VARIANTS.find(v => v.id === btn.getAttribute('data-variant')) || VARIANTS[0];
       });
     });
-    document.getElementById('spin-go').addEventListener('click', spin);
-    document.getElementById('spin-dial').addEventListener('click', spin);
+    const goBtn = document.getElementById('spin-go');
+    const dialBtn = document.getElementById('spin-dial');
+    goBtn.addEventListener('click', spin);
+    dialBtn.addEventListener('click', spin);
 
+    // The pool load is a network round trip -- a click landing in that
+    // gap used to hit an empty pool and do nothing, silently. Hold the
+    // control disabled and say so until there's something to spin.
+    goBtn.disabled = true;
+    goBtn.textContent = 'Loading…';
     pool = await loadPool();
+    poolLoading = false;
+    goBtn.disabled = false;
+    goBtn.textContent = 'Spin';
   }
 
   if (document.readyState === 'loading') {

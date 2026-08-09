@@ -28,6 +28,11 @@
     return m ? m[1] : null;
   }
 
+  function cityDisplayName() {
+    const rec = (window.CITIES_DATA || []).find(c => c.slug === citySlug);
+    return rec ? rec.name : 'this city';
+  }
+
   function esc(s) {
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -54,14 +59,17 @@
   }
 
   // ---------- composer ----------
-  function composerHTML() {
+  function composerHTML(cityName) {
+    const name = cityName || 'this city';
     return `
       <div class="checkin-composer" id="checkin-composer">
-        <p class="eyebrow">Check in</p>
-        <h3 class="checkin-heading">What are you doing here right now?</h3>
+        <p class="eyebrow checkin-live-eyebrow live-mark">Check in</p>
+        <h2 class="checkin-neon-title">Check in to <span class="checkin-glow">${esc(name)}</span></h2>
+        <p class="checkin-subtext">What are you doing here right now?</p>
+        <p class="checkin-rewards-note">✨ Daily check-ins put you in the running for this week's ${esc(name)} rewards.</p>
         <div class="checkin-signedout" id="checkin-signedout">
           <p class="checkin-copy">Sign in to add your check-in. Browsing stays anonymous.</p>
-          <button class="btn-neon" type="button" id="checkin-signin-btn">Sign in to check in</button>
+          <button class="btn-neon checkin-neon-btn" type="button" id="checkin-signin-btn">Check in to ${esc(name)}</button>
         </div>
         <form class="checkin-form" id="checkin-form" hidden>
           <div class="checkin-modes" role="group" aria-label="Check-in mode">
@@ -81,7 +89,7 @@
             <p class="checkin-item-note" id="checkin-preview-note" hidden></p>
           </div>
           <div class="checkin-actions">
-            <button type="submit" class="btn-neon" id="checkin-submit">Post check-in</button>
+            <button type="submit" class="btn-neon checkin-neon-btn" id="checkin-submit">Post check-in</button>
             <span class="checkin-status" id="checkin-status" role="status" aria-live="polite"></span>
           </div>
         </form>
@@ -168,13 +176,14 @@
             }),
           });
           if (!resp.ok) throw new Error('post failed ' + resp.status);
-          status.textContent = 'Posted.';
+          status.textContent = `Posted. You're in the running for this week's ${cityDisplayName()} rewards.`;
+          status.classList.add('checkin-status-reward');
           note.value = '';
           count.textContent = `0/${NOTE_MAX}`;
           updatePreviewNote();
           offset = 0;
           await loadCheckins({ replace: true });
-          setTimeout(() => { status.textContent = ''; }, 3000);
+          setTimeout(() => { status.textContent = ''; status.classList.remove('checkin-status-reward'); }, 5000);
         } catch (err) {
           status.textContent = 'Could not post that. Try again shortly.';
         }
@@ -354,6 +363,7 @@
   function mount() {
     citySlug = detectCitySlug();
     if (!citySlug) return;
+    const cityName = cityDisplayName();
 
     // Replace the generated static "Live observations" body with the live
     // composer + list. Falls back to appending a section if that anchor
@@ -367,16 +377,19 @@
       // undo that hide -- otherwise a brand-new city's check-in form is
       // invisible even though it works.
       section.style.display = '';
+      // The composer now carries its own "Check in to {City}" heading and
+      // subtext -- the static ones this section shipped with would just
+      // duplicate it right above.
       const heading = section.querySelector('h2');
-      if (heading) heading.textContent = 'Human check-ins';
+      if (heading) heading.remove();
       const desc = section.querySelector('.vertical-description');
-      if (desc) desc.textContent = 'Live check-ins from people in this city right now.';
-      host.innerHTML = composerHTML();
+      if (desc) desc.remove();
+      host.innerHTML = composerHTML(cityName);
     } else {
       const main = document.querySelector('main') || document.body;
       const section = document.createElement('section');
-      section.className = 'glass-card city-feed-section';
-      section.innerHTML = `<h2>Human check-ins</h2><div id="city-observation-feed">${composerHTML()}</div>`;
+      section.className = 'glass-card city-feed-section checkin-hero-section';
+      section.innerHTML = `<div id="city-observation-feed">${composerHTML(cityName)}</div>`;
       main.appendChild(section);
     }
 
