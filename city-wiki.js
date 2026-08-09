@@ -184,6 +184,7 @@
           <p class="context-fact">${escapeHTML(excerpt)}</p>
         </div>
       `);
+      if (window.GlotempCore) GlotempCore.reconcileVerticalOrder(verticalSlug);
     } catch (e) { /* no match is a valid, honest state -- render nothing */ }
   }
 

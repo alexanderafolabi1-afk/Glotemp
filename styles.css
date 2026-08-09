@@ -3322,9 +3322,30 @@ button:hover:not(:focus-visible) {
   50% { color: var(--brass); opacity: 1; }
 }
 
+/* When a vertical has no live reading yet BUT does have real sourced
+   context, GlotempCore.reconcileVerticalOrder moves that context ahead
+   of this block -- the page opens on substance, not on absence. The
+   empty-state becomes a quiet footnote instead of the headline: smaller,
+   no big display-font sentence, same honest copy. */
+.vertical-content--secondary .empty-state {
+  padding: 1rem 0 0;
+  text-align: left;
+  border-top: 1px dashed var(--hairline);
+}
+.vertical-content--secondary .empty-state p {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--sand);
+  display: inline;
+  margin: 0;
+}
+.vertical-content--secondary .empty-state .empty-state-cta { margin-left: 0.4em; }
+
 /* ===== Real-world context (city-wiki.js / city-worldbank.js) =====
-   Supplementary, clearly-sourced facts sitting below a vertical's own
-   live reading -- never a replacement for it, never shown without a
+   Real, sourced facts about this vertical. When a live reading exists
+   they sit below it as supplementary depth; when the reading is still
+   empty, reconcileVerticalOrder() promotes this block ahead of the
+   empty-state so the section opens on substance. Never shown without a
    genuine source match. */
 .vertical-context:empty { display: none; }
 .context-block {

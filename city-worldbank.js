@@ -69,6 +69,7 @@
         </p>
       </div>
     `);
+    if (window.GlotempCore) GlotempCore.reconcileVerticalOrder(verticalSlug);
   }
 
   window.GlotempWorldBank = { loadVerticalIndicator, INDICATORS };

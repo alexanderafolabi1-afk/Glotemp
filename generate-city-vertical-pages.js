@@ -66,7 +66,7 @@ function pageHTML(city, v) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=23" />
+  <link rel="stylesheet" href="/styles.css?v=24" />
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -136,11 +136,13 @@ function pageHTML(city, v) {
         );
         if (!response.ok) {
           contentEl.innerHTML = '<div class="empty-state"><p>Nobody has spoken for ${city.name} today.</p><span class="empty-state-cta">Be the first.</span></div>';
+          if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder('${v.slug}');
           return;
         }
         const readings = await response.json();
         if (!readings.length) {
           contentEl.innerHTML = '<div class="empty-state"><p>Nobody has spoken for ${city.name} today.</p><span class="empty-state-cta">Be the first.</span></div>';
+          if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder('${v.slug}');
           return;
         }
         contentEl.innerHTML = readings.slice(0, 15).map(reading => {
