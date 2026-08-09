@@ -9,7 +9,7 @@
 
   var msgs = {
     en: {
-      text: 'We use essential cookies to remember your language preference and mood check-ins. No third-party tracking.',
+      text: 'We use essential cookies to remember your language preference and mood readings. No third-party tracking.',
       accept: 'Accept All',
       settings: 'Settings'
     },

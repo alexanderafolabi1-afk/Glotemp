@@ -193,7 +193,7 @@
     <section class="glass-card page-header">
       <p class="eyebrow">All 12 verticals, one stream</p>
       <h1>Stories</h1>
-      <p class="section-copy" style="color:var(--sand); max-width:64ch;">Every signal as it lands - news sentiment, market data, sport, fashion, transit, human check-ins. Filter to one vertical or one city, or watch it all move.</p>
+      <p class="section-copy" style="color:var(--sand); max-width:64ch;">Every signal as it lands - news sentiment, market data, sport, fashion, transit, submitted readings. Filter to one vertical or one city, or watch it all move.</p>
     </section>
 
     <section class="glass-card" style="padding:0; overflow:hidden;">
@@ -343,10 +343,10 @@
         vertical: 'pulse',
         citySlug: obs.city,
         cityName: obs.cityName,
-        headline: `A human check-in from ${obs.cityName}`,
+        headline: `A reading from ${obs.cityName}`,
         context: obs.context,
         timestamp: obs.created_at,
-        source: 'Human check-in',
+        source: 'Reading',
         sourceUrl: null,
         kind: 'checkin',
       }));

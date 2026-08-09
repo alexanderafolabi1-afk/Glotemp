@@ -38,7 +38,7 @@
           <span id="city-metro-pop"></span>
         </div>
         <div class="city-action-row">
-          <button id="watch-city-btn" class="btn-neon" type="button">Watch this city</button>
+          <button id="watch-city-btn" class="btn-neon" type="button">Follow this city</button>
           <button id="share-city-btn" class="btn-neon" type="button" style="--btn-band: var(--band-restrained);">Share</button>
         </div>
         <div id="watch-email-panel" class="watch-email-panel" style="display:none;">
@@ -52,15 +52,15 @@
       </div>
     </section>
 
-    <!-- Check-in: the central brand action, given the first, most
-         prominent placement on the page -- right after the hero, before
-         anything else. glotemp-checkin.js finds #city-observation-feed by
-         id regardless of where it sits in the DOM, so moving it here is
-         safe; it replaces this section's contents with the live composer
-         (or, signed out, a sign-in prompt) and the recent check-ins list. -->
+    <!-- City reading: given the first, most prominent placement on the
+         page -- right after the hero, before anything else.
+         glotemp-checkin.js finds #city-observation-feed by id regardless
+         of where it sits in the DOM, so moving it here is safe; it
+         replaces this section's contents with the live composer (or,
+         signed out, a sign-in prompt) and the recent readings list. -->
     <section class="glass-card city-feed-section checkin-hero-section">
-      <h2>Human check-ins</h2>
-      <p class="vertical-description">Recent human check-ins and signals for this city.</p>
+      <h2>City reading</h2>
+      <p class="vertical-description">How this city feels right now.</p>
       <div id="city-observation-feed" class="vertical-content"></div>
     </section>
 
@@ -400,7 +400,7 @@
       `;
     })();
 
-    // ---- Watch this city ----
+    // ---- Follow this city ----
     (function wireWatch() {
       const btn = document.getElementById('watch-city-btn');
       const panel = document.getElementById('watch-email-panel');
@@ -411,7 +411,7 @@
       const citySlug = 'chicago';
 
       function refreshLabel() {
-        btn.textContent = GlotempCore.isWatched(citySlug) ? 'Watching this city ✓' : 'Watch this city';
+        btn.textContent = GlotempCore.isWatched(citySlug) ? 'Following this city ✓' : 'Follow this city';
       }
       refreshLabel();
 
@@ -483,7 +483,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Magnificent Mile at noon - wind off the lake, city in full stride.","language_lens":"visitor","created_at":"2026-08-09T22:21:33.406Z"},{"context":"Wicker Park on a Friday - live music bleeding out of every bar.","language_lens":"local","created_at":"2026-08-09T17:21:33.406Z"},{"context":"Logan Square brunch spot - relaxed Midwest energy at its best.","language_lens":"visitor","created_at":"2026-08-09T10:21:33.406Z"},{"context":"Pilsen murals on a Sunday afternoon - culture breathing loud.","language_lens":"diaspora","created_at":"2026-08-09T01:21:33.406Z"},{"context":"Red Line El train - city soundtrack, familiar and grounding.","language_lens":"local","created_at":"2026-08-08T13:21:33.406Z"},{"context":"Millennium Park on a summer evening - jazz, kids, the whole city gathered.","language_lens":"visitor","created_at":"2026-08-08T03:21:33.406Z"}];
+      const checkins = [{"context":"Magnificent Mile at noon - wind off the lake, city in full stride.","language_lens":"visitor","created_at":"2026-08-09T22:47:04.682Z"},{"context":"Wicker Park on a Friday - live music bleeding out of every bar.","language_lens":"local","created_at":"2026-08-09T17:47:04.682Z"},{"context":"Logan Square brunch spot - relaxed Midwest energy at its best.","language_lens":"visitor","created_at":"2026-08-09T10:47:04.682Z"},{"context":"Pilsen murals on a Sunday afternoon - culture breathing loud.","language_lens":"diaspora","created_at":"2026-08-09T01:47:04.682Z"},{"context":"Red Line El train - city soundtrack, familiar and grounding.","language_lens":"local","created_at":"2026-08-08T13:47:04.682Z"},{"context":"Millennium Park on a summer evening - jazz, kids, the whole city gathered.","language_lens":"visitor","created_at":"2026-08-08T03:47:04.682Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
@@ -494,7 +494,7 @@
       container.innerHTML = checkins.map(obs => `
         <div class="reading glass-card">
           <div class="reading-header">
-            <span class="reading-metric">Human check-in</span>
+            <span class="reading-metric">Reading</span>
           </div>
           <div class="reading-value"><span class="reading-label">${obs.context}</span></div>
           <div class="reading-footer">

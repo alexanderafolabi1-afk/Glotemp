@@ -265,7 +265,7 @@ function generateCityPage(city) {
       \`;
     })();
 
-    // ---- Watch this city ----
+    // ---- Follow this city ----
     (function wireWatch() {
       const btn = document.getElementById('watch-city-btn');
       const panel = document.getElementById('watch-email-panel');
@@ -276,7 +276,7 @@ function generateCityPage(city) {
       const citySlug = '${city.slug}';
 
       function refreshLabel() {
-        btn.textContent = GlotempCore.isWatched(citySlug) ? 'Watching this city ✓' : 'Watch this city';
+        btn.textContent = GlotempCore.isWatched(citySlug) ? 'Following this city ✓' : 'Follow this city';
       }
       refreshLabel();
 
@@ -359,7 +359,7 @@ function generateCityPage(city) {
       container.innerHTML = checkins.map(obs => \`
         <div class="reading glass-card">
           <div class="reading-header">
-            <span class="reading-metric">Human check-in</span>
+            <span class="reading-metric">Reading</span>
           </div>
           <div class="reading-value"><span class="reading-label">\${obs.context}</span></div>
           <div class="reading-footer">

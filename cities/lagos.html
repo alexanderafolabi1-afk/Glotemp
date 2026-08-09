@@ -38,7 +38,7 @@
           <span id="city-metro-pop"></span>
         </div>
         <div class="city-action-row">
-          <button id="watch-city-btn" class="btn-neon" type="button">Watch this city</button>
+          <button id="watch-city-btn" class="btn-neon" type="button">Follow this city</button>
           <button id="share-city-btn" class="btn-neon" type="button" style="--btn-band: var(--band-restrained);">Share</button>
         </div>
         <div id="watch-email-panel" class="watch-email-panel" style="display:none;">
@@ -52,15 +52,15 @@
       </div>
     </section>
 
-    <!-- Check-in: the central brand action, given the first, most
-         prominent placement on the page -- right after the hero, before
-         anything else. glotemp-checkin.js finds #city-observation-feed by
-         id regardless of where it sits in the DOM, so moving it here is
-         safe; it replaces this section's contents with the live composer
-         (or, signed out, a sign-in prompt) and the recent check-ins list. -->
+    <!-- City reading: given the first, most prominent placement on the
+         page -- right after the hero, before anything else.
+         glotemp-checkin.js finds #city-observation-feed by id regardless
+         of where it sits in the DOM, so moving it here is safe; it
+         replaces this section's contents with the live composer (or,
+         signed out, a sign-in prompt) and the recent readings list. -->
     <section class="glass-card city-feed-section checkin-hero-section">
-      <h2>Human check-ins</h2>
-      <p class="vertical-description">Recent human check-ins and signals for this city.</p>
+      <h2>City reading</h2>
+      <p class="vertical-description">How this city feels right now.</p>
       <div id="city-observation-feed" class="vertical-content"></div>
     </section>
 
@@ -400,7 +400,7 @@
       `;
     })();
 
-    // ---- Watch this city ----
+    // ---- Follow this city ----
     (function wireWatch() {
       const btn = document.getElementById('watch-city-btn');
       const panel = document.getElementById('watch-email-panel');
@@ -411,7 +411,7 @@
       const citySlug = 'lagos';
 
       function refreshLabel() {
-        btn.textContent = GlotempCore.isWatched(citySlug) ? 'Watching this city ✓' : 'Watch this city';
+        btn.textContent = GlotempCore.isWatched(citySlug) ? 'Following this city ✓' : 'Follow this city';
       }
       refreshLabel();
 
@@ -483,7 +483,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Victoria Island traffic heavy but the music plays.","language_lens":"local","created_at":"2026-08-09T19:21:33.406Z"},{"context":"Lekki Friday night - Afrobeats everywhere.","language_lens":"local","created_at":"2026-08-09T12:21:33.406Z"},{"context":"Balogun Market midday - energy so dense you can feel it on your skin.","language_lens":"local","created_at":"2026-08-09T21:21:33.406Z"},{"context":"Victoria Island rooftop bar - Lagos looking rich and restless.","language_lens":"diaspora","created_at":"2026-08-08T12:21:33.406Z"}];
+      const checkins = [{"context":"Victoria Island traffic heavy but the music plays.","language_lens":"local","created_at":"2026-08-09T19:47:04.682Z"},{"context":"Lekki Friday night - Afrobeats everywhere.","language_lens":"local","created_at":"2026-08-09T12:47:04.682Z"},{"context":"Balogun Market midday - energy so dense you can feel it on your skin.","language_lens":"local","created_at":"2026-08-09T21:47:04.682Z"},{"context":"Victoria Island rooftop bar - Lagos looking rich and restless.","language_lens":"diaspora","created_at":"2026-08-08T12:47:04.682Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
@@ -494,7 +494,7 @@
       container.innerHTML = checkins.map(obs => `
         <div class="reading glass-card">
           <div class="reading-header">
-            <span class="reading-metric">Human check-in</span>
+            <span class="reading-metric">Reading</span>
           </div>
           <div class="reading-value"><span class="reading-label">${obs.context}</span></div>
           <div class="reading-footer">
