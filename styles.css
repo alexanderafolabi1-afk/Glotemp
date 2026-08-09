@@ -192,22 +192,24 @@ body::after {
   }
 }
 
+/* Full-bleed: pages run the full viewport width with responsive side
+   padding instead of being boxed into a narrow centered column. Inner
+   prose and grids already define their own track/measure sizing (see
+   the 68ch caps and grid minmax() tracks throughout this file), so
+   nothing here needs the outer wrapper to also cap width. */
 #app {
-  max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 1rem clamp(1rem, 4vw, 4rem);
   position: relative;
   z-index: 1;
 }
 
-/* .page-content: the city-profile pages' main wrapper -- had no CSS at
-   all (unlike .page-main used by every other inner page), so it never
-   got a max-width/centering pass, and its sections had no guaranteed
-   clearance from each other either. */
+/* .page-content: the city-profile pages' main wrapper. */
 .page-content {
-  max-width: 1000px;
+  width: 100%;
   margin: 0 auto;
-  padding: 1rem 1rem 3rem;
+  padding: 1rem clamp(1rem, 4vw, 4rem) 3rem;
   position: relative;
   z-index: 1;
 }
@@ -233,9 +235,9 @@ body::after {
 /* ===== PAGE + PROSE LAYOUT ===== */
 /* about.html, explore.html and blog.html have no #app wrapper */
 .page-main {
-  max-width: 1000px;
+  width: 100%;
   margin: 0 auto;
-  padding: 1rem 1rem 3rem;
+  padding: 1rem clamp(1rem, 4vw, 4rem) 3rem;
   position: relative;
   z-index: 1;
 }
@@ -976,8 +978,8 @@ body.scroll-reveals-enabled section.revealed {
 }
 
 /* ===== NAVIGATION ===== */
-/* Flush top bar -- intentionally NOT .glass/.glass-card here: no pill/oval
-   container, just a hairline to separate it from page content. */
+/* Sits on the page ground -- no filled bar, no pill/oval container, just
+   a single brass hairline beneath to separate it from page content. */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -986,7 +988,7 @@ body.scroll-reveals-enabled section.revealed {
   margin-bottom: 1.5rem;
   position: relative;
   z-index: 10;
-  background: linear-gradient(180deg, rgba(30, 24, 17, 0.9) 0%, rgba(14, 12, 9, 0.55) 100%);
+  background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border: none;
@@ -1028,22 +1030,20 @@ body.scroll-reveals-enabled section.revealed {
 .nav-links a,
 .nav-links button {
   color: var(--sand);
-  opacity: 0.72;
+  opacity: 1;
   text-decoration: none;
   margin-left: 1.5rem;
-  font-weight: var(--fw-bold);
+  font-weight: var(--fw-regular);
   letter-spacing: 0.02em;
-  transition: color var(--transition), opacity var(--transition);
+  transition: color var(--transition);
 }
 
 .nav-links a:hover {
-  color: var(--sand);
-  opacity: 1;
+  color: var(--ivory);
 }
 
 .nav-links a.active {
   color: var(--ivory);
-  opacity: 1;
 }
 
 .btn-icon {
@@ -1434,7 +1434,7 @@ textarea:focus:not(:focus-visible) {
 
 .blog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
   padding: 0 0 2rem;
 }
@@ -1718,7 +1718,7 @@ textarea:focus:not(:focus-visible) {
 }
 
 .form-grid {
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
 }
 
 .observation-form label,
@@ -1786,7 +1786,7 @@ textarea:focus:not(:focus-visible) {
 .contribution-panels,
 .systems-grid,
 .products-grid {
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 }
 
 .signal-list {
@@ -1825,11 +1825,11 @@ textarea:focus:not(:focus-visible) {
 }
 
 .wall-grid {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
 
 .observations-grid {
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 }
 
 .wall-card {
@@ -2272,7 +2272,7 @@ textarea:focus:not(:focus-visible) {
   padding: 2rem;
   border-radius: var(--radius);
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 0.5rem;
   border: 1px solid var(--hairline);
 }
@@ -2657,7 +2657,7 @@ small {
 
 .fastest-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1rem;
   margin-top: 2rem;
 }
@@ -2874,7 +2874,7 @@ button:hover:not(:focus-visible) {
 /* Vertical Cards */
 .verticals-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
   margin: 2rem 0;
 }
@@ -3133,8 +3133,8 @@ button:hover:not(:focus-visible) {
 }
 
 .vertical-section {
-  padding: 2rem;
-  margin-bottom: 2rem;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .vertical-section h2 {
@@ -3219,16 +3219,32 @@ button:hover:not(:focus-visible) {
 }
 
 .empty-state {
-  padding: 2rem;
+  padding: 1.75rem 1.5rem;
   text-align: center;
   color: var(--sand);
-  border: 2px dashed rgba(79, 216, 232, 0.2);
+  border: 1px solid var(--brass-dim);
   border-radius: 8px;
+  background: rgba(240, 224, 200, 0.03);
+}
+
+.empty-state p {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--ivory);
+  margin-bottom: 0.4rem;
+}
+
+.empty-state .empty-state-cta {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--band-warm);
 }
 
 .compare-section {
-  padding: 2rem;
-  margin-top: 3rem;
+  padding: 1.5rem;
+  margin-top: 2rem;
 }
 
 /* Responsive */
@@ -3980,23 +3996,23 @@ button:hover:not(:focus-visible) {
   justify-content: center;
   margin-bottom: 1.5rem;
 }
+/* Text, not pills: a hairline underline marks the active mode. */
 .spin-variant {
   min-height: 44px;
-  padding: 0.55rem 1.05rem;
-  background: rgba(240, 224, 200, 0.05);
-  border: 1px solid var(--brass-dim);
-  border-radius: 999px;
+  padding: 0.4rem 0.3rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
   color: var(--sand);
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
   font-size: 0.85rem;
   cursor: pointer;
-  transition: all var(--transition);
+  transition: color var(--transition), border-color var(--transition);
 }
-.spin-variant:hover { color: var(--ivory); border-color: var(--brass); }
-/* Same as .checkin-mode above: brighter hairline and ink, no fill. */
+.spin-variant:hover { color: var(--ivory); }
 .spin-variant[aria-pressed="true"] {
-  border-color: var(--ivory);
+  border-bottom-color: var(--ivory);
   color: var(--ivory);
 }
 
@@ -4062,28 +4078,37 @@ button:hover:not(:focus-visible) {
 }
 .spin-sentence.is-settling { opacity: 0.35; }
 
+/* Flight/Room/Table: inline brass line icons with the label beneath,
+   no boxes -- three columns on the ground, not three buttons. */
 .spin-affiliates {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 1.5rem;
   justify-content: center;
   margin-top: 1.35rem;
   min-height: 52px;
 }
 .spin-aff {
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.35rem;
   min-height: 48px;
-  padding: 0.65rem 1.15rem;
-  border: 1px solid var(--brass-dim);
-  border-radius: 12px;
+  padding: 0.3rem 0.2rem;
+  border: none;
   text-decoration: none;
   color: var(--ivory);
   font-size: 0.9rem;
-  transition: all var(--transition);
+  transition: opacity var(--transition);
+  opacity: 0.85;
 }
-.spin-aff:hover { border-color: var(--brass); background: rgba(176, 141, 87, 0.08); }
+.spin-aff:hover { opacity: 1; }
+.spin-aff-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--brass);
+}
+.spin-aff-icon svg { width: 100%; height: 100%; display: block; fill: none; stroke: currentColor; stroke-width: 1.4; }
 .spin-aff-kind {
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
@@ -4152,9 +4177,9 @@ time, .instr-clock, .tonight-modelled {
   font-variant-numeric: tabular-nums;
 }
 
-/* ===== NAV: HIDDEN GEM + FOOTER LANGUAGE ===== */
-.nav-gem { color: var(--brass) !important; opacity: 1 !important; }
-.nav-gem:hover { color: var(--ivory) !important; }
+/* ===== NAV: HIDDEN GEM + FOOTER LANGUAGE =====
+   Hidden gem carries no special color -- same sand/ivory rules as every
+   other nav item, per "all items identical weight and size". */
 
 .footer-lang-row { margin-top: 0.6rem; }
 .footer-lang {
@@ -4322,10 +4347,31 @@ time, .instr-clock, .tonight-modelled {
    are the measured rendered heights at each breakpoint; without these,
    the spin shell and the showcase rotator fill in and push the page,
    which is exactly the CLS the shrink reintroduced. */
-.spin-section { min-height: 669px !important; }
 .showcase { min-height: 147px; }
-@media (max-width: 900px) { .spin-section { min-height: 634px !important; } .showcase { min-height: 132px; } }
-@media (max-width: 600px) { .spin-section { min-height: 756px !important; } }
+@media (max-width: 900px) { .showcase { min-height: 132px; } }
+
+/* ===== SPIN: CUT THE SECTION HEIGHT =====
+   The shrink pass above still left the spin instrument as tall as the
+   rest of the homepage put together. Every element in it comes down
+   again -- dial, type, spacing -- ~30% shorter measured end to end.
+   Reserved min-height values below are the actual rendered heights at
+   each breakpoint (Playwright, 375/768/1440), not a guess: the dial
+   floor, the worst-case 4-line spin-sentence reservation, and the
+   icon+label affiliate row all have a real minimum footprint that a
+   flat halve would have clipped and reintroduced CLS. */
+.spin-section { min-height: 480px !important; padding: 1.25rem 0 1rem !important; }
+.spin-dial { width: clamp(88px, 14vw, 116px); }
+.spin-title { font-size: clamp(17px, 1.9vw, 22px); margin-bottom: 0.5rem; }
+.spin-variants { margin-bottom: 0.6rem; gap: 0.35rem; }
+.spin-variant { min-height: 32px; padding: 0.2rem 0.15rem; font-size: 0.7rem; }
+.spin-stage { gap: 0.5rem; }
+.spin-go { min-height: 38px; padding: 0.45rem 1.4rem; font-size: 0.85rem; }
+.spin-sentence { font-size: clamp(13px, 1.4vw, 16px); margin-top: 0.6rem; min-height: 4.2em; }
+.spin-affiliates { margin-top: 0.5rem; gap: 1rem; }
+.spin-aff-icon { width: 18px; height: 18px; }
+.spin-prov { margin-top: 0.4rem; }
+@media (max-width: 900px) { .spin-section { min-height: 455px !important; } }
+@media (max-width: 600px) { .spin-section { min-height: 585px !important; } }
 
 /* ===== GUARANTEED SECTION CLEARANCE (global root-cause fix) =====
    After the box removal, .glass-card lost its margin-bottom and section
@@ -4445,8 +4491,10 @@ main > *,
   box-shadow: none !important;
 }
 
-/* Where a boundary is genuinely needed it is one brass hairline. */
-.mood-btn, .mood-emoji, .checkin-mode, .band-chip, .spin-variant,
+/* Where a boundary is genuinely needed it is one brass hairline.
+   .spin-variant is deliberately excluded -- mode options are plain text
+   with a hairline underline on the active one only, never a bordered box. */
+.mood-btn, .mood-emoji, .checkin-mode, .band-chip,
 .pagination-btn, .affiliate-btn, .vertical-link {
   border: 1px solid var(--brass-dim);
 }

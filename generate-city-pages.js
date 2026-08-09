@@ -144,13 +144,13 @@ function generateCityPage(city) {
           );
 
           if (!response.ok) {
-            contentEl.innerHTML = '<div class="empty-state">No data available for this vertical yet.</div>';
+            contentEl.innerHTML = '<div class="empty-state"><p>Nobody has spoken for ${city.name} today.</p><span class="empty-state-cta">Be the first.</span></div>';
             continue;
           }
 
           const readings = await response.json();
           if (!readings.length) {
-            contentEl.innerHTML = '<div class="empty-state">No readings yet for this city.</div>';
+            contentEl.innerHTML = '<div class="empty-state"><p>Nobody has spoken for ${city.name} today.</p><span class="empty-state-cta">Be the first.</span></div>';
             continue;
           }
 
@@ -285,7 +285,7 @@ function generateCityPage(city) {
       const checkins = ${JSON.stringify(observationsForCity(city.slug))};
 
       if (!checkins.length) {
-        container.innerHTML = '<div class="empty-state">No observations yet for this city. Be the first.</div>';
+        container.innerHTML = '<div class="empty-state"><p>Nobody has spoken for ${city.name} today.</p><span class="empty-state-cta">Be the first.</span></div>';
         return;
       }
 

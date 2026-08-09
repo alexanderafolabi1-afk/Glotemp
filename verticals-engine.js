@@ -113,17 +113,14 @@ class VerticalsEngine {
     return '○ Low confidence';
   }
 
-  // Render empty state for a vertical with no data
-  renderEmptyState(vertical) {
-    const messages = {
-      pulse: 'No pulse data yet. Be the first to check in.',
-      tech: 'Tech activity data coming soon.',
-      finance: 'Market data loading.',
-    };
-
+  // Render empty state for a vertical with no data. Always recruits --
+  // never says "no data" -- since an empty reading is an invitation for
+  // the visitor to be the first signal, not a dead end.
+  renderEmptyState(cityName) {
     return `
       <div class="empty-state">
-        <p>${messages[vertical] || 'Data not yet available.'}</p>
+        <p>Nobody has spoken for ${cityName} today.</p>
+        <span class="empty-state-cta">Be the first.</span>
       </div>
     `;
   }

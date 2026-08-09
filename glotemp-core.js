@@ -140,88 +140,10 @@
     </div>`;
   }
 
-  // Progressively builds the hamburger + full-screen nav panel for any
-  // page carrying the standard .navbar/.nav-links markup that doesn't
-  // already define one by hand (the homepage does; every page built via
-  // this module doesn't, to avoid duplicating this markup file by file).
-  // Mirrors initHamburger() in app.js so pages that skip app.js still get
-  // working mobile nav.
-  function initMobileNav() {
-    const navbar = document.querySelector('.navbar');
-    const links = navbar && navbar.querySelector('.nav-links');
-    if (!navbar || !links || document.getElementById('nav-hamburger')) return;
-
-    const hamburger = document.createElement('button');
-    hamburger.id = 'nav-hamburger';
-    hamburger.className = 'nav-hamburger';
-    hamburger.setAttribute('aria-label', 'Open navigation');
-    hamburger.setAttribute('aria-expanded', 'false');
-    hamburger.setAttribute('aria-controls', 'nav-panel');
-    hamburger.innerHTML = '<span></span><span></span><span></span>';
-    navbar.appendChild(hamburger);
-
-    const panel = document.createElement('div');
-    panel.id = 'nav-panel';
-    panel.className = 'nav-panel';
-    panel.setAttribute('aria-hidden', 'true');
-    panel.setAttribute('role', 'dialog');
-    panel.setAttribute('aria-label', 'Navigation');
-
-    const panelLinks = document.createElement('nav');
-    panelLinks.className = 'nav-panel-links';
-    links.querySelectorAll('a').forEach((a) => {
-      const clone = a.cloneNode(true);
-      panelLinks.appendChild(clone);
-    });
-    const langBtn = links.querySelector('#lang-switch');
-    if (langBtn) {
-      const langClone = document.createElement('button');
-      langClone.id = 'lang-switch-mobile';
-      langClone.className = 'nav-panel-lang';
-      langClone.textContent = '◉ Language';
-      panelLinks.appendChild(langClone);
-    }
-
-    const closeBtn = document.createElement('button');
-    closeBtn.id = 'nav-panel-close';
-    closeBtn.className = 'nav-panel-close';
-    closeBtn.setAttribute('aria-label', 'Close navigation');
-    closeBtn.textContent = '✕';
-
-    panel.appendChild(closeBtn);
-    panel.appendChild(panelLinks);
-    document.body.appendChild(panel);
-
-    function openPanel() {
-      panel.classList.add('open');
-      panel.setAttribute('aria-hidden', 'false');
-      hamburger.setAttribute('aria-expanded', 'true');
-      document.body.style.overflow = 'hidden';
-      closeBtn.focus();
-    }
-    function closePanel() {
-      panel.classList.remove('open');
-      panel.setAttribute('aria-hidden', 'true');
-      hamburger.setAttribute('aria-expanded', 'false');
-      document.body.style.overflow = '';
-      hamburger.focus();
-    }
-
-    hamburger.addEventListener('click', openPanel);
-    closeBtn.addEventListener('click', closePanel);
-    panel.addEventListener('click', (e) => { if (e.target === panel) closePanel(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && panel.classList.contains('open')) closePanel(); });
-    panelLinks.querySelectorAll('a').forEach((a) => a.addEventListener('click', closePanel));
-    if (langBtn) {
-      panelLinks.querySelector('#lang-switch-mobile').addEventListener('click', () => { closePanel(); langBtn.click(); });
-    }
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMobileNav);
-  } else {
-    initMobileNav();
-  }
+  // Hamburger + full-screen nav panel now come from nav-component.js,
+  // the single shared nav source every page mounts -- it builds and
+  // wires #nav-hamburger/#nav-panel itself, so this module no longer
+  // needs to duplicate that.
 
   window.GlotempCore = {
     moodToBand,

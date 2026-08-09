@@ -20,23 +20,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=16">
+  <link rel="stylesheet" href="/styles.css?v=17">
 </head>
 <body>
-  <nav class="navbar glass">
-    <div class="nav-brand">
-      <img src="/assets/logo.png" alt="Glotemp" class="nav-logo">
-      <span class="logo-text">Glotemp</span>
-      <span class="pulse-dot" aria-hidden="true">❤️</span>
-    </div>
-    <div class="nav-links">
-      <a href="/">Pulse</a>
-      <a href="/feed">Feed</a>
-      <a href="/explore" class="active">Cities</a>
-      <a href="/about">About</a>
-      <a href="/gem" class="nav-gem">Hidden gem</a>
-    </div>
-  </nav>
+  <nav id="site-nav"></nav>
+<script src="/nav-component.js"></script>
 
   <main class="page-content">
     <section class="city-header glass-card">
@@ -387,7 +375,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"أحياء المدينة في حركة. يوم جمعة عادي.","language_lens":"local","created_at":"2026-08-07T12:24:08.676Z"},{"context":"Morocco Mall area Friday evening — modernity and tradition in balance.","language_lens":"visitor","created_at":"2026-08-07T17:24:08.676Z"}];
+      const checkins = [{"context":"أحياء المدينة في حركة. يوم جمعة عادي.","language_lens":"local","created_at":"2026-08-08T11:06:44.456Z"},{"context":"Morocco Mall area Friday evening — modernity and tradition in balance.","language_lens":"visitor","created_at":"2026-08-08T16:06:44.456Z"}];
 
       if (!checkins.length) {
         container.innerHTML = '<div class="empty-state">No observations yet for this city. Be the first.</div>';

@@ -39,7 +39,10 @@ const urls = [
   { loc: 'https://glo-temp.com/', priority: '1.0', changefreq: 'daily' },
   { loc: 'https://glo-temp.com/explore', priority: '0.9', changefreq: 'daily' },
   { loc: 'https://glo-temp.com/about', priority: '0.8', changefreq: 'weekly' },
-  { loc: 'https://glo-temp.com/blog', priority: '0.9', changefreq: 'daily' },
+  { loc: 'https://glo-temp.com/feed', priority: '0.9', changefreq: 'daily' },
+  { loc: 'https://glo-temp.com/gem', priority: '0.6', changefreq: 'daily' },
+  { loc: 'https://glo-temp.com/methodology', priority: '0.5', changefreq: 'monthly' },
+  { loc: 'https://glo-temp.com/movers', priority: '0.7', changefreq: 'daily' },
   { loc: 'https://glo-temp.com/verticals', priority: '0.8', changefreq: 'weekly' },
   { loc: 'https://glo-temp.com/privacy', priority: '0.3', changefreq: 'monthly' },
   { loc: 'https://glo-temp.com/terms', priority: '0.3', changefreq: 'monthly' },
@@ -84,7 +87,7 @@ ${urls.map(url => `  <url>
 fs.writeFileSync('./sitemap.xml', sitemapXml);
 console.log(`✅ Generated sitemap with ${urls.length} URLs`);
 console.log(`   - 1 home page`);
-console.log(`   - 6 top-level pages (explore, about, blog, verticals, privacy, terms)`);
+console.log(`   - 9 top-level pages (explore, about, feed, gem, methodology, movers, verticals, privacy, terms)`);
 console.log(`   - ${VERTICALS.length} vertical detail pages + ${VERTICALS.length} ranking pages`);
 console.log(`   - ${cities.length} city profile pages`);
 console.log(`   - ${cities.length * VERTICALS.length} city x vertical pages`);
