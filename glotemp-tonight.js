@@ -77,14 +77,13 @@
 
   function modeCardHTML(mode, row, timezone) {
     if (!row) {
-      // Designed empty state. No spinner, no invented number.
+      // No live reading yet: the card still names what this mode covers,
+      // without an invented number and without announcing the absence.
       return `<article class="tonight-mode tonight-mode--empty">
         <div class="tonight-mode-head">
           <h3 class="tonight-mode-name">${esc(mode.label)}</h3>
-          <span class="tonight-mode-status">Not published</span>
         </div>
         <p class="tonight-mode-blurb">${esc(mode.blurb)}</p>
-        <p class="tonight-empty-copy">No live source has reported ${esc(mode.label.toLowerCase())} for this city yet. Nothing is shown rather than something invented.</p>
       </article>`;
     }
 

@@ -192,7 +192,7 @@
       const rows = await resp.json();
       const html = rows.map(checkinHTML).join('');
       if (replace || offset === 0) {
-        list.innerHTML = html || '<p class="checkin-empty">No check-ins here yet. Be the first.</p>';
+        list.innerHTML = html;
       } else {
         list.insertAdjacentHTML('beforeend', html);
       }

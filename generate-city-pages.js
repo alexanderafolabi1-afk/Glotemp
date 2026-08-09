@@ -155,14 +155,14 @@ function generateCityPage(city) {
           );
 
           if (!response.ok) {
-            contentEl.innerHTML = '<div class="empty-state"><p>Nobody has spoken for ${city.name} today.</p><span class="empty-state-cta">Be the first.</span></div>';
+            contentEl.innerHTML = '';
             if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
             continue;
           }
 
           const readings = await response.json();
           if (!readings.length) {
-            contentEl.innerHTML = '<div class="empty-state"><p>Nobody has spoken for ${city.name} today.</p><span class="empty-state-cta">Be the first.</span></div>';
+            contentEl.innerHTML = '';
             if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
             continue;
           }
@@ -302,7 +302,8 @@ function generateCityPage(city) {
       const checkins = ${JSON.stringify(observationsForCity(city.slug))};
 
       if (!checkins.length) {
-        container.innerHTML = '<div class="empty-state"><p>Nobody has spoken for ${city.name} today.</p><span class="empty-state-cta">Be the first.</span></div>';
+        const section = container.closest('.city-feed-section');
+        if (section) section.style.display = 'none';
         return;
       }
 
