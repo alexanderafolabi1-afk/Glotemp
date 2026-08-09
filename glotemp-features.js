@@ -129,13 +129,6 @@
       `<span class="sun-item">${MOON_ICON}<span class="sun-label">Last light</span><span class="sun-time">${esc(t.set)}</span></span>`;
   }
 
-  // ---------- RECRUITING EMPTY STATE ----------
-  // Never "no data". Always names the city and asks for the first voice.
-  function emptyRecruit(cityName, what) {
-    return `<p class="empty-recruit"><strong>Nobody has spoken for ${esc(cityName)} ${esc(what || 'today')}.</strong><br>
-      <span class="empty-cta">Be the first.</span></p>`;
-  }
-
   // ---------- CITY PAGE MOUNT ----------
   async function mountCityPage() {
     const m = window.location.pathname.match(/\/cities\/([a-z0-9-]+)\.html$/i);
@@ -205,7 +198,7 @@
   }
 
   window.GlotempFeatures = {
-    rivalFor, historyFor, sparklineSVG, sunTimes, renderSunRow, emptyRecruit, hash,
+    rivalFor, historyFor, sparklineSVG, sunTimes, renderSunRow, hash,
   };
 
   if (document.readyState === 'loading') {

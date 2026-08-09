@@ -113,17 +113,6 @@ class VerticalsEngine {
     return '○ Low confidence';
   }
 
-  // Render empty state for a vertical with no data. Always recruits --
-  // never says "no data" -- since an empty reading is an invitation for
-  // the visitor to be the first signal, not a dead end.
-  renderEmptyState(cityName) {
-    return `
-      <div class="empty-state">
-        <p>Nobody has spoken for ${cityName} today.</p>
-        <span class="empty-state-cta">Be the first.</span>
-      </div>
-    `;
-  }
 }
 
 const verticals = new VerticalsEngine();

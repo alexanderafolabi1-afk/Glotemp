@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=24">
+  <link rel="stylesheet" href="/styles.css?v=25">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -268,14 +268,14 @@
           );
 
           if (!response.ok) {
-            contentEl.innerHTML = '<div class="empty-state"><p>Nobody has spoken for Cairo today.</p><span class="empty-state-cta">Be the first.</span></div>';
+            contentEl.innerHTML = '';
             if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
             continue;
           }
 
           const readings = await response.json();
           if (!readings.length) {
-            contentEl.innerHTML = '<div class="empty-state"><p>Nobody has spoken for Cairo today.</p><span class="empty-state-cta">Be the first.</span></div>';
+            contentEl.innerHTML = '';
             if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
             continue;
           }
@@ -412,10 +412,11 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"وسط البلد مكتظ كالعادة. الحياة تسير ببطء لكنها مستمرة.","language_lens":"local","created_at":"2026-08-08T21:03:10.907Z"},{"context":"Coffee at a rooftop in Zamalek — city spread below.","language_lens":"visitor","created_at":"2026-08-08T09:03:10.907Z"},{"context":"Khan el-Khalili at night — souqs lit up, tea flowing, city unpausing.","language_lens":"visitor","created_at":"2026-08-08T23:03:10.907Z"},{"context":"مترو الأنفاق في ساعة الذروة — الحياة المصرية في أبسط صورها.","language_lens":"local","created_at":"2026-08-07T18:03:10.907Z"}];
+      const checkins = [{"context":"وسط البلد مكتظ كالعادة. الحياة تسير ببطء لكنها مستمرة.","language_lens":"local","created_at":"2026-08-08T21:15:18.260Z"},{"context":"Coffee at a rooftop in Zamalek — city spread below.","language_lens":"visitor","created_at":"2026-08-08T09:15:18.260Z"},{"context":"Khan el-Khalili at night — souqs lit up, tea flowing, city unpausing.","language_lens":"visitor","created_at":"2026-08-08T23:15:18.260Z"},{"context":"مترو الأنفاق في ساعة الذروة — الحياة المصرية في أبسط صورها.","language_lens":"local","created_at":"2026-08-07T18:15:18.260Z"}];
 
       if (!checkins.length) {
-        container.innerHTML = '<div class="empty-state"><p>Nobody has spoken for Cairo today.</p><span class="empty-state-cta">Be the first.</span></div>';
+        const section = container.closest('.city-feed-section');
+        if (section) section.style.display = 'none';
         return;
       }
 

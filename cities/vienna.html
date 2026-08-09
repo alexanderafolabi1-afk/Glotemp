@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=24">
+  <link rel="stylesheet" href="/styles.css?v=25">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -268,14 +268,14 @@
           );
 
           if (!response.ok) {
-            contentEl.innerHTML = '<div class="empty-state"><p>Nobody has spoken for Vienna today.</p><span class="empty-state-cta">Be the first.</span></div>';
+            contentEl.innerHTML = '';
             if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
             continue;
           }
 
           const readings = await response.json();
           if (!readings.length) {
-            contentEl.innerHTML = '<div class="empty-state"><p>Nobody has spoken for Vienna today.</p><span class="empty-state-cta">Be the first.</span></div>';
+            contentEl.innerHTML = '';
             if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
             continue;
           }
@@ -412,10 +412,11 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Kaffeehaus Querung — Melange und Zeitung, die Welt steht still.","language_lens":"local","created_at":"2026-08-08T23:03:10.907Z"},{"context":"Naschmarkt on Saturday — cheese, spice, and conversation.","language_lens":"visitor","created_at":"2026-08-08T17:03:10.907Z"},{"context":"U4 Karlsplatz — Studenten und Touristen, angenehme Stimmung.","language_lens":"local","created_at":"2026-08-08T08:03:10.907Z"},{"context":"Gürtel bar district late on Saturday — unexpected and alive.","language_lens":"visitor","created_at":"2026-08-07T22:03:10.907Z"},{"context":"Prater on a warm afternoon — jogging, chess, old Vienna charm.","language_lens":"diaspora","created_at":"2026-08-07T10:03:10.907Z"}];
+      const checkins = [{"context":"Kaffeehaus Querung — Melange und Zeitung, die Welt steht still.","language_lens":"local","created_at":"2026-08-08T23:15:18.260Z"},{"context":"Naschmarkt on Saturday — cheese, spice, and conversation.","language_lens":"visitor","created_at":"2026-08-08T17:15:18.260Z"},{"context":"U4 Karlsplatz — Studenten und Touristen, angenehme Stimmung.","language_lens":"local","created_at":"2026-08-08T08:15:18.260Z"},{"context":"Gürtel bar district late on Saturday — unexpected and alive.","language_lens":"visitor","created_at":"2026-08-07T22:15:18.260Z"},{"context":"Prater on a warm afternoon — jogging, chess, old Vienna charm.","language_lens":"diaspora","created_at":"2026-08-07T10:15:18.260Z"}];
 
       if (!checkins.length) {
-        container.innerHTML = '<div class="empty-state"><p>Nobody has spoken for Vienna today.</p><span class="empty-state-cta">Be the first.</span></div>';
+        const section = container.closest('.city-feed-section');
+        if (section) section.style.display = 'none';
         return;
       }
 

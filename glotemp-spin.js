@@ -184,10 +184,8 @@
     let candidates = pool;
     if (variant.modes) candidates = pool.filter(c => variant.modes.indexOf(c.mode) !== -1);
     if (!candidates.length) {
-      // Honest empty state -- no invented destination.
-      sentenceEl.textContent = pool.length
-        ? 'Nothing is published for that mode yet. Try another variant.'
-        : 'Tonight has not published yet. Nothing is shown rather than something invented.';
+      // No invented destination -- and no announcement of absence either.
+      sentenceEl.textContent = pool.length ? 'Try another variant.' : '';
       document.getElementById('spin-affiliates').hidden = true;
       provEl.textContent = '';
       return;
@@ -251,10 +249,6 @@
     document.getElementById('spin-dial').addEventListener('click', spin);
 
     pool = await loadPool();
-    if (!pool.length) {
-      document.getElementById('spin-sentence').textContent =
-        'Tonight has not published yet. Nothing is shown rather than something invented.';
-    }
   }
 
   if (document.readyState === 'loading') {

@@ -1672,11 +1672,7 @@ function renderObservations(citySlug, loading = false) {
   const observations = [...localObs, ...seedObs];
 
   if (observations.length === 0) {
-    // Empty states recruit. Never "no data".
-    const cityRec = (window.CITIES_DATA || []).find(x => x.slug === citySlug);
-    const nm = cityRec ? cityRec.name : 'this city';
-    grid.innerHTML = `<p class="empty-recruit"><strong>Nobody has spoken for ${nm} today.</strong><br>
-      <span class="empty-cta">Be the first.</span></p>`;
+    grid.innerHTML = '';
     return;
   }
 
