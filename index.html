@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=25" />
+  <link rel="stylesheet" href="/styles.css?v=27" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
@@ -167,13 +167,22 @@
          the slot's height is reserved and the row is a fixed shape. -->
     <section class="glass-card trip-slot">
       <p class="eyebrow" data-i18n="trip_engine_title">Should you go</p>
-      <p class="trip-verdict-line" id="trip-verdict-line">Reading the city&hellip;</p>
-      <div class="trip-actions" id="trip-actions">
-        <a class="trip-action" id="book-hotel-btn" href="https://booking.com/searchresults?ss=New%20York" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18V7M3 12h13a4 4 0 014 4v2M3 18h18"/><circle cx="7.5" cy="9.5" r="1.6"/></svg><span data-i18n="book_hotel">Room</span></a>
-        <a class="trip-action" id="find-flights-btn" href="https://www.skyscanner.net/transport/flights/" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.2 3.3a1.6 1.6 0 013.1 0l1.5 5.4 6.1 1.8a1.2 1.2 0 010 2.3l-6.1 1.8-1.5 5.4a1.6 1.6 0 01-3.1 0l-1.5-5.4-6.1-1.8a1.2 1.2 0 010-2.3l6.1-1.8z"/></svg><span data-i18n="find_flights">Flight</span></a>
-        <a class="trip-action" id="book-table-btn" href="https://www.opentable.com/" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v8a2 2 0 002 2h0a2 2 0 002-2V3M7 13v8M17 3c-1.7 0-2.5 2-2.5 4.5S15.3 12 17 12v9"/></svg><span>Table</span></a>
+      <div class="trip-body">
+        <div class="trip-text">
+          <p class="trip-verdict-line" id="trip-verdict-line">Reading the city&hellip;</p>
+          <div class="trip-actions" id="trip-actions">
+            <a class="trip-action" id="book-hotel-btn" href="https://booking.com/searchresults?ss=New%20York" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18V7M3 12h13a4 4 0 014 4v2M3 18h18"/><circle cx="7.5" cy="9.5" r="1.6"/></svg><span data-i18n="book_hotel">Room</span></a>
+            <a class="trip-action" id="find-flights-btn" href="https://www.skyscanner.net/transport/flights/" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.2 3.3a1.6 1.6 0 013.1 0l1.5 5.4 6.1 1.8a1.2 1.2 0 010 2.3l-6.1 1.8-1.5 5.4a1.6 1.6 0 01-3.1 0l-1.5-5.4-6.1-1.8a1.2 1.2 0 010-2.3l6.1-1.8z"/></svg><span data-i18n="find_flights">Flight</span></a>
+            <a class="trip-action" id="book-table-btn" href="https://www.opentable.com/" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v8a2 2 0 002 2h0a2 2 0 002-2V3M7 13v8M17 3c-1.7 0-2.5 2-2.5 4.5S15.3 12 17 12v9"/></svg><span>Table</span></a>
+          </div>
+          <p class="trip-sponsor-note" id="trip-sponsor-note">This slot is reserved for a sponsor. Until then: <a href="#observation-form">be the signal that makes the next reading real</a>.</p>
+        </div>
+        <div class="trip-reading" id="trip-reading">
+          <span class="trip-reading-value">—</span>
+          <span class="trip-reading-band">—</span>
+          <span class="trip-reading-city">—</span>
+        </div>
       </div>
-      <p class="trip-sponsor-note" id="trip-sponsor-note">This slot is reserved for a sponsor. Until then: <a href="#observation-form">be the signal that makes the next reading real</a>.</p>
     </section>
 
     <!-- Daily Pulse: city showcase rotator. Default city is Helsinki. -->

@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=25">
+  <link rel="stylesheet" href="/styles.css?v=27">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -288,6 +288,7 @@
                 <span class="reading-metric">${reading.metric}</span>
                 <span class="reading-confidence" title="Data confidence: ${(reading.confidence * 100).toFixed(0)}%">
                   ${verticals.getConfidenceLabel(reading.confidence)}
+                  <span class="reading-confidence-track"><span class="reading-confidence-fill" style="width:${Math.round(reading.confidence * 100)}%"></span></span>
                 </span>
               </div>
               <div class="reading-value">
@@ -412,7 +413,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Drizzle on Oxford Street but the pubs are warm inside.","language_lens":"visitor","created_at":"2026-08-09T00:15:18.260Z"},{"context":"City desks are busy. Post-market close energy.","language_lens":"local","created_at":"2026-08-08T21:15:18.260Z"},{"context":"Borough Market on a Saturday — the place is alive.","language_lens":"diaspora","created_at":"2026-08-08T12:15:18.260Z"},{"context":"Brixton Market on a Saturday — cultures colliding beautifully.","language_lens":"visitor","created_at":"2026-08-09T02:45:18.260Z"},{"context":"Northern Line rush hour — everyone managing their own peace.","language_lens":"local","created_at":"2026-08-07T22:15:18.260Z"}];
+      const checkins = [{"context":"Drizzle on Oxford Street but the pubs are warm inside.","language_lens":"visitor","created_at":"2026-08-09T02:58:32.084Z"},{"context":"City desks are busy. Post-market close energy.","language_lens":"local","created_at":"2026-08-08T23:58:32.084Z"},{"context":"Borough Market on a Saturday — the place is alive.","language_lens":"diaspora","created_at":"2026-08-08T14:58:32.084Z"},{"context":"Brixton Market on a Saturday — cultures colliding beautifully.","language_lens":"visitor","created_at":"2026-08-09T05:28:32.084Z"},{"context":"Northern Line rush hour — everyone managing their own peace.","language_lens":"local","created_at":"2026-08-08T00:58:32.084Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

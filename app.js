@@ -1576,10 +1576,17 @@ function updateCity(selected) {
   // "MAYBE / It's decent, but check the weather first", which talks a
   // person out of going; nothing here hedges.
   const verdictLine = document.getElementById('trip-verdict-line');
-  const verdictColor = moodToBand(synthesizedMood).color;
+  const band = moodToBand(synthesizedMood);
   if (verdictLine) {
     verdictLine.textContent = buildTripLine(city, synthesizedMood);
-    verdictLine.style.setProperty('--trip-band', verdictColor);
+    verdictLine.style.setProperty('--trip-band', band.color);
+  }
+  const tripReading = document.getElementById('trip-reading');
+  if (tripReading) {
+    tripReading.style.setProperty('--trip-band', band.color);
+    tripReading.querySelector('.trip-reading-value').textContent = synthesizedMood.toFixed(1);
+    tripReading.querySelector('.trip-reading-band').textContent = band.band;
+    tripReading.querySelector('.trip-reading-city').textContent = city.name;
   }
   // Update affiliate links with city name
   if (typeof updateAffiliateLinks === 'function') {
@@ -2102,7 +2109,7 @@ function tickStatUp(el, target, duration) {
 
 function loadCoverageStats() {
   // Cities tracked from dataset
-  const tracked = (window.CITIES_DATA || []).length || 150;
+  const tracked = (window.CITIES_DATA || []).length || 151;
   const trackedEl = document.getElementById('cities-tracked-count');
   if (trackedEl) tickStatUp(trackedEl, tracked, 800);
 

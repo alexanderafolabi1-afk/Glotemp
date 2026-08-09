@@ -1,15 +1,18 @@
 // Glotemp per-city check-in layer: composer, recent check-ins list, and
 // the watch button + watcher count. Mounts itself on any city page (it
-// derives the slug from /cities/<slug>.html) so all 150 pages get this
-// from one shared file rather than 150 copies of the same markup.
+// derives the slug from /cities/<slug>.html) so all 151 pages get this
+// from one shared file rather than 151 copies of the same markup.
 (function () {
   const MODES = [
-    { slug: 'eat', label: 'Eat' },
-    { slug: 'drink', label: 'Drink' },
-    { slug: 'watch', label: 'Watch' },
-    { slug: 'move', label: 'Move' },
-    { slug: 'make', label: 'Make' },
+    { slug: 'eat', label: 'Eat', icon: '<path d="M5 3v8a2 2 0 002 2h0a2 2 0 002-2V3M7 13v8M17 3c-1.7 0-2.5 2-2.5 4.5S15.3 12 17 12v9"/>' },
+    { slug: 'drink', label: 'Drink', icon: '<path d="M7 8h10l-1 11a2 2 0 01-2 2H10a2 2 0 01-2-2L7 8z"/><path d="M9 8V5a3 3 0 016 0v3"/>' },
+    { slug: 'watch', label: 'Watch', icon: '<rect x="3" y="5" width="18" height="13" rx="2"/><path d="M10 9l5 3-5 3V9z"/>' },
+    { slug: 'move', label: 'Move', icon: '<path d="M4 12h13M12 6l6 6-6 6"/>' },
+    { slug: 'make', label: 'Make', icon: '<path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/>' },
   ];
+  // Rough word for each intensity value, so the slider reads as a feeling
+  // ("Buzzing") rather than a bare number a visitor has to interpret.
+  const INTENSITY_WORDS = ['', 'Quiet', 'Calm', 'Easy', 'Steady', 'Comfortable', 'Lively', 'Energetic', 'Buzzing', 'Intense', 'Packed'];
   const PAGE_SIZE = 20;
   const NOTE_MAX = 200;
 
@@ -62,12 +65,21 @@
         </div>
         <form class="checkin-form" id="checkin-form" hidden>
           <div class="checkin-modes" role="group" aria-label="Check-in mode">
-            ${MODES.map((m, i) => `<button type="button" class="checkin-mode" data-mode="${m.slug}" aria-pressed="${i === 0 ? 'true' : 'false'}">${m.label}</button>`).join('')}
+            ${MODES.map((m, i) => `<button type="button" class="checkin-mode" data-mode="${m.slug}" aria-pressed="${i === 0 ? 'true' : 'false'}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${m.icon}</svg><span>${m.label}</span></button>`).join('')}
           </div>
-          <label class="checkin-label" for="checkin-intensity">Intensity <span class="checkin-intensity-value" id="checkin-intensity-value">5</span><span class="checkin-intensity-max">/10</span></label>
+          <label class="checkin-label" for="checkin-intensity">Intensity <span class="checkin-intensity-value" id="checkin-intensity-value">${INTENSITY_WORDS[5]} (5/10)</span></label>
           <input type="range" id="checkin-intensity" min="1" max="10" step="1" value="5" class="checkin-range">
           <label class="checkin-label" for="checkin-note">Note <span class="checkin-count" id="checkin-count">0/${NOTE_MAX}</span></label>
           <textarea id="checkin-note" class="checkin-note" rows="2" maxlength="${NOTE_MAX}" placeholder="A short note — what does it feel like?"></textarea>
+          <p class="checkin-preview-label">This is what will post</p>
+          <div class="checkin-preview" id="checkin-preview">
+            <div class="checkin-item-head">
+              <span class="checkin-item-name">You</span>
+              <span class="checkin-item-mode" id="checkin-preview-mode">Eat</span>
+              <span class="checkin-item-intensity" id="checkin-preview-intensity">5/10</span>
+            </div>
+            <p class="checkin-item-note" id="checkin-preview-note" hidden></p>
+          </div>
           <div class="checkin-actions">
             <button type="submit" class="btn-neon" id="checkin-submit">Post check-in</button>
             <span class="checkin-status" id="checkin-status" role="status" aria-live="polite"></span>
@@ -91,11 +103,28 @@
     const count = document.getElementById('checkin-count');
     const status = document.getElementById('checkin-status');
 
+    const previewMode = document.getElementById('checkin-preview-mode');
+    const previewIntensity = document.getElementById('checkin-preview-intensity');
+    const previewNote = document.getElementById('checkin-preview-note');
+
+    function updatePreviewNote() {
+      if (!previewNote || !note) return;
+      const val = note.value.trim();
+      previewNote.textContent = val;
+      previewNote.hidden = !val;
+    }
+
     if (range && rangeVal) {
-      range.addEventListener('input', () => { rangeVal.textContent = range.value; });
+      range.addEventListener('input', () => {
+        rangeVal.textContent = `${INTENSITY_WORDS[Number(range.value)]} (${range.value}/10)`;
+        if (previewIntensity) previewIntensity.textContent = `${range.value}/10`;
+      });
     }
     if (note && count) {
-      note.addEventListener('input', () => { count.textContent = `${note.value.length}/${NOTE_MAX}`; });
+      note.addEventListener('input', () => {
+        count.textContent = `${note.value.length}/${NOTE_MAX}`;
+        updatePreviewNote();
+      });
     }
 
     document.querySelectorAll('.checkin-mode').forEach(btn => {
@@ -103,6 +132,7 @@
         document.querySelectorAll('.checkin-mode').forEach(b => b.setAttribute('aria-pressed', 'false'));
         btn.setAttribute('aria-pressed', 'true');
         selectedMode = btn.getAttribute('data-mode');
+        if (previewMode) previewMode.textContent = btn.querySelector('span').textContent;
       });
     });
 
@@ -141,6 +171,7 @@
           status.textContent = 'Posted.';
           note.value = '';
           count.textContent = `0/${NOTE_MAX}`;
+          updatePreviewNote();
           offset = 0;
           await loadCheckins({ replace: true });
           setTimeout(() => { status.textContent = ''; }, 3000);
@@ -330,6 +361,12 @@
     let host = document.getElementById('city-observation-feed');
     if (host) {
       const section = host.closest('section') || host;
+      // The static seed-data render hides this section with display:none
+      // when a city has zero seed check-ins (e.g. a newly added city). The
+      // live composer replaces that content entirely, so it must also
+      // undo that hide -- otherwise a brand-new city's check-in form is
+      // invisible even though it works.
+      section.style.display = '';
       const heading = section.querySelector('h2');
       if (heading) heading.textContent = 'Human check-ins';
       const desc = section.querySelector('.vertical-description');
