@@ -28,7 +28,12 @@
     const lineEl=document.getElementById('showcase-line');
     const openEl=document.getElementById('showcase-open');
     const l=line(city);
-    nameEl.textContent=city.name;
+    if (typeof GlotempLandmarks !== 'undefined') {
+      nameEl.innerHTML = GlotempLandmarks.cityIconHTML(city.slug, { size: 22, className: 'city-landmark-icon' }) + `<span>${esc(city.name)}</span>`;
+      if (typeof GlotempLandmarkPhotos !== 'undefined') GlotempLandmarkPhotos.upgrade(nameEl, city.slug, 22);
+    } else {
+      nameEl.textContent = city.name;
+    }
     nameEl.style.color=l.color;
     lineEl.textContent=l.text;
     openEl.href=`/cities/${city.slug}.html`;

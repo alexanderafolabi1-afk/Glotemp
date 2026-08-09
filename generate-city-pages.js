@@ -44,18 +44,18 @@ const template = fs.readFileSync('./cities/_city-template.html', 'utf8');
 
 // Verticals list with their primary metrics and descriptions
 const VERTICALS = [
-  { name: 'pulse', label: 'Pulse', desc: 'How does this city feel right now?' },
-  { name: 'tech', label: 'Tech', desc: 'Should I build or work here?' },
-  { name: 'finance', label: 'Finance', desc: 'Should I invest or trade here?' },
-  { name: 'work', label: 'Work', desc: 'Where should you work and live?' },
-  { name: 'property', label: 'Property', desc: 'Where should you invest in real estate?' },
-  { name: 'education', label: 'Education', desc: 'Where should you study?' },
-  { name: 'sport', label: 'Sport', desc: 'Where should you play and watch sports?' },
-  { name: 'entertainment', label: 'Entertainment', desc: 'Where should you experience culture and nightlife?' },
-  { name: 'fashion', label: 'Fashion', desc: 'Where is the center of global style?' },
-  { name: 'food', label: 'Food', desc: 'Where should you eat and explore cuisine?' },
-  { name: 'health', label: 'Health', desc: 'Where is it healthiest to live?' },
-  { name: 'transport', label: 'Transport', desc: 'Which cities have the best mobility?' },
+  { name: 'pulse', label: '💓 Pulse', desc: 'How does this city feel right now?' },
+  { name: 'tech', label: '💻 Tech', desc: 'Should I build or work here?' },
+  { name: 'finance', label: '💰 Finance', desc: 'Should I invest or trade here?' },
+  { name: 'work', label: '💼 Work', desc: 'Where should you work and live?' },
+  { name: 'property', label: '🏠 Property', desc: 'Where should you invest in real estate?' },
+  { name: 'education', label: '🎓 Education', desc: 'Where should you study?' },
+  { name: 'sport', label: '⚽ Sport', desc: 'Where should you play and watch sports?' },
+  { name: 'entertainment', label: '🎭 Entertainment', desc: 'Where should you experience culture and nightlife?' },
+  { name: 'fashion', label: '👗 Fashion', desc: 'Where is the center of global style?' },
+  { name: 'food', label: '🍽️ Food', desc: 'Where should you eat and explore cuisine?' },
+  { name: 'health', label: '🩺 Health', desc: 'Where is it healthiest to live?' },
+  { name: 'transport', label: '🚇 Transport', desc: 'Which cities have the best mobility?' },
   { name: 'radio', label: '📻 Radio', desc: 'What is this city listening to right now?' }
 ];
 
@@ -123,7 +123,13 @@ function generateCityPage(city) {
       const city = window.CITIES_DATA.find(c => c.slug === citySlug);
 
       if (city) {
-        document.getElementById('city-name').textContent = city.name;
+        const nameEl = document.getElementById('city-name');
+        if (typeof GlotempLandmarks !== 'undefined') {
+          nameEl.innerHTML = GlotempLandmarks.cityIconHTML(city.slug, { size: 34, className: 'city-landmark-icon' }) + \`<span>\${city.name}</span>\`;
+          if (typeof GlotempLandmarkPhotos !== 'undefined') GlotempLandmarkPhotos.upgrade(nameEl, city.slug, 34);
+        } else {
+          nameEl.textContent = city.name;
+        }
         document.getElementById('city-country-region').textContent = \`\${city.country} • \${city.region}\`;
         document.getElementById('city-timezone').textContent = \`📍 \${city.timezone}\`;
         document.getElementById('city-penetration').textContent = \`📡 \${(city.penetration * 100).toFixed(0)}% online\`;

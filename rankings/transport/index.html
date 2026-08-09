@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#06060A" />
   <meta name="description" content="Public transit and mobility quality, ranked. Live league table across every city Glotemp tracks, ranked by transit quality.">
-  <meta property="og:title" content="Transport Rankings - Glotemp" />
+  <meta property="og:title" content="🚇 Transport Rankings - Glotemp" />
   <meta property="og:description" content="Public transit and mobility quality, ranked." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/rankings/transport" />
@@ -16,13 +16,13 @@
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <title>Transport Rankings - Glotemp</title>
+  <title>🚇 Transport Rankings - Glotemp</title>
 
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "name": "Transport Rankings",
+    "name": "🚇 Transport Rankings",
     "description": "Public transit and mobility quality, ranked.",
     "url": "https://glo-temp.com/rankings/transport"
   }
@@ -32,7 +32,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=32" />
+  <link rel="stylesheet" href="/styles.css?v=39" />
   <style>
     .rank-row {
       display: flex;
@@ -51,7 +51,7 @@
       flex-shrink: 0;
     }
     .rank-city { flex: 1; min-width: 0; }
-    .rank-city-name { color: var(--ivory); font-family: var(--font-display); font-size: 1.1rem; }
+    .rank-city-name { color: var(--ivory); font-family: var(--font-display); font-size: 1.1rem; display: inline-flex; align-items: center; gap: 0.35rem; }
     .rank-city-country { color: var(--sand); font-size: 0.8rem; }
     .rank-value { font-family: var(--font-mono); font-size: 1.2rem; text-align: right; flex-shrink: 0; }
     .rank-movement { font-family: var(--font-mono); font-size: 0.78rem; color: var(--sand); width: 4.5rem; text-align: right; flex-shrink: 0; }
@@ -65,7 +65,7 @@
   <main class="page-main">
     <section class="glass-card page-header">
       <p class="eyebrow">Live league table</p>
-      <h1>Transport Rankings</h1>
+      <h1>🚇 Transport Rankings</h1>
       <p class="section-copy" style="color:var(--sand); max-width:64ch;">Public transit and mobility quality, ranked.</p>
     </section>
 
@@ -77,7 +77,7 @@
 
     <section class="glass-card" style="text-align:center; padding:2rem;">
       <p style="color:var(--sand); margin-bottom:1rem;">See every vertical for one city instead.</p>
-      <a href="/verticals/transport.html" class="btn-neon" style="text-decoration:none; display:inline-block;">Explore Transport in detail</a>
+      <a href="/verticals/transport.html" class="secondary-link">Explore 🚇 Transport in detail</a>
     </section>
   </main>
 
@@ -93,6 +93,8 @@
 
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
+  <script src="/city-landmarks.js"></script>
+  <script src="/city-landmark-photos.js"></script>
   <script>
     // var, not const: tempo-economy.js (loaded below) also declares
     // these; var redeclaration across scripts is a safe no-op.
@@ -145,7 +147,7 @@
         if (!ranked.length) {
           listEl.innerHTML = '';
           emptyEl.style.display = 'block';
-          emptyEl.textContent = 'No city has reached the ' + THRESHOLD + '-signal threshold for Transport yet.';
+          emptyEl.textContent = 'No city has reached the ' + THRESHOLD + '-signal threshold for 🚇 Transport yet.';
           return;
         }
 
@@ -158,7 +160,7 @@
           return `<a class="rank-row hover-lift" href="/cities/${r.slug}/transport/" data-city-link="${r.slug}" data-city-nav="false" style="--hover-band:${color};">
             <span class="rank-pos">#${i + 1}</span>
             <span class="rank-city">
-              <span class="rank-city-name" style="color:${color};">${name}</span><br>
+              <span class="rank-city-name" style="color:${color};">${typeof GlotempLandmarks !== 'undefined' ? GlotempLandmarks.cityIconHTML(r.slug, { size: 15, className: 'city-landmark-icon' }) : ''}${name}</span><br>
               <span class="rank-city-country">${country} · ${r.signals} signal${r.signals === 1 ? '' : 's'}</span>
             </span>
             <span class="rank-value" style="color:${color};">${r.value.toFixed(1)} / 10</span>
@@ -172,6 +174,11 @@
             GlotempCore.setPinnedCity(slug);
             window.location.href = row.getAttribute('href');
           });
+          if (typeof GlotempLandmarkPhotos !== 'undefined') {
+            const slug = row.getAttribute('data-city-link');
+            const nameEl = row.querySelector('.rank-city-name');
+            if (slug && nameEl) GlotempLandmarkPhotos.upgrade(nameEl, slug, 15);
+          }
         });
       } catch (e) {
         console.warn('Rankings unavailable:', e.message);

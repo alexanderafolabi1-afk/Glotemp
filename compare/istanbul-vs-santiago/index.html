@@ -32,7 +32,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=32" />
+  <link rel="stylesheet" href="/styles.css?v=39" />
   <style>
     .compare-header-row {
       display: grid;
@@ -87,13 +87,13 @@
     <section class="glass-card" style="padding:0; overflow:hidden;">
       <div class="compare-header-row">
         <a class="compare-side" href="/cities/istanbul.html" data-city-link="istanbul" data-city-nav="false" style="text-decoration:none;">
-          <h2 id="a-name" style="color:var(--ivory);">Istanbul</h2>
+          <h2 id="a-name" style="color:var(--ivory); display:flex; align-items:center; justify-content:center; gap:0.5rem;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="city-landmark-icon"><path d="M4 20V8a2 4 0 014 0v12"/><path d="M16 20V8a2 4 0 014 0v12"/><path d="M8 20v-6a4 3 0 018 0v6"/></svg><span>Istanbul</span></h2>
           <p>Turkey</p>
           <p id="a-band" style="font-family:var(--font-mono); text-transform:uppercase; font-size:0.8rem;">-</p>
         </a>
         <span class="compare-vs">VS</span>
         <a class="compare-side" href="/cities/santiago.html" data-city-link="santiago" data-city-nav="false" style="text-decoration:none;">
-          <h2 id="b-name" style="color:var(--ivory);">Santiago</h2>
+          <h2 id="b-name" style="color:var(--ivory); display:flex; align-items:center; justify-content:center; gap:0.5rem;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="city-landmark-icon"><path d="M4 21V11h4v10M10 21V7h4v14M16 21V13h4v8"/><path d="M3 21h18"/></svg><span>Santiago</span></h2>
           <p>Chile</p>
           <p id="b-band" style="font-family:var(--font-mono); text-transform:uppercase; font-size:0.8rem;">-</p>
         </a>
@@ -106,9 +106,9 @@
 
     <section class="glass-card" style="text-align:center; padding:2rem;">
       <p style="color:var(--sand); margin-bottom:1rem;">Want the full picture for either city?</p>
-      <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-        <a href="/cities/istanbul.html" class="btn-neon" style="text-decoration:none; display:inline-block;">Istanbul profile</a>
-        <a href="/cities/santiago.html" class="btn-neon" style="text-decoration:none; display:inline-block;">Santiago profile</a>
+      <div class="secondary-links-row">
+        <a href="/cities/istanbul.html" class="secondary-link">🏙️ Istanbul profile</a>
+        <a href="/cities/santiago.html" class="secondary-link">🏙️ Santiago profile</a>
       </div>
     </section>
   </main>
@@ -125,6 +125,8 @@
 
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
+  <script src="/city-landmarks.js"></script>
+  <script src="/city-landmark-photos.js"></script>
   <script>
     // var, not const: tempo-economy.js (loaded below) also declares
     // these; var redeclaration across scripts is a safe no-op.
@@ -193,6 +195,10 @@
 
     renderMood();
     loadComparison();
+    if (typeof GlotempLandmarkPhotos !== 'undefined') {
+      GlotempLandmarkPhotos.upgrade(document.getElementById('a-name'), CITY_A, 24);
+      GlotempLandmarkPhotos.upgrade(document.getElementById('b-name'), CITY_B, 24);
+    }
     GlotempCore.wireCityLinks(document);
     const lang = localStorage.getItem('glotemp-lang') || 'en';
     document.documentElement.lang = lang;

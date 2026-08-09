@@ -16,18 +16,18 @@ const cities = cityLines.map(line => {
 }).filter(Boolean);
 
 const VERTICALS = [
-  { slug: 'pulse', label: 'Pulse', desc: 'How does this city feel right now?' },
-  { slug: 'tech', label: 'Tech', desc: 'Should I build or work here?' },
-  { slug: 'finance', label: 'Finance', desc: 'Should I invest or trade here?' },
-  { slug: 'work', label: 'Work', desc: 'Where should you work and live?' },
-  { slug: 'property', label: 'Property', desc: 'Where should you invest in real estate?' },
-  { slug: 'education', label: 'Education', desc: 'Where should you study?' },
-  { slug: 'sport', label: 'Sport', desc: 'Where should you play and watch sports?' },
-  { slug: 'entertainment', label: 'Entertainment', desc: 'Where should you experience culture and nightlife?' },
-  { slug: 'fashion', label: 'Fashion', desc: 'Where is the center of global style?' },
-  { slug: 'food', label: 'Food', desc: 'Where should you eat and explore cuisine?' },
-  { slug: 'health', label: 'Health', desc: 'Where is it healthiest to live?' },
-  { slug: 'transport', label: 'Transport', desc: 'Which cities have the best mobility?' },
+  { slug: 'pulse', label: '💓 Pulse', desc: 'How does this city feel right now?' },
+  { slug: 'tech', label: '💻 Tech', desc: 'Should I build or work here?' },
+  { slug: 'finance', label: '💰 Finance', desc: 'Should I invest or trade here?' },
+  { slug: 'work', label: '💼 Work', desc: 'Where should you work and live?' },
+  { slug: 'property', label: '🏠 Property', desc: 'Where should you invest in real estate?' },
+  { slug: 'education', label: '🎓 Education', desc: 'Where should you study?' },
+  { slug: 'sport', label: '⚽ Sport', desc: 'Where should you play and watch sports?' },
+  { slug: 'entertainment', label: '🎭 Entertainment', desc: 'Where should you experience culture and nightlife?' },
+  { slug: 'fashion', label: '👗 Fashion', desc: 'Where is the center of global style?' },
+  { slug: 'food', label: '🍽️ Food', desc: 'Where should you eat and explore cuisine?' },
+  { slug: 'health', label: '🩺 Health', desc: 'Where is it healthiest to live?' },
+  { slug: 'transport', label: '🚇 Transport', desc: 'Which cities have the best mobility?' },
 ];
 
 function pageHTML(city, v) {
@@ -66,7 +66,7 @@ function pageHTML(city, v) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=32" />
+  <link rel="stylesheet" href="/styles.css?v=39" />
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -84,9 +84,11 @@ function pageHTML(city, v) {
       <div id="${v.slug}-context" class="vertical-context"></div>
     </section>
 
-    <section class="glass-card" style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; padding:2rem; text-align:center;">
-      <a href="/cities/${city.slug}.html" class="btn-neon" style="text-decoration:none; display:inline-block;">Full ${city.name} profile</a>
-      <a href="/rankings/${v.slug}/" class="btn-neon" style="text-decoration:none; display:inline-block;">${v.label} rankings, all cities</a>
+    <section class="glass-card" style="padding:2rem; text-align:center;">
+      <div class="secondary-links-row">
+        <a href="/cities/${city.slug}.html" class="secondary-link">🏙️ Full ${city.name} profile</a>
+        <a href="/rankings/${v.slug}/" class="secondary-link">🏆 ${v.label} rankings, all cities</a>
+      </div>
     </section>
   </main>
 

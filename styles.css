@@ -25,7 +25,7 @@
      and every pure white on the site in one move. */
   --bone: #F0E0C8;            /* was #F0E0C8 (cool white) */
   --ash: #C9B79C;             /* was #C9B79C (cool grey) */
-  --hairline: rgba(176, 141, 87, 0.22);   /* brass-tinted, never grey */
+  --hairline: rgba(176, 141, 87, 0.32);   /* brass-tinted, never grey; raised from 0.22 -- dividers and field borders were reading as barely-there */
 
   /* Warm text tokens (canonical names) */
   --ivory: #F0E0C8;
@@ -33,7 +33,7 @@
 
   /* Brass: nav hairline + dial rim accents */
   --brass: #B08D57;
-  --brass-dim: rgba(176, 141, 87, 0.35);
+  --brass-dim: rgba(176, 141, 87, 0.48);  /* raised from 0.35, same reason */
 
   /* Band colors (mood/reading state, used everywhere a band appears) */
   --band-low: #4FD8E8;
@@ -258,11 +258,11 @@ body.ambient-night::before   { filter: hue-rotate(var(--mood-hue, 0deg)) saturat
 #app {
   width: 100%;
   margin: 0 auto;
-  /* Floor raised to 1.75rem (28px) so content never sits closer than
+  /* Floor raised to 2.25rem (36px) so content never sits closer than
      that to the screen edge on any phone; scales faster with viewport
      width and caps at 6rem (96px) so large screens get noticeably more
      breathing room instead of flattening out at a modest 64px. */
-  padding: 1rem clamp(1.75rem, 5vw, 6rem);
+  padding: 1rem clamp(2.25rem, 6vw, 6rem);
   position: relative;
   z-index: 1;
 }
@@ -271,7 +271,7 @@ body.ambient-night::before   { filter: hue-rotate(var(--mood-hue, 0deg)) saturat
 .page-content {
   width: 100%;
   margin: 0 auto;
-  padding: 1rem clamp(1.75rem, 5vw, 6rem) 3rem;
+  padding: 1rem clamp(2.25rem, 6vw, 6rem) 3rem;
   position: relative;
   z-index: 1;
 }
@@ -295,11 +295,14 @@ body.ambient-night::before   { filter: hue-rotate(var(--mood-hue, 0deg)) saturat
 }
 
 /* ===== PAGE + PROSE LAYOUT ===== */
-/* about.html, explore.html and blog.html have no #app wrapper */
+/* about.html, explore.html, blog.html, and every generated page (city x
+   vertical, compare, rankings) use this wrapper instead of #app -- it
+   must be kept in step with #app/.page-content's padding by hand, since
+   there's no shared variable backing all three. */
 .page-main {
   width: 100%;
   margin: 0 auto;
-  padding: 1rem clamp(1.75rem, 5vw, 6rem) 3rem;
+  padding: 1rem clamp(2.25rem, 6vw, 6rem) 3rem;
   position: relative;
   z-index: 1;
 }
@@ -492,6 +495,15 @@ main > .glass:first-child,
 .instrument-slot:focus-within {
   transform: translateY(-2px);
   border-color: var(--slot-glow, var(--ion));
+  animation-play-state: paused;
+}
+
+/* Immediate feedback at the point of click: without this, picking a city
+   here only changes something far below the fold, and the click reads as
+   having done nothing at all. */
+.instrument-slot.is-selected {
+  border-color: var(--slot-glow, var(--brass)) !important;
+  box-shadow: 0 0 0 1px var(--slot-glow, var(--brass)), 0 0 20px rgba(176, 141, 87, 0.3);
   animation-play-state: paused;
 }
 
@@ -736,6 +748,10 @@ main > .glass:first-child,
   font-size: 0.95rem;
   font-weight: var(--fw-light);
   line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
   /* Reserves 2 lines' worth of height, and a stable full-bleed width, so
      replacing the "-" placeholder with a real (possibly wrapping) city
      name on first render doesn't shift its own box -- and therefore
@@ -1139,6 +1155,31 @@ body.scroll-reveals-enabled section.revealed {
   opacity: 1;
 }
 
+/* Secondary "go see more" navigation (profile links, rankings links at
+   the foot of a page) -- text with an underline, not a second row of
+   buttons next to the real CTA. Two or three of these side by side used
+   to render as a small grid of boxes; this reads as a simple link list. */
+.secondary-links-row {
+  display: flex;
+  gap: 1.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.secondary-link {
+  display: inline-block;
+  color: var(--sand);
+  text-decoration: none;
+  font-size: 0.98rem;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--brass-dim);
+  min-height: 44px;
+  transition: color var(--transition), border-color var(--transition);
+}
+.secondary-link:hover {
+  color: var(--ivory);
+  border-color: var(--brass);
+}
+
 .btn-text {
   background: transparent;
   border: none;
@@ -1344,25 +1385,29 @@ textarea:focus:not(:focus-visible) {
   padding: 1.5rem 0;
 }
 
+/* Text plus icon, underlined -- not a pill/box. Six of these can sit in
+   a row on a city page; six bordered pills read as a grid of buttons,
+   six underlined text links read as a simple list, which is the effect
+   wanted here. */
 .affiliate-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 0;
   background: transparent;
-  border: 1px solid var(--hairline);
-  border-radius: 20px;
-  color: var(--bone);
+  border: none;
+  border-bottom: 1px solid var(--brass-dim);
+  color: var(--sand);
   text-decoration: none;
   font-weight: var(--fw-medium);
-  transition: all var(--transition);
+  transition: color var(--transition), border-color var(--transition), transform var(--transition);
   cursor: pointer;
   min-height: 44px;
 }
 
 .affiliate-btn:hover {
-  border-color: var(--ion);
-  color: var(--ion);
+  border-color: var(--brass);
+  color: var(--ivory);
   transform: translateY(-2px);
 }
 
@@ -1735,10 +1780,10 @@ textarea:focus:not(:focus-visible) {
   text-transform: uppercase;
   letter-spacing: 0.2em;
   color: var(--ash);
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.75rem;
   display: block;
   width: 100%;
-  padding-bottom: 0.75rem;
+  padding-bottom: 1.1rem;
   border-bottom: 1px solid var(--hairline);
 }
 
@@ -1752,6 +1797,14 @@ textarea:focus:not(:focus-visible) {
 .check-in {
   padding: 1.5rem;
   margin-bottom: 1.5rem;
+  transition: box-shadow 400ms ease;
+}
+
+/* Briefly marks the check-in section when "Add your voice" (further down
+   the page) scrolls the visitor back up to it, so the link between the
+   two reads as one action, not a jump into the void. */
+.check-in-highlight {
+  box-shadow: 0 0 0 1px var(--brass), 0 0 32px rgba(176, 141, 87, 0.25) !important;
 }
 
 .mood-buttons {
@@ -1761,41 +1814,45 @@ textarea:focus:not(:focus-visible) {
   margin: 1rem 0;
 }
 
-/* Shared "chip" style for both mood pickers on the homepage (the check-in
-   form's .mood-btn and the per-city comment box's .mood-emoji) -- a
-   rounded rect instead of a full circle, and the same visual language in
-   both places instead of two different-looking pickers. */
+/* The homepage's one mood picker (the check-in composer's .mood-btn --
+   the per-city comment box that used to duplicate this with unlabeled
+   .mood-emoji glyphs has been folded into a single "Add your voice" link
+   back up to this control). Text plus icon, never a bordered box -- same
+   "text, not pills" language as .spin-variant: a hairline underline marks
+   the active choice, nothing else is ever drawn around it. */
 .mood-btn {
   position: relative;
-  font-size: 1.35rem;
-  background-color: rgba(240, 224, 200, 0.05);
-  border: 1px solid var(--hairline);
-  border-radius: 12px;
-  width: 48px;
-  height: 48px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.7rem 0.6rem;
+  min-width: 64px;
   cursor: pointer;
-  transition: all var(--transition);
-  min-width: 48px;
-  min-height: 48px;
-  color: var(--bone);
-  opacity: 0.6;
+  transition: color var(--transition), border-color var(--transition), transform var(--transition);
+  color: var(--sand);
   font-weight: var(--fw-light);
+}
+.mood-btn-icon { font-size: 1.3rem; line-height: 1; }
+.mood-btn-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .mood-btn:hover {
-  opacity: 1;
+  color: var(--ivory);
   transform: translateY(-2px);
-  border-color: rgba(79, 216, 232, 0.3);
 }
 
 .mood-btn.active {
-  opacity: 1;
-  border-color: var(--ion);
-  background-color: rgba(79, 216, 232, 0.08);
-  box-shadow: 0 0 0 1px var(--ion);
+  color: var(--ivory);
+  border-bottom-color: var(--brass);
 }
 
 .observation-form,
@@ -2471,9 +2528,10 @@ small {
   }
 
   .page-main {
-    /* Kept in step with the base clamp()'s 1.75rem (28px) floor above --
-       this override used to undercut it on phones/tablets under 768px. */
-    padding: 0.5rem 1.75rem 2rem;
+    /* Kept in step with the base clamp()'s 2.25rem (36px) floor above --
+       this override was hardcoded to the old, smaller 1.75rem (28px) and
+       silently undercut it on every phone/tablet under 768px. */
+    padding: 0.5rem 2.25rem 2rem;
   }
 
   .nav-links a {
@@ -2601,8 +2659,8 @@ small {
 
   .mood-btn {
     width: 100%;
-    aspect-ratio: 1;
     min-width: 44px;
+    padding: 0.5rem 0.3rem 0.45rem;
   }
 
   .card-media {
@@ -2621,8 +2679,13 @@ small {
 
 @media (max-width: 414px) {
   .mood-btn {
-    font-size: 1.4rem;
     width: 100%;
+  }
+  .mood-btn-icon {
+    font-size: 1.15rem;
+  }
+  .mood-btn-label {
+    font-size: 0.58rem;
   }
 
   .form-grid {
@@ -2663,8 +2726,13 @@ small {
 
 @media (max-width: 375px) {
   .mood-btn {
-    font-size: 1.2rem;
-    padding: 0;
+    padding: 0.4rem 0.2rem 0.35rem;
+  }
+  .mood-btn-icon {
+    font-size: 1.05rem;
+  }
+  .mood-btn-label {
+    font-size: 0.55rem;
   }
 
   .form-grid {
@@ -3190,6 +3258,42 @@ button:hover:not(:focus-visible) {
 .city-header-content h1 {
   margin-bottom: 0.5rem;
   color: var(--ivory);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* City landmark insignia: a small, quiet line-drawn mark next to the
+   city name -- a real landmark for cities we can draw one confidently
+   for, a plain honest skyline glyph everywhere else. Never a photo,
+   never a filled icon; matches the same brass/ivory hairline language
+   as every other icon on the site. */
+.city-landmark-icon {
+  flex: none;
+  color: var(--brass);
+  opacity: 0.85;
+  transition: color 250ms ease, transform 250ms ease;
+}
+a:hover .city-landmark-icon,
+.dial-wrap:hover .city-landmark-icon {
+  color: var(--ivory);
+  transform: translateY(-1px) scale(1.06);
+}
+
+.city-landmark-photo {
+  flex: none;
+  display: inline-block;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--brass-dim);
+  opacity: 0.92;
+  transition: opacity 250ms ease, transform 250ms ease, border-color 250ms ease;
+}
+a:hover .city-landmark-photo,
+.dial-wrap:hover .city-landmark-photo {
+  opacity: 1;
+  border-color: var(--brass);
+  transform: translateY(-1px) scale(1.06);
 }
 
 .city-meta {
@@ -3681,6 +3785,7 @@ button:hover:not(:focus-visible) {
   align-items: center;
   justify-content: center;
   gap: 2rem;
+  padding: 1.5rem 2.25rem;
   opacity: 0;
   pointer-events: none;
   transform: translateY(-8px);
@@ -4351,6 +4456,99 @@ button:hover:not(:focus-visible) {
   max-width: none;
 }
 
+/* ===== HOMEPAGE OPENER: says what the site is before asking the visitor
+   to spin, pick a mood, or click a city -- context before controls. ===== */
+.homepage-intro {
+  text-align: center;
+  padding: 1.5rem 0 0.5rem;
+  max-width: 56ch;
+  margin: 0 auto;
+}
+.homepage-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 4.4vw, 48px);
+  font-weight: var(--fw-light);
+  color: var(--ivory);
+  line-height: 1.15;
+  margin-bottom: 0.6rem;
+}
+.homepage-subhead {
+  color: var(--sand);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+/* Sits just above the instrument row: tells the visitor the barometers
+   are clickable before they wonder why nothing happened when they tried. */
+.instrument-hint {
+  text-align: center;
+  color: var(--sand);
+  font-size: 0.85rem;
+  opacity: 0.85;
+  margin: -0.5rem 0 1.1rem;
+}
+
+/* Replaces the old duplicate mood+comment box under "Recent observations":
+   a single line pointing back up at the one real check-in composer. */
+.add-voice-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1rem 0;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: 1.5rem;
+}
+.add-voice-copy {
+  color: var(--sand);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Live observations: one rotating snippet -- city, quote, done -- instead
+   of a scrollable wall of cards for a single fixed city. A plain button so
+   it's keyboard/tap-accessible (clicking it opens that city), styled as
+   text-on-ground like everything else, never a filled panel. */
+.obs-snippet {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 1.25rem 0;
+  margin-top: 1.1rem;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  transition: opacity 300ms ease;
+}
+.obs-snippet.is-fading { opacity: 0; }
+.obs-snippet-pin {
+  flex: none;
+  color: var(--obs-band, var(--brass));
+  margin-top: 0.2rem;
+}
+.obs-snippet-body { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+.obs-snippet-city {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--obs-band, var(--ivory));
+}
+.obs-snippet-text {
+  color: var(--sand);
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+.obs-snippet:hover .obs-snippet-city { color: var(--brass); }
+
+/* The check-in composer names the city it's recording for, right in the
+   heading, so "share the pulse" is never an abstract or random act. */
+.checkin-city { color: var(--brass); font-weight: var(--fw-regular); }
+
 /* ===== SPIN DIAL (homepage centrepiece) ===== */
 .spin-section {
   padding: 2rem 1.5rem 2.25rem;
@@ -4649,7 +4847,7 @@ time, .instr-clock, .tonight-modelled {
 .empty-recruit .empty-cta { color: var(--brass); }
 
 /* ===== TRIP ENGINE / AD-READY SLOT ===== */
-.trip-slot { padding: 2rem 0; border-top: 1px solid var(--hairline); }
+.trip-slot { padding: 2.75rem 0; border-top: 1px solid var(--hairline); }
 /* Two columns on wide screens so the verdict sentence -- deliberately
    capped at a readable measure, not stretched across a full-bleed page
    -- has somewhere real to sit beside it, instead of leaving most of a
@@ -4670,6 +4868,7 @@ time, .instr-clock, .tonight-modelled {
   line-height: 1.35;
   max-width: 34ch;
   min-height: 2.7em;
+  margin-top: 0.5rem;
 }
 .trip-reading {
   flex: 0 0 auto;
@@ -4767,7 +4966,7 @@ time, .instr-clock, .tonight-modelled {
 
 /* Daily Pulse -> showcase rotator */
 .showcase { padding: 0.5rem 0 0; min-height: 132px; }
-.showcase-city { font-family: var(--font-display); font-size: clamp(26px, 3.4vw, 40px); font-weight: var(--fw-light); line-height: 1.1; }
+.showcase-city { font-family: var(--font-display); font-size: clamp(26px, 3.4vw, 40px); font-weight: var(--fw-light); line-height: 1.1; display: flex; align-items: center; gap: 0.5rem; }
 .showcase-line { color: var(--sand); font-size: 1rem; margin-top: 0.5rem; min-height: 1.6em; max-width: 46ch; }
 .showcase-open { display: inline-block; margin-top: 0.9rem; min-height: 44px; color: var(--ivory); text-decoration: none; border-bottom: 1px solid var(--brass-dim); padding-bottom: 3px; }
 .showcase-open:hover { color: var(--brass); border-color: var(--brass); }
@@ -4776,7 +4975,7 @@ time, .instr-clock, .tonight-modelled {
 .live-ticker { border: none !important; border-top: 1px solid var(--hairline) !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; padding: 1rem 0 !important; }
 
 /* Check-in composer: three fields, on the ground. */
-.check-in { padding: 2.5rem 0 2rem; }
+.check-in { padding: 3rem 0 2.5rem; }
 .checkin-composer, .comment-input-wrap { border: none !important; border-radius: 0 !important; background: transparent !important; padding: 0 !important; }
 .form-grid { grid-template-columns: 1fr !important; max-width: 34rem; }
 .observation-form input, .observation-form select, .observation-form textarea {
@@ -4940,10 +5139,11 @@ main > *,
 }
 
 /* Where a boundary is genuinely needed it is one brass hairline.
-   .spin-variant is deliberately excluded -- mode options are plain text
-   with a hairline underline on the active one only, never a bordered box. */
-.mood-btn, .mood-emoji, .checkin-mode, .band-chip,
-.pagination-btn, .affiliate-btn, .vertical-link {
+   .spin-variant, .mood-btn and .affiliate-btn are deliberately excluded
+   -- those read as plain text with a hairline underline, never a
+   bordered box or pill (see their own rules above). */
+.mood-emoji, .checkin-mode, .band-chip,
+.pagination-btn, .vertical-link {
   border: 1px solid var(--brass-dim);
 }
 

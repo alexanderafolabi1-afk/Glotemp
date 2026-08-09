@@ -9,18 +9,18 @@ const path = require('path');
 const SIGNAL_THRESHOLD = 2;
 
 const VERTICALS = [
-  { slug: 'pulse', label: 'Pulse', metric: 'sentiment_score', unit: '/ 10', desc: 'How every city feels right now, ranked.' },
-  { slug: 'tech', label: 'Tech', metric: 'developer_activity', unit: 'activity index', desc: 'Where the developer and startup activity is highest.' },
-  { slug: 'finance', label: 'Finance', metric: 'currency_strength', unit: '/ 10', desc: 'Currency stability and cost dynamics, ranked.' },
-  { slug: 'work', label: 'Work', metric: 'salary_competitiveness', unit: '/ 100', desc: 'Where salaries and work culture are most competitive.' },
-  { slug: 'property', label: 'Property', metric: 'property_appreciation', unit: '% annual', desc: 'Where real estate is appreciating fastest.' },
-  { slug: 'education', label: 'Education', metric: 'education_quality_score', unit: '/ 10', desc: 'University density and education quality, ranked.' },
-  { slug: 'sport', label: 'Sport', metric: 'active_participation', unit: '% participation', desc: 'Where sports participation and venues are strongest.' },
-  { slug: 'entertainment', label: 'Entertainment', metric: 'nightlife_score', unit: '/ 10', desc: 'Nightlife energy and cultural events, ranked.' },
-  { slug: 'fashion', label: 'Fashion', metric: 'style_influence', unit: '/ 10', desc: 'Global style influence and fashion presence, ranked.' },
-  { slug: 'food', label: 'Food', metric: 'culinary_diversity', unit: '/ 10', desc: 'Culinary diversity and dining scenes, ranked.' },
-  { slug: 'health', label: 'Health', metric: 'wellness_index', unit: '/ 10', desc: 'Wellness, air quality and healthcare, ranked.' },
-  { slug: 'transport', label: 'Transport', metric: 'transit_quality', unit: '/ 10', desc: 'Public transit and mobility quality, ranked.' },
+  { slug: 'pulse', label: '💓 Pulse', metric: 'sentiment_score', unit: '/ 10', desc: 'How every city feels right now, ranked.' },
+  { slug: 'tech', label: '💻 Tech', metric: 'developer_activity', unit: 'activity index', desc: 'Where the developer and startup activity is highest.' },
+  { slug: 'finance', label: '💰 Finance', metric: 'currency_strength', unit: '/ 10', desc: 'Currency stability and cost dynamics, ranked.' },
+  { slug: 'work', label: '💼 Work', metric: 'salary_competitiveness', unit: '/ 100', desc: 'Where salaries and work culture are most competitive.' },
+  { slug: 'property', label: '🏠 Property', metric: 'property_appreciation', unit: '% annual', desc: 'Where real estate is appreciating fastest.' },
+  { slug: 'education', label: '🎓 Education', metric: 'education_quality_score', unit: '/ 10', desc: 'University density and education quality, ranked.' },
+  { slug: 'sport', label: '⚽ Sport', metric: 'active_participation', unit: '% participation', desc: 'Where sports participation and venues are strongest.' },
+  { slug: 'entertainment', label: '🎭 Entertainment', metric: 'nightlife_score', unit: '/ 10', desc: 'Nightlife energy and cultural events, ranked.' },
+  { slug: 'fashion', label: '👗 Fashion', metric: 'style_influence', unit: '/ 10', desc: 'Global style influence and fashion presence, ranked.' },
+  { slug: 'food', label: '🍽️ Food', metric: 'culinary_diversity', unit: '/ 10', desc: 'Culinary diversity and dining scenes, ranked.' },
+  { slug: 'health', label: '🩺 Health', metric: 'wellness_index', unit: '/ 10', desc: 'Wellness, air quality and healthcare, ranked.' },
+  { slug: 'transport', label: '🚇 Transport', metric: 'transit_quality', unit: '/ 10', desc: 'Public transit and mobility quality, ranked.' },
 ];
 
 function pageHTML(v) {
@@ -58,7 +58,7 @@ function pageHTML(v) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=32" />
+  <link rel="stylesheet" href="/styles.css?v=39" />
   <style>
     .rank-row {
       display: flex;
@@ -77,7 +77,7 @@ function pageHTML(v) {
       flex-shrink: 0;
     }
     .rank-city { flex: 1; min-width: 0; }
-    .rank-city-name { color: var(--ivory); font-family: var(--font-display); font-size: 1.1rem; }
+    .rank-city-name { color: var(--ivory); font-family: var(--font-display); font-size: 1.1rem; display: inline-flex; align-items: center; gap: 0.35rem; }
     .rank-city-country { color: var(--sand); font-size: 0.8rem; }
     .rank-value { font-family: var(--font-mono); font-size: 1.2rem; text-align: right; flex-shrink: 0; }
     .rank-movement { font-family: var(--font-mono); font-size: 0.78rem; color: var(--sand); width: 4.5rem; text-align: right; flex-shrink: 0; }
@@ -103,7 +103,7 @@ function pageHTML(v) {
 
     <section class="glass-card" style="text-align:center; padding:2rem;">
       <p style="color:var(--sand); margin-bottom:1rem;">See every vertical for one city instead.</p>
-      <a href="/verticals/${v.slug}.html" class="btn-neon" style="text-decoration:none; display:inline-block;">Explore ${v.label} in detail</a>
+      <a href="/verticals/${v.slug}.html" class="secondary-link">Explore ${v.label} in detail</a>
     </section>
   </main>
 
@@ -119,6 +119,8 @@ function pageHTML(v) {
 
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
+  <script src="/city-landmarks.js"></script>
+  <script src="/city-landmark-photos.js"></script>
   <script>
     // var, not const: tempo-economy.js (loaded below) also declares
     // these; var redeclaration across scripts is a safe no-op.
@@ -184,7 +186,7 @@ function pageHTML(v) {
           return \`<a class="rank-row hover-lift" href="/cities/\${r.slug}/${v.slug}/" data-city-link="\${r.slug}" data-city-nav="false" style="--hover-band:\${color};">
             <span class="rank-pos">#\${i + 1}</span>
             <span class="rank-city">
-              <span class="rank-city-name" style="color:\${color};">\${name}</span><br>
+              <span class="rank-city-name" style="color:\${color};">\${typeof GlotempLandmarks !== 'undefined' ? GlotempLandmarks.cityIconHTML(r.slug, { size: 15, className: 'city-landmark-icon' }) : ''}\${name}</span><br>
               <span class="rank-city-country">\${country} · \${r.signals} signal\${r.signals === 1 ? '' : 's'}</span>
             </span>
             <span class="rank-value" style="color:\${color};">\${r.value.toFixed(1)} ${v.unit}</span>
@@ -198,6 +200,11 @@ function pageHTML(v) {
             GlotempCore.setPinnedCity(slug);
             window.location.href = row.getAttribute('href');
           });
+          if (typeof GlotempLandmarkPhotos !== 'undefined') {
+            const slug = row.getAttribute('data-city-link');
+            const nameEl = row.querySelector('.rank-city-name');
+            if (slug && nameEl) GlotempLandmarkPhotos.upgrade(nameEl, slug, 15);
+          }
         });
       } catch (e) {
         console.warn('Rankings unavailable:', e.message);
