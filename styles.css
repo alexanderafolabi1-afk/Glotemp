@@ -1091,10 +1091,36 @@ body.scroll-reveals-enabled section.revealed {
   vertical-align: middle;
 }
 
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
 .nav-brand {
   display: flex;
   align-items: center;
   text-decoration: none;
+}
+
+/* "Your city temperature in real time" -- a quiet line of positioning
+   copy between the mark and the links, not a second logo. Desktop only:
+   the mobile navbar is already at capacity with the brand and hamburger. */
+.nav-tagline {
+  display: none;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sand);
+  opacity: 0.75;
+  white-space: nowrap;
+  padding-left: 1.25rem;
+  border-left: 1px solid var(--hairline);
+}
+@media (min-width: 960px) {
+  .nav-tagline { display: inline-block; }
 }
 
 /* Small beating heart next to the wordmark (replaces the old pulse-dot ping) */
@@ -1108,21 +1134,48 @@ body.scroll-reveals-enabled section.revealed {
 
 .nav-links a,
 .nav-links button {
+  position: relative;
   color: var(--sand);
   opacity: 1;
   text-decoration: none;
-  margin-left: 1.5rem;
-  font-weight: var(--fw-regular);
-  letter-spacing: 0.02em;
+  margin-left: 1.75rem;
+  padding-bottom: 5px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   transition: color var(--transition);
+}
+
+/* A hairline draws in under the link on hover/active instead of a flat
+   color swap -- the same "text, not pills" underline language used by
+   the spin dial and mood picker, so the nav reads as one design system
+   with the rest of the page rather than default browser link styling. */
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: 0;
+  height: 1px;
+  background: var(--brass);
+  transition: right var(--transition);
 }
 
 .nav-links a:hover {
   color: var(--ivory);
 }
+.nav-links a:hover::after {
+  right: 0;
+}
 
 .nav-links a.active {
   color: var(--ivory);
+}
+.nav-links a.active::after {
+  right: 0;
+  background: var(--ivory);
 }
 
 .btn-icon {
@@ -4183,6 +4236,103 @@ a:hover .city-landmark-photo,
 
 .checkin-copy { color: var(--sand); font-size: 0.9rem; margin-bottom: 1rem; }
 
+/* ===== CHECK-IN HERO: the central brand action on every city page.
+   Soft brass glow on the city name, never a saturated neon -- the same
+   restrained warm palette as the rest of the site, just turned up on the
+   one element that should read as "do this." ===== */
+.checkin-hero-section {
+  padding-top: 2.75rem;
+  padding-bottom: 2.5rem;
+}
+.checkin-live-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: auto;
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0.85rem;
+}
+.checkin-live-eyebrow::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brass);
+  box-shadow: 0 0 6px 1px rgba(176, 141, 87, 0.8);
+  animation: live-dot-pulse 2.4s ease-in-out infinite;
+}
+
+.checkin-neon-title {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: clamp(30px, 4.6vw, 50px);
+  line-height: 1.12;
+  color: var(--ivory);
+  margin-bottom: 0.6rem;
+}
+.checkin-glow {
+  color: var(--ivory);
+  text-shadow: 0 0 18px rgba(176, 141, 87, 0.55), 0 0 42px rgba(176, 141, 87, 0.22);
+  animation: checkin-glow-breathe 4.5s ease-in-out infinite;
+}
+
+.checkin-subtext {
+  color: var(--sand);
+  font-size: 1.02rem;
+  margin-bottom: 0.75rem;
+}
+
+/* The rewards teaser -- a single quiet line, never a banner. Structured
+   as its own class so a real backend (vouchers, raffle entries, partner
+   codes) can hook in later without touching the surrounding markup. */
+.checkin-rewards-note {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--brass);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  opacity: 0.9;
+  margin-bottom: 1.5rem;
+}
+
+.checkin-neon-btn {
+  transition: background var(--transition), color var(--transition), box-shadow 400ms ease;
+}
+.checkin-neon-btn:hover,
+.checkin-neon-btn:focus-visible {
+  box-shadow: 0 0 24px rgba(176, 141, 87, 0.45), 0 0 48px rgba(176, 141, 87, 0.2);
+}
+
+.checkin-status-reward { color: var(--brass); }
+
+/* Small "Live" mark above the city hero h1 -- reuses the same pulsing
+   dot as the check-in eyebrow so both read as one visual language. */
+.city-live-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brass);
+  opacity: 0.85;
+  margin-bottom: 0.6rem;
+}
+
+@keyframes checkin-glow-breathe {
+  0%, 100% { text-shadow: 0 0 18px rgba(176, 141, 87, 0.55), 0 0 42px rgba(176, 141, 87, 0.22); }
+  50% { text-shadow: 0 0 26px rgba(176, 141, 87, 0.8), 0 0 58px rgba(176, 141, 87, 0.35); }
+}
+@keyframes live-dot-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.35); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .checkin-glow, .checkin-live-eyebrow::before { animation: none; }
+}
+
 .checkin-modes { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
 
 .checkin-mode {
@@ -5100,7 +5250,8 @@ main > *,
 .dial-face-outer,
 .logo-img,
 .nav-panel-close,
-.gt-auth-close {
+.gt-auth-close,
+.checkin-live-eyebrow::before {
   border-radius: 50% !important;
 }
 
