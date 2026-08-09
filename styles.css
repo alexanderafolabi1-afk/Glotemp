@@ -737,7 +737,7 @@ main > .glass:first-child,
   font-weight: var(--fw-light);
   line-height: 1.2;
   /* Reserves 2 lines' worth of height, and a stable full-bleed width, so
-     replacing the "—" placeholder with a real (possibly wrapping) city
+     replacing the "-" placeholder with a real (possibly wrapping) city
      name on first render doesn't shift its own box -- and therefore
      nothing around it -- either vertically or horizontally. */
   min-height: 2.4em;

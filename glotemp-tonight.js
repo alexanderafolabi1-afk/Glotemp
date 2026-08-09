@@ -168,7 +168,7 @@
       <div class="tonight-head">
         <p class="eyebrow">The thirteenth layer</p>
         <h2>Tonight</h2>
-        <p class="vertical-description">Five modes, each with its own reading and its own shape across the day. Local time in ${esc(city ? city.name : 'this city')} is <span id="tonight-clock">—</span>.</p>
+        <p class="vertical-description">Five modes, each with its own reading and its own shape across the day. Local time in ${esc(city ? city.name : 'this city')} is <span id="tonight-clock">-</span>.</p>
       </div>
       <div class="tonight-grid" id="tonight-grid">
         ${MODES.map(m => `<article class="tonight-mode tonight-mode--loading"><div class="tonight-mode-head"><h3 class="tonight-mode-name">${esc(m.label)}</h3></div><p class="tonight-mode-blurb">${esc(m.blurb)}</p></article>`).join('')}
@@ -185,7 +185,7 @@
         el.textContent = new Intl.DateTimeFormat('en-GB', {
           timeZone: timezone, hour: '2-digit', minute: '2-digit', hour12: false,
         }).format(new Date());
-      } catch (e) { el.textContent = '—'; }
+      } catch (e) { el.textContent = '-'; }
     }
     tickClock();
     setInterval(tickClock, 30000);

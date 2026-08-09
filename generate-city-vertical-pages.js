@@ -38,7 +38,7 @@ function pageHTML(city, v) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#06060A" />
   <meta name="description" content="${v.label} in ${city.name}: ${v.desc} Live readings, updated as new signal arrives.">
-  <meta property="og:title" content="${v.label} in ${city.name} — Glotemp" />
+  <meta property="og:title" content="${v.label} in ${city.name} - Glotemp" />
   <meta property="og:description" content="${v.desc}" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/cities/${city.slug}/${v.slug}/" />
@@ -49,7 +49,7 @@ function pageHTML(city, v) {
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <title>${v.label} in ${city.name} — Glotemp</title>
+  <title>${v.label} in ${city.name} - Glotemp</title>
 
   <script type="application/ld+json">
   {
@@ -66,7 +66,7 @@ function pageHTML(city, v) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=31" />
+  <link rel="stylesheet" href="/styles.css?v=32" />
 </head>
 <body>
   <nav id="site-nav"></nav>

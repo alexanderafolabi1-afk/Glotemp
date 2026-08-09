@@ -6,20 +6,20 @@
   <meta name="theme-color" content="#06060A" />
   <meta name="description" content="How Glotemp computes a reading: live coverage figures, the confidence ramp from first check-in to established signal, and the modelled-vs-observed split, shown as it stands right now." />
   <meta name="keywords" content="about Glotemp, methodology, how it works, confidence score, modelled vs observed" />
-  <meta property="og:title" content="How it works — Glotemp" />
+  <meta property="og:title" content="How it works - Glotemp" />
   <meta property="og:description" content="How Glotemp computes a reading: live coverage figures, the confidence ramp, and the modelled-vs-observed split, shown as it stands right now." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/about" />
   <meta property="og:image" content="https://glo-temp.com/assets/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="How it works — Glotemp" />
+  <meta name="twitter:title" content="How it works - Glotemp" />
   <meta name="twitter:description" content="Live coverage figures, the confidence ramp, and the modelled-vs-observed split, shown as it stands right now." />
   <link rel="canonical" href="https://glo-temp.com/about" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <title>How it works — Glotemp</title>
+  <title>How it works - Glotemp</title>
 
   <script type="application/ld+json">
   {
@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=31" />
+  <link rel="stylesheet" href="/styles.css?v=32" />
 
   <style>
     .proof-stats-grid {
@@ -178,7 +178,7 @@
     <section class="glass-card page-header">
       <p class="eyebrow">The proof, not the pitch</p>
       <h1>How a reading gets made</h1>
-      <p class="section-copy" style="color:var(--sand); max-width:64ch;">Every number below is queried live, not written into this page. What follows is the actual mechanism — the same one behind every band, bar and ranking on this site.</p>
+      <p class="section-copy" style="color:var(--sand); max-width:64ch;">Every number below is queried live, not written into this page. What follows is the actual mechanism - the same one behind every band, bar and ranking on this site.</p>
     </section>
 
     <section class="glass-card" style="padding:0; overflow:hidden;">
@@ -214,7 +214,7 @@
         <div class="instrument-mini-readout">
           <div class="instrument-mini-band" id="mini-band-label" style="color:var(--band-equilibrium);">Equilibrium</div>
           <div class="instrument-mini-city" id="mini-city-label">Pin a city to see it move here</div>
-          <p class="instrument-mini-note">This is the exact widget every city page uses — the needle moves because the underlying number moved, nothing more.</p>
+          <p class="instrument-mini-note">This is the exact widget every city page uses - the needle moves because the underlying number moved, nothing more.</p>
         </div>
       </div>
     </section>
@@ -226,7 +226,7 @@
           <h2>Why the first check-in barely moves anything</h2>
         </div>
       </div>
-      <p style="padding:0 1.5rem; color:var(--sand);">A single signal starts a reading at roughly half confidence. Confidence climbs with volume, not certainty of any one voice — this is the actual ramp used across every vertical's edge function:</p>
+      <p style="padding:0 1.5rem; color:var(--sand);">A single signal starts a reading at roughly half confidence. Confidence climbs with volume, not certainty of any one voice - this is the actual ramp used across every vertical's edge function:</p>
       <div class="confidence-ramp" id="confidence-ramp"></div>
       <div class="split-legend" style="padding-top:0;">
         <span style="color:var(--sand); font-size:0.78rem; font-family:var(--font-mono);">1 signal → ~50% confidence · 50 signals → ~90% confidence, the practical ceiling</span>
@@ -242,8 +242,8 @@
       </div>
       <p style="padding:0 1.5rem; color:var(--sand);">Some readings come from seed data used to bootstrap a city before real signal arrives. The rest come from a live API call or a human check-in. This is the current split, queried on load:</p>
       <div class="split-bar-track" id="split-bar">
-        <div class="split-bar-modelled" id="split-modelled" style="width:50%;">—</div>
-        <div class="split-bar-observed" id="split-observed" style="width:50%;">—</div>
+        <div class="split-bar-modelled" id="split-modelled" style="width:50%;">-</div>
+        <div class="split-bar-observed" id="split-observed" style="width:50%;">-</div>
       </div>
       <div class="split-legend">
         <span class="modelled">Modelled (seed / low-confidence fallback)</span>
@@ -257,13 +257,13 @@
         <h2 style="margin-top:0;">The plain version</h2>
 
         <h3>How a reading is computed</h3>
-        <p>Every observation — a human check-in, a GDELT sentiment pull, a World Bank indicator, an air-quality reading — lands in one append-only table, tagged with a city, a vertical, a value, a source, and a confidence score. A city's current reading for a vertical is the confidence-weighted average of everything recorded for it in the trailing window, not a single latest value. Nothing is ever overwritten; old readings age out of the average, they aren't deleted.</p>
+        <p>Every observation - a human check-in, a GDELT sentiment pull, a World Bank indicator, an air-quality reading - lands in one append-only table, tagged with a city, a vertical, a value, a source, and a confidence score. A city's current reading for a vertical is the confidence-weighted average of everything recorded for it in the trailing window, not a single latest value. Nothing is ever overwritten; old readings age out of the average, they aren't deleted.</p>
 
         <h3>How signals are weighted</h3>
-        <p>Two things move a signal's weight: how confident the source is in it, and how recent it is. A same-hour GDELT pull carries more weight than a three-day-old one. A reading built from fifty check-ins carries more weight than one built from a single check-in — see the ramp above.</p>
+        <p>Two things move a signal's weight: how confident the source is in it, and how recent it is. A same-hour GDELT pull carries more weight than a three-day-old one. A reading built from fifty check-ins carries more weight than one built from a single check-in - see the ramp above.</p>
 
         <h3>Why a first check-in counts less than a hundredth</h3>
-        <p>One person's read on a city is real, but it's one data point in a place that never stops changing. The confidence formula treats volume as the thing that converts a single observation into a trustworthy reading — not because the first voice is wrong, but because a hundred voices are harder to be wrong together.</p>
+        <p>One person's read on a city is real, but it's one data point in a place that never stops changing. The confidence formula treats volume as the thing that converts a single observation into a trustworthy reading - not because the first voice is wrong, but because a hundred voices are harder to be wrong together.</p>
       </div>
     </section>
 
@@ -359,10 +359,10 @@
         if (total !== null && !Number.isNaN(total)) {
           countUp(document.getElementById('stat-readings'), total, 1200);
         } else {
-          document.getElementById('stat-readings').textContent = '—';
+          document.getElementById('stat-readings').textContent = '-';
         }
       } catch (e) {
-        document.getElementById('stat-readings').textContent = '—';
+        document.getElementById('stat-readings').textContent = '-';
       }
 
       try {
@@ -388,8 +388,8 @@
         oEl.textContent = observedPct + '%';
       } catch (e) {
         console.warn('Modelled/observed split unavailable:', e.message);
-        document.getElementById('split-modelled').textContent = '—';
-        document.getElementById('split-observed').textContent = '—';
+        document.getElementById('split-modelled').textContent = '-';
+        document.getElementById('split-observed').textContent = '-';
       }
     }
 

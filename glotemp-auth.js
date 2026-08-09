@@ -335,7 +335,7 @@
     cities.forEach(c => {
       const opt = document.createElement('option');
       opt.value = c.slug;
-      opt.textContent = `${c.name} — ${c.country}`;
+      opt.textContent = `${c.name} - ${c.country}`;
       sel.appendChild(opt);
     });
     if (cities.length) sel.dataset.populated = '1';

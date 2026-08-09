@@ -40,7 +40,7 @@ function pageHTML(a, b) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#06060A" />
   <meta name="description" content="${title}, head to head: live mood, coverage and per-vertical readings compared side by side.">
-  <meta property="og:title" content="${title} — Glotemp" />
+  <meta property="og:title" content="${title} - Glotemp" />
   <meta property="og:description" content="${title}, head to head: live mood, coverage and per-vertical readings compared side by side." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/compare/${slug}/" />
@@ -51,7 +51,7 @@ function pageHTML(a, b) {
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <title>${title} — Glotemp</title>
+  <title>${title} - Glotemp</title>
 
   <script type="application/ld+json">
   {
@@ -67,7 +67,7 @@ function pageHTML(a, b) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=31" />
+  <link rel="stylesheet" href="/styles.css?v=32" />
   <style>
     .compare-header-row {
       display: grid;
@@ -124,13 +124,13 @@ function pageHTML(a, b) {
         <a class="compare-side" href="/cities/${a.slug}.html" data-city-link="${a.slug}" data-city-nav="false" style="text-decoration:none;">
           <h2 id="a-name" style="color:var(--ivory);">${a.name}</h2>
           <p>${a.country}</p>
-          <p id="a-band" style="font-family:var(--font-mono); text-transform:uppercase; font-size:0.8rem;">—</p>
+          <p id="a-band" style="font-family:var(--font-mono); text-transform:uppercase; font-size:0.8rem;">-</p>
         </a>
         <span class="compare-vs">VS</span>
         <a class="compare-side" href="/cities/${b.slug}.html" data-city-link="${b.slug}" data-city-nav="false" style="text-decoration:none;">
           <h2 id="b-name" style="color:var(--ivory);">${b.name}</h2>
           <p>${b.country}</p>
-          <p id="b-band" style="font-family:var(--font-mono); text-transform:uppercase; font-size:0.8rem;">—</p>
+          <p id="b-band" style="font-family:var(--font-mono); text-transform:uppercase; font-size:0.8rem;">-</p>
         </a>
       </div>
     </section>
@@ -216,9 +216,9 @@ function pageHTML(a, b) {
           const bWins = aVal !== null && bVal !== null && bVal > aVal;
           return \`<div class="compare-metric-row">
             <div class="compare-metric-label">\${v.label}</div>
-            <div class="compare-metric-value left \${aWins ? 'winner' : ''}">\${aVal !== null ? aVal.toFixed(1) + ' ' + v.unit : '—'}</div>
+            <div class="compare-metric-value left \${aWins ? 'winner' : ''}">\${aVal !== null ? aVal.toFixed(1) + ' ' + v.unit : '-'}</div>
             <div style="text-align:center; color:var(--sand); font-size:0.8rem;">vs</div>
-            <div class="compare-metric-value right \${bWins ? 'winner' : ''}">\${bVal !== null ? bVal.toFixed(1) + ' ' + v.unit : '—'}</div>
+            <div class="compare-metric-value right \${bWins ? 'winner' : ''}">\${bVal !== null ? bVal.toFixed(1) + ' ' + v.unit : '-'}</div>
           </div>\`;
         }).join('');
       } catch (e) {
