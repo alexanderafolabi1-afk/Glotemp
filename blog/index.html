@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=41" />
+  <link rel="stylesheet" href="/styles.css?v=43" />
 
   <style>
     .feed-toolbar {
@@ -99,18 +99,21 @@
     .feed-list {
       display: flex;
       flex-direction: column;
-      gap: 0.9rem;
-      padding: 1.5rem;
+      padding: 0 1.5rem 1.5rem;
     }
+    /* A stacked list divided by a single rule, with the vertical's colour
+       carried as a left-edge accent -- not a bordered card per item. */
     .feed-item {
       display: block;
-      padding: 1.1rem 1.3rem;
-      border: 1px solid var(--hairline);
+      padding: 1.1rem 0;
+      border: none;
+      border-top: 1px solid var(--hairline);
       border-left: 3px solid var(--item-band, var(--band-equilibrium));
-      border-radius: 10px;
-      background: rgba(23, 25, 38, 0.4);
+      padding-left: 1rem;
+      background: none;
       text-decoration: none;
     }
+    .feed-item:first-child { border-top: none; }
     .feed-item-top {
       display: flex;
       justify-content: space-between;
@@ -229,6 +232,7 @@
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
   <script src="/stories.js"></script>
+  <script src="/seed-observations.js"></script>
   <script>
     // var, not const: tempo-economy.js (loaded below) also declares
     // these; var redeclaration across scripts is a safe no-op.
