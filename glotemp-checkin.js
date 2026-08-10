@@ -65,6 +65,10 @@
       <div class="checkin-composer" id="checkin-composer">
         <p class="eyebrow">City reading</p>
         <h2 class="checkin-neon-title">How <span class="checkin-glow">${esc(name)}</span> feels right now</h2>
+        <div class="checkin-insignia" aria-hidden="true">
+          <span class="checkin-insignia-hand">&#128073;</span>
+          <span class="checkin-insignia-label">Check in</span>
+        </div>
         <div class="checkin-signedout" id="checkin-signedout">
           <p class="checkin-copy">Sign in to add a reading. Browsing stays anonymous.</p>
           <button class="btn-neon checkin-neon-btn" type="button" id="checkin-signin-btn">Sign in</button>
