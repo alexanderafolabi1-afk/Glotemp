@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=51">
+  <link rel="stylesheet" href="/styles.css?v=52">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -274,6 +274,8 @@
   <script src="/glotemp-listings.js" defer></script>
   <script src="/city-sports-data.js" defer></script>
   <script src="/glotemp-sports.js" defer></script>
+  <script src="/city-trivia-data.js" defer></script>
+  <script src="/glotemp-personality.js" defer></script>
   <script src="/city-wiki.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
   <script src="/city-radio.js" defer></script>
@@ -586,7 +588,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"أحياء المدينة في حركة. يوم جمعة عادي.","language_lens":"local","created_at":"2026-08-10T00:41:54.833Z"},{"context":"Morocco Mall area Friday evening - modernity and tradition in balance.","language_lens":"visitor","created_at":"2026-08-10T05:41:54.833Z"}];
+      const checkins = [{"context":"أحياء المدينة في حركة. يوم جمعة عادي.","language_lens":"local","created_at":"2026-08-10T01:03:55.629Z"},{"context":"Morocco Mall area Friday evening - modernity and tradition in balance.","language_lens":"visitor","created_at":"2026-08-10T06:03:55.629Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
