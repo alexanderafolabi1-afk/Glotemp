@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#06060A" />
-  <meta name="description" content="How Glotemp computes a reading: live coverage figures, the confidence ramp from first check-in to established signal, and the modelled-vs-observed split, shown as it stands right now." />
+  <meta name="description" content="How Glotemp computes a reading: live coverage figures, the confidence ramp, and the modelled-vs-observed split, shown as it stands right now." />
   <meta name="keywords" content="about Glotemp, methodology, how it works, confidence score, modelled vs observed" />
   <meta property="og:title" content="How it works - Glotemp" />
   <meta property="og:description" content="How Glotemp computes a reading: live coverage figures, the confidence ramp, and the modelled-vs-observed split, shown as it stands right now." />
@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=43" />
+  <link rel="stylesheet" href="/styles.css?v=45" />
 
   <style>
     .proof-stats-grid {
@@ -223,13 +223,13 @@
       <div class="section-heading" style="padding:1.5rem 1.5rem 0;">
         <div>
           <p class="eyebrow">Confidence</p>
-          <h2>Why the first check-in barely moves anything</h2>
+          <h2>How confidence builds</h2>
         </div>
       </div>
-      <p style="padding:0 1.5rem; color:var(--sand);">A single signal starts a reading at roughly half confidence. Confidence climbs with volume, not certainty of any one voice - this is the actual ramp used across every vertical's edge function:</p>
+      <p style="padding:0 1.5rem; color:var(--sand);">A reading starts at roughly half confidence and rises as more inputs accumulate for the same place and window - this is the actual ramp used across every vertical's edge function:</p>
       <div class="confidence-ramp" id="confidence-ramp"></div>
       <div class="split-legend" style="padding-top:0;">
-        <span style="color:var(--sand); font-size:0.78rem; font-family:var(--font-mono);">1 signal → ~50% confidence · 50 signals → ~90% confidence, the practical ceiling</span>
+        <span style="color:var(--sand); font-size:0.78rem; font-family:var(--font-mono);">1 input → ~50% confidence · 50 inputs → ~90% confidence, the practical ceiling</span>
       </div>
     </section>
 
@@ -240,14 +240,14 @@
           <h2>Modelled vs. observed</h2>
         </div>
       </div>
-      <p style="padding:0 1.5rem; color:var(--sand);">Some readings come from seed data used to bootstrap a city before real signal arrives. The rest come from a live API call or a human check-in. This is the current split, queried on load:</p>
+      <p style="padding:0 1.5rem; color:var(--sand);">Some readings come from seed data used to bootstrap a city before real signal arrives. The rest come from a live API call or a submitted reading. This is the current split, queried on load:</p>
       <div class="split-bar-track" id="split-bar">
         <div class="split-bar-modelled" id="split-modelled" style="width:50%;">-</div>
         <div class="split-bar-observed" id="split-observed" style="width:50%;">-</div>
       </div>
       <div class="split-legend">
         <span class="modelled">Modelled (seed / low-confidence fallback)</span>
-        <span class="observed">Observed (live API or human check-in)</span>
+        <span class="observed">Observed (live API or submitted reading)</span>
       </div>
     </section>
 
@@ -257,13 +257,13 @@
         <h2 style="margin-top:0;">The plain version</h2>
 
         <h3>How a reading is computed</h3>
-        <p>Every observation - a human check-in, a GDELT sentiment pull, a World Bank indicator, an air-quality reading - lands in one append-only table, tagged with a city, a vertical, a value, a source, and a confidence score. A city's current reading for a vertical is the confidence-weighted average of everything recorded for it in the trailing window, not a single latest value. Nothing is ever overwritten; old readings age out of the average, they aren't deleted.</p>
+        <p>Every observation - a submitted reading, a GDELT sentiment pull, a World Bank indicator, an air-quality reading - lands in one append-only table, tagged with a city, a vertical, a value, a source, and a confidence score. A city's current reading for a vertical is the confidence-weighted average of everything recorded for it in the trailing window, not a single latest value. Nothing is ever overwritten; old readings age out of the average, they aren't deleted.</p>
 
-        <h3>How signals are weighted</h3>
-        <p>Two things move a signal's weight: how confident the source is in it, and how recent it is. A same-hour GDELT pull carries more weight than a three-day-old one. A reading built from fifty check-ins carries more weight than one built from a single check-in - see the ramp above.</p>
+        <h3>How inputs are weighted</h3>
+        <p>Two things move an input's weight: how confident the source is in it, and how recent it is. A same-hour GDELT pull carries more weight than a three-day-old one. A reading built from fifty inputs carries more weight than one built from a single input - see the ramp above.</p>
 
-        <h3>Why a first check-in counts less than a hundredth</h3>
-        <p>One person's read on a city is real, but it's one data point in a place that never stops changing. The confidence formula treats volume as the thing that converts a single observation into a trustworthy reading - not because the first voice is wrong, but because a hundred voices are harder to be wrong together.</p>
+        <h3>Why an early reading counts less than a later one</h3>
+        <p>A single observation is real, but it's one data point in a place that never stops changing. The confidence formula treats sample size as the thing that converts an early observation into a trustworthy reading - not because the first input is wrong, but because a broader sample is harder to be wrong than a narrow one.</p>
       </div>
     </section>
 
@@ -272,8 +272,8 @@
     </section>
 
     <section class="glass-card cta-closing">
-      <h2>Add the next signal</h2>
-      <p>The mechanism above only works because someone checks in. Be the next data point.</p>
+      <h2>Add a reading</h2>
+      <p>Every reading adds precision to the instrument.</p>
       <a href="/#observation-form" class="btn-neon" style="--btn-band: var(--band-warm); display:inline-block; text-decoration:none;">Add your first observation</a>
     </section>
   </main>

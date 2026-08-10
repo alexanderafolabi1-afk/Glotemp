@@ -42,18 +42,18 @@ const translations = {
     trip_go_reason: "The streets are charged. Energy is high. The moment is right.",
     trip_maybe_reason: "It’s decent, but check the weather first.",
     trip_wait_reason: "Mood is low; maybe next weekend.",
-    checkin_title: "Check in to",
+    checkin_title: "How",
     stars: "Stars",
     stars_share: "Those who contribute most share in the city's reward.",
     footer_tagline: "Measuring the world's heartbeat.",
     about_title: "About Glotemp",
-    about_text: "We measure what cannot be seen on a map - the collective feeling of a city. Glotemp is the world's first real-time mood infrastructure. It turns the silent emotional current of urban life into clear, living intelligence for travellers, businesses and communities. Every check-in adds a heartbeat. Every city gains a voice.",
+    about_text: "We measure what cannot be seen on a map - the collective feeling of a city. Glotemp is the world's first real-time mood infrastructure. It turns the silent emotional current of urban life into clear, living intelligence for travellers, businesses and communities. Every reading adds a heartbeat. Every city gains a voice.",
     invest_title: "Seed Round Open",
     invest_text: "We are building the emotional layer of the internet of cities. A new category of location intelligence is forming - one based on collective human energy rather than static data. Early partners will help define it. Deck available on request.",
     privacy_policy: "Privacy Policy",
     terms_of_service: "Terms of Service",
     cookie_settings: "Cookie Settings",
-    cookie_banner_text: "We use essential cookies to remember your language preference and mood check-ins. No third-party tracking.",
+    cookie_banner_text: "We use essential cookies to remember your language preference and mood readings. No third-party tracking.",
     cookie_accept: "Accept All",
     cookie_settings_btn: "Settings",
     dimensions: ["Mood","Economic","Nightlife","Study","Tourism","Safety","Health","Traffic","Events","Community","Weather","Innovation"],
@@ -76,9 +76,9 @@ const translations = {
     pulse_title: "How five cities feel today",
     pulse_intro: "Five cities, chosen from what's moving right now.",
     instrument_hint: "Tap any city below to see if today's the day to go.",
-    no_observations: "Be the first to share an observation. Check in now.",
-    checkin_eyebrow: "Check in",
-    checkin_intro: "How does your city feel right now? Pick a mood, add a note if you like, and you'll shape the next reading.",
+    no_observations: "No recent readings for this city yet.",
+    checkin_eyebrow: "City reading",
+    checkin_intro: "Pick a mood and add a note if you like.",
     add_voice_copy: "Want to add your own read on a city?",
     add_voice_btn: "Add your voice ↑",
     intensity_label: "Intensity",
@@ -109,7 +109,7 @@ const translations = {
     cadence_label: "Contribution cadence",
     context_label: "Optional local note",
     context_placeholder: "A small observation, event note, or mood context.",
-    record_observation: "Check in",
+    record_observation: "Add reading",
     human_signal_verified: "Human signal verified",
     contribution_quality_title: "Quality of signal",
     contribution_quality_copy: "Subtle context, repeat observations, and cross-language notes increase the scientific value of each entry.",
@@ -1397,10 +1397,8 @@ function recordObservation(event) {
   addStars(note ? 18 : 12);
   renderSignalPanels();
   const feedbackEl = document.getElementById('observation-feedback');
-  feedbackEl.textContent = `${t('observation_saved')} You're in the running for this week's ${observation.city} rewards.`;
-  feedbackEl.classList.add('checkin-status-reward');
-  setTimeout(() => feedbackEl.classList.remove('checkin-status-reward'), 6000);
-  // Fold the new check-in into the rotating snippet pool and show it now,
+  feedbackEl.textContent = t('observation_saved');
+  // Fold the new reading into the rotating snippet pool and show it now,
   // so submitting feels like it landed somewhere instead of vanishing.
   if (typeof refreshObsSnippetPool === 'function') refreshObsSnippetPool(citySlug);
   // Update the live observation count

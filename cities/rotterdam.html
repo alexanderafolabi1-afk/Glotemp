@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=43">
+  <link rel="stylesheet" href="/styles.css?v=45">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -38,7 +38,7 @@
           <span id="city-metro-pop"></span>
         </div>
         <div class="city-action-row">
-          <button id="watch-city-btn" class="btn-neon" type="button">Watch this city</button>
+          <button id="watch-city-btn" class="btn-neon" type="button">Follow this city</button>
           <button id="share-city-btn" class="btn-neon" type="button" style="--btn-band: var(--band-restrained);">Share</button>
         </div>
         <div id="watch-email-panel" class="watch-email-panel" style="display:none;">
@@ -52,15 +52,15 @@
       </div>
     </section>
 
-    <!-- Check-in: the central brand action, given the first, most
-         prominent placement on the page -- right after the hero, before
-         anything else. glotemp-checkin.js finds #city-observation-feed by
-         id regardless of where it sits in the DOM, so moving it here is
-         safe; it replaces this section's contents with the live composer
-         (or, signed out, a sign-in prompt) and the recent check-ins list. -->
+    <!-- City reading: given the first, most prominent placement on the
+         page -- right after the hero, before anything else.
+         glotemp-checkin.js finds #city-observation-feed by id regardless
+         of where it sits in the DOM, so moving it here is safe; it
+         replaces this section's contents with the live composer (or,
+         signed out, a sign-in prompt) and the recent readings list. -->
     <section class="glass-card city-feed-section checkin-hero-section">
-      <h2>Human check-ins</h2>
-      <p class="vertical-description">Recent human check-ins and signals for this city.</p>
+      <h2>City reading</h2>
+      <p class="vertical-description">How this city feels right now.</p>
       <div id="city-observation-feed" class="vertical-content"></div>
     </section>
 
@@ -400,7 +400,7 @@
       `;
     })();
 
-    // ---- Watch this city ----
+    // ---- Follow this city ----
     (function wireWatch() {
       const btn = document.getElementById('watch-city-btn');
       const panel = document.getElementById('watch-email-panel');
@@ -411,7 +411,7 @@
       const citySlug = 'rotterdam';
 
       function refreshLabel() {
-        btn.textContent = GlotempCore.isWatched(citySlug) ? 'Watching this city ✓' : 'Watch this city';
+        btn.textContent = GlotempCore.isWatched(citySlug) ? 'Following this city ✓' : 'Follow this city';
       }
       refreshLabel();
 
@@ -494,7 +494,7 @@
       container.innerHTML = checkins.map(obs => `
         <div class="reading glass-card">
           <div class="reading-header">
-            <span class="reading-metric">Human check-in</span>
+            <span class="reading-metric">Reading</span>
           </div>
           <div class="reading-value"><span class="reading-label">${obs.context}</span></div>
           <div class="reading-footer">

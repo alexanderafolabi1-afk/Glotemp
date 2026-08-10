@@ -9,7 +9,7 @@
 
   var msgs = {
     en: {
-      text: 'We use essential cookies to remember your language preference and mood check-ins. No third-party tracking.',
+      text: 'We use essential cookies to remember your language preference and mood readings. No third-party tracking.',
       accept: 'Accept All',
       settings: 'Settings'
     },
@@ -70,8 +70,8 @@
       '#cookie-consent-banner .cookie-btns { display: flex; gap: 1.25rem; flex-shrink: 0; }',
       '#cookie-consent-banner .btn-cookie-accept {',
       '  background: transparent; color: #F0E0C8;',
-      '  border: 1px solid #B08D57; border-radius: 0;',
-      '  padding: 0.5rem 1.5rem; cursor: pointer; font-size: 0.8rem;',
+      '  border: none; border-bottom: 1px solid #B08D57; border-radius: 0;',
+      '  padding: 0.5rem 0.25rem; cursor: pointer; font-size: 0.8rem;',
       '  font-variant-caps: small-caps; letter-spacing: 0.1em;',
       '  transition: color 200ms ease, border-color 200ms ease;',
       '}',
@@ -129,15 +129,35 @@
     document.body.appendChild(banner);
   }
 
+  // The banner is position:fixed to the viewport bottom, so without this
+  // it sits on top of whatever the page has there -- on most pages that's
+  // the footer, which is where the language switcher lives. Reserving the
+  // banner's real height as body padding keeps the footer clickable
+  // underneath it instead of hidden behind it.
+  var resizeHandler = null;
+  function reserveSpace() {
+    var banner = document.getElementById('cookie-consent-banner');
+    if (!banner) return;
+    document.body.style.paddingBottom = banner.offsetHeight + 'px';
+  }
+
   function hideBanner() {
     var banner = document.getElementById('cookie-consent-banner');
     if (banner) banner.remove();
+    document.body.style.paddingBottom = '';
+    if (resizeHandler) {
+      window.removeEventListener('resize', resizeHandler);
+      resizeHandler = null;
+    }
   }
 
   function showBanner() {
     if (!document.getElementById('cookie-consent-banner')) {
       injectStyles();
       createBanner();
+      reserveSpace();
+      resizeHandler = reserveSpace;
+      window.addEventListener('resize', resizeHandler);
     }
   }
 

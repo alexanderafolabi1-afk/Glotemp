@@ -35,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=43" />
+  <link rel="stylesheet" href="/styles.css?v=45" />
 
   <style>
     .feed-toolbar {
@@ -50,11 +50,12 @@
       flex-wrap: wrap;
     }
     .feed-search-input, .feed-select {
-      background: rgba(233, 231, 240, 0.05);
-      border: 1px solid rgba(233, 231, 240, 0.09);
-      border-radius: 12px;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(233, 231, 240, 0.18);
+      border-radius: 0;
       color: var(--ivory);
-      padding: 0.85rem 1rem;
+      padding: 0.85rem 0.2rem;
       font: inherit;
       min-height: 44px;
     }
@@ -76,11 +77,12 @@
     }
     .vertical-chip {
       flex-shrink: 0;
-      border: 1px solid var(--hairline);
+      border: none;
+      border-bottom: 1px solid var(--hairline);
       background: transparent;
       color: var(--sand);
-      padding: 0.5rem 1rem;
-      border-radius: 999px;
+      padding: 0.5rem 0.5rem 0.4rem;
+      border-radius: 0;
       font-family: var(--font-mono);
       font-size: 0.78rem;
       text-transform: uppercase;
@@ -91,8 +93,8 @@
       white-space: nowrap;
     }
     .vertical-chip[data-active="true"] {
-      color: var(--obsidian);
-      background: var(--active-band, var(--band-equilibrium));
+      color: var(--active-band, var(--band-equilibrium));
+      background: transparent;
       border-color: var(--active-band, var(--band-equilibrium));
     }
 
@@ -165,11 +167,11 @@
       text-decoration: underline;
     }
     .feed-empty-state {
-      padding: 2.5rem;
+      padding: 2.5rem 0;
       text-align: center;
       color: var(--sand);
-      border: 2px dashed var(--hairline);
-      border-radius: 12px;
+      border-top: 1px solid var(--hairline);
+      border-radius: 0;
     }
     .feed-load-more {
       display: block;
@@ -193,7 +195,7 @@
     <section class="glass-card page-header">
       <p class="eyebrow">All 12 verticals, one stream</p>
       <h1>Stories</h1>
-      <p class="section-copy" style="color:var(--sand); max-width:64ch;">Every signal as it lands - news sentiment, market data, sport, fashion, transit, human check-ins. Filter to one vertical or one city, or watch it all move.</p>
+      <p class="section-copy" style="color:var(--sand); max-width:64ch;">Every signal as it lands - news sentiment, market data, sport, fashion, transit, submitted readings. Filter to one vertical or one city, or watch it all move.</p>
     </section>
 
     <section class="glass-card" style="padding:0; overflow:hidden;">
@@ -343,10 +345,10 @@
         vertical: 'pulse',
         citySlug: obs.city,
         cityName: obs.cityName,
-        headline: `A human check-in from ${obs.cityName}`,
+        headline: `A reading from ${obs.cityName}`,
         context: obs.context,
         timestamp: obs.created_at,
-        source: 'Human check-in',
+        source: 'Reading',
         sourceUrl: null,
         kind: 'checkin',
       }));

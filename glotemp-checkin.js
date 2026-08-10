@@ -63,16 +63,18 @@
     const name = cityName || 'this city';
     return `
       <div class="checkin-composer" id="checkin-composer">
-        <p class="eyebrow checkin-live-eyebrow live-mark">Check in</p>
-        <h2 class="checkin-neon-title">Check in to <span class="checkin-glow">${esc(name)}</span></h2>
-        <p class="checkin-subtext">What are you doing here right now?</p>
-        <p class="checkin-rewards-note">✨ Daily check-ins put you in the running for this week's ${esc(name)} rewards.</p>
+        <p class="eyebrow">City reading</p>
+        <h2 class="checkin-neon-title">How <span class="checkin-glow">${esc(name)}</span> feels right now</h2>
+        <div class="checkin-insignia" aria-hidden="true">
+          <span class="checkin-insignia-hand">&#128073;</span>
+          <span class="checkin-insignia-label">Check in</span>
+        </div>
         <div class="checkin-signedout" id="checkin-signedout">
-          <p class="checkin-copy">Sign in to add your check-in. Browsing stays anonymous.</p>
-          <button class="btn-neon checkin-neon-btn" type="button" id="checkin-signin-btn">Check in to ${esc(name)}</button>
+          <p class="checkin-copy">Sign in to add a reading. Browsing stays anonymous.</p>
+          <button class="btn-neon checkin-neon-btn" type="button" id="checkin-signin-btn">Sign in</button>
         </div>
         <form class="checkin-form" id="checkin-form" hidden>
-          <div class="checkin-modes" role="group" aria-label="Check-in mode">
+          <div class="checkin-modes" role="group" aria-label="Mode">
             ${MODES.map((m, i) => `<button type="button" class="checkin-mode" data-mode="${m.slug}" aria-pressed="${i === 0 ? 'true' : 'false'}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${m.icon}</svg><span>${m.label}</span></button>`).join('')}
           </div>
           <label class="checkin-label" for="checkin-intensity">Intensity <span class="checkin-intensity-value" id="checkin-intensity-value">${INTENSITY_WORDS[5]} (5/10)</span></label>
@@ -89,14 +91,14 @@
             <p class="checkin-item-note" id="checkin-preview-note" hidden></p>
           </div>
           <div class="checkin-actions">
-            <button type="submit" class="btn-neon checkin-neon-btn" id="checkin-submit">Post check-in</button>
+            <button type="submit" class="btn-neon checkin-neon-btn" id="checkin-submit">Add reading</button>
             <span class="checkin-status" id="checkin-status" role="status" aria-live="polite"></span>
           </div>
         </form>
       </div>
       <div class="checkin-list-wrap">
-        <h3 class="checkin-heading">Recent check-ins</h3>
-        <div class="checkin-list" id="checkin-list"><p class="checkin-empty">Loading check-ins…</p></div>
+        <h3 class="checkin-heading">Recent readings</h3>
+        <div class="checkin-list" id="checkin-list"><p class="checkin-empty">Loading…</p></div>
         <div class="checkin-more-row"><button class="pagination-btn" type="button" id="checkin-more" hidden>Load more</button></div>
       </div>`;
   }
@@ -146,7 +148,7 @@
 
     if (signInBtn) {
       signInBtn.addEventListener('click', async () => {
-        const ok = await GlotempAuth.requireAuth('Sign in to post a check-in for this city.');
+        const ok = await GlotempAuth.requireAuth('Sign in to add a reading for this city.');
         if (ok) refreshAuthState();
       });
     }
@@ -154,7 +156,7 @@
     if (form) {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const ok = await GlotempAuth.requireAuth('Sign in to post a check-in for this city.');
+        const ok = await GlotempAuth.requireAuth('Sign in to add a reading for this city.');
         if (!ok) return;
         refreshAuthState();
         const session = await GlotempAuth.getSession();
@@ -176,14 +178,13 @@
             }),
           });
           if (!resp.ok) throw new Error('post failed ' + resp.status);
-          status.textContent = `Posted. You're in the running for this week's ${cityDisplayName()} rewards.`;
-          status.classList.add('checkin-status-reward');
+          status.textContent = 'Posted.';
           note.value = '';
           count.textContent = `0/${NOTE_MAX}`;
           updatePreviewNote();
           offset = 0;
           await loadCheckins({ replace: true });
-          setTimeout(() => { status.textContent = ''; status.classList.remove('checkin-status-reward'); }, 5000);
+          setTimeout(() => { status.textContent = ''; }, 3000);
         } catch (err) {
           status.textContent = 'Could not post that. Try again shortly.';
         }
@@ -306,33 +307,15 @@
     const fresh = btn.cloneNode(true);
     btn.parentNode.replaceChild(fresh, btn);
 
-    // Reserved-height count line, inserted once, so filling it in after
-    // the async count resolves doesn't shift the page.
-    if (!document.getElementById('watch-count')) {
-      const count = document.createElement('p');
-      count.id = 'watch-count';
-      count.className = 'watch-count';
-      count.textContent = ' ';
-      // After the whole .city-action-row, not next to the button: that
-      // row is a flex line, so a sibling of the button would render
-      // between "Watch this city" and "Share" instead of on its own line.
-      const actionRow = fresh.closest('.city-action-row');
-      if (actionRow && actionRow.parentNode) {
-        actionRow.parentNode.insertBefore(count, actionRow.nextSibling);
-      } else {
-        fresh.parentNode.insertBefore(count, fresh.nextSibling);
-      }
-    }
-
     async function refreshLabel() {
       const watching = await isWatching();
-      fresh.textContent = watching ? 'Watching this city ✓' : 'Watch this city';
+      fresh.textContent = watching ? 'Following this city ✓' : 'Follow this city';
       return watching;
     }
     refreshLabel();
 
     fresh.addEventListener('click', async () => {
-      const ok = await GlotempAuth.requireAuth('Sign in to watch this city and follow its readings.');
+      const ok = await GlotempAuth.requireAuth('Sign in to follow this city.');
       if (!ok) return;
       const session = await GlotempAuth.getSession();
       const user = GlotempAuth.getUser();
@@ -352,9 +335,8 @@
             body: JSON.stringify({ user_id: user.id, city_slug: citySlug }),
           });
         }
-      } catch (e) { /* surfaced by the label/count refresh below */ }
+      } catch (e) { /* surfaced by the label refresh below */ }
       await refreshLabel();
-      await renderWatchCount();
       fresh.disabled = false;
     });
   }
@@ -377,8 +359,8 @@
       // undo that hide -- otherwise a brand-new city's check-in form is
       // invisible even though it works.
       section.style.display = '';
-      // The composer now carries its own "Check in to {City}" heading and
-      // subtext -- the static ones this section shipped with would just
+      // The composer now carries its own "How {City} feels right now"
+      // heading -- the static one this section shipped with would just
       // duplicate it right above.
       const heading = section.querySelector('h2');
       if (heading) heading.remove();
@@ -396,7 +378,6 @@
     wireComposer();
     refreshAuthState();
     wireWatch();
-    renderWatchCount();
     loadCheckins();
 
     const moreBtn = document.getElementById('checkin-more');
@@ -404,7 +385,6 @@
 
     document.addEventListener('glotemp:auth-changed', () => {
       refreshAuthState();
-      renderWatchCount();
     });
   }
 

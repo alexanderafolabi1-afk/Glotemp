@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=43" />
+  <link rel="stylesheet" href="/styles.css?v=45" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
@@ -50,7 +50,7 @@
          visitor to do anything, so the spin instrument below has context. -->
     <section class="homepage-intro">
       <h1 class="homepage-h1">Know how a city feels before you go.</h1>
-      <p class="homepage-subhead">Real people checking in, blended with live data, across 151 cities. Spin for an instant answer, or pick a city below.</p>
+      <p class="homepage-subhead">Live readings across 151 cities.</p>
     </section>
 
     <!-- Spin: most prominent interactive element on the page -->
@@ -149,7 +149,7 @@
         <div class="hiw-step">
           <div class="hiw-body">
             <span class="hiw-numeral">📝</span>
-            <h3 class="hiw-title">Check in</h3>
+            <h3 class="hiw-title">Add a reading</h3>
             <p class="hiw-copy">You tell us how your city feels right now.</p>
           </div>
         </div>
@@ -157,7 +157,7 @@
           <div class="hiw-body">
             <span class="hiw-numeral">🔄</span>
             <h3 class="hiw-title">We aggregate</h3>
-            <p class="hiw-copy">Thousands of signals become one reading.</p>
+            <p class="hiw-copy">Every input becomes part of one reading.</p>
           </div>
         </div>
         <div class="hiw-step">
@@ -203,16 +203,15 @@
       </div>
     </section>
 
-    <!-- Check-in & Contributor Economy -->
+    <!-- City reading -->
     <section class="check-in glass-card checkin-hero-section">
       <div class="section-heading">
         <div>
-          <p class="eyebrow checkin-live-eyebrow live-mark" data-i18n="checkin_eyebrow">Check in</p>
-          <h2 class="checkin-neon-title"><span data-i18n="checkin_title">Check in to</span> <span class="checkin-glow" id="checkin-city-name">New York</span></h2>
+          <p class="eyebrow" data-i18n="checkin_eyebrow">City reading</p>
+          <h2 class="checkin-neon-title"><span data-i18n="checkin_title">How</span> <span class="checkin-glow" id="checkin-city-name">New York</span> feels right now</h2>
         </div>
-        <p class="section-copy" data-i18n="checkin_intro">How does your city feel right now? Pick a mood, add a note if you like, and you'll shape the next reading.</p>
+        <p class="section-copy" data-i18n="checkin_intro">Pick a mood and add a note if you like.</p>
       </div>
-      <p class="checkin-rewards-note">✨ Daily check-ins put you in the running for this week's city rewards.</p>
       <div class="mood-buttons" role="group" aria-label="How does your city feel right now?">
         <button class="mood-btn" data-mood="🔥" data-band="charged"     data-label="Energized" title="Energized"><span class="mood-btn-icon" aria-hidden="true">🔥</span><span class="mood-btn-label">Energized</span></button>
         <button class="mood-btn" data-mood="😊" data-band="warm"        data-label="Good"      title="Good"><span class="mood-btn-icon" aria-hidden="true">😊</span><span class="mood-btn-label">Good</span></button>
@@ -246,7 +245,7 @@
           <textarea id="context-note" rows="3" maxlength="240" data-i18n-placeholder="context_placeholder" placeholder="A small observation, event note, or mood context."></textarea>
         </label>
         <div class="form-actions">
-          <button id="record-observation" type="submit" class="btn-neon checkin-neon-btn" data-i18n="record_observation">Check in</button>
+          <button id="record-observation" type="submit" class="btn-neon checkin-neon-btn" data-i18n="record_observation">Add reading</button>
           <p id="observation-feedback" class="inline-feedback" aria-live="polite"></p>
         </div>
       </form>

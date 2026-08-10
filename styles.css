@@ -957,7 +957,6 @@ body.scroll-reveals-enabled section.revealed {
   min-height: 500px;
   border-radius: calc(var(--radius) * 1.5);
   background: linear-gradient(135deg, rgba(35, 28, 20, 0.8) 0%, rgba(35, 28, 20, 0.6) 100%);
-  border: 1px solid rgba(240, 224, 200, 0.06);
   overflow: hidden;
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.5),
@@ -1201,21 +1200,22 @@ body.scroll-reveals-enabled section.revealed {
 .btn-neon {
   --btn-band: var(--band-equilibrium);
   background: transparent;
-  border: 1px solid var(--btn-band);
-  padding: 0.75rem 1.75rem;
+  border: none;
+  border-bottom: 1px solid var(--btn-band);
+  padding: 0.75rem 1.75rem 0.65rem;
   border-radius: 0;
   color: var(--btn-band);
   font-weight: var(--fw-semibold);
   font-size: var(--body-size);
   cursor: pointer;
-  transition: background var(--transition), color var(--transition);
+  transition: color var(--transition), border-color var(--transition);
   min-height: 44px;
   font-variant-numeric: tabular-nums;
 }
 
 .btn-neon:hover {
-  background: var(--btn-band);
-  color: var(--obsidian);
+  color: var(--ivory);
+  border-color: var(--ivory);
   opacity: 1;
 }
 
@@ -1257,10 +1257,11 @@ body.scroll-reveals-enabled section.revealed {
 
 .btn-outline {
   background: transparent;
-  border: 1px solid var(--hairline);
+  border: none;
+  border-bottom: 1px solid var(--hairline);
   color: var(--ash);
-  padding: 0.35rem 0.9rem;
-  border-radius: 20px;
+  padding: 0.35rem 0.9rem 0.25rem;
+  border-radius: 0;
   font-size: 0.82rem;
   cursor: pointer;
   transition: all var(--transition);
@@ -1392,12 +1393,13 @@ textarea:focus:not(:focus-visible) {
 
 .dim-badge {
   padding: 0.3rem 0.8rem;
-  background: rgba(240, 224, 200, 0.08);
-  border-radius: 20px;
+  background: transparent;
+  border-radius: 0;
   font-size: 0.8rem;
   display: flex;
   gap: 0.3rem;
-  border: 1px solid var(--hairline);
+  border: none;
+  border-bottom: 1px solid var(--hairline);
   font-family: var(--font-mono);
 }
 
@@ -1486,11 +1488,14 @@ textarea:focus:not(:focus-visible) {
    language as the rest of the site's honest empty states, just aimed
    at a commercial audience (local businesses, tourism boards, hotels,
    restaurants, experiences) instead of a visitor. */
+/* Dashed top rule, not a boxed placeholder -- marks this as a reserved
+   spot rather than filled content, the same visual language as
+   .checkin-preview's draft state. */
 .sponsor-slot {
   margin-top: 1.5rem;
-  padding: 1.1rem 1.25rem;
-  border: 1px dashed var(--brass-dim);
-  border-radius: 4px;
+  padding: 1.1rem 0 0;
+  border: none;
+  border-top: 1px dashed var(--brass-dim);
 }
 .sponsor-slot-tag {
   display: inline-block;
@@ -1522,7 +1527,6 @@ textarea:focus:not(:focus-visible) {
   border-radius: var(--radius);
   overflow: hidden;
   margin-bottom: 1rem;
-  border: 1px solid var(--hairline);
 }
 
 .card-media img {
@@ -1556,7 +1560,6 @@ textarea:focus:not(:focus-visible) {
   justify-content: center;
   aspect-ratio: 3 / 2;
   background: var(--basalt);
-  border: 1px solid var(--hairline);
   border-radius: var(--radius);
   margin-bottom: 1rem;
   min-height: 200px;
@@ -1617,10 +1620,11 @@ textarea:focus:not(:focus-visible) {
 .blog-search-input {
   width: 100%;
   max-width: 480px;
-  padding: 0.7rem 1.2rem;
-  border-radius: 40px;
-  border: 1px solid var(--hairline);
-  background: rgba(240, 224, 200, 0.05);
+  padding: 0.7rem 0.2rem 0.6rem;
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid var(--hairline);
+  background: transparent;
   color: var(--bone);
   font-size: 1rem;
   font-family: var(--font-body);
@@ -1972,11 +1976,12 @@ textarea:focus:not(:focus-visible) {
 .observation-form textarea,
 .badge-form input,
 .badge-form textarea {
-  background: rgba(240, 224, 200, 0.05);
-  border: 1px solid rgba(240, 224, 200, 0.09);
-  border-radius: 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(240, 224, 200, 0.18);
+  border-radius: 0;
   color: var(--bone);
-  padding: 0.85rem 1rem;
+  padding: 0.85rem 0.2rem;
   font: inherit;
   font-family: var(--font-body);
   min-height: 44px;
@@ -2004,12 +2009,13 @@ textarea:focus:not(:focus-visible) {
 }
 
 .human-signal-pill {
-  border: 1px solid rgba(79, 216, 232, 0.25);
-  border-radius: 999px;
-  padding: 0.45rem 0.85rem;
+  border: none;
+  border-bottom: 1px solid rgba(79, 216, 232, 0.25);
+  border-radius: 0;
+  padding: 0.45rem 0.2rem;
   font-size: 0.8rem;
   color: var(--bone);
-  background: rgba(79, 216, 232, 0.08);
+  background: transparent;
   font-family: var(--font-mono);
 }
 
@@ -2049,10 +2055,9 @@ textarea:focus:not(:focus-visible) {
 }
 
 .product-card {
-  padding: 1.4rem;
-  border: 1px solid rgba(240, 224, 200, 0.08);
-  border-radius: 22px;
-  background: rgba(240, 224, 200, 0.03);
+  padding: 1.4rem 0;
+  border-bottom: 1px solid var(--hairline);
+  background: transparent;
 }
 
 /* ===== CONSTELLATION WALL ===== */
@@ -2072,10 +2077,9 @@ textarea:focus:not(:focus-visible) {
 }
 
 .wall-card {
-  padding: 1.2rem;
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(240, 224, 200, 0.04), rgba(240, 224, 200, 0.02));
-  border: 1px solid rgba(240, 224, 200, 0.08);
+  padding: 1.2rem 0;
+  background: transparent;
+  border-bottom: 1px solid var(--hairline);
 }
 
 .wall-city,
@@ -2093,10 +2097,9 @@ textarea:focus:not(:focus-visible) {
 
 /* ===== OBSERVATION CARDS ===== */
 .obs-card {
-  padding: 1rem;
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(240, 224, 200, 0.04), rgba(240, 224, 200, 0.01));
-  border: 1px solid rgba(240, 224, 200, 0.06);
+  padding: 1rem 0;
+  background: transparent;
+  border-bottom: 1px solid var(--hairline);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -2181,7 +2184,7 @@ textarea:focus:not(:focus-visible) {
   position: relative;
   background: linear-gradient(180deg, rgba(35, 28, 20, 0.95), rgba(15, 16, 24, 0.98));
   border-radius: var(--radius);
-  border: 1px solid var(--hairline);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
 }
 
 .constellation-close {
@@ -2193,7 +2196,6 @@ textarea:focus:not(:focus-visible) {
 #badge-canvas {
   width: 100%;
   border-radius: var(--radius);
-  border: 1px solid var(--hairline);
   background: var(--obsidian);
 }
 
@@ -2225,11 +2227,12 @@ textarea:focus:not(:focus-visible) {
 }
 
 .comment-input {
-  background: rgba(240, 224, 200, 0.06);
-  border: 1px solid rgba(240, 224, 200, 0.1);
-  border-radius: 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(240, 224, 200, 0.18);
+  border-radius: 0;
   color: var(--bone);
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 0.2rem;
   font-size: 0.95rem;
   font-family: var(--font-body);
   outline: none;
@@ -2261,9 +2264,10 @@ textarea:focus:not(:focus-visible) {
    Selection state is toggled via inline style by app.js, not a class. */
 .mood-emoji {
   font-size: 1.35rem;
-  background-color: rgba(240, 224, 200, 0.05);
-  border: 1px solid var(--hairline);
-  border-radius: 12px;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
   width: 44px;
   height: 44px;
   display: flex;
@@ -2280,7 +2284,7 @@ textarea:focus:not(:focus-visible) {
 .mood-emoji:hover {
   opacity: 1;
   transform: translateY(-2px);
-  border-color: rgba(79, 216, 232, 0.3);
+  border-color: var(--brass);
 }
 
 .mood-emoji[style*="opacity: 1"] {
@@ -2301,20 +2305,21 @@ textarea:focus:not(:focus-visible) {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
+/* A stacked list divided by a single rule, not a bordered card per
+   comment -- the "Add your voice" list on every city page. */
 .comment-item {
-  padding: 1rem;
-  background: rgba(240, 224, 200, 0.04);
-  border: 1px solid rgba(240, 224, 200, 0.08);
-  border-radius: 12px;
-  transition: all var(--transition);
+  padding: 1rem 0;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--hairline);
+  transition: border-color var(--transition);
 }
+.comment-item:first-child { border-top: none; }
 
 .comment-item:hover {
-  background: rgba(240, 224, 200, 0.08);
-  border-color: rgba(240, 224, 200, 0.15);
+  border-color: var(--brass-dim);
 }
 
 .comment-item p {
@@ -2335,11 +2340,11 @@ textarea:focus:not(:focus-visible) {
 /* ===== LEADERBOARD ===== */
 .leaderboard-card {
   margin-top: 2rem;
-  padding: 1.5rem;
-  background: rgba(35, 28, 20, var(--glass-opacity));
-  backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--hairline);
-  border-radius: var(--radius);
+  padding: 1.5rem 0 0;
+  background: transparent;
+  backdrop-filter: none;
+  border-top: 1px solid var(--hairline);
+  border-radius: 0;
 }
 
 .leaderboard-card h3 {
@@ -2362,10 +2367,10 @@ textarea:focus:not(:focus-visible) {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 1rem;
-  background: rgba(240, 224, 200, 0.03);
-  border-radius: 8px;
-  border: 1px solid rgba(240, 224, 200, 0.06);
+  padding: 0.75rem 0;
+  background: transparent;
+  border-radius: 0;
+  border-bottom: 1px solid var(--hairline);
 }
 
 .leaderboard-rank {
@@ -2395,10 +2400,10 @@ textarea:focus:not(:focus-visible) {
 
 /* ===== SPONSORED CARD ===== */
 .sponsored-card {
-  padding: 1rem;
-  background: linear-gradient(135deg, rgba(200, 107, 224, 0.1), rgba(139, 107, 245, 0.1));
-  border: 1px solid rgba(200, 107, 224, 0.2);
-  border-radius: 12px;
+  padding: 1rem 0;
+  background: transparent;
+  border-bottom: 1px solid rgba(200, 107, 224, 0.3);
+  border-radius: 0;
   margin: 1rem 0;
   position: relative;
 }
@@ -2509,7 +2514,7 @@ textarea:focus:not(:focus-visible) {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 0.5rem;
-  border: 1px solid var(--hairline);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
 }
 
 .lang-option {
@@ -2860,11 +2865,11 @@ small {
 }
 
 .stat-card {
-  padding: 1.5rem;
+  padding: 1.5rem 0;
   text-align: center;
-  background: linear-gradient(135deg, rgba(45, 95, 159, 0.04), rgba(240, 224, 200, 0.02));
-  border: 1px solid rgba(45, 95, 159, 0.1);
-  border-radius: 18px;
+  background: transparent;
+  border-bottom: 1px solid rgba(45, 95, 159, 0.2);
+  border-radius: 0;
   transition: all 0.3s ease;
 }
 
@@ -3070,25 +3075,27 @@ button:hover:not(:focus-visible) {
 /* ===== MULTI-VERTICAL PLATFORM STYLES ===== */
 
 /* Cities Directory */
+/* An index list divided by a single rule, not a grid of bordered tiles. */
 .cities-grid {
-  display: grid;
-  gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
   margin: 2rem 0;
+  border-top: 1px solid var(--hairline);
 }
 
 .city-card {
   display: block;
-  padding: 1.5rem;
-  border: 1px solid rgba(240, 224, 200, 0.1);
-  border-radius: 12px;
+  padding: 1.25rem 0;
+  border: none;
+  border-bottom: 1px solid var(--hairline);
   text-decoration: none;
   color: inherit;
-  transition: transform 300ms, border-color 300ms;
+  transition: border-color 300ms, padding-left 300ms;
 }
 
 .city-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--ion);
+  padding-left: 0.5rem;
+  border-color: var(--brass);
 }
 
 .city-card-header {
@@ -3275,24 +3282,26 @@ button:hover:not(:focus-visible) {
 .ranking-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
+/* A league table as a stacked list divided by a single rule, not a
+   bordered card per row. */
 .ranking-item {
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  padding: 1.5rem;
-  border: 1px solid rgba(240, 224, 200, 0.1);
-  border-radius: 8px;
+  padding: 1.25rem 0;
+  border: none;
+  border-top: 1px solid var(--hairline);
   text-decoration: none;
   color: inherit;
-  transition: all 300ms;
+  transition: border-color 300ms, padding-left 300ms;
 }
+.ranking-item:first-child { border-top: none; }
 
 .ranking-item:hover {
-  border-color: var(--ion);
-  transform: translateX(4px);
+  border-color: var(--brass);
+  padding-left: 0.5rem;
 }
 
 .ranking-position {
@@ -3439,9 +3448,10 @@ a:hover .city-landmark-photo,
 }
 
 .vertical-link {
-  padding: 0.7rem 1.5rem;
-  border: 1px solid rgba(79, 216, 232, 0.2);
-  border-radius: 6px;
+  padding: 0.7rem 1.5rem 0.55rem;
+  border: none;
+  border-bottom: 1px solid rgba(79, 216, 232, 0.3);
+  border-radius: 0;
   text-decoration: none;
   color: var(--ivory);
   transition: all 300ms;
@@ -3573,13 +3583,15 @@ a:hover .city-landmark-photo,
 .reading-provenance--observed { color: var(--band-warm); }
 .reading-provenance--modelled { color: var(--sand); }
 
+/* A quiet typographic message, not a bordered placeholder box -- matches
+   how every other "nothing here yet" state on the site (Movers, the
+   feed, etc.) is handled: plain text, no container. */
 .empty-state {
-  padding: 1.75rem 1.5rem;
+  padding: 1.5rem 0;
   text-align: center;
   color: var(--sand);
-  border: 1px solid var(--brass-dim);
-  border-radius: 8px;
-  background: rgba(240, 224, 200, 0.03);
+  border: none;
+  background: none;
 }
 
 .empty-state p {
@@ -3743,10 +3755,6 @@ a:hover .city-landmark-photo,
 
 /* Responsive */
 @media (max-width: 768px) {
-  .cities-grid {
-    grid-template-columns: 1fr;
-  }
-
   .verticals-grid {
     grid-template-columns: 1fr;
   }
@@ -4006,11 +4014,12 @@ a:hover .city-landmark-photo,
 
 .watch-email-row input {
   flex: 1 1 220px;
-  background: rgba(240, 224, 200, 0.05);
-  border: 1px solid rgba(240, 224, 200, 0.09);
-  border-radius: 10px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(240, 224, 200, 0.18);
+  border-radius: 0;
   color: var(--ivory);
-  padding: 0.7rem 1rem;
+  padding: 0.7rem 0.2rem;
   font: inherit;
   min-height: 44px;
 }
@@ -4035,8 +4044,6 @@ a:hover .city-landmark-photo,
   width: 200px;
   height: 150px;
   object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid var(--hairline);
 }
 .wiki-text { flex: 1 1 320px; min-width: 0; }
 .wiki-extract {
@@ -4069,7 +4076,7 @@ a:hover .city-landmark-photo,
   position: absolute;
   z-index: 3000;
   background: var(--basalt-raised);
-  border: 1px solid var(--band-equilibrium);
+  border-bottom: 2px solid var(--band-equilibrium);
   border-radius: 10px;
   padding: 0.6rem 0.9rem;
   font-size: 0.85rem;
@@ -4163,7 +4170,6 @@ a:hover .city-landmark-photo,
   width: 100%;
   max-width: 420px;
   background: linear-gradient(180deg, rgba(30, 24, 17, 0.96) 0%, rgba(14, 12, 9, 0.98) 100%);
-  border: 1px solid var(--brass-dim);
   border-radius: var(--radius);
   padding: 2rem 1.75rem 1.75rem;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
@@ -4235,7 +4241,8 @@ a:hover .city-landmark-photo,
 .gt-auth-provider[data-provider="apple"] {
   background: transparent;
   color: var(--ivory);
-  border: 1px solid var(--brass-dim);
+  border: none;
+  border-bottom: 1px solid var(--brass-dim);
 }
 .gt-auth-provider[data-provider="apple"]:hover { border-color: var(--brass); }
 
@@ -4271,10 +4278,11 @@ a:hover .city-landmark-photo,
 .gt-auth-input {
   width: 100%;
   min-height: 48px;
-  padding: 0.8rem 1rem;
-  background: rgba(240, 224, 200, 0.05);
-  border: 1px solid rgba(240, 224, 200, 0.12);
-  border-radius: 12px;
+  padding: 0.8rem 0.2rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(240, 224, 200, 0.2);
+  border-radius: 0;
   color: var(--ivory);
   font-family: var(--font-body);
   font-size: 0.95rem;
@@ -4293,9 +4301,10 @@ a:hover .city-landmark-photo,
 
 /* ===== CHECK-IN COMPOSER + LIST ===== */
 .checkin-composer {
-  border: 1px solid var(--brass-dim);
-  border-radius: 16px;
-  padding: 1.25rem;
+  border: none;
+  border-top: 1px solid var(--brass-dim);
+  border-radius: 0;
+  padding: 1.25rem 0 0;
   margin-bottom: 1.5rem;
   /* Reserved so swapping the signed-out prompt for the full composer
      (or vice versa, once auth resolves) never shifts the page. */
@@ -4394,6 +4403,41 @@ a:hover .city-landmark-photo,
 
 .checkin-status-reward { color: var(--brass); }
 
+/* Neon "check in" insignia: a pointing hand + label that sits between the
+   composer heading and the sign-in prompt / form, so it reads as a sign
+   pointing down at whichever one is showing. Same brass glow language as
+   .checkin-glow, never a box or badge fill -- just light and motion. */
+.checkin-insignia {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+  color: var(--brass);
+  text-shadow: 0 0 14px rgba(176, 141, 87, 0.6), 0 0 32px rgba(176, 141, 87, 0.26);
+  animation: checkin-glow-breathe 4.5s ease-in-out infinite;
+}
+.checkin-insignia-hand {
+  display: inline-block;
+  font-size: 1.4rem;
+  line-height: 1;
+  transform: rotate(90deg);
+  filter: drop-shadow(0 0 10px rgba(176, 141, 87, 0.65));
+  animation: checkin-insignia-point 1.8s ease-in-out infinite;
+}
+.checkin-insignia-label {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.98rem;
+  letter-spacing: 0.05em;
+}
+@keyframes checkin-insignia-point {
+  0%, 100% { transform: rotate(90deg) translateX(0); }
+  50% { transform: rotate(90deg) translateX(7px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .checkin-insignia, .checkin-insignia-hand { animation: none; }
+}
+
 /* Small "Live" mark above the city hero h1 -- carries the same pulse-trace
    underline as the check-in eyebrow so both read as one visual language. */
 .city-live-badge {
@@ -4428,10 +4472,11 @@ a:hover .city-landmark-photo,
   gap: 0.35rem;
   min-height: 64px;
   min-width: 64px;
-  padding: 0.6rem 1rem;
-  background: rgba(240, 224, 200, 0.05);
-  border: 1px solid var(--brass-dim);
-  border-radius: 12px;
+  padding: 0.6rem 1rem 0.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--brass-dim);
+  border-radius: 0;
   color: var(--sand);
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
@@ -4466,10 +4511,11 @@ a:hover .city-landmark-photo,
 
 .checkin-note {
   width: 100%;
-  padding: 0.75rem 0.9rem;
-  background: rgba(240, 224, 200, 0.05);
-  border: 1px solid rgba(240, 224, 200, 0.12);
-  border-radius: 12px;
+  padding: 0.75rem 0.2rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(240, 224, 200, 0.2);
+  border-radius: 0;
   color: var(--ivory);
   font-family: var(--font-body);
   font-size: 0.92rem;
@@ -4488,12 +4534,13 @@ a:hover .city-landmark-photo,
 }
 
 /* Reuses .checkin-item's own look so this preview is literally a
-   preview -- the same card the visitor will see appear in the list
-   below once they submit, not a description of what will happen. */
+   preview -- the same row the visitor will see appear in the list below
+   once they submit, not a description of what will happen. Dashed
+   rather than solid marks it as draft/not-yet-posted. */
 .checkin-preview {
-  border: 1px dashed var(--brass-dim);
-  border-radius: 12px;
-  padding: 0.9rem 1rem;
+  border: none;
+  border-top: 1px dashed var(--brass-dim);
+  padding: 0.9rem 0 0;
   margin-bottom: 1rem;
   opacity: 0.9;
 }
@@ -4506,7 +4553,7 @@ a:hover .city-landmark-photo,
   min-height: 1.2em;
 }
 
-.checkin-list { display: flex; flex-direction: column; gap: 0.75rem; min-height: 96px; }
+.checkin-list { display: flex; flex-direction: column; min-height: 96px; }
 
 /* ===== INVESTOR PAGE: REVENUE PATHS ===== */
 .revenue-paths-list {
@@ -4523,12 +4570,18 @@ a:hover .city-landmark-photo,
 }
 .revenue-paths-list li:last-child { padding-bottom: 0; }
 
+/* A stacked list divided by a single rule -- not a bordered card per
+   check-in. This list sits directly under the "Check in to {City}"
+   composer, the single most prominent feature on every city page, so a
+   wall of boxes here would undercut the whole "editorial, not
+   dashboard" premise more than almost anywhere else on the site. */
 .checkin-item {
-  border: 1px solid var(--hairline);
-  border-radius: 12px;
-  padding: 0.9rem 1rem;
-  background: rgba(35, 28, 20, 0.4);
+  border: none;
+  border-top: 1px solid var(--hairline);
+  padding: 0.9rem 0;
+  background: none;
 }
+.checkin-item:first-child { border-top: none; }
 
 .checkin-item-head {
   display: flex;
@@ -4673,10 +4726,8 @@ a:hover .city-landmark-photo,
 }
 .tonight-modelled {
   color: var(--brass);
-  border: 1px solid var(--brass-dim);
-  border-radius: 4px;
-  padding: 0 0.3rem;
   font-variant-caps: small-caps;
+  font-style: italic;
 }
 .tonight-empty-copy {
   color: var(--sand);
@@ -4781,7 +4832,8 @@ a:hover .city-landmark-photo,
 .spin-section {
   padding: 2rem 1.5rem 2.25rem;
   margin-bottom: 2rem;
-  border: 1px solid var(--brass-dim);
+  border: none;
+  border-top: 1px solid var(--hairline);
   /* #spin-section ships empty and is filled by glotemp-spin.js on mount.
      Without a reserved box the fill pushes everything below it down --
      measured as a real (if small) layout shift at 768px, where the fold
@@ -4837,16 +4889,16 @@ a:hover .city-landmark-photo,
 .spin-dial-svg { display: block; width: 100%; height: 100%; }
 .spin-rotor { transform-origin: 110px 110px; }
 
-/* Brass hairline, not a filled slab. This was the last solid rectangle
-   with a drop shadow on the homepage; it stays the most prominent
-   control through scale, tracking and the 260px dial above it, without
-   being a box. */
+/* A bottom hairline, not a box. Stays the most prominent control through
+   scale, tracking and the 260px dial above it, without ever outlining a
+   rectangle. */
 .spin-go {
   min-height: 52px;
-  padding: 0.85rem 2.6rem;
+  padding: 0.85rem 2.6rem 0.65rem;
   background: transparent;
   color: var(--brass);
-  border: 1px solid var(--brass);
+  border: none;
+  border-bottom: 1px solid var(--brass);
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
   font-size: 1.05rem;
@@ -5154,11 +5206,11 @@ time, .instr-clock, .tonight-modelled {
 .trip-sponsor-note a:hover { color: var(--ivory); }
 
 /* ===== AUTH MODAL: hairlines, not stacked boxes ===== */
-.gt-auth-modal { border-radius: 0; border: 1px solid var(--brass-dim); background: var(--obsidian); }
+.gt-auth-modal { border-radius: 0; border: none; background: var(--obsidian); box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6); }
 .gt-auth-close { border-radius: 0; }
 .gt-auth-provider {
   border-radius: 0; background: transparent; color: var(--ivory);
-  border: 1px solid var(--brass-dim);
+  border: none; border-bottom: 1px solid var(--brass-dim);
   display: flex; align-items: center; justify-content: center; gap: 0.7rem;
 }
 .gt-auth-provider:hover { border-color: var(--brass); background: transparent; transform: none; }
@@ -5365,13 +5417,15 @@ main > *,
   box-shadow: none !important;
 }
 
-/* Where a boundary is genuinely needed it is one brass hairline.
-   .spin-variant, .mood-btn and .affiliate-btn are deliberately excluded
-   -- those read as plain text with a hairline underline, never a
-   bordered box or pill (see their own rules above). */
+/* No full borders anywhere on the site, full stop -- not even a hairline
+   box outline. Every one of these reads as plain text with a single
+   bottom hairline, exactly like .spin-variant, .mood-btn and
+   .affiliate-btn (see their own rules above). */
 .mood-emoji, .checkin-mode, .band-chip,
 .pagination-btn, .vertical-link {
-  border: 1px solid var(--brass-dim);
+  border: none;
+  border-bottom: 1px solid var(--brass-dim);
+  border-radius: 0;
 }
 
 /* Text inputs read as a single ruled line, not a filled field. */

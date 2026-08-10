@@ -239,7 +239,7 @@
         <div data-step="signin">
           <p class="eyebrow">Glotemp</p>
           <h2 class="gt-auth-title">Sign in to add your signal</h2>
-          <p class="gt-auth-copy" id="gt-auth-reason">Browsing stays anonymous. Signing in is only needed to check in, comment, or watch a city.</p>
+          <p class="gt-auth-copy" id="gt-auth-reason">Browsing stays anonymous. Signing in is only needed to add a reading, comment, or follow a city.</p>
           <form class="gt-auth-email-form" id="gt-auth-email-form">
             <label class="gt-auth-label" for="gt-auth-email">Email</label>
             <input class="gt-auth-input" type="email" id="gt-auth-email" placeholder="you@example.com" required autocomplete="email">
@@ -251,7 +251,7 @@
         <div data-step="profile" hidden>
           <p class="eyebrow">One last thing</p>
           <h2 class="gt-auth-title">Set up your profile</h2>
-          <p class="gt-auth-copy">This is how your check-ins appear to everyone else.</p>
+          <p class="gt-auth-copy">This is how your readings appear to everyone else.</p>
           <form class="gt-auth-email-form" id="gt-auth-profile-form">
             <label class="gt-auth-label" for="gt-auth-display-name">Display name</label>
             <input class="gt-auth-input" type="text" id="gt-auth-display-name" maxlength="60" required autocomplete="nickname">
@@ -382,7 +382,7 @@
     if (isSignedIn()) {
       const profile = await fetchProfile();
       if (!profile) {
-        openModal('Tell us who you are so your check-ins have a name.', 'profile');
+        openModal('Tell us who you are so your readings have a name.', 'profile');
       } else {
         // Announce a resolved signed-in state on every load, not only
         // after an OAuth return. Other modules (the check-in composer)
