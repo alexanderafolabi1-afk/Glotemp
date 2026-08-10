@@ -31,7 +31,7 @@ const VERTICALS = [
 ];
 
 // Kept identical to generate-city-pages.js's copy.
-const LISTINGS_VERTICALS = new Set(['sport', 'entertainment', 'fashion', 'food', 'property', 'work', 'tech', 'transport']);
+const LISTINGS_VERTICALS = new Set(['entertainment', 'fashion', 'food', 'property', 'work', 'tech', 'transport']);
 
 function pageHTML(city, v) {
   return `<!DOCTYPE html>
@@ -69,7 +69,7 @@ function pageHTML(city, v) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=50" />
+  <link rel="stylesheet" href="/styles.css?v=51" />
 </head>
 <body>
   <nav id="site-nav"></nav>

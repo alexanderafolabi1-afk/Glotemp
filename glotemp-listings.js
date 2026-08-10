@@ -1,6 +1,8 @@
 // Glotemp Listings: curated content + partner/nomination system for the
-// commercial verticals (sport, entertainment, fashion, food, property,
-// work, tech, transport). Reads approved rows from curated_listings;
+// commercial verticals (entertainment, fashion, food, property, work,
+// tech, transport). Sport is covered by glotemp-sports.js's live feed
+// instead -- fixtures and results don't need manual curation. Reads
+// approved rows from curated_listings;
 // unfilled slots become an editorial "open slot" inviting a nomination.
 // Nothing here is fabricated -- an empty table means every slot on every
 // page shows the open-slot prompt, honestly, until a real submission is
@@ -12,14 +14,6 @@
   var SUPABASE_ANON_KEY = SUPABASE_ANON_KEY || 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
 
   var CONFIG = {
-    sport: {
-      slots: 3, kind: 'partner',
-      eyebrow: 'Featured in sport',
-      emptyLabel: 'Partner slot open',
-      cta: 'Partner with your club or federation',
-      modalTitle: 'Partner or feature a club',
-      modalCopy: 'Tell us about a club, federation, or local sports story worth featuring here -- especially one our live feed does not cover yet.',
-    },
     entertainment: {
       slots: 5, kind: 'event',
       eyebrow: 'Upcoming events',

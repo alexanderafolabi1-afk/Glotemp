@@ -1,9 +1,16 @@
-// Glotemp curated city -> sports team mapping. Real, well-known clubs only --
-// deliberately incomplete rather than guessed. A city missing here simply
-// gets the global F1 calendar and an open partner/nominate slot instead of a
-// fabricated local club. glotemp-sports.js resolves each team name to a live
-// ID via TheSportsDB's search endpoint at runtime, so this file only needs
-// to get the name right, not any numeric ID.
+// Glotemp curated city -> sports team mapping, in two layers:
+//
+// 1. CITY_SPORTS: real, specific local clubs for cities where I'm confident
+//    of the club. Deliberately incomplete rather than guessed.
+// 2. COUNTRY_NATIONAL_TEAMS + CITY_NATIONAL_FOOTBALL_OVERRIDE below: every
+//    city's country resolves to its real national football team (and,
+//    where the sport is genuinely major there, its national rugby and
+//    cricket teams too), so every one of the 151 cities gets live coverage
+//    -- not just the ones with a locally curated club.
+//
+// glotemp-sports.js resolves every team name to a live ID via TheSportsDB's
+// search endpoint at runtime, so this file only needs to get the name
+// right, not any numeric ID.
 const CITY_SPORTS = {
   london: { football: ['Arsenal', 'Chelsea'], rugby: ['Harlequins'] },
   madrid: { football: ['Real Madrid'] },
@@ -139,4 +146,66 @@ const CITY_SPORTS = {
 // hardcoded here -- calendars shift year to year and a stale hardcoded list
 // would go stale silently.
 
-if (typeof window !== 'undefined') window.CITY_SPORTS = CITY_SPORTS;
+// Every city's `country` field (from cities-data.js) resolves to its real
+// national football team name -- this is the universal layer that gives
+// every one of the 151 cities live sport coverage, not just the ones with
+// a hand-curated local club above. Names match how the country is commonly
+// listed in sports databases, which occasionally differs from the
+// cities-data.js country string (e.g. "Czechia" -> "Czech Republic").
+const COUNTRY_NATIONAL_FOOTBALL = {
+  Algeria: 'Algeria', Argentina: 'Argentina', Australia: 'Australia', Austria: 'Austria',
+  Bangladesh: 'Bangladesh', Belgium: 'Belgium', Brazil: 'Brazil', Bulgaria: 'Bulgaria',
+  Cambodia: 'Cambodia', Canada: 'Canada', Chile: 'Chile', China: 'China',
+  Colombia: 'Colombia', Cuba: 'Cuba', Czechia: 'Czech Republic', DRC: 'DR Congo',
+  Denmark: 'Denmark', Ecuador: 'Ecuador', Egypt: 'Egypt', Ethiopia: 'Ethiopia',
+  Finland: 'Finland', France: 'France', Germany: 'Germany', Ghana: 'Ghana',
+  Greece: 'Greece', 'Hong Kong': 'Hong Kong', Hungary: 'Hungary', India: 'India',
+  Indonesia: 'Indonesia', Iran: 'Iran', Iraq: 'Iraq', Ireland: 'Republic of Ireland',
+  Israel: 'Israel', Italy: 'Italy', Japan: 'Japan', Jordan: 'Jordan', Kenya: 'Kenya',
+  Kuwait: 'Kuwait', Laos: 'Laos', Lebanon: 'Lebanon', Lithuania: 'Lithuania',
+  Malaysia: 'Malaysia', Mexico: 'Mexico', Mongolia: 'Mongolia', Morocco: 'Morocco',
+  Myanmar: 'Myanmar', Nepal: 'Nepal', Netherlands: 'Netherlands', 'New Zealand': 'New Zealand',
+  Nigeria: 'Nigeria', Norway: 'Norway', Oman: 'Oman', Pakistan: 'Pakistan', Peru: 'Peru',
+  Philippines: 'Philippines', Poland: 'Poland', Portugal: 'Portugal', Qatar: 'Qatar',
+  Romania: 'Romania', Russia: 'Russia', 'Saudi Arabia': 'Saudi Arabia', Senegal: 'Senegal',
+  Singapore: 'Singapore', 'South Africa': 'South Africa', 'South Korea': 'South Korea',
+  Spain: 'Spain', 'Sri Lanka': 'Sri Lanka', Sweden: 'Sweden', Switzerland: 'Switzerland',
+  Taiwan: 'Chinese Taipei', Tanzania: 'Tanzania', Thailand: 'Thailand', Tunisia: 'Tunisia',
+  Turkey: 'Turkey', UAE: 'United Arab Emirates', UK: 'England', USA: 'United States',
+  Ukraine: 'Ukraine', Uruguay: 'Uruguay', Venezuela: 'Venezuela', Vietnam: 'Vietnam',
+};
+
+// The UK is not itself a FIFA nation -- London and Milton Keynes are in
+// England's football association, Edinburgh is in Scotland's.
+const CITY_NATIONAL_FOOTBALL_OVERRIDE = {
+  edinburgh: 'Scotland',
+};
+
+// National rugby and cricket teams, limited to countries where the sport
+// is genuinely a major one nationally -- not attempted everywhere the way
+// football is, since most countries don't field a nationally-followed
+// rugby or cricket side.
+const COUNTRY_NATIONAL_RUGBY = {
+  UK: 'England', Ireland: 'Ireland', France: 'France', Italy: 'Italy',
+  'South Africa': 'South Africa', 'New Zealand': 'New Zealand', Australia: 'Australia',
+  Argentina: 'Argentina', Japan: 'Japan', USA: 'United States', Canada: 'Canada',
+  Romania: 'Romania', Portugal: 'Portugal', Spain: 'Spain',
+};
+const CITY_NATIONAL_RUGBY_OVERRIDE = {
+  edinburgh: 'Scotland',
+};
+
+const COUNTRY_NATIONAL_CRICKET = {
+  India: 'India', Pakistan: 'Pakistan', 'Sri Lanka': 'Sri Lanka', Bangladesh: 'Bangladesh',
+  Australia: 'Australia', UK: 'England', 'South Africa': 'South Africa',
+  'New Zealand': 'New Zealand', Ireland: 'Ireland',
+};
+
+if (typeof window !== 'undefined') {
+  window.CITY_SPORTS = CITY_SPORTS;
+  window.COUNTRY_NATIONAL_FOOTBALL = COUNTRY_NATIONAL_FOOTBALL;
+  window.CITY_NATIONAL_FOOTBALL_OVERRIDE = CITY_NATIONAL_FOOTBALL_OVERRIDE;
+  window.COUNTRY_NATIONAL_RUGBY = COUNTRY_NATIONAL_RUGBY;
+  window.CITY_NATIONAL_RUGBY_OVERRIDE = CITY_NATIONAL_RUGBY_OVERRIDE;
+  window.COUNTRY_NATIONAL_CRICKET = COUNTRY_NATIONAL_CRICKET;
+}

@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=50">
+  <link rel="stylesheet" href="/styles.css?v=51">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -172,7 +172,7 @@
       <div id="sport-content" class="vertical-content"></div>
       <div id="sport-context" class="vertical-context"></div>
       <div id="sport-live" class="sport-live" data-city="tehran" data-city-name="Tehran" data-country="Iran"></div>
-      <div class="vertical-listings" data-city="tehran" data-vertical="sport"></div>
+      
     </section>
   
 
@@ -586,7 +586,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"خیابان ولیعصر روز جمعه - مردم پیاده‌روی می‌کنند، آرام.","language_lens":"local","created_at":"2026-08-10T07:31:16.140Z"},{"context":"Darband cafés at dusk - mountain air, tea, and laughter.","language_lens":"visitor","created_at":"2026-08-09T20:31:16.140Z"},{"context":"مترو خط ۲ ساعت شلوغی - همه چیز عادی است.","language_lens":"local","created_at":"2026-08-09T07:31:16.140Z"},{"context":"North Tehran, Tajrish square on a Thursday - families out, warm.","language_lens":"diaspora","created_at":"2026-08-08T19:31:16.140Z"}];
+      const checkins = [{"context":"خیابان ولیعصر روز جمعه - مردم پیاده‌روی می‌کنند، آرام.","language_lens":"local","created_at":"2026-08-10T07:41:54.833Z"},{"context":"Darband cafés at dusk - mountain air, tea, and laughter.","language_lens":"visitor","created_at":"2026-08-09T20:41:54.833Z"},{"context":"مترو خط ۲ ساعت شلوغی - همه چیز عادی است.","language_lens":"local","created_at":"2026-08-09T07:41:54.833Z"},{"context":"North Tehran, Tajrish square on a Thursday - families out, warm.","language_lens":"diaspora","created_at":"2026-08-08T19:41:54.833Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

@@ -83,7 +83,7 @@ function generateVerticalNav() {
 // Verticals with a curated-content + partner/nomination system, per the
 // monetisation brief. Pulse, Finance, Education, Health, Radio stay
 // pure-reading verticals -- untouched.
-const LISTINGS_VERTICALS = new Set(['sport', 'entertainment', 'fashion', 'food', 'property', 'work', 'tech', 'transport']);
+const LISTINGS_VERTICALS = new Set(['entertainment', 'fashion', 'food', 'property', 'work', 'tech', 'transport']);
 
 function generateVerticalSections(city) {
   return VERTICALS.map(v => `

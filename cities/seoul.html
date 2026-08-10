@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=50">
+  <link rel="stylesheet" href="/styles.css?v=51">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -172,7 +172,7 @@
       <div id="sport-content" class="vertical-content"></div>
       <div id="sport-context" class="vertical-context"></div>
       <div id="sport-live" class="sport-live" data-city="seoul" data-city-name="Seoul" data-country="South Korea"></div>
-      <div class="vertical-listings" data-city="seoul" data-vertical="sport"></div>
+      
     </section>
   
 
@@ -586,7 +586,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"홍대 거리는 토요일 오후에 항상 활기차다. 좋은 에너지.","language_lens":"local","created_at":"2026-08-10T09:31:16.140Z"},{"context":"Bukchon Hanok Village - serene, slow, beautiful.","language_lens":"visitor","created_at":"2026-08-09T18:31:16.140Z"},{"context":"Itaewon on Saturday - globalness compressed into one neighbourhood.","language_lens":"visitor","created_at":"2026-08-10T12:31:16.140Z"},{"context":"강남구 클럽 구역 밤 11시 - 에너지가 폭발하고 있다.","language_lens":"local","created_at":"2026-08-09T04:31:16.140Z"}];
+      const checkins = [{"context":"홍대 거리는 토요일 오후에 항상 활기차다. 좋은 에너지.","language_lens":"local","created_at":"2026-08-10T09:41:54.833Z"},{"context":"Bukchon Hanok Village - serene, slow, beautiful.","language_lens":"visitor","created_at":"2026-08-09T18:41:54.833Z"},{"context":"Itaewon on Saturday - globalness compressed into one neighbourhood.","language_lens":"visitor","created_at":"2026-08-10T12:41:54.833Z"},{"context":"강남구 클럽 구역 밤 11시 - 에너지가 폭발하고 있다.","language_lens":"local","created_at":"2026-08-09T04:41:54.833Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

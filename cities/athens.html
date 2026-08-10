@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=50">
+  <link rel="stylesheet" href="/styles.css?v=51">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -172,7 +172,7 @@
       <div id="sport-content" class="vertical-content"></div>
       <div id="sport-context" class="vertical-context"></div>
       <div id="sport-live" class="sport-live" data-city="athens" data-city-name="Athens" data-country="Greece"></div>
-      <div class="vertical-listings" data-city="athens" data-vertical="sport"></div>
+      
     </section>
   
 
@@ -586,7 +586,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Monastiraki flea market on Sunday - ancient city still breathing.","language_lens":"visitor","created_at":"2026-08-10T11:31:16.140Z"},{"context":"Καφές στο Θησείο το πρωί - Ακρόπολη στον ορίζοντα.","language_lens":"local","created_at":"2026-08-10T04:31:16.140Z"},{"context":"Gazi district at 1am - music, warmth, the Mediterranean night.","language_lens":"visitor","created_at":"2026-08-09T19:31:16.140Z"},{"context":"Μετρό γραμμή 2 γεμάτο - αλλά ήρεμο.","language_lens":"local","created_at":"2026-08-09T08:31:16.140Z"},{"context":"Exarcheia neighbourhood - art, resistance, real Athenian life.","language_lens":"diaspora","created_at":"2026-08-08T18:31:16.140Z"}];
+      const checkins = [{"context":"Monastiraki flea market on Sunday - ancient city still breathing.","language_lens":"visitor","created_at":"2026-08-10T11:41:54.833Z"},{"context":"Καφές στο Θησείο το πρωί - Ακρόπολη στον ορίζοντα.","language_lens":"local","created_at":"2026-08-10T04:41:54.833Z"},{"context":"Gazi district at 1am - music, warmth, the Mediterranean night.","language_lens":"visitor","created_at":"2026-08-09T19:41:54.833Z"},{"context":"Μετρό γραμμή 2 γεμάτο - αλλά ήρεμο.","language_lens":"local","created_at":"2026-08-09T08:41:54.833Z"},{"context":"Exarcheia neighbourhood - art, resistance, real Athenian life.","language_lens":"diaspora","created_at":"2026-08-08T18:41:54.833Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
