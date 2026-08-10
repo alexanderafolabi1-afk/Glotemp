@@ -147,15 +147,15 @@
 
   // Ties the ambient background to a real mood reading (0-10) so the
   // page actually shows the temperature the product is named for,
-  // rather than sitting at a fixed neutral tone. --mood-hue/--mood-sat
+  // rather than sitting at a fixed neutral tone. --ambient-warmth
   // feed the rotating wash layer in styles.css's body::before.
   function applyMoodBackground(mood) {
     const m = typeof mood === 'number' && !Number.isNaN(mood) ? mood : 5.0;
     const normalized = m / 10;
-    const hueShift = (normalized - 0.5) * 140; // cold/low -> -70deg, charged -> +70deg
-    const saturation = 0.9 + Math.abs(normalized - 0.5) * 0.7;
-    document.documentElement.style.setProperty('--mood-hue', `${hueShift.toFixed(1)}deg`);
-    document.documentElement.style.setProperty('--mood-saturation', saturation.toFixed(2));
+    // Strength of one warm tone, not a hue rotation. This used to rotate
+    // the ground's hue by up to +/-70 degrees, which dragged the warm
+    // brown-black through purple, green and red depending on the city.
+    document.documentElement.style.setProperty('--ambient-warmth', normalized.toFixed(2));
   }
 
   // On load, tint the background using whatever mood is already known --

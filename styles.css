@@ -89,15 +89,6 @@
   --scrim-opacity: 0.18;
 }
 
-/* Lets the rotating wash color animate smoothly (browsers without
-   @property support just render the wash static -- still colorful,
-   just not spinning; a fine progressive-enhancement fallback). */
-@property --spin-angle {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 /* ===== BACKGROUND & TEXTURE ===== */
@@ -118,27 +109,17 @@ body {
   position: relative;
 }
 
-/* Living background: a slow, continuously rotating "aurora" wash in the
-   site's own band colors (the same five colors every barometer/reading
-   uses) sits under the leather texture, so the page actually shows a
-   temperature instead of reading as flat near-black. --mood-hue/
-   --mood-saturation (set by GlotempCore.applyMoodBackground, driven by
-   whichever city's mood the current page actually knows about) shift
-   that wash toward the real reading; --spin-angle keeps it moving on
-   its own even when no mood is known yet. */
+/* Ground: deep warm brown-black, one tone.
+   This replaced a continuously rotating conic-gradient "aurora" in five
+   band colours -- magenta, orange, cream, blue and cyan, each at 0.30
+   alpha, spinning on a 70s loop, with the mottling layer recoloured to
+   match. Five hues bleeding across each other is what read as a muddy
+   multicoloured blur rather than a deliberate surface. The texture stays;
+   the colour does not. Ambient variation is strength only, via
+   --ambient-warmth, never a second hue. */
 :root {
   --mood-tint: rgba(6, 6, 10, 0);
   --mood-tint-transition: 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --spin-angle: 0deg;
-}
-
-@keyframes ambient-spin {
-  to { --spin-angle: 360deg; }
-}
-
-body {
-  --spin-angle: 0deg;
-  animation: ambient-spin 70s linear infinite;
 }
 
 body::before {
@@ -150,29 +131,16 @@ body::before {
   height: 100%;
   background-color: var(--obsidian);
   background-image:
-    /* Rotating aurora wash -- the actual "temperature", in band colors.
-       Large, full-viewport and saturated: this is the layer that should
-       read as alive at a glance, not a hint. */
-    conic-gradient(
-      from var(--spin-angle) at 50% 50%,
-      rgba(200, 107, 224, 0.30),
-      rgba(245, 162, 90, 0.30),
-      rgba(240, 224, 200, 0.22),
-      rgba(107, 168, 245, 0.30),
-      rgba(79, 216, 232, 0.30),
-      rgba(200, 107, 224, 0.30)
-    ),
-    /* A second, larger and off-center soft glow that drifts against the
-       conic wash so the color never sits perfectly still even at a
-       glance -- two different rotation speeds reading as one living field. */
-    radial-gradient(ellipse 80% 70% at 30% 20%, rgba(245, 162, 90, 0.16) 0%, transparent 60%),
-    /* Large mottling layer - creates the hide texture, now with real presence */
-    radial-gradient(ellipse 120px 90px at 15% 25%, rgba(240, 224, 200,0.16) 0%, transparent 40%),
-    radial-gradient(ellipse 100px 80px at 75% 60%, rgba(200, 107, 224,0.14) 0%, transparent 45%),
-    radial-gradient(ellipse 110px 85px at 45% 75%, rgba(245, 162, 90,0.15) 0%, transparent 42%),
-    radial-gradient(ellipse 95px 70px at 85% 20%, rgba(79, 216, 232,0.13) 0%, transparent 48%),
-    radial-gradient(ellipse 105px 75px at 25% 55%, rgba(107, 168, 245,0.14) 0%, transparent 46%),
-    /* Medium grain texture - subtle */
+    /* One warm brass glow, off-centre, holding the top of the page. */
+    radial-gradient(ellipse 90% 70% at 50% 0%,
+      rgba(176, 141, 87, calc(0.05 + 0.05 * var(--ambient-warmth, 0.5))) 0%, transparent 62%),
+    /* Hide mottling, in the ground's own warm tones. */
+    radial-gradient(ellipse 120px 90px at 15% 25%, rgba(240, 224, 200, 0.030) 0%, transparent 40%),
+    radial-gradient(ellipse 100px 80px at 75% 60%, rgba(176, 141, 87, 0.026) 0%, transparent 45%),
+    radial-gradient(ellipse 110px 85px at 45% 75%, rgba(240, 224, 200, 0.028) 0%, transparent 42%),
+    radial-gradient(ellipse 95px 70px at 85% 20%, rgba(176, 141, 87, 0.024) 0%, transparent 48%),
+    radial-gradient(ellipse 105px 75px at 25% 55%, rgba(240, 224, 200, 0.026) 0%, transparent 46%),
+    /* Medium grain */
     radial-gradient(ellipse 3px 2px at 20% 30%, rgba(240, 224, 200,0.016) 0%, transparent 50%),
     radial-gradient(ellipse 3px 2px at 60% 70%, rgba(240, 224, 200,0.014) 0%, transparent 50%),
     radial-gradient(ellipse 3px 2px at 40% 50%, rgba(240, 224, 200,0.015) 0%, transparent 50%),
@@ -193,15 +161,20 @@ body::before {
       rgba(240, 224, 200,0.005) 2px,
       rgba(240, 224, 200,0.005) 3px
     );
-  background-size: 100% 100%, 100% 100%, cover, cover, cover, cover, cover, cover, cover, cover, cover, cover, 8px 8px, 8px 8px;
-  background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
-  background-repeat: no-repeat, no-repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat;
+  background-size: 100% 100%, cover, cover, cover, cover, cover, cover, cover, cover, cover, cover, 8px 8px, 8px 8px;
+  background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+  background-repeat: no-repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat;
   background-attachment: fixed;
   opacity: 0.95;
   pointer-events: none;
   z-index: -2;
   transition: filter var(--mood-tint-transition);
-  filter: hue-rotate(var(--mood-hue, 0deg)) saturate(var(--mood-saturation, 1));
+  /* No hue-rotate, no saturate. Rotating the hue of a warm brown-black
+     ground by up to +/-70 degrees per city is what turned the ground
+     purple, green and red -- a multi-hue wash that read as a mistake.
+     Mood is carried by the instruments; the ground stays one warm tone
+     and varies only in strength. */
+  filter: brightness(calc(0.94 + 0.12 * var(--ambient-warmth, 0.5)));
 }
 
 /* Legibility scrim -- lighter than before so the wash actually shows;
@@ -221,12 +194,14 @@ body::after {
 /* Time-of-day: updateAmbientLighting() in app.js sets one of these on
    <body> for every page (not just the homepage) and refreshes hourly, so
    the wash keeps drifting warmer/cooler across the day even on a page
-   with no mood reading to key off yet. Layers with --mood-hue/
-   --mood-saturation when a real reading is known. */
-body.ambient-morning::before { filter: hue-rotate(calc(var(--mood-hue, 0deg) + 8deg)) saturate(calc(var(--mood-saturation, 1) * 1.05)) brightness(1.06); }
-body.ambient-day::before     { filter: hue-rotate(calc(var(--mood-hue, 0deg) - 4deg)) saturate(calc(var(--mood-saturation, 1) * 1.1))  brightness(1.1); }
-body.ambient-evening::before { filter: hue-rotate(calc(var(--mood-hue, 0deg) + 14deg)) saturate(calc(var(--mood-saturation, 1) * 1.08)) brightness(1.02); }
-body.ambient-night::before   { filter: hue-rotate(var(--mood-hue, 0deg)) saturate(var(--mood-saturation, 1)) brightness(0.92); }
+   with no mood reading to key off yet. Varies brightness only -- never
+   hue -- so the ground stays one warm tone. */
+/* Time of day varies BRIGHTNESS only, never hue -- the drift across the
+   day stays within the one warm tone. */
+body.ambient-morning::before { filter: brightness(calc(1.00 + 0.12 * var(--ambient-warmth, 0.5))); }
+body.ambient-day::before     { filter: brightness(calc(1.04 + 0.12 * var(--ambient-warmth, 0.5))); }
+body.ambient-evening::before { filter: brightness(calc(0.96 + 0.12 * var(--ambient-warmth, 0.5))); }
+body.ambient-night::before   { filter: brightness(calc(0.86 + 0.12 * var(--ambient-warmth, 0.5))); }
 
 /* Respect reduced transparency */
 @media (prefers-reduced-transparency: reduce) {
@@ -1105,7 +1080,12 @@ body.scroll-reveals-enabled section.revealed {
   border-radius: 50%;
   width: 60px;
   height: 60px;
-  object-fit: cover;
+  /* `cover` sliced the engraved outer bezel off the compass, and on a
+     phone the image's own line box could push it above the fixed bar so
+     the top of the plate was cut by the viewport. `contain` + block
+     keeps the whole plate inside its circular window at every width. */
+  display: block;
+  object-fit: contain;
   margin-right: 0.6rem;
   vertical-align: middle;
 }
@@ -5650,3 +5630,78 @@ main > *,
    source, not a container -- keep it. */
 .tonight-mode { border-left: 2px solid var(--tonight-band, var(--brass-dim)); }
 .obs-row { border-left: 2px solid var(--obs-band, var(--brass-dim)); }
+
+/* ==========================================================================
+   GLOBAL HORIZONTAL INSET FLOOR
+   The wrappers (#app / .page-main / .page-content) already clamp to a
+   36px minimum, but blocks that sit OUTSIDE them carried their own
+   smaller padding -- the footer's small print reached 16px from the edge
+   on a phone, and the injected cookie banner sat at 24px when 32px is
+   required at tablet width. This is the floor, applied where it was
+   missing rather than layered on top of padding that was already correct.
+   ========================================================================== */
+:root { --page-inset: 24px; }
+@media (min-width: 700px)  { :root { --page-inset: 32px; } }
+@media (min-width: 1200px) { :root { --page-inset: 48px; } }
+
+.footer,
+body > footer,
+body > header,
+body > section {
+  padding-left: max(var(--page-inset), env(safe-area-inset-left));
+  padding-right: max(var(--page-inset), env(safe-area-inset-right));
+  box-sizing: border-box;
+}
+
+/* The banner is injected from JS with an id selector, so the floor has to
+   match that specificity to land. */
+#cookie-consent-banner {
+  padding-left: max(var(--page-inset), env(safe-area-inset-left)) !important;
+  padding-right: max(var(--page-inset), env(safe-area-inset-right)) !important;
+}
+
+/* ==========================================================================
+   CHECK-IN COMPOSER — numbered flow, and a slider that is not a default
+   ========================================================================== */
+.checkin-step-head {
+  display: flex; align-items: center; gap: 0.6rem;
+  margin: 1.35rem 0 0.7rem;
+}
+.checkin-step-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; flex-shrink: 0;
+  border: 1px solid var(--brass-dim); border-radius: 50%;
+  font-family: var(--font-mono); font-size: 0.72rem; color: var(--brass);
+  transition: color var(--transition), border-color var(--transition);
+}
+.checkin-step-head.is-done .checkin-step-num { color: var(--ivory); border-color: var(--ivory); }
+.checkin-step-title {
+  font-family: var(--font-mono); font-variant-caps: small-caps;
+  font-size: 0.82rem; letter-spacing: 0.07em; color: var(--sand);
+}
+.checkin-step-head.is-done .checkin-step-title { color: var(--ivory); }
+.checkin-optional { font-size: 0.72rem; opacity: 0.6; letter-spacing: 0.04em; }
+.checkin-insignia-mark { width: 22px; height: 22px; color: var(--brass); }
+
+/* accent-color only recolours the default widget; the track and thumb were
+   still the browser's. Drawn explicitly instead: brass hairline track,
+   cream ivory thumb, no blue in any state. */
+.checkin-range {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; margin-bottom: 1rem; min-height: 24px;
+  background: transparent; border: none; outline: none; cursor: pointer;
+}
+.checkin-range::-webkit-slider-runnable-track { height: 1px; background: var(--brass-dim); border: none; }
+.checkin-range::-moz-range-track { height: 1px; background: var(--brass-dim); border: none; }
+.checkin-range::-moz-range-progress { height: 1px; background: var(--brass); }
+.checkin-range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 15px; height: 15px; margin-top: -7px;
+  border-radius: 50%; background: var(--ivory);
+  border: 1px solid var(--brass); box-shadow: none;
+}
+.checkin-range::-moz-range-thumb {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--ivory); border: 1px solid var(--brass);
+}
+.checkin-range:focus-visible::-webkit-slider-thumb { outline: 1px solid var(--ivory); outline-offset: 2px; }

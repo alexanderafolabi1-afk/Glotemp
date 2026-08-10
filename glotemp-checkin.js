@@ -66,7 +66,10 @@
         <p class="eyebrow">City reading</p>
         <h2 class="checkin-neon-title">How <span class="checkin-glow">${esc(name)}</span> feels right now</h2>
         <div class="checkin-insignia" aria-hidden="true">
-          <span class="checkin-insignia-hand">&#128073;</span>
+          <svg class="checkin-insignia-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>
+          </svg>
           <span class="checkin-insignia-label">Check in</span>
         </div>
         <div class="checkin-signedout" id="checkin-signedout">
@@ -74,11 +77,14 @@
           <button class="btn-neon checkin-neon-btn" type="button" id="checkin-signin-btn">Sign in</button>
         </div>
         <form class="checkin-form" id="checkin-form" hidden>
+          <p class="checkin-step-head" id="checkin-step-1"><span class="checkin-step-num">1</span><span class="checkin-step-title">Pick what you are doing</span></p>
           <div class="checkin-modes" role="group" aria-label="Mode">
             ${MODES.map((m, i) => `<button type="button" class="checkin-mode" data-mode="${m.slug}" aria-pressed="${i === 0 ? 'true' : 'false'}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${m.icon}</svg><span>${m.label}</span></button>`).join('')}
           </div>
+          <p class="checkin-step-head" id="checkin-step-2"><span class="checkin-step-num">2</span><span class="checkin-step-title">Set how intense it is</span></p>
           <label class="checkin-label" for="checkin-intensity">Intensity <span class="checkin-intensity-value" id="checkin-intensity-value">${INTENSITY_WORDS[5]} (5/10)</span></label>
           <input type="range" id="checkin-intensity" min="1" max="10" step="1" value="5" class="checkin-range">
+          <p class="checkin-step-head" id="checkin-step-3"><span class="checkin-step-num">3</span><span class="checkin-step-title">Add a note <span class="checkin-optional">optional</span></span></p>
           <label class="checkin-label" for="checkin-note">Note <span class="checkin-count" id="checkin-count">0/${NOTE_MAX}</span></label>
           <textarea id="checkin-note" class="checkin-note" rows="2" maxlength="${NOTE_MAX}" placeholder="A short note - what does it feel like?"></textarea>
           <p class="checkin-preview-label">This is what will post</p>
@@ -90,6 +96,7 @@
             </div>
             <p class="checkin-item-note" id="checkin-preview-note" hidden></p>
           </div>
+          <p class="checkin-step-head" id="checkin-step-4"><span class="checkin-step-num">4</span><span class="checkin-step-title">Post it</span></p>
           <div class="checkin-actions">
             <button type="submit" class="btn-neon checkin-neon-btn" id="checkin-submit">Add reading</button>
             <span class="checkin-status" id="checkin-status" role="status" aria-live="polite"></span>
@@ -137,8 +144,19 @@
       });
     }
 
+    // Each step marks itself done as it is satisfied, so what to do next is
+    // visible rather than guessed at.
+    function markDone(id, done) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('is-done', !!done);
+    }
+    markDone('checkin-step-1', true);
+    if (range) range.addEventListener('input', () => markDone('checkin-step-2', true));
+    if (note) note.addEventListener('input', () => markDone('checkin-step-3', note.value.trim().length > 0));
+
     document.querySelectorAll('.checkin-mode').forEach(btn => {
       btn.addEventListener('click', () => {
+        markDone('checkin-step-1', true);
         document.querySelectorAll('.checkin-mode').forEach(b => b.setAttribute('aria-pressed', 'false'));
         btn.setAttribute('aria-pressed', 'true');
         selectedMode = btn.getAttribute('data-mode');
