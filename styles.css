@@ -3771,65 +3771,93 @@ a:hover .city-landmark-photo,
   white-space: nowrap;
 }
 
-/* ===== PERSONALITY TOAST =====
-   The site's one floating, unsolicited UI element -- weather asides,
-   gentle check-ins, city trivia. Kept deliberately small, quiet, and
-   easy to dismiss: a flush hairline-topped strip (same grammar as the
-   cookie banner) rather than a boxed card, no glow, no motion beyond a
-   single soft rise on entry. */
+/* ===== PERSONALITY CLOUD =====
+   The one place on Glotemp that's allowed to be soft instead of precise:
+   weather asides, gentle check-ins, city trivia. Deliberately not a card
+   -- no straight edges, no flat panel fill, no bordered rectangle. An
+   organic, slowly-morphing blob washed with the site's own mood-band
+   colours (the same hues used for city temperature elsewhere), warm
+   parchment instead of obsidian so it reads as a small burst of light
+   against the dark instrument-panel rest of the page. Ink-dark text for
+   contrast, same as the dial faces on /explore. */
 .gt-toast {
   position: fixed;
   right: 1.5rem;
   bottom: 1.5rem;
   z-index: 5000;
-  width: min(360px, calc(100vw - 3rem));
-  background: var(--obsidian);
+  width: min(320px, calc(100vw - 3rem));
+  background:
+    radial-gradient(60% 60% at 22% 18%, rgba(200, 107, 224, 0.32), transparent 72%),
+    radial-gradient(55% 55% at 82% 20%, rgba(79, 216, 232, 0.28), transparent 72%),
+    radial-gradient(68% 68% at 55% 92%, rgba(245, 162, 90, 0.34), transparent 72%),
+    #F3E9DA;
   border: none;
-  border-top: 1px solid var(--brass-dim);
-  border-radius: 0;
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
-  padding: 1.1rem 2.6rem 1.15rem 1.25rem;
-  animation: fadeInUp 420ms cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 40% 60% 62% 38% / 42% 45% 55% 58%;
+  box-shadow:
+    0 25px 60px rgba(20, 16, 11, 0.5),
+    0 0 60px rgba(200, 107, 224, 0.10),
+    0 0 46px rgba(79, 216, 232, 0.08);
+  padding: 2.1rem 2.2rem 1.95rem;
+  animation: cloudRise 700ms cubic-bezier(0.16, 1, 0.3, 1), cloudMorph 10s ease-in-out 700ms infinite;
 }
 .gt-toast-eyebrow {
-  font-family: var(--font-mono);
-  font-variant-caps: small-caps;
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  color: var(--brass);
-  margin: 0 0 0.4rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.86rem;
+  letter-spacing: 0.01em;
+  color: #6B5643;
+  margin: 0 0 0.5rem;
 }
 .gt-toast-icon {
   font-variant-caps: normal;
   font-family: initial;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 .gt-toast-body {
   font-family: var(--font-body);
-  font-size: 0.92rem;
-  line-height: 1.5;
-  color: var(--ivory);
+  font-size: 0.94rem;
+  line-height: 1.55;
+  color: #3A2E22;
   margin: 0;
 }
 .gt-toast-close {
   position: absolute;
-  top: 0.7rem;
-  right: 0.7rem;
-  width: 32px;
-  height: 32px;
+  top: 1.15rem;
+  right: 1.35rem;
+  width: 30px;
+  height: 30px;
   background: transparent;
-  border: 1px solid var(--brass-dim);
+  border: none;
   border-radius: 50%;
-  color: var(--sand);
-  font-size: 0.78rem;
+  color: #6B5643;
+  font-size: 0.76rem;
   line-height: 1;
   cursor: pointer;
-  transition: all var(--transition);
+  opacity: 0.6;
+  transition: opacity var(--transition), background var(--transition);
 }
-.gt-toast-close:hover { color: var(--ivory); border-color: var(--brass); }
+.gt-toast-close:hover { opacity: 1; background: rgba(58, 46, 34, 0.08); }
+
+@keyframes cloudRise {
+  0% { opacity: 0; transform: translateY(18px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes cloudMorph {
+  0%, 100% { border-radius: 40% 60% 62% 38% / 42% 45% 55% 58%; }
+  50% { border-radius: 58% 42% 44% 56% / 55% 58% 42% 45%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gt-toast { animation: none; }
+}
 
 @media (max-width: 600px) {
-  .gt-toast { right: 1rem; left: 1rem; bottom: 1rem; width: auto; }
+  .gt-toast {
+    right: 1rem;
+    left: 1rem;
+    bottom: 1rem;
+    width: auto;
+    border-radius: 30px 30px 8% 8% / 22px 22px 8% 8%;
+  }
 }
 
 .context-meta {
