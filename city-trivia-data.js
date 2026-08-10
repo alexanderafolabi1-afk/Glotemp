@@ -23,7 +23,7 @@ const CITY_TRIVIA = {
     "The city hosts one of the world's biggest Pride parades every year.",
   ],
   "mexico-city": [
-    "Mexico City is slowly sinking — it's built on the drained bed of a former lake, Lake Texcoco.",
+    "Mexico City is slowly sinking. It's built on the drained bed of a former lake, Lake Texcoco.",
     "Xochimilco, its floating garden district, is still farmed and navigated by boat today.",
   ],
   cairo: [
@@ -35,7 +35,7 @@ const CITY_TRIVIA = {
     "The city was originally seven separate islands, joined together over centuries by land reclamation.",
   ],
   beijing: [
-    "Legend holds the Forbidden City has 9,999.5 rooms — deliberately one half-room short of heaven's mythical 10,000.",
+    "Legend holds the Forbidden City has 9,999.5 rooms, deliberately one half-room short of heaven's mythical 10,000.",
     "Beijing's subway is one of the longest and busiest metro systems in the world.",
   ],
   osaka: [
@@ -55,7 +55,7 @@ const CITY_TRIVIA = {
     "Paris is said to have only one official stop sign in the entire city.",
   ],
   toronto: [
-    "Toronto is one of the most multicultural cities on Earth — over half its residents were born outside Canada.",
+    "Toronto is one of the most multicultural cities on Earth. Over half its residents were born outside Canada.",
     "The CN Tower held the record for the world's tallest freestanding structure for over 30 years.",
   ],
   sydney: [
@@ -67,7 +67,7 @@ const CITY_TRIVIA = {
     "The city has three opera houses and around 180 kilometres of navigable waterways.",
   ],
   dubai: [
-    "The Burj Khalifa is tall enough to watch the sunset twice — once at ground level, once again riding up before it sets.",
+    "The Burj Khalifa is tall enough to watch the sunset twice: once at ground level, once again riding up before it sets.",
     "Dubai was mostly desert and fishing villages before the 1960s oil discovery reshaped it entirely.",
   ],
   singapore: [
@@ -108,7 +108,7 @@ const CITY_TRIVIA = {
   ],
   moscow: [
     "Several Moscow Metro stations look like underground palaces, complete with chandeliers and mosaics.",
-    "Red Square isn't named for communism — \"red\" in old Russian also meant \"beautiful\".",
+    "Red Square isn't named for communism. \"Red\" in old Russian also meant \"beautiful\".",
   ],
   seoul: [
     "Seoul has been the capital of Korea for over 600 years.",
@@ -134,7 +134,7 @@ const CITY_TRIVIA = {
     "The city's deep-dish pizza and its skyline share the same trait: total confidence.",
   ],
   miami: [
-    "Miami is the only major US city founded by a woman — Julia Tuttle.",
+    "Miami is the only major US city founded by a woman, Julia Tuttle.",
     "More than half of Miami's residents were born outside the United States.",
   ],
   houston: [
@@ -186,7 +186,7 @@ const CITY_TRIVIA = {
     "The city's name blends the Dakota word for water, \"minne\", with the Greek word for city, \"polis\".",
   ],
   denver: [
-    "Denver's official elevation is exactly one mile — 5,280 feet — marked on a step of the State Capitol.",
+    "Denver's official elevation is exactly one mile, 5,280 feet, marked on a step of the State Capitol.",
   ],
   philadelphia: [
     "Philadelphia hosted the signing of both the Declaration of Independence and the US Constitution.",
@@ -207,7 +207,7 @@ const CITY_TRIVIA = {
     "Barcelona's Eixample district was designed with chamfered corners specifically to improve visibility and airflow.",
   ],
   rome: [
-    "Rome is home to a country within a country — Vatican City sits entirely inside it.",
+    "Rome is home to a country within a country: Vatican City sits entirely inside it.",
     "The Trevi Fountain collects around a million euros in tossed coins every year, donated to charity.",
   ],
   milan: [
@@ -260,7 +260,7 @@ const CITY_TRIVIA = {
   ],
   athens: [
     "Athens has been continuously inhabited for over 3,000 years.",
-    "The Parthenon has almost no straight lines — its columns subtly curve to look perfectly straight from a distance.",
+    "The Parthenon has almost no straight lines. Its columns subtly curve to look perfectly straight from a distance.",
   ],
   bucharest: [
     "Bucharest's Palace of the Parliament is recognised as the heaviest building in the world.",
@@ -273,7 +273,7 @@ const CITY_TRIVIA = {
   ],
   lyon: [
     "Many chefs consider Lyon the culinary capital of France.",
-    "The city's traboules — hidden passageways through buildings — once sheltered Resistance fighters.",
+    "The city's traboules, hidden passageways through buildings, once sheltered Resistance fighters.",
   ],
   rotterdam: [
     "Rotterdam was almost entirely rebuilt after WWII, and is now known for bold modern architecture, including cube houses tilted at 45 degrees.",
@@ -341,7 +341,7 @@ const CITY_TRIVIA = {
   ],
   jakarta: [
     "Jakarta is sinking faster than almost any city in the world, part of why Indonesia is building a new capital elsewhere.",
-    "It's affectionately nicknamed \"the Big Durian\" — a nod to New York's Big Apple.",
+    "It's affectionately nicknamed \"the Big Durian\", a nod to New York's Big Apple.",
   ],
   manila: [
     "Manila is one of the most densely populated cities on Earth.",
@@ -453,7 +453,7 @@ const CITY_TRIVIA = {
     "Belo Horizonte was one of Brazil's first planned cities, laid out in the 1890s.",
   ],
   "porto-alegre": [
-    "Porto Alegre pioneered participatory budgeting, letting residents vote directly on parts of the city budget — a model since copied worldwide.",
+    "Porto Alegre pioneered participatory budgeting, letting residents vote directly on parts of the city budget, a model since copied worldwide.",
   ],
   recife: [
     "Recife is criss-crossed by rivers and bridges, earning it the nickname \"the Venice of Brazil\".",
@@ -485,18 +485,18 @@ const CITY_TRIVIA = {
   ],
   "dar-es-salaam": [
     "Dar es Salaam's name means \"haven of peace\" in Arabic.",
-    "Despite being Tanzania's largest city, it hasn't been the official capital since the 1970s — that's Dodoma.",
+    "Despite being Tanzania's largest city, it hasn't been the official capital since the 1970s. That's Dodoma.",
   ],
   casablanca: [
     "Casablanca's Hassan II Mosque has one of the tallest minarets in the world.",
-    "Despite the famous film's title, almost none of \"Casablanca\" was actually shot there — it was filmed in a Hollywood studio.",
+    "Despite the famous film's title, almost none of \"Casablanca\" was actually shot there. It was filmed in a Hollywood studio.",
   ],
   dakar: [
     "Dakar is the westernmost city in mainland Africa.",
     "It's the traditional finish line of the original Dakar Rally, though the race itself now runs elsewhere.",
   ],
   algiers: [
-    "Algiers is nicknamed \"Alger la Blanche\" — Algiers the White — for the pale buildings covering its hillsides.",
+    "Algiers is nicknamed \"Alger la Blanche\", Algiers the White, for the pale buildings covering its hillsides.",
   ],
   tunis: [
     "Tunis sits close to the ruins of ancient Carthage, one of antiquity's great trading powers.",

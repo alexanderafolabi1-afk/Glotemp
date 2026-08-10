@@ -163,6 +163,10 @@
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
   function fill(template, cityName) { return template.replace(/\{city\}/g, cityName); }
 
+  // A different playful, rounded face each time a cloud appears -- part
+  // of what makes this layer feel handwritten rather than templated.
+  var CLOUD_FONTS = ["Fredoka", "Baloo 2", "Quicksand", "Comfortaa", "Varela Round"];
+
   var WEATHER_ICON = {
     'extreme-heat': '🌡️', 'heavy-rain': '🌧️', rain: '🌦️', drizzle: '💧',
     snow: '❄️', thunderstorm: '⛈️', 'thunderstorm-hail': '⛈️', 'strong-wind': '💨',
@@ -172,86 +176,86 @@
 
   var WEATHER_COPY = {
     'extreme-heat': [
-      '{city} is running hot today — the kind of heat that makes shade a personal achievement.',
+      '{city} is running hot today. Shade has become a personal achievement.',
       "It's the sort of afternoon in {city} where even the shadows are looking for shade.",
       "{city}'s thermometer has ambitions today. Hydrate accordingly.",
       "Fair warning: the pavement in {city} could probably fry an egg right about now.",
-      "{city} is having a moment — a very warm one. Slow down, seek shade, sip something cold.",
+      "{city} is having a very warm moment. Slow down, seek shade, sip something cold.",
     ],
     'heavy-rain': [
-      "It's coming down properly in {city} right now — the kind of rain that rearranges plans.",
+      "It's coming down properly in {city} right now, the kind of rain that rearranges plans.",
       '{city} is getting a proper soaking today. An umbrella is more suggestion than accessory at this point.',
       "The sky over {city} has opinions today, and it's expressing them at volume.",
-      "Heavy rain in {city} — the streets are shining and nobody's complaining about the free car wash.",
+      "Heavy rain in {city} today. The streets are shining and nobody's complaining about the free car wash.",
       '{city} is under a determined downpour. Perfect weather for staying in with something warm.',
     ],
     rain: [
-      'A steady rain is falling over {city} — the unhurried kind that settles in for a while.',
+      'A steady rain is falling over {city}, the unhurried kind that settles in for a while.',
       "{city} is having a soft, grey sort of day. Bring the umbrella, keep the pace slow.",
       "It's raining in {city}, in that quietly persistent way good stories often start.",
       "{city}'s streets are glistening under a gentle, steady rain right now.",
     ],
     drizzle: [
-      'Just a light drizzle over {city} — barely enough to notice, just enough to romanticise.',
+      'Just a light drizzle over {city}, barely enough to notice, just enough to romanticise.',
       '{city} is misting itself lightly today. Barely rain, mostly atmosphere.',
-      'A fine drizzle in {city} — the kind that makes umbrellas feel like overreacting.',
+      'A fine drizzle in {city} today. The kind that makes umbrellas feel like overreacting.',
       "There's the gentlest drizzle in {city} right now. Practically weather cosplay.",
     ],
     snow: [
-      "It's snowing in {city} — the world outside just got noticeably quieter.",
+      "It's snowing in {city}. The world outside just got noticeably quieter.",
       '{city} is dusted in white today. Everything looks a little more forgiving under snow.',
       'Snow is falling over {city}, turning the ordinary into something worth a second look.',
       "{city}'s streets have gone soft and white. A good day for slow walks and warm drinks.",
     ],
     thunderstorm: [
-      "There's thunder rolling over {city} right now — nature, clearing its throat.",
+      "There's thunder rolling over {city} right now, nature clearing its throat.",
       '{city} is having a dramatic afternoon. Lightning included, no extra charge.',
       'A storm is putting on a show over {city}. Front row seats from indoors, ideally.',
-      "Thunder over {city} today — the sky's way of reminding everyone who's really in charge.",
+      "Thunder over {city} today. The sky's way of reminding everyone who's really in charge.",
     ],
     'thunderstorm-hail': [
-      '{city} is getting thunder and hail today — the sky is not holding back.',
+      '{city} is getting thunder and hail today. The sky is not holding back.',
       "It's a proper storm over {city} right now, hail and all. Best admired from a window.",
     ],
     'strong-wind': [
-      "It's properly blustery in {city} today — hold onto hats, umbrellas, and dignity.",
+      "It's properly blustery in {city} today. Hold onto hats, umbrellas, and dignity.",
       '{city} is windy enough today to make every walk feel like a small negotiation.',
       "There's a strong wind moving through {city} right now, rearranging everything not nailed down.",
       "{city}'s air has somewhere to be today, and it's taking loose hats with it.",
     ],
     'dust-haze': [
       'There\'s dust in the air over {city} today, softening the skyline into something hazier.',
-      "{city}'s sky has that dusty, golden haze to it right now — desert weather doing desert things.",
+      "{city}'s sky has that dusty, golden haze to it right now. Desert weather doing desert things.",
       'A dry haze is hanging over {city} today. The horizon\'s a little blurred, the mood still warm.',
     ],
     fog: [
-      '{city} is wrapped in fog this morning — the whole city softened at the edges.',
+      '{city} is wrapped in fog this morning. The whole city softened at the edges.',
       "There's a hush of fog over {city} right now. Everything familiar, slightly mysterious.",
       "{city}'s skyline has gone shy today, hiding behind a thin curtain of fog.",
     ],
     'clear-perfect': [
       '{city} is having about as close to a perfect day as weather gets. Go outside, say hello to it.',
-      'Clear skies over {city} right now — the kind of day that makes staying indoors feel like a missed opportunity.',
+      'Clear skies over {city} right now. The kind of day that makes staying indoors feel like a missed opportunity.',
       '{city} is basking in a genuinely lovely day. No notes.',
-      "It's simply a good day to be in {city} — clear, calm, unbothered.",
+      "It's simply a good day to be in {city}: clear, calm, unbothered.",
     ],
     'clear-night': [
-      "{city}'s sky has cleared up nicely tonight — a good night for looking up.",
+      "{city}'s sky has cleared up nicely tonight. A good night for looking up.",
       "It's a clear, quiet night over {city}. The stars are doing their best work.",
     ],
     cloudy: [
-      '{city} is under a soft blanket of cloud today — moody, but not unkind.',
+      '{city} is under a soft blanket of cloud today. Moody, but not unkind.',
       'The sky over {city} is thinking it over today. Overcast, contemplative, perfectly fine.',
       "{city}'s clouds are doing their quiet, unhurried thing today.",
     ],
     'brisk-cold': [
-      "It's properly crisp in {city} today — the kind of cold that clears your head.",
+      "It's properly crisp in {city} today. The kind of cold that clears your head.",
       '{city} is bracing today. Clear skies, sharp air, a good excuse for a warm coat.',
     ],
     'sudden-change': [
-      "{city}'s weather just changed its mind — noticeably different from last time you checked in.",
+      "{city}'s weather just changed its mind. Noticeably different from last time you checked in.",
       "Something's shifted in {city} since you last looked. The sky rarely sits still here.",
-      "{city} is in a different mood today than last time — weather, like people, doesn't always stay consistent.",
+      "{city} is in a different mood today than last time. Weather, like people, doesn't always stay consistent.",
     ],
   };
 
@@ -259,7 +263,7 @@
     'How\'s your day treating you in {city}?',
     'Hope {city} is being kind to you today.',
     'A small check-in: how are things, really, in {city}?',
-    "No rush, no agenda — just wondering how {city} is treating you right now.",
+    "No rush, no agenda. Just wondering how {city} is treating you right now.",
     "However your day's going in {city}, we're glad you stopped by.",
   ];
 
@@ -278,6 +282,7 @@
     el.className = 'gt-toast';
     el.setAttribute('role', 'status');
     el.setAttribute('aria-live', 'polite');
+    el.style.setProperty('--cloud-font', "'" + pick(CLOUD_FONTS) + "'");
     el.innerHTML =
       '<button type="button" class="gt-toast-close" aria-label="Dismiss">&#10005;</button>' +
       '<p class="gt-toast-eyebrow">' + eyebrow + '</p>' +
@@ -288,9 +293,10 @@
     dismissTimer = setTimeout(removeToast, 9000);
   }
 
-  // The eyebrow line runs in a small-caps monospace font; some emoji
-  // glyphs render blank when caught under font-variant-caps, so the icon
-  // gets its own span with that reset back to normal.
+  // The eyebrow/body run in whichever playful font this appearance
+  // picked; the icon gets its own span with the font reset back to a
+  // plain system stack so emoji rendering never depends on which of the
+  // rotating faces happens to be active.
   function iconSpan(icon) { return '<span class="gt-toast-icon">' + icon + '</span>'; }
 
   function showWeatherToast(category, cityName) {
@@ -322,7 +328,7 @@
       : 0;
     lastByCity[citySlug] = idx;
     try { localStorage.setItem(TRIVIA_LAST_KEY, JSON.stringify(lastByCity)); } catch (e) { /* ignore */ }
-    showToast('<span>Did you know — ' + esc(cityName) + '</span>', facts[idx]);
+    showToast('<span>Did you know about ' + esc(cityName) + '</span>', facts[idx]);
     return true;
   }
 

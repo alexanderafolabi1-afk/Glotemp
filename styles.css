@@ -3801,22 +3801,24 @@ a:hover .city-landmark-photo,
   animation: cloudRise 700ms cubic-bezier(0.16, 1, 0.3, 1), cloudMorph 10s ease-in-out 700ms infinite;
 }
 .gt-toast-eyebrow {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 0.86rem;
+  font-family: var(--cloud-font, Quicksand), sans-serif;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 0.72rem;
   letter-spacing: 0.01em;
-  color: #6B5643;
-  margin: 0 0 0.5rem;
+  color: #7A6650;
+  margin: 0 0 0.45rem;
 }
 .gt-toast-icon {
   font-variant-caps: normal;
   font-family: initial;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 .gt-toast-body {
-  font-family: var(--font-body);
-  font-size: 0.94rem;
-  line-height: 1.55;
+  font-family: var(--cloud-font, Quicksand), sans-serif;
+  font-weight: 400;
+  font-size: 0.82rem;
+  line-height: 1.6;
   color: #3A2E22;
   margin: 0;
 }
