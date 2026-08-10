@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=47">
+  <link rel="stylesheet" href="/styles.css?v=51">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -105,6 +105,8 @@
       <p class="vertical-description">How does this city feel right now?</p>
       <div id="pulse-content" class="vertical-content"></div>
       <div id="pulse-context" class="vertical-context"></div>
+      
+      
     </section>
   
 
@@ -114,6 +116,8 @@
       <p class="vertical-description">Should I build or work here?</p>
       <div id="tech-content" class="vertical-content"></div>
       <div id="tech-context" class="vertical-context"></div>
+      
+      <div class="vertical-listings" data-city="osaka" data-vertical="tech"></div>
     </section>
   
 
@@ -123,6 +127,8 @@
       <p class="vertical-description">Should I invest or trade here?</p>
       <div id="finance-content" class="vertical-content"></div>
       <div id="finance-context" class="vertical-context"></div>
+      
+      
     </section>
   
 
@@ -132,6 +138,8 @@
       <p class="vertical-description">Where should you work and live?</p>
       <div id="work-content" class="vertical-content"></div>
       <div id="work-context" class="vertical-context"></div>
+      
+      <div class="vertical-listings" data-city="osaka" data-vertical="work"></div>
     </section>
   
 
@@ -141,6 +149,8 @@
       <p class="vertical-description">Where should you invest in real estate?</p>
       <div id="property-content" class="vertical-content"></div>
       <div id="property-context" class="vertical-context"></div>
+      
+      <div class="vertical-listings" data-city="osaka" data-vertical="property"></div>
     </section>
   
 
@@ -150,6 +160,8 @@
       <p class="vertical-description">Where should you study?</p>
       <div id="education-content" class="vertical-content"></div>
       <div id="education-context" class="vertical-context"></div>
+      
+      
     </section>
   
 
@@ -159,6 +171,8 @@
       <p class="vertical-description">Where should you play and watch sports?</p>
       <div id="sport-content" class="vertical-content"></div>
       <div id="sport-context" class="vertical-context"></div>
+      <div id="sport-live" class="sport-live" data-city="osaka" data-city-name="Osaka" data-country="Japan"></div>
+      
     </section>
   
 
@@ -168,6 +182,8 @@
       <p class="vertical-description">Where should you experience culture and nightlife?</p>
       <div id="entertainment-content" class="vertical-content"></div>
       <div id="entertainment-context" class="vertical-context"></div>
+      
+      <div class="vertical-listings" data-city="osaka" data-vertical="entertainment"></div>
     </section>
   
 
@@ -177,6 +193,8 @@
       <p class="vertical-description">Where is the center of global style?</p>
       <div id="fashion-content" class="vertical-content"></div>
       <div id="fashion-context" class="vertical-context"></div>
+      
+      <div class="vertical-listings" data-city="osaka" data-vertical="fashion"></div>
     </section>
   
 
@@ -186,6 +204,8 @@
       <p class="vertical-description">Where should you eat and explore cuisine?</p>
       <div id="food-content" class="vertical-content"></div>
       <div id="food-context" class="vertical-context"></div>
+      
+      <div class="vertical-listings" data-city="osaka" data-vertical="food"></div>
     </section>
   
 
@@ -195,6 +215,8 @@
       <p class="vertical-description">Where is it healthiest to live?</p>
       <div id="health-content" class="vertical-content"></div>
       <div id="health-context" class="vertical-context"></div>
+      
+      
     </section>
   
 
@@ -204,6 +226,8 @@
       <p class="vertical-description">Which cities have the best mobility?</p>
       <div id="transport-content" class="vertical-content"></div>
       <div id="transport-context" class="vertical-context"></div>
+      
+      <div class="vertical-listings" data-city="osaka" data-vertical="transport"></div>
     </section>
   
 
@@ -213,6 +237,8 @@
       <p class="vertical-description">What is this city listening to right now?</p>
       <div id="radio-content" class="vertical-content"></div>
       <div id="radio-context" class="vertical-context"></div>
+      
+      
     </section>
   
     <!-- Compare Section -->
@@ -245,6 +271,9 @@
   <script src="/glotemp-checkin.js"></script>
   <script src="/glotemp-tonight.js"></script>
   <script src="/glotemp-features.js"></script>
+  <script src="/glotemp-listings.js" defer></script>
+  <script src="/city-sports-data.js" defer></script>
+  <script src="/glotemp-sports.js" defer></script>
   <script src="/city-wiki.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
   <script src="/city-radio.js" defer></script>
@@ -252,48 +281,84 @@
   <script src="/tempo-economy.js" defer></script>
   
   <script>
-    // Icon + colour per metric key, purely cosmetic -- the raw key itself
-    // (mood_reading, education_quality_score, etc.) never reaches the
-    // page. One entry per metric actually written by the data pipeline;
-    // METRIC_META_FALLBACK covers anything added later without an update.
-    const METRIC_META = {
-      mood_reading: { icon: '💗', rgb: '224,110,150' },
-      event_energy: { icon: '⚡', rgb: '230,180,70' },
-      developer_activity: { icon: '🛠️', rgb: '90,160,230' },
-      job_openings: { icon: '💼', rgb: '70,190,170' },
-      startup_activity: { icon: '🚀', rgb: '150,110,230' },
-      cost_of_living: { icon: '🛒', rgb: '110,190,120' },
-      currency_strength: { icon: '💵', rgb: '90,190,140' },
-      inflation_rate: { icon: '📉', rgb: '230,120,90' },
-      remote_work_adoption: { icon: '🏠', rgb: '100,170,230' },
-      salary_competitiveness: { icon: '💰', rgb: '100,200,140' },
-      work_culture_score: { icon: '⚖️', rgb: '170,130,230' },
-      housing_availability: { icon: '🏗️', rgb: '230,170,90' },
-      median_rent: { icon: '🏢', rgb: '120,130,220' },
-      property_appreciation: { icon: '📈', rgb: '100,200,130' },
-      education_quality_score: { icon: '🎓', rgb: '100,150,230' },
-      international_students: { icon: '🌍', rgb: '90,190,180' },
-      university_count: { icon: '🏛️', rgb: '130,140,220' },
-      active_participation: { icon: '🏃', rgb: '230,150,90' },
-      major_events: { icon: '🏆', rgb: '230,190,80' },
-      sports_venues: { icon: '🏟️', rgb: '110,190,120' },
-      event_frequency: { icon: '🎫', rgb: '220,110,180' },
-      nightlife_score: { icon: '🌃', rgb: '160,110,220' },
-      venue_count: { icon: '🎪', rgb: '180,120,220' },
-      designer_brands: { icon: '🏷️', rgb: '230,120,170' },
-      fashion_events: { icon: '👠', rgb: '220,100,160' },
-      style_influence: { icon: '✨', rgb: '230,190,100' },
-      culinary_diversity: { icon: '🍜', rgb: '230,150,90' },
-      michelin_stars: { icon: '⭐', rgb: '230,190,80' },
-      restaurant_count: { icon: '🍴', rgb: '230,130,90' },
-      air_quality_index: { icon: '🌬️', rgb: '110,190,190' },
-      hospital_quality: { icon: '🏥', rgb: '230,120,130' },
-      wellness_index: { icon: '🧘', rgb: '110,190,150' },
-      bike_share_bikes: { icon: '🚲', rgb: '110,190,120' },
-      congestion_level: { icon: '🚦', rgb: '230,140,90' },
-      transit_quality: { icon: '🚇', rgb: '100,150,230' },
+    // Reasonable ceiling per metric, used only to normalise how much of
+    // the instrument's arc is filled -- purely a presentation choice,
+    // never written back and never changes the stored reading. Derived
+    // from the real observed range of each metric in production.
+    const METRIC_MAX = {
+      mood_reading: 10, event_energy: 10,
+      developer_activity: 3000, job_openings: 500, startup_activity: 50,
+      cost_of_living: 200, currency_strength: 10, inflation_rate: 10,
+      remote_work_adoption: 80, salary_competitiveness: 100, work_culture_score: 10,
+      housing_availability: 80, median_rent: 3000, property_appreciation: 10,
+      education_quality_score: 10, international_students: 50, university_count: 50,
+      active_participation: 80, major_events: 12, sports_venues: 110,
+      event_frequency: 250, nightlife_score: 10, venue_count: 330,
+      designer_brands: 110, fashion_events: 10, style_influence: 10,
+      culinary_diversity: 10, michelin_stars: 50, restaurant_count: 2100,
+      air_quality_index: 200, hospital_quality: 10, wellness_index: 10,
+      bike_share_bikes: 4700, congestion_level: 10, transit_quality: 10,
     };
-    const METRIC_META_FALLBACK = { icon: '📊', rgb: '176,141,87' };
+    const METRIC_MAX_FALLBACK = 10;
+
+    // One quiet accent per vertical (not per metric) -- desaturated,
+    // brass-family tones so every instrument still reads as one
+    // consistent set of dials, not a rainbow of dashboard widgets.
+    const VERTICAL_ACCENT = {
+      pulse: '198,140,150', tech: '110,140,180', finance: '120,160,130',
+      work: '150,130,180', property: '190,150,100', education: '120,130,180',
+      sport: '190,130,100', entertainment: '160,110,150', fashion: '190,140,150',
+      food: '190,140,90', health: '100,160,150', transport: '110,130,160',
+    };
+
+    // Same circular-instrument language as /explore's city dials: an
+    // ivory face, a brass hairline ring, a coloured reading arc, and rim
+    // ticks -- filled here by confidence rather than coverage. No hour
+    // hand (there's no time to tell); the rounded value sits as HTML text
+    // over the centre instead, so it shares the page's own font stack
+    // rather than being drawn as SVG text.
+    const INS_CX = 48, INS_CY = 48, INS_R_FACE = 32, INS_R_ARC = 37, INS_R_TICK_IN = 40, INS_R_TICK_OUT = 43;
+    const INS_ARC_CIRC = 2 * Math.PI * INS_R_ARC;
+
+    function instrumentTicksSVG(confidence) {
+      const filled = typeof confidence === 'number' ? Math.round(confidence * 12) : 0;
+      let out = '';
+      for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * 360 - 90;
+        const rad = (angle * Math.PI) / 180;
+        const x1 = INS_CX + INS_R_TICK_IN * Math.cos(rad);
+        const y1 = INS_CY + INS_R_TICK_IN * Math.sin(rad);
+        const x2 = INS_CX + INS_R_TICK_OUT * Math.cos(rad);
+        const y2 = INS_CY + INS_R_TICK_OUT * Math.sin(rad);
+        const on = i < filled;
+        out += `<line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" stroke="${on ? 'var(--sand)' : 'var(--brass-dim)'}" stroke-width="${on ? 1.4 : 0.9}" stroke-linecap="round" />`;
+      }
+      return out;
+    }
+
+    function instrumentSVG(value, max, accentRgb, confidence, ariaLabel) {
+      const frac = value === null ? 0 : Math.max(0, Math.min(1, value / max));
+      const arcLen = INS_ARC_CIRC * frac;
+      return `<svg viewBox="0 0 96 96" role="img" aria-label="${(ariaLabel || '').replace(/"/g, '&quot;')}">
+        <g>${instrumentTicksSVG(confidence)}</g>
+        <circle cx="${INS_CX}" cy="${INS_CY}" r="${INS_R_FACE}" fill="#F0E0C8" />
+        <circle cx="${INS_CX}" cy="${INS_CY}" r="${INS_R_FACE}" fill="none" stroke="var(--brass)" stroke-width="1" />
+        <circle cx="${INS_CX}" cy="${INS_CY}" r="${INS_R_ARC}" fill="none" stroke="rgb(${accentRgb})"
+          stroke-width="2.5" stroke-linecap="round"
+          stroke-dasharray="${arcLen.toFixed(2)} ${(INS_ARC_CIRC - arcLen).toFixed(2)}"
+          transform="rotate(-90 ${INS_CX} ${INS_CY})" />
+      </svg>`;
+    }
+
+    // Keeps the centred readout short enough to sit cleanly inside the dial:
+    // whole numbers (developer_activity, job_openings, etc.) drop the decimal
+    // entirely, small-scale metrics (scores out of 10, percentages) keep at
+    // most one.
+    function formatInstrumentValue(value) {
+      const num = Number(value);
+      const rounded = Math.abs(num) >= 100 ? Math.round(num) : Math.round(num * 10) / 10;
+      return rounded.toString();
+    }
 
     // Load city data and populate verticals
     async function loadCityData() {
@@ -372,18 +437,21 @@
             continue;
           }
 
+          const accentRgb = VERTICAL_ACCENT[vertical] || '176,141,87';
           const content = readings.slice(0, 10).map(reading => {
-            const meta = METRIC_META[reading.metric] || METRIC_META_FALLBACK;
-            const shownValue = reading.value !== null && reading.value !== undefined ? Number(reading.value).toFixed(1) : null;
+            const max = METRIC_MAX[reading.metric] || METRIC_MAX_FALLBACK;
+            const shownValue = reading.value !== null && reading.value !== undefined ? formatInstrumentValue(reading.value) : null;
             const confidenceNote = typeof reading.confidence === 'number' ? `${Math.round(reading.confidence * 100)}% confidence` : '';
+            const ariaLabel = `${reading.label || 'Reading'}: ${shownValue !== null ? shownValue : 'n/a'}`;
+            const valueClass = shownValue !== null && shownValue.length > 3 ? 'instrument-value instrument-value-compact' : 'instrument-value';
             return `
-            <div class="reading" style="--metric-rgb:${meta.rgb};" ${confidenceNote ? `title="${confidenceNote}"` : ''}>
-              <span class="reading-icon" aria-hidden="true">${meta.icon}</span>
-              <div class="reading-main">
-                ${shownValue !== null ? `<span class="reading-value">${shownValue}</span>` : ''}
-                <span class="reading-label">${reading.label || ''}</span>
+            <div class="instrument" ${confidenceNote ? `title="${confidenceNote}"` : ''}>
+              <div class="instrument-dial">
+                ${instrumentSVG(reading.value, max, accentRgb, reading.confidence, ariaLabel)}
+                ${shownValue !== null ? `<span class="${valueClass}">${shownValue}</span>` : ''}
               </div>
-              <time class="reading-time" datetime="${reading.fetched_at}">${verticals.getTimeAgo(new Date(reading.fetched_at))}</time>
+              <span class="instrument-label">${reading.label || ''}</span>
+              <time class="instrument-time" datetime="${reading.fetched_at}">${verticals.getTimeAgo(new Date(reading.fetched_at))}</time>
             </div>
           `;
           }).join('');
@@ -518,7 +586,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"道頓堀の夜は最高のエネルギーだ。屋台と人と笑い。","language_lens":"local","created_at":"2026-08-09T23:52:55.579Z"},{"context":"Namba at midnight - takoyaki, neon, strangers becoming friends.","language_lens":"visitor","created_at":"2026-08-09T19:22:55.579Z"},{"context":"梅田の喫茶店、のんびりした午後。","language_lens":"local","created_at":"2026-08-09T12:22:55.579Z"},{"context":"Kuromon market - vendors shouting, fish glistening, beautiful chaos.","language_lens":"visitor","created_at":"2026-08-09T04:22:55.579Z"},{"context":"地下鉄御堂筋線、ラッシュアワーでも整然としている。","language_lens":"local","created_at":"2026-08-08T19:22:55.579Z"},{"context":"Shinsekai at dusk - retro neon and warm kushikatsu smell.","language_lens":"visitor","created_at":"2026-08-08T09:22:55.579Z"}];
+      const checkins = [{"context":"道頓堀の夜は最高のエネルギーだ。屋台と人と笑い。","language_lens":"local","created_at":"2026-08-10T13:11:54.833Z"},{"context":"Namba at midnight - takoyaki, neon, strangers becoming friends.","language_lens":"visitor","created_at":"2026-08-10T08:41:54.833Z"},{"context":"梅田の喫茶店、のんびりした午後。","language_lens":"local","created_at":"2026-08-10T01:41:54.833Z"},{"context":"Kuromon market - vendors shouting, fish glistening, beautiful chaos.","language_lens":"visitor","created_at":"2026-08-09T17:41:54.833Z"},{"context":"地下鉄御堂筋線、ラッシュアワーでも整然としている。","language_lens":"local","created_at":"2026-08-09T08:41:54.833Z"},{"context":"Shinsekai at dusk - retro neon and warm kushikatsu smell.","language_lens":"visitor","created_at":"2026-08-08T22:41:54.833Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
