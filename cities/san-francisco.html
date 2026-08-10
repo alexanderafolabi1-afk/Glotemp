@@ -19,8 +19,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=51">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&family=Fredoka:wght@400..600&family=Baloo+2:wght@400..600&family=Quicksand:wght@400..600&family=Comfortaa:wght@400..600&family=Varela+Round&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css?v=54">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -274,6 +274,8 @@
   <script src="/glotemp-listings.js" defer></script>
   <script src="/city-sports-data.js" defer></script>
   <script src="/glotemp-sports.js" defer></script>
+  <script src="/city-trivia-data.js" defer></script>
+  <script src="/glotemp-personality.js" defer></script>
   <script src="/city-wiki.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
   <script src="/city-radio.js" defer></script>
@@ -586,7 +588,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Mission District murals in the afternoon - colour and purpose.","language_lens":"visitor","created_at":"2026-08-10T11:41:54.833Z"},{"context":"SoMa offices at midday - the start-up energy is real, slightly muted.","language_lens":"local","created_at":"2026-08-10T03:41:54.833Z"},{"context":"Blue Bottle coffee in the Haight - laid-back west coast warmth.","language_lens":"visitor","created_at":"2026-08-09T18:41:54.833Z"},{"context":"Muni F-line - the whole city cross-section in one car.","language_lens":"local","created_at":"2026-08-09T07:41:54.833Z"},{"context":"Dolores Park on a Sunday - SF at its most human and joyful.","language_lens":"diaspora","created_at":"2026-08-08T20:41:54.833Z"}];
+      const checkins = [{"context":"Mission District murals in the afternoon - colour and purpose.","language_lens":"visitor","created_at":"2026-08-10T12:43:59.463Z"},{"context":"SoMa offices at midday - the start-up energy is real, slightly muted.","language_lens":"local","created_at":"2026-08-10T04:43:59.463Z"},{"context":"Blue Bottle coffee in the Haight - laid-back west coast warmth.","language_lens":"visitor","created_at":"2026-08-09T19:43:59.463Z"},{"context":"Muni F-line - the whole city cross-section in one car.","language_lens":"local","created_at":"2026-08-09T08:43:59.463Z"},{"context":"Dolores Park on a Sunday - SF at its most human and joyful.","language_lens":"diaspora","created_at":"2026-08-08T21:43:59.463Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
