@@ -60,27 +60,22 @@ class VerticalsEngine {
     }
   }
 
-  // Render a reading as HTML with source attribution
+  // Render a reading as HTML. Icon/colour treatment lives in the per-city
+  // page's own inline script (generate-city-pages.js, METRIC_META) since
+  // that's the copy that actually ships; this mirrors its text rules
+  // (no raw metric key, no raw source, values rounded to 1 decimal) for
+  // any caller that reaches this class method instead.
   renderReading(reading) {
     const timeAgo = this.getTimeAgo(new Date(reading.fetched_at));
-    const confidenceLabel = this.getConfidenceLabel(reading.confidence);
+    const shownValue = reading.value !== null && reading.value !== undefined ? Number(reading.value).toFixed(1) : null;
 
     return `
-      <div class="reading glass-card">
-        <div class="reading-header">
-          <span class="reading-metric">${reading.metric}</span>
-          <span class="reading-confidence" title="Data confidence: ${(reading.confidence * 100).toFixed(0)}%">
-            ${confidenceLabel}
-          </span>
-        </div>
-        <div class="reading-value">
-          ${reading.value !== null ? `<span class="value">${reading.value}${reading.label ? ` ${reading.label}` : ''}</span>` : ''}
+      <div class="reading">
+        <div class="reading-main">
+          ${shownValue !== null ? `<span class="reading-value">${shownValue}</span>` : ''}
           <span class="reading-label">${reading.label || ''}</span>
         </div>
-        <div class="reading-footer">
-          <span class="reading-source">${reading.source}</span>
-          <time class="reading-time" datetime="${reading.fetched_at}">${timeAgo}</time>
-        </div>
+        <time class="reading-time" datetime="${reading.fetched_at}">${timeAgo}</time>
       </div>
     `;
   }

@@ -117,6 +117,49 @@ function generateCityPage(city) {
   // Add script to load city data
   const cityLoadScript = `
   <script>
+    // Icon + colour per metric key, purely cosmetic -- the raw key itself
+    // (mood_reading, education_quality_score, etc.) never reaches the
+    // page. One entry per metric actually written by the data pipeline;
+    // METRIC_META_FALLBACK covers anything added later without an update.
+    const METRIC_META = {
+      mood_reading: { icon: '💗', rgb: '224,110,150' },
+      event_energy: { icon: '⚡', rgb: '230,180,70' },
+      developer_activity: { icon: '🛠️', rgb: '90,160,230' },
+      job_openings: { icon: '💼', rgb: '70,190,170' },
+      startup_activity: { icon: '🚀', rgb: '150,110,230' },
+      cost_of_living: { icon: '🛒', rgb: '110,190,120' },
+      currency_strength: { icon: '💵', rgb: '90,190,140' },
+      inflation_rate: { icon: '📉', rgb: '230,120,90' },
+      remote_work_adoption: { icon: '🏠', rgb: '100,170,230' },
+      salary_competitiveness: { icon: '💰', rgb: '100,200,140' },
+      work_culture_score: { icon: '⚖️', rgb: '170,130,230' },
+      housing_availability: { icon: '🏗️', rgb: '230,170,90' },
+      median_rent: { icon: '🏢', rgb: '120,130,220' },
+      property_appreciation: { icon: '📈', rgb: '100,200,130' },
+      education_quality_score: { icon: '🎓', rgb: '100,150,230' },
+      international_students: { icon: '🌍', rgb: '90,190,180' },
+      university_count: { icon: '🏛️', rgb: '130,140,220' },
+      active_participation: { icon: '🏃', rgb: '230,150,90' },
+      major_events: { icon: '🏆', rgb: '230,190,80' },
+      sports_venues: { icon: '🏟️', rgb: '110,190,120' },
+      event_frequency: { icon: '🎫', rgb: '220,110,180' },
+      nightlife_score: { icon: '🌃', rgb: '160,110,220' },
+      venue_count: { icon: '🎪', rgb: '180,120,220' },
+      designer_brands: { icon: '🏷️', rgb: '230,120,170' },
+      fashion_events: { icon: '👠', rgb: '220,100,160' },
+      style_influence: { icon: '✨', rgb: '230,190,100' },
+      culinary_diversity: { icon: '🍜', rgb: '230,150,90' },
+      michelin_stars: { icon: '⭐', rgb: '230,190,80' },
+      restaurant_count: { icon: '🍴', rgb: '230,130,90' },
+      air_quality_index: { icon: '🌬️', rgb: '110,190,190' },
+      hospital_quality: { icon: '🏥', rgb: '230,120,130' },
+      wellness_index: { icon: '🧘', rgb: '110,190,150' },
+      bike_share_bikes: { icon: '🚲', rgb: '110,190,120' },
+      congestion_level: { icon: '🚦', rgb: '230,140,90' },
+      transit_quality: { icon: '🚇', rgb: '100,150,230' },
+    };
+    const METRIC_META_FALLBACK = { icon: '📊', rgb: '176,141,87' };
+
     // Load city data and populate verticals
     async function loadCityData() {
       const citySlug = '${city.slug}';
@@ -195,25 +238,17 @@ function generateCityPage(city) {
           }
 
           const content = readings.slice(0, 10).map(reading => {
-            const isModelled = reading.source === 'seed' || (typeof reading.confidence === 'number' && reading.confidence < 0.6);
+            const meta = METRIC_META[reading.metric] || METRIC_META_FALLBACK;
+            const shownValue = reading.value !== null && reading.value !== undefined ? Number(reading.value).toFixed(1) : null;
+            const confidenceNote = typeof reading.confidence === 'number' ? \`\${Math.round(reading.confidence * 100)}% confidence\` : '';
             return \`
-            <div class="reading glass-card">
-              <div class="reading-header">
-                <span class="reading-metric">\${reading.metric}</span>
-                <span class="reading-confidence" title="Data confidence: \${(reading.confidence * 100).toFixed(0)}%">
-                  \${verticals.getConfidenceLabel(reading.confidence)}
-                  <span class="reading-confidence-track"><span class="reading-confidence-fill" style="width:\${Math.round(reading.confidence * 100)}%"></span></span>
-                </span>
-              </div>
-              <div class="reading-value">
-                \${reading.value !== null ? \`<span class="value">\${reading.value}\${reading.label ? \` \${reading.label}\` : ''}</span>\` : ''}
+            <div class="reading" style="--metric-rgb:\${meta.rgb};" \${confidenceNote ? \`title="\${confidenceNote}"\` : ''}>
+              <span class="reading-icon" aria-hidden="true">\${meta.icon}</span>
+              <div class="reading-main">
+                \${shownValue !== null ? \`<span class="reading-value">\${shownValue}</span>\` : ''}
                 <span class="reading-label">\${reading.label || ''}</span>
               </div>
-              <div class="reading-footer">
-                <span class="reading-source">\${reading.source}</span>
-                <span class="reading-provenance reading-provenance--\${isModelled ? 'modelled' : 'observed'}">\${isModelled ? 'Modelled' : 'Observed'}</span>
-                <time class="reading-time" datetime="\${reading.fetched_at}">\${verticals.getTimeAgo(new Date(reading.fetched_at))}</time>
-              </div>
+              <time class="reading-time" datetime="\${reading.fetched_at}">\${verticals.getTimeAgo(new Date(reading.fetched_at))}</time>
             </div>
           \`;
           }).join('');
