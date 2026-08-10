@@ -3484,73 +3484,71 @@ a:hover .city-landmark-photo,
 
 .vertical-content {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 2.25rem 1.5rem;
+  justify-items: center;
 }
 
-/* Metric cards: a colour-matched icon carries the "what", a quiet rounded
-   number carries the "how much". --metric-rgb is set inline per card from
-   METRIC_META (generate-city-pages.js) so one rule covers every metric
-   without 35 separate colour classes. No border anywhere -- the soft
-   radial wash is the only visual edge, never a hard outline. */
-.reading {
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  padding: 1rem 1.1rem;
-  border-radius: 18px;
-  background:
-    radial-gradient(circle at 18% 22%, rgba(var(--metric-rgb), 0.16), rgba(var(--metric-rgb), 0.03) 70%);
-}
-
-.reading-icon {
-  flex: none;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.35rem;
-  line-height: 1;
-  background: radial-gradient(circle, rgba(var(--metric-rgb), 0.4), rgba(var(--metric-rgb), 0.12) 72%);
-  box-shadow: 0 0 16px rgba(var(--metric-rgb), 0.35);
-}
-
-.reading-main {
-  flex: 1 1 auto;
-  min-width: 0;
+/* Circular instruments: the same design language as /explore's city
+   dials (ivory face, brass hairline ring, coloured reading arc, rim
+   ticks) rather than a card. No fill panel, no glow, no border -- the
+   dial itself is the entire visual object, exactly like a real gauge. */
+.instrument {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  align-items: center;
+  text-align: center;
+  max-width: 150px;
 }
 
-.reading-value {
+.instrument-dial {
+  position: relative;
+  width: 84px;
+  height: 84px;
+}
+
+.instrument-dial svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.instrument-value {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-family: var(--font-mono);
-  font-size: 1.1rem;
+  font-size: 0.98rem;
   font-weight: 600;
-  color: var(--ivory);
+  color: #3A2E22;
   font-variant-numeric: tabular-nums;
+  pointer-events: none;
 }
 
-.reading-label {
+.instrument-value-compact {
+  font-size: 0.74rem;
+  letter-spacing: -0.02em;
+}
+
+.instrument-label {
+  margin-top: 0.85rem;
   color: var(--sand);
   font-size: 0.82rem;
   line-height: 1.3;
 }
 
-.reading-time {
-  flex: none;
-  font-size: 0.7rem;
+.instrument-time {
+  margin-top: 0.25rem;
+  font-size: 0.68rem;
   color: var(--sand);
-  opacity: 0.65;
+  opacity: 0.6;
   white-space: nowrap;
-  align-self: flex-start;
-  margin-top: 0.15rem;
 }
 
 @media (max-width: 480px) {
-  .vertical-content { grid-template-columns: 1fr; }
+  .vertical-content { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 2rem 1rem; }
 }
 
 /* A quiet typographic message, not a bordered placeholder box -- matches
@@ -3638,6 +3636,84 @@ a:hover .city-landmark-photo,
   line-height: 1.6;
 }
 .context-fact strong { color: var(--ivory); }
+
+/* Verticals monetisation: curated listings + open slots. Reuses the
+   site's hairline-border language (no boxes, no fills) so partner and
+   nomination content reads as editorial, not as ad units. */
+.vertical-listings {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--hairline);
+}
+.listings-eyebrow {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  color: var(--brass);
+  margin-bottom: 1rem;
+}
+.listings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.listing-item, .listing-open-slot {
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--hairline);
+}
+.listing-item:first-child, .listing-open-slot:first-child { border-top: none; }
+.listing-title {
+  color: var(--ivory);
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.listing-title a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--brass-dim); }
+.listing-title a:hover { border-color: var(--brass); color: var(--brass); }
+.listing-date {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--sand);
+  white-space: nowrap;
+}
+.listing-desc {
+  color: var(--sand);
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+  line-height: 1.5;
+}
+.listing-open-slot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--hairline);
+  text-align: left;
+  cursor: pointer;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.listing-open-slot:first-child { border-top: none; }
+.listing-open-label {
+  color: var(--sand);
+  font-style: italic;
+  font-size: 0.9rem;
+}
+.listing-open-cta {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--brass);
+  white-space: nowrap;
+  transition: color var(--transition);
+}
+.listing-open-slot:hover .listing-open-cta { color: var(--ivory); }
+
 .context-meta {
   display: block;
   margin-top: 0.3rem;
@@ -5410,17 +5486,17 @@ main > *,
   border-bottom-color: var(--brass);
 }
 
-/* Content blocks sit on the ground, separated by a rule above. .reading
-   is excluded: its own soft radial-gradient tile (see its rule above) is
-   the edge, and a straight hairline across a rounded gradient card would
-   look like a stray line cutting through it. */
+/* Content blocks sit on the ground, separated by a rule above. .instrument
+   is excluded: it's a dial, not a card -- its own circular face is the
+   entire visual object, and a straight hairline across it would look
+   like a stray line cutting through the instrument. */
 .tonight-mode, .ranking-item, .city-card, .vertical-card,
 .stat-card, .obs-card, .feed-item, .checkin-item, .mini-panel, .system-card,
 .empty-state {
   border: none;
   border-top: 1px solid var(--hairline);
 }
-.reading { border: none; }
+.instrument, .instrument-dial { border: none; }
 .dial-wrap, .instrument-visual { border: none; }
 /* The band-coloured left edge on Tonight and observations is a light
    source, not a container -- keep it. */
