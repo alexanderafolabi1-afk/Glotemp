@@ -240,7 +240,7 @@
       offset += rows.length;
       if (moreBtn) moreBtn.hidden = rows.length < PAGE_SIZE;
     } catch (e) {
-      if (offset === 0) list.innerHTML = '<p class="checkin-empty">Check-ins are unavailable right now.</p>';
+      if (offset === 0) list.innerHTML = '';
       if (moreBtn) moreBtn.hidden = true;
     }
   }

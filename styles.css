@@ -3483,105 +3483,75 @@ a:hover .city-landmark-photo,
 }
 
 .vertical-content {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 1rem;
 }
 
+/* Metric cards: a colour-matched icon carries the "what", a quiet rounded
+   number carries the "how much". --metric-rgb is set inline per card from
+   METRIC_META (generate-city-pages.js) so one rule covers every metric
+   without 35 separate colour classes. No border anywhere -- the soft
+   radial wash is the only visual edge, never a hard outline. */
 .reading {
-  padding: 1.25rem 1.5rem;
-  border-left: 3px solid var(--band-equilibrium);
-  background: rgba(240, 224, 200, 0.04);
-  border-radius: 4px;
-}
-
-.reading-header {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.8rem;
-  font-size: 0.9rem;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(var(--metric-rgb), 0.16), rgba(var(--metric-rgb), 0.03) 70%);
 }
 
-.reading-metric {
-  font-weight: 600;
-  color: var(--ivory);
-  font-family: var(--font-mono);
+.reading-icon {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  line-height: 1;
+  background: radial-gradient(circle, rgba(var(--metric-rgb), 0.4), rgba(var(--metric-rgb), 0.12) 72%);
+  box-shadow: 0 0 16px rgba(var(--metric-rgb), 0.35);
 }
 
-.reading-confidence {
-  color: var(--sand);
-  font-size: 0.8rem;
-  text-align: right;
-}
-
-.reading-confidence-track {
-  display: block;
-  margin-top: 0.3rem;
-  width: 56px;
-  height: 3px;
-  margin-left: auto;
-  background: var(--hairline);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.reading-confidence-fill {
-  display: block;
-  height: 100%;
-  background: var(--band-warm);
-  border-radius: 2px;
+.reading-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
 }
 
 .reading-value {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  margin-bottom: 0.8rem;
-  flex-wrap: wrap;
-}
-
-.value {
-  font-size: 1.3rem;
-  font-weight: 600;
   font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 600;
   color: var(--ivory);
+  font-variant-numeric: tabular-nums;
 }
 
 .reading-label {
   color: var(--sand);
-  font-size: 0.85rem;
-}
-
-.reading-footer {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  color: var(--sand);
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.reading-source {
-  font-family: var(--font-mono);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 0.82rem;
+  line-height: 1.3;
 }
 
 .reading-time {
+  flex: none;
+  font-size: 0.7rem;
+  color: var(--sand);
+  opacity: 0.65;
   white-space: nowrap;
+  align-self: flex-start;
+  margin-top: 0.15rem;
 }
 
-/* Every reading says, in the reading itself, whether it's a live signal
-   or a modelled/seed fallback -- the same modelled-vs-observed split
-   /about computes, surfaced everywhere a number actually appears. */
-.reading-provenance {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+@media (max-width: 480px) {
+  .vertical-content { grid-template-columns: 1fr; }
 }
-.reading-provenance--observed { color: var(--band-warm); }
-.reading-provenance--modelled { color: var(--sand); }
 
 /* A quiet typographic message, not a bordered placeholder box -- matches
    how every other "nothing here yet" state on the site (Movers, the
@@ -5403,7 +5373,6 @@ main > *,
 .tonight-mode,
 .dial-wrap,
 .instrument-visual,
-.reading,
 .ranking-item,
 .city-card,
 .vertical-card,
@@ -5441,13 +5410,17 @@ main > *,
   border-bottom-color: var(--brass);
 }
 
-/* Content blocks sit on the ground, separated by a rule above. */
-.tonight-mode, .reading, .ranking-item, .city-card, .vertical-card,
+/* Content blocks sit on the ground, separated by a rule above. .reading
+   is excluded: its own soft radial-gradient tile (see its rule above) is
+   the edge, and a straight hairline across a rounded gradient card would
+   look like a stray line cutting through it. */
+.tonight-mode, .ranking-item, .city-card, .vertical-card,
 .stat-card, .obs-card, .feed-item, .checkin-item, .mini-panel, .system-card,
 .empty-state {
   border: none;
   border-top: 1px solid var(--hairline);
 }
+.reading { border: none; }
 .dial-wrap, .instrument-visual { border: none; }
 /* The band-coloured left edge on Tonight and observations is a light
    source, not a container -- keep it. */
