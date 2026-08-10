@@ -129,15 +129,35 @@
     document.body.appendChild(banner);
   }
 
+  // The banner is position:fixed to the viewport bottom, so without this
+  // it sits on top of whatever the page has there -- on most pages that's
+  // the footer, which is where the language switcher lives. Reserving the
+  // banner's real height as body padding keeps the footer clickable
+  // underneath it instead of hidden behind it.
+  var resizeHandler = null;
+  function reserveSpace() {
+    var banner = document.getElementById('cookie-consent-banner');
+    if (!banner) return;
+    document.body.style.paddingBottom = banner.offsetHeight + 'px';
+  }
+
   function hideBanner() {
     var banner = document.getElementById('cookie-consent-banner');
     if (banner) banner.remove();
+    document.body.style.paddingBottom = '';
+    if (resizeHandler) {
+      window.removeEventListener('resize', resizeHandler);
+      resizeHandler = null;
+    }
   }
 
   function showBanner() {
     if (!document.getElementById('cookie-consent-banner')) {
       injectStyles();
       createBanner();
+      reserveSpace();
+      resizeHandler = reserveSpace;
+      window.addEventListener('resize', resizeHandler);
     }
   }
 
