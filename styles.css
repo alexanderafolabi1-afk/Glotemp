@@ -3714,6 +3714,63 @@ a:hover .city-landmark-photo,
 }
 .listing-open-slot:hover .listing-open-cta { color: var(--ivory); }
 
+/* Sport vertical: live fixtures/results/form pulled straight from public
+   sports APIs at load time, plus the F1 calendar. Sits above the
+   partner/nominate slots, same hairline grammar, no boxes. */
+.sport-live:not(:empty) {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--hairline);
+}
+.sport-live-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.sport-live-item {
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--hairline);
+}
+.sport-live-item:first-child { border-top: none; }
+.sport-live-heading {
+  color: var(--ivory);
+  font-size: 0.95rem;
+}
+.sport-form {
+  margin-top: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+}
+.sport-form span { margin-right: 0.35rem; }
+.sport-form-w { color: var(--ivory); }
+.sport-form-l { color: var(--sand); opacity: 0.55; }
+.sport-form-d { color: var(--sand); }
+.sport-live-line {
+  margin-top: 0.4rem;
+  color: var(--sand);
+  font-size: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.sport-live-tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--brass);
+  margin-right: 0.5rem;
+}
+.sport-live-date {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--sand);
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
 .context-meta {
   display: block;
   margin-top: 0.3rem;

@@ -69,7 +69,7 @@ function pageHTML(city, v) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=49" />
+  <link rel="stylesheet" href="/styles.css?v=50" />
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -85,6 +85,7 @@ function pageHTML(city, v) {
     <section id="${v.slug}" class="vertical-section glass-card">
       <div id="${v.slug}-content" class="vertical-content"></div>
       <div id="${v.slug}-context" class="vertical-context"></div>
+      ${v.slug === 'sport' ? `<div id="sport-live" class="sport-live" data-city="${city.slug}" data-city-name="${city.name.replace(/"/g, '&quot;')}" data-country="${city.country.replace(/"/g, '&quot;')}"></div>` : ''}
       ${LISTINGS_VERTICALS.has(v.slug) ? `<div class="vertical-listings" data-city="${city.slug}" data-vertical="${v.slug}"></div>` : ''}
     </section>
 
@@ -112,6 +113,8 @@ function pageHTML(city, v) {
   <script src="/city-worldbank.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
   <script src="/glotemp-listings.js" defer></script>
+  <script src="/city-sports-data.js" defer></script>
+  <script src="/glotemp-sports.js" defer></script>
   <script>
     // SUPABASE_URL / SUPABASE_ANON_KEY come from verticals-engine.js
     // (deferred, but resolved by the time DOMContentLoaded fires below) --

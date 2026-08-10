@@ -13,12 +13,12 @@
 
   var CONFIG = {
     sport: {
-      slots: 5, kind: 'event',
-      eyebrow: 'Fixtures & results',
-      emptyLabel: 'Fixture listing open',
-      cta: 'Nominate a fixture or partner with your club',
-      modalTitle: 'Nominate a fixture',
-      modalCopy: 'Tell us about an upcoming fixture, a recent result, or a club worth featuring here.',
+      slots: 3, kind: 'partner',
+      eyebrow: 'Featured in sport',
+      emptyLabel: 'Partner slot open',
+      cta: 'Partner with your club or federation',
+      modalTitle: 'Partner or feature a club',
+      modalCopy: 'Tell us about a club, federation, or local sports story worth featuring here -- especially one our live feed does not cover yet.',
     },
     entertainment: {
       slots: 5, kind: 'event',

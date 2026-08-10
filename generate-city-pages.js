@@ -85,7 +85,7 @@ function generateVerticalNav() {
 // pure-reading verticals -- untouched.
 const LISTINGS_VERTICALS = new Set(['sport', 'entertainment', 'fashion', 'food', 'property', 'work', 'tech', 'transport']);
 
-function generateVerticalSections(citySlug) {
+function generateVerticalSections(city) {
   return VERTICALS.map(v => `
     <!-- ${v.label} Vertical -->
     <section id="${v.name}" class="vertical-section glass-card">
@@ -93,7 +93,8 @@ function generateVerticalSections(citySlug) {
       <p class="vertical-description">${v.desc}</p>
       <div id="${v.name}-content" class="vertical-content"></div>
       <div id="${v.name}-context" class="vertical-context"></div>
-      ${LISTINGS_VERTICALS.has(v.name) ? `<div class="vertical-listings" data-city="${citySlug}" data-vertical="${v.name}"></div>` : ''}
+      ${v.name === 'sport' ? `<div id="sport-live" class="sport-live" data-city="${city.slug}" data-city-name="${city.name.replace(/"/g, '&quot;')}" data-country="${city.country.replace(/"/g, '&quot;')}"></div>` : ''}
+      ${LISTINGS_VERTICALS.has(v.name) ? `<div class="vertical-listings" data-city="${city.slug}" data-vertical="${v.name}"></div>` : ''}
     </section>
   `).join('\n');
 }
@@ -117,7 +118,7 @@ function generateCityPage(city) {
   // Update vertical sections to include all 12 verticals
   html = html.replace(
     /<!-- Pulse Vertical -->[\s\S]*?<!-- Compare Section -->/,
-    generateVerticalSections(city.slug) + '\n    <!-- Compare Section -->'
+    generateVerticalSections(city) + '\n    <!-- Compare Section -->'
   );
 
   // Add script to load city data
