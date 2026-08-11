@@ -50,3 +50,59 @@ verify_jwt = false
 
 [functions.tonight-layer]
 verify_jwt = false
+
+# ===== AUTH =====
+# These settings are the fix for confirmation links pointing at
+# http://localhost:3000. GoTrue falls back to site_url whenever the caller
+# does not supply a redirect it recognises, and an unset site_url defaults
+# to localhost -- which is what shipped in every real confirmation email.
+#
+# Apply with:  supabase link --project-ref hnysztednzqfzbmiqqgl
+#              supabase config push
+# Anything set here is also settable by hand in
+# Dashboard > Authentication > URL Configuration.
+[auth]
+site_url = "https://glo-temp.com"
+# The allow list. Production only -- no localhost entry, so a link can
+# never be issued for a host a recipient cannot reach.
+additional_redirect_urls = ["https://glo-temp.com/auth/confirm/"]
+enable_signup = true
+
+[auth.email]
+enable_confirmations = true
+
+# Branded templates live in supabase/email-templates/ and are the same
+# design system as the site: warm brown-black ground, ivory and sand text,
+# brass hairlines, Fraunces headings, Manrope body, no boxes, and a text
+# link rather than a filled button.
+[auth.email.template.confirmation]
+subject = "Confirm your email — Glotemp"
+content_path = "./supabase/email-templates/confirmation.html"
+
+[auth.email.template.magic_link]
+subject = "Your sign-in link — Glotemp"
+content_path = "./supabase/email-templates/magic-link.html"
+
+[auth.email.template.recovery]
+subject = "Reset your password — Glotemp"
+content_path = "./supabase/email-templates/recovery.html"
+
+[auth.email.template.email_change]
+subject = "Confirm your new email — Glotemp"
+content_path = "./supabase/email-templates/email-change.html"
+
+# Custom SMTP, so mail comes from glo-temp.com rather than Supabase's
+# shared sender (which is also rate limited to a handful of messages an
+# hour and is why the mail reads as "Supabase Auth").
+#
+# Credentials are env() references on purpose -- no secret is committed.
+# Set SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASS in the environment
+# before `supabase config push`, and add SPF and DKIM records for
+# glo-temp.com at your DNS provider or the mail will land in spam.
+[auth.email.smtp]
+host = "env(SMTP_HOST)"
+port = 587
+user = "env(SMTP_USER)"
+pass = "env(SMTP_PASS)"
+admin_email = "hello@glo-temp.com"
+sender_name = "Glotemp"

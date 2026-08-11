@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Glotemp</title>
+</head>
+<!-- Ground is set on body AND on the outer table: many clients drop body
+     styles, and a warm brown-black that falls back to white would make the
+     ivory text unreadable. -->
+<body style="margin:0;padding:0;background:#14100B;">
+  <span style="display:none;font-size:1px;color:#14100B;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">Reset your Glotemp password.</span>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#14100B;">
+    <tr>
+      <td align="center" style="padding:40px 24px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
+
+          <!-- compass -->
+          <tr>
+            <td style="padding:0 0 28px;">
+              <img src="https://glo-temp.com/assets/logo.png" width="52" height="52" alt="Glotemp"
+                   style="display:block;border:0;outline:none;text-decoration:none;width:52px;height:52px;border-radius:50%;">
+            </td>
+          </tr>
+
+          <!-- brass hairline -->
+          <tr><td style="border-top:1px solid rgba(176,141,87,0.28);font-size:0;line-height:0;">&nbsp;</td></tr>
+
+          <tr>
+            <td style="padding:28px 0 0;">
+              <p style="margin:0 0 10px;font-family:'IBM Plex Mono',Menlo,Consolas,monospace;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#C9B79C;">Password reset</p>
+              <h1 style="margin:0 0 20px;font-family:Fraunces,Georgia,'Times New Roman',serif;font-weight:300;font-size:30px;line-height:1.2;color:#F0E0C8;">Let us get you back in.</h1>
+                  <p style="margin:0 0 16px;font-family:Manrope,'Helvetica Neue',Arial,sans-serif;font-size:16px;line-height:1.7;color:#C9B79C;">Use the link below to set a new password. It works once and expires shortly.</p>
+                  <p style="margin:0 0 16px;font-family:Manrope,'Helvetica Neue',Arial,sans-serif;font-size:16px;line-height:1.7;color:#C9B79C;">Your readings and the cities you watch are exactly where you left them.</p>
+            </td>
+          </tr>
+
+          <!-- the action: a text link with a brass hairline under it -->
+          <tr>
+            <td style="padding:14px 0 30px;">
+              <a href="{{ .ConfirmationURL }}"
+                 style="display:inline-block;font-family:'IBM Plex Mono',Menlo,Consolas,monospace;font-size:15px;letter-spacing:0.09em;color:#F0E0C8;text-decoration:none;border-bottom:1px solid #B08D57;padding-bottom:4px;">Set a new password</a>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:0 0 30px;">
+              <p style="margin:0;font-family:Manrope,'Helvetica Neue',Arial,sans-serif;font-size:14px;line-height:1.7;color:#C9B79C;opacity:0.85;">If you did not ask for this, ignore it -- your current password stays as it is.</p>
+            </td>
+          </tr>
+
+          <tr><td style="border-top:1px solid rgba(176,141,87,0.28);font-size:0;line-height:0;">&nbsp;</td></tr>
+
+          <tr>
+            <td style="padding:22px 0 0;">
+              <p style="margin:0 0 6px;font-family:'IBM Plex Mono',Menlo,Consolas,monospace;font-size:12px;line-height:1.6;color:#C9B79C;opacity:0.75;">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
+              <p style="margin:0;font-family:'IBM Plex Mono',Menlo,Consolas,monospace;font-size:12px;line-height:1.6;color:#C9B79C;opacity:0.55;">
+                <a href="https://glo-temp.com" style="color:#B08D57;text-decoration:none;">glo-temp.com</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

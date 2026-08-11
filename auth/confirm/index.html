@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#06060A" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="description" content="Your email is confirmed. Welcome to Glotemp." />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <title>Email confirmed - Glotemp</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=55" />
+
+  <style>
+    /* Page-scoped. Hairlines and negative space only -- no panel, no box. */
+    .confirm-wrap {
+      max-width: 46rem;
+      padding: 3.5rem 0 4rem;
+      /* Reserved so swapping the working state for the confirmed state
+         cannot shift the page. */
+      min-height: 340px;
+    }
+    .confirm-mark { width: 44px; height: 44px; color: var(--brass); display: block; margin-bottom: 1.5rem; }
+    .confirm-eyebrow {
+      font-family: var(--font-mono);
+      font-variant-caps: small-caps;
+      font-size: 0.76rem;
+      letter-spacing: 0.1em;
+      color: var(--sand);
+      margin: 0 0 0.75rem;
+    }
+    .confirm-title {
+      font-family: var(--font-display);
+      font-weight: var(--fw-light);
+      font-size: clamp(1.9rem, 5vw, 3rem);
+      line-height: 1.15;
+      color: var(--ivory);
+      margin: 0 0 1.25rem;
+    }
+    .confirm-copy {
+      font-family: var(--font-body);
+      font-size: 1.02rem;
+      line-height: 1.7;
+      color: var(--sand);
+      max-width: 54ch;
+      margin: 0 0 1rem;
+    }
+    .confirm-email {
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      color: var(--ivory);
+      word-break: break-all;
+    }
+    .confirm-rule { border: none; border-top: 1px solid var(--hairline); margin: 2.25rem 0 1.75rem; }
+    /* A text link with a brass hairline under it -- never a filled button. */
+    .confirm-action {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-variant-caps: small-caps;
+      font-size: 0.95rem;
+      letter-spacing: 0.09em;
+      color: var(--ivory);
+      text-decoration: none;
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--brass);
+      border-radius: 0;
+      padding: 0.35rem 0;
+      cursor: pointer;
+      transition: color 200ms ease, border-color 200ms ease;
+    }
+    .confirm-action:hover { color: var(--brass); }
+    .confirm-secondary {
+      display: inline-block;
+      margin-left: 1.75rem;
+      font-family: var(--font-mono);
+      font-variant-caps: small-caps;
+      font-size: 0.82rem;
+      letter-spacing: 0.07em;
+      color: var(--sand);
+      text-decoration: none;
+      border-bottom: 1px solid var(--hairline);
+      padding: 0.35rem 0;
+    }
+    .confirm-secondary:hover { color: var(--ivory); border-bottom-color: var(--brass-dim); }
+    @media (max-width: 600px) {
+      .confirm-wrap { padding: 2.5rem 0 3rem; min-height: 300px; }
+      .confirm-secondary { display: block; margin: 1.25rem 0 0; }
+    }
+  </style>
+</head>
+<body>
+  <nav id="site-nav"></nav>
+<script src="/nav-component.js"></script>
+
+  <main class="page-main">
+    <section class="glass-card">
+      <div class="confirm-wrap" id="confirm-wrap">
+        <!-- Working state. Replaced in place by the script below, which is
+             why the wrapper reserves its height. -->
+        <p class="confirm-eyebrow" id="confirm-eyebrow">Confirming</p>
+        <h1 class="confirm-title" id="confirm-title">One moment.</h1>
+        <p class="confirm-copy" id="confirm-copy">Checking your link with the instrument.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer glass">
+    <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
+  </footer>
+
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
+  <script src="/glotemp-auth.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var TICK = '<svg class="confirm-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+      'stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>';
+
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function render(html) {
+      document.getElementById('confirm-wrap').innerHTML = html;
+    }
+
+    function returnPath() {
+      if (window.GlotempAuth && typeof GlotempAuth.takeReturnPath === 'function') {
+        return GlotempAuth.takeReturnPath();
+      }
+      return '/';
+    }
+
+    function confirmed(email, back) {
+      var where = back && back !== '/' ? 'Back to your reading' : 'Add your first reading';
+      render(
+        TICK +
+        '<p class="confirm-eyebrow">Email confirmed</p>' +
+        '<h1 class="confirm-title">You are in.</h1>' +
+        (email
+          ? '<p class="confirm-copy">We have verified <span class="confirm-email">' + esc(email) + '</span>. ' +
+            'You are signed in on this device.</p>'
+          : '<p class="confirm-copy">Your email is verified and you are signed in on this device.</p>') +
+        '<p class="confirm-copy">Your reading now counts toward the collective instrument. ' +
+        'Every city on Glotemp is built from observations like the one you were about to make.</p>' +
+        '<hr class="confirm-rule">' +
+        '<a class="confirm-action" href="' + esc(back) + '">' + where + '</a>' +
+        '<a class="confirm-secondary" href="/explore">Browse all 151 cities</a>'
+      );
+    }
+
+    function failed(reason) {
+      render(
+        '<p class="confirm-eyebrow">Link not accepted</p>' +
+        '<h1 class="confirm-title">That link has expired.</h1>' +
+        '<p class="confirm-copy">' + esc(reason || 'Confirmation links are single use and time limited.') +
+        ' Ask for a fresh one and it will arrive in a moment.</p>' +
+        '<hr class="confirm-rule">' +
+        '<a class="confirm-action" href="/">Send me a new link</a>' +
+        '<a class="confirm-secondary" href="/explore">Browse all 151 cities</a>'
+      );
+    }
+
+    async function run() {
+      var back = returnPath();
+
+      // GoTrue reports failures in the fragment (implicit flow) or the
+      // query string (PKCE), so read both before deciding anything.
+      var hash = new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
+      var query = new URLSearchParams(window.location.search || '');
+      var err = hash.get('error_description') || query.get('error_description') ||
+                hash.get('error') || query.get('error');
+      if (err) { failed(decodeURIComponent(err).replace(/\+/g, ' ')); return; }
+
+      if (!window.GlotempAuth) { failed('The page could not reach the sign-in service.'); return; }
+
+      try {
+        // glotemp-auth.js consumes the token fragment on load and scrubs it
+        // from the address bar; give it a moment, then read the session.
+        var user = null;
+        for (var i = 0; i < 25; i++) {
+          if (typeof GlotempAuth.getUser === 'function') user = GlotempAuth.getUser();
+          if (user && user.email) break;
+          if (typeof GlotempAuth.isSignedIn === 'function' && GlotempAuth.isSignedIn() && i > 4) break;
+          await new Promise(function (r) { setTimeout(r, 120); });
+        }
+        var signedIn = typeof GlotempAuth.isSignedIn === 'function' ? GlotempAuth.isSignedIn() : !!user;
+        if (signedIn) confirmed(user && user.email, back);
+        else failed('We could not read a session from that link.');
+      } catch (e) {
+        failed('Something went wrong reading that link.');
+      }
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+    else run();
+  })();
+  </script>
+</body>
+</html>
