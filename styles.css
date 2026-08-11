@@ -2527,6 +2527,50 @@ textarea:focus:not(:focus-visible) {
   color: var(--bone);
 }
 
+/* Contact addresses (footer, about, privacy, terms): sand text, a brass
+   hairline that draws in under the link on hover -- the same "text, not
+   pills" underline language as .nav-links a, not the always-on
+   underline the .footer .small-print a rule above uses for the legal
+   links. No button, no box. */
+.contact-link {
+  position: relative;
+  color: var(--sand);
+  text-decoration: none;
+  padding-bottom: 1px;
+  transition: color var(--transition);
+}
+.contact-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: 0;
+  height: 1px;
+  background: var(--brass);
+  transition: right var(--transition);
+}
+.contact-link:hover {
+  color: var(--ivory);
+}
+.contact-link:hover::after {
+  right: 0;
+}
+
+/* .footer .small-print a (above) always-underlines and is more specific
+   than .contact-link alone (two classes + element vs. one class), so it
+   otherwise wins the cascade for a contact-link nested in the footer
+   and silently restores the underline. This re-asserts the hairline
+   treatment at matching specificity without touching the legal-links
+   rule those other footer links still rely on. */
+.footer .small-print a.contact-link {
+  color: var(--sand);
+  text-decoration: none;
+}
+.footer .small-print a.contact-link:hover {
+  opacity: 1;
+  color: var(--ivory);
+}
+
 .logo-img {
   filter: drop-shadow(0 0 8px rgba(79, 216, 232, 0.5));
   display: inline-block;

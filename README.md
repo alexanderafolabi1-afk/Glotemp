@@ -193,7 +193,7 @@ Contributor earns Stars → rank unlocks rewards → income → recruits network
 
 Decks, data-rooms, and founder calls available on request.
 
-📧 [hello@glotemp.com](mailto:hello@glotemp.com)
+📧 [info@glo-temp.com](mailto:info@glo-temp.com)
 
 -----
 

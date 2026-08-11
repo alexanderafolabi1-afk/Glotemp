@@ -102,6 +102,7 @@ function pageHTML(city, v) {
     <p class="small-print">
       <a href="/privacy">Privacy Policy</a> | <a href="/terms">Terms of Service</a> | <a href="#" id="cookie-settings">Cookie Settings</a>
     </p>
+    <p class="small-print"><a href="mailto:info@glo-temp.com" class="contact-link">info@glo-temp.com</a></p>
     <p class="small-print footer-lang-row">
       <button type="button" id="lang-switch" class="footer-lang">Language</button>
     </p>
