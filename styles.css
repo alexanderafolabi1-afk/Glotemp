@@ -89,6 +89,15 @@
   --scrim-opacity: 0.18;
 }
 
+/* Lets the rotating wash color animate smoothly (browsers without
+   @property support just render the wash static -- still colorful,
+   just not spinning; a fine progressive-enhancement fallback). */
+@property --spin-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 /* ===== BACKGROUND & TEXTURE ===== */
@@ -109,17 +118,39 @@ body {
   position: relative;
 }
 
-/* Ground: deep warm brown-black, one tone.
-   This replaced a continuously rotating conic-gradient "aurora" in five
-   band colours -- magenta, orange, cream, blue and cyan, each at 0.30
-   alpha, spinning on a 70s loop, with the mottling layer recoloured to
-   match. Five hues bleeding across each other is what read as a muddy
-   multicoloured blur rather than a deliberate surface. The texture stays;
-   the colour does not. Ambient variation is strength only, via
-   --ambient-warmth, never a second hue. */
+/* Ground: a slow, continuously rotating "aurora" wash in the site's own
+   band colors (the same five colors every barometer/reading uses), so
+   the page actually shows a temperature instead of sitting flat. A
+   previous pass replaced this with a single warm tone, reasoning that
+   five hues layered at matching alpha plus a second hue-rotate filter on
+   top (up to +/-70deg from mood, another +/-70deg swing across time of
+   day) was compounding into a muddy blur -- correct about the cause, but
+   the fix went too far and lost the multicolour identity entirely. This
+   restores it while actually fixing the muddiness: the redundant
+   same-hue "glow" layer and recoloured mottling are gone (mottling is
+   back to a neutral warm tone, texture only, not competing colour), the
+   conic wash's own alpha is raised so it reads as vivid rather than
+   washed out, and --ambient-warmth (0-1, set by
+   GlotempCore.applyMoodBackground / app.js) now drives a gentle +/-20deg
+   hue nudge and a saturation/brightness lift instead of the old wide
+   hue-rotate swing -- enough to feel alive and mood-responsive without
+   dragging the wash through unrelated hue families. */
 :root {
   --mood-tint: rgba(6, 6, 10, 0);
   --mood-tint-transition: 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --spin-angle: 0deg;
+  /* Derived once here so every filter below (time-of-day included) reads
+     the same gentle swing instead of repeating the calc. */
+  --wash-hue: calc((var(--ambient-warmth, 0.5) - 0.5) * 40deg);
+}
+
+@keyframes ambient-spin {
+  to { --spin-angle: 360deg; }
+}
+
+body {
+  --spin-angle: 0deg;
+  animation: ambient-spin 70s linear infinite;
 }
 
 body::before {
@@ -131,16 +162,29 @@ body::before {
   height: 100%;
   background-color: var(--obsidian);
   background-image:
-    /* One warm brass glow, off-centre, holding the top of the page. */
-    radial-gradient(ellipse 90% 70% at 50% 0%,
-      rgba(176, 141, 87, calc(0.05 + 0.05 * var(--ambient-warmth, 0.5))) 0%, transparent 62%),
-    /* Hide mottling, in the ground's own warm tones. */
-    radial-gradient(ellipse 120px 90px at 15% 25%, rgba(240, 224, 200, 0.030) 0%, transparent 40%),
-    radial-gradient(ellipse 100px 80px at 75% 60%, rgba(176, 141, 87, 0.026) 0%, transparent 45%),
-    radial-gradient(ellipse 110px 85px at 45% 75%, rgba(240, 224, 200, 0.028) 0%, transparent 42%),
-    radial-gradient(ellipse 95px 70px at 85% 20%, rgba(176, 141, 87, 0.024) 0%, transparent 48%),
-    radial-gradient(ellipse 105px 75px at 25% 55%, rgba(240, 224, 200, 0.026) 0%, transparent 46%),
-    /* Medium grain */
+    /* Rotating aurora wash -- the actual "temperature", in band colors.
+       Alpha raised from the original 0.30 to 0.38 so it reads as vivid
+       at a glance rather than a hint; the extra vibrancy is affordable
+       now that nothing else duplicates these hues underneath it. */
+    conic-gradient(
+      from var(--spin-angle) at 50% 50%,
+      rgba(200, 107, 224, 0.38),
+      rgba(245, 162, 90, 0.38),
+      rgba(240, 224, 200, 0.28),
+      rgba(107, 168, 245, 0.38),
+      rgba(79, 216, 232, 0.38),
+      rgba(200, 107, 224, 0.38)
+    ),
+    /* Hide mottling -- neutral warm tone only. The original recoloured
+       this to match the aurora hues, doubling up on saturated colour in
+       the same layer and reading as mud; texture belongs here, colour
+       belongs to the wash above it. */
+    radial-gradient(ellipse 120px 90px at 15% 25%, rgba(240, 224, 200,0.030) 0%, transparent 40%),
+    radial-gradient(ellipse 100px 80px at 75% 60%, rgba(240, 224, 200,0.026) 0%, transparent 45%),
+    radial-gradient(ellipse 110px 85px at 45% 75%, rgba(240, 224, 200,0.028) 0%, transparent 42%),
+    radial-gradient(ellipse 95px 70px at 85% 20%, rgba(240, 224, 200,0.024) 0%, transparent 48%),
+    radial-gradient(ellipse 105px 75px at 25% 55%, rgba(240, 224, 200,0.026) 0%, transparent 46%),
+    /* Medium grain texture - subtle */
     radial-gradient(ellipse 3px 2px at 20% 30%, rgba(240, 224, 200,0.016) 0%, transparent 50%),
     radial-gradient(ellipse 3px 2px at 60% 70%, rgba(240, 224, 200,0.014) 0%, transparent 50%),
     radial-gradient(ellipse 3px 2px at 40% 50%, rgba(240, 224, 200,0.015) 0%, transparent 50%),
@@ -165,16 +209,17 @@ body::before {
   background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
   background-repeat: no-repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat;
   background-attachment: fixed;
-  opacity: 0.95;
+  opacity: 1;
   pointer-events: none;
   z-index: -2;
   transition: filter var(--mood-tint-transition);
-  /* No hue-rotate, no saturate. Rotating the hue of a warm brown-black
-     ground by up to +/-70 degrees per city is what turned the ground
-     purple, green and red -- a multi-hue wash that read as a mistake.
-     Mood is carried by the instruments; the ground stays one warm tone
-     and varies only in strength. */
-  filter: brightness(calc(0.94 + 0.12 * var(--ambient-warmth, 0.5)));
+  /* Gentle nudge only -- +/-20deg keeps every hue recognisably itself
+     (magenta stays magenta, cyan stays cyan) rather than the old
+     +/-70deg swing that dragged the whole wash into unrelated hue
+     families. Saturation and brightness rise together with warmth so a
+     "charged" reading actually looks more vivid, not just differently
+     tinted. */
+  filter: hue-rotate(var(--wash-hue)) saturate(calc(0.95 + 0.3 * var(--ambient-warmth, 0.5))) brightness(calc(0.98 + 0.14 * var(--ambient-warmth, 0.5)));
 }
 
 /* Legibility scrim -- lighter than before so the wash actually shows;
@@ -194,14 +239,13 @@ body::after {
 /* Time-of-day: updateAmbientLighting() in app.js sets one of these on
    <body> for every page (not just the homepage) and refreshes hourly, so
    the wash keeps drifting warmer/cooler across the day even on a page
-   with no mood reading to key off yet. Varies brightness only -- never
-   hue -- so the ground stays one warm tone. */
-/* Time of day varies BRIGHTNESS only, never hue -- the drift across the
-   day stays within the one warm tone. */
-body.ambient-morning::before { filter: brightness(calc(1.00 + 0.12 * var(--ambient-warmth, 0.5))); }
-body.ambient-day::before     { filter: brightness(calc(1.04 + 0.12 * var(--ambient-warmth, 0.5))); }
-body.ambient-evening::before { filter: brightness(calc(0.96 + 0.12 * var(--ambient-warmth, 0.5))); }
-body.ambient-night::before   { filter: brightness(calc(0.86 + 0.12 * var(--ambient-warmth, 0.5))); }
+   with no mood reading to key off yet. Layers on top of --wash-hue with
+   a small additional offset per time of day -- still nowhere near the
+   old +/-70deg swing. */
+body.ambient-morning::before { filter: hue-rotate(calc(var(--wash-hue) + 6deg))  saturate(calc(1.00 + 0.3 * var(--ambient-warmth, 0.5))) brightness(calc(1.02 + 0.14 * var(--ambient-warmth, 0.5))); }
+body.ambient-day::before     { filter: hue-rotate(calc(var(--wash-hue) - 3deg))  saturate(calc(1.05 + 0.3 * var(--ambient-warmth, 0.5))) brightness(calc(1.06 + 0.14 * var(--ambient-warmth, 0.5))); }
+body.ambient-evening::before { filter: hue-rotate(calc(var(--wash-hue) + 10deg)) saturate(calc(1.02 + 0.3 * var(--ambient-warmth, 0.5))) brightness(calc(1.00 + 0.14 * var(--ambient-warmth, 0.5))); }
+body.ambient-night::before   { filter: hue-rotate(var(--wash-hue))               saturate(calc(0.92 + 0.3 * var(--ambient-warmth, 0.5))) brightness(calc(0.88 + 0.14 * var(--ambient-warmth, 0.5))); }
 
 /* Respect reduced transparency */
 @media (prefers-reduced-transparency: reduce) {
@@ -221,7 +265,11 @@ body.ambient-night::before   { filter: brightness(calc(0.86 + 0.12 * var(--ambie
 @media (max-width: 768px) {
   body::before {
     background-attachment: scroll;
-    background-size: 100% 100%, 100% 100%, 220px 220px, 560px 560px, 220px 220px, 560px 560px, 220px 220px, 560px 560px, 220px 220px, 560px 560px, 220px 220px, 560px 560px, 8px 8px, 8px 8px;
+    /* 13 values for 13 background-image layers (conic wash, 5 mottling,
+       5 grain, 2 hair). A leftover 14-value list from an earlier layer
+       count was stretching one mottling ellipse to full-viewport size
+       here -- fixed to match the current layer count. */
+    background-size: 100% 100%, 220px 220px, 220px 220px, 220px 220px, 220px 220px, 220px 220px, 140px 140px, 140px 140px, 140px 140px, 140px 140px, 140px 140px, 8px 8px, 8px 8px;
   }
 }
 
