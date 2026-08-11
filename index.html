@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=54" />
+  <link rel="stylesheet" href="/styles.css?v=55" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
@@ -46,11 +46,30 @@
 <script src="/nav-component.js"></script>
 
     
-    <!-- Plain-language opener: says what the site is before asking the
-         visitor to do anything, so the spin instrument below has context. -->
-    <section class="homepage-intro">
-      <h1 class="homepage-h1">Know how a city feels before you go.</h1>
-      <p class="homepage-subhead">Live readings across 151 cities.</p>
+    <!-- Hero instrument: instrument-base.png (uploaded artwork, never
+         modified) plus a live SVG layer over its aperture, driven by
+         whichever city is pinned. See glotemp-hero-instrument.js. -->
+    <section class="hero-instrument-section" id="hero-instrument-section">
+      <div class="hero-copy">
+        <h1 class="hero-headline">Know how a city feels before you go.</h1>
+        <p class="hero-subhead">Live readings across 151 cities.</p>
+        <form class="hero-search" id="hero-city-search" role="search">
+          <input type="text" id="hero-city-input" class="hero-search-input" list="hero-city-list"
+                 placeholder="Search a city" autocomplete="off" aria-label="Search a city">
+          <datalist id="hero-city-list"></datalist>
+          <button type="submit" class="hero-search-go">Go</button>
+        </form>
+        <a href="#" class="hero-cta btn-neon" id="hero-primary-cta">View this city</a>
+      </div>
+
+      <div class="hero-instrument" id="hero-instrument" tabindex="0" role="img" aria-label="Live instrument for the pinned city">
+        <div class="hero-instrument-inner">
+          <div class="hero-instrument-glow" id="hero-instrument-glow" aria-hidden="true"></div>
+          <img class="hero-instrument-base" src="/assets/instrument-base.png" alt="" aria-hidden="true" width="1024" height="1024">
+          <svg class="hero-instrument-live" id="hero-instrument-live" viewBox="0 0 1024 1024" aria-hidden="true"></svg>
+          <div class="hero-instrument-weather" id="hero-instrument-weather" aria-hidden="true"></div>
+        </div>
+      </div>
     </section>
 
     <!-- Spin: most prominent interactive element on the page -->
@@ -299,6 +318,7 @@
   <script src="/glotemp-tonight.js" defer></script>
   <script src="/glotemp-showcase.js" defer></script>
   <script src="/glotemp-spin.js" defer></script>
+  <script src="/glotemp-hero-instrument.js" defer></script>
   <script src="/app.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
   <script src="/cookie-consent.js" defer></script>

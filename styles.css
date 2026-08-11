@@ -142,6 +142,15 @@ body {
   /* Derived once here so every filter below (time-of-day included) reads
      the same gentle swing instead of repeating the calc. */
   --wash-hue: calc((var(--ambient-warmth, 0.5) - 0.5) * 40deg);
+  /* Set by initVisitorAmbientWeather() in app.js when the visitor grants
+     location access -- multiplies on top of every filter below so the
+     wash can read "sunny and bright" or "grey and rainy" without a
+     separate rule per weather x time-of-day combination. Defaults are
+     neutral (no-op) so a page with no location permission, or one
+     app.js hasn't run on yet, looks exactly as before. */
+  --weather-brightness-mult: 1;
+  --weather-saturate-mult: 1;
+  --weather-hue-shift: 0deg;
 }
 
 @keyframes ambient-spin {
@@ -219,7 +228,9 @@ body::before {
      families. Saturation and brightness rise together with warmth so a
      "charged" reading actually looks more vivid, not just differently
      tinted. */
-  filter: hue-rotate(var(--wash-hue)) saturate(calc(0.95 + 0.3 * var(--ambient-warmth, 0.5))) brightness(calc(0.98 + 0.14 * var(--ambient-warmth, 0.5)));
+  filter: hue-rotate(calc(var(--wash-hue) + var(--weather-hue-shift, 0deg)))
+           saturate(calc((0.95 + 0.3 * var(--ambient-warmth, 0.5)) * var(--weather-saturate-mult, 1)))
+           brightness(calc((0.98 + 0.14 * var(--ambient-warmth, 0.5)) * var(--weather-brightness-mult, 1)));
 }
 
 /* Legibility scrim -- lighter than before so the wash actually shows;
@@ -241,11 +252,13 @@ body::after {
    the wash keeps drifting warmer/cooler across the day even on a page
    with no mood reading to key off yet. Layers on top of --wash-hue with
    a small additional offset per time of day -- still nowhere near the
-   old +/-70deg swing. */
-body.ambient-morning::before { filter: hue-rotate(calc(var(--wash-hue) + 6deg))  saturate(calc(1.00 + 0.3 * var(--ambient-warmth, 0.5))) brightness(calc(1.02 + 0.14 * var(--ambient-warmth, 0.5))); }
-body.ambient-day::before     { filter: hue-rotate(calc(var(--wash-hue) - 3deg))  saturate(calc(1.05 + 0.3 * var(--ambient-warmth, 0.5))) brightness(calc(1.06 + 0.14 * var(--ambient-warmth, 0.5))); }
-body.ambient-evening::before { filter: hue-rotate(calc(var(--wash-hue) + 10deg)) saturate(calc(1.02 + 0.3 * var(--ambient-warmth, 0.5))) brightness(calc(1.00 + 0.14 * var(--ambient-warmth, 0.5))); }
-body.ambient-night::before   { filter: hue-rotate(var(--wash-hue))               saturate(calc(0.92 + 0.3 * var(--ambient-warmth, 0.5))) brightness(calc(0.88 + 0.14 * var(--ambient-warmth, 0.5))); }
+   old +/-70deg swing. Each also folds in --weather-* (see :root above),
+   so "sunny in the afternoon" and "raining in the afternoon" read as
+   genuinely different without a rule per combination. */
+body.ambient-morning::before { filter: hue-rotate(calc(var(--wash-hue) + 6deg + var(--weather-hue-shift, 0deg)))  saturate(calc((1.00 + 0.3 * var(--ambient-warmth, 0.5)) * var(--weather-saturate-mult, 1))) brightness(calc((1.02 + 0.14 * var(--ambient-warmth, 0.5)) * var(--weather-brightness-mult, 1))); }
+body.ambient-day::before     { filter: hue-rotate(calc(var(--wash-hue) - 3deg + var(--weather-hue-shift, 0deg)))  saturate(calc((1.05 + 0.3 * var(--ambient-warmth, 0.5)) * var(--weather-saturate-mult, 1))) brightness(calc((1.06 + 0.14 * var(--ambient-warmth, 0.5)) * var(--weather-brightness-mult, 1))); }
+body.ambient-evening::before { filter: hue-rotate(calc(var(--wash-hue) + 10deg + var(--weather-hue-shift, 0deg))) saturate(calc((1.02 + 0.3 * var(--ambient-warmth, 0.5)) * var(--weather-saturate-mult, 1))) brightness(calc((1.00 + 0.14 * var(--ambient-warmth, 0.5)) * var(--weather-brightness-mult, 1))); }
+body.ambient-night::before   { filter: hue-rotate(calc(var(--wash-hue) + var(--weather-hue-shift, 0deg)))         saturate(calc((0.92 + 0.3 * var(--ambient-warmth, 0.5)) * var(--weather-saturate-mult, 1))) brightness(calc((0.88 + 0.14 * var(--ambient-warmth, 0.5)) * var(--weather-brightness-mult, 1))); }
 
 /* Respect reduced transparency */
 @media (prefers-reduced-transparency: reduce) {
@@ -4960,24 +4973,341 @@ a:hover .city-landmark-photo,
 
 /* ===== HOMEPAGE OPENER: says what the site is before asking the visitor
    to spin, pick a mood, or click a city -- context before controls. ===== */
-.homepage-intro {
-  text-align: center;
-  padding: 1.5rem 0 0.5rem;
-  max-width: 56ch;
-  margin: 0 auto;
+/* ===== HERO INSTRUMENT =====
+   instrument-base.png (uploaded artwork, see /assets -- never modified)
+   is a flattened export with no real alpha channel: the "transparent"
+   aperture and surrounding checkerboard the source file showed are
+   baked into opaque pixels (solid near-black aperture, a literal grey
+   checker pattern as background), confirmed by inspecting the shipped
+   file directly. Two things follow from that, neither of which touches
+   the asset itself:
+     1. The outer checkerboard is cropped away with clip-path (a circle
+        matched to the housing's real outer edge, detected by scanning
+        the shipped PNG once -- see detection notes below).
+     2. The "glow beneath the aperture" effect is faked with
+        mix-blend-mode:screen on a layer painted ABOVE the image and
+        clipped to the aperture circle -- screening amber over
+        near-black reads as light glowing through, without any real
+        transparency required.
+   Detected once against the shipped 1024x1024 file (aperture: near-black
+   blob bounding box; outer edge: housing silhouette by saturation, since
+   the checkerboard is perfectly neutral R=G=B at any brightness):
+     aperture  cx=50.20% cy=49.90% r=10.5%  (of the image's own box)
+     outer rim cx=50.20% cy=49.90% r=38.5%
+   Re-detect and update these if instrument-base.png is ever replaced. */
+.hero-instrument-section {
+  display: grid;
+  grid-template-columns: minmax(280px, 40%) 1fr;
+  align-items: center;
+  gap: 2rem;
+  min-height: min(88vh, 820px);
+  padding: 2rem 0 1rem;
+  overflow: hidden;
 }
-.homepage-h1 {
+.hero-copy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding-bottom: 2rem;
+  /* Grid items default to min-width:auto, which sizes to the largest
+     child's max-content and can blow the column wider than the grid
+     track (here, wider than the viewport on narrow screens, clipped by
+     the section's overflow:hidden). min-width:0 lets it actually shrink
+     to the track's real width so children wrap/shrink instead. */
+  min-width: 0;
+}
+.hero-headline {
   font-family: var(--font-display);
-  font-size: clamp(30px, 4.4vw, 48px);
+  font-size: clamp(32px, 4.6vw, 54px);
   font-weight: var(--fw-light);
   color: var(--ivory);
-  line-height: 1.15;
-  margin-bottom: 0.6rem;
+  line-height: 1.12;
 }
-.homepage-subhead {
+.hero-subhead {
+  font-family: var(--font-body);
   color: var(--sand);
-  font-size: 1rem;
+  font-size: 1.05rem;
   line-height: 1.55;
+  max-width: 40ch;
+}
+.hero-search {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 380px;
+  min-width: 0;
+  margin-top: 0.4rem;
+}
+.hero-search-input {
+  flex: 1;
+  min-width: 0;
+  background: rgba(240, 224, 200, 0.06);
+  border: 1px solid var(--brass-dim);
+  border-radius: 4px;
+  color: var(--ivory);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  padding: 0.65rem 0.9rem;
+}
+.hero-search-input:focus {
+  outline: none;
+  border-color: var(--brass);
+  background: rgba(240, 224, 200, 0.1);
+}
+.hero-search-go {
+  background: transparent;
+  border: 1px solid var(--brass-dim);
+  border-radius: 4px;
+  color: var(--ivory);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  padding: 0.65rem 1.1rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.hero-search-go:hover { border-color: var(--brass); color: var(--brass); }
+.hero-cta { margin-top: 0.2rem; }
+
+.hero-instrument {
+  position: relative;
+  z-index: 1;
+  justify-self: end;
+  min-width: 0;
+  width: min(62vw, 780px);
+  aspect-ratio: 1;
+  margin-right: -8%;
+  cursor: pointer;
+  transform: scale(1);
+  animation-name: hero-instrument-breathe;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-duration: var(--hero-breathe-period, 6s);
+  touch-action: none;
+}
+@keyframes hero-instrument-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.015); }
+}
+.hero-instrument-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  /* Contains .hero-instrument-glow's mix-blend-mode:screen to this
+     stacking context -- without it, the blend reaches past the base
+     image and mixes with the page's own animated background wash
+     behind everything, instead of blending only with the (black)
+     aperture pixels directly beneath it. */
+  isolation: isolate;
+}
+.hero-instrument-base {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  /* A hard clip-path at the housing's true edge still let a 1-2px
+     checkerboard sliver show at some zoom levels (JPEG edge noise on a
+     boundary this is only approximately detected) -- a soft mask that
+     fades out just inside that edge hides it completely instead. */
+  -webkit-mask-image: radial-gradient(circle at 50.2% 49.9%, #000 36.5%, transparent 37.6%);
+  mask-image: radial-gradient(circle at 50.2% 49.9%, #000 36.5%, transparent 37.6%);
+  filter: drop-shadow(0 30px 70px rgba(0, 0, 0, 0.55));
+  user-select: none;
+  -webkit-user-drag: none;
+}
+/* Screen-blend amber "glow", clipped to the aperture circle and painted
+   above the (opaque) base image -- see the file-level comment above for
+   why this stands in for real alpha transparency. */
+.hero-instrument-glow {
+  position: absolute;
+  left: 39.7%;
+  top: 39.4%;
+  width: 21%;
+  height: 21%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 55%,
+    rgba(245, 178, 90, 0.95) 0%,
+    rgba(220, 140, 60, 0.55) 45%,
+    rgba(120, 70, 30, 0) 75%);
+  mix-blend-mode: screen;
+  opacity: var(--hero-glow-opacity, 0.7);
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+.hero-instrument:hover .hero-instrument-glow,
+.hero-instrument:focus-visible .hero-instrument-glow {
+  opacity: min(1, calc(var(--hero-glow-opacity, 0.7) + 0.25));
+}
+.hero-instrument-live {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.hero-instrument-hand {
+  transform-origin: 514px 511px;
+  animation-name: hero-hand-spin;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes hero-hand-spin {
+  to { transform: rotate(360deg); }
+}
+.hero-instrument-weather {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  clip-path: circle(10.5% at 50.2% 49.9%);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .hero-instrument-section {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: 1.5rem 0 0.5rem;
+    text-align: left;
+  }
+  .hero-instrument {
+    justify-self: center;
+    /* 100% of the grid column, not vw -- vw is relative to the viewport
+       and ignores the section's own padding, which was making this
+       wider than its column and forcing the whole grid (including the
+       search form next to it) to overflow and get clipped. */
+    width: min(100%, 520px);
+    margin-right: 0;
+    margin-top: 0.5rem;
+    order: 2;
+  }
+  .hero-copy { order: 1; padding-bottom: 0.5rem; align-items: flex-start; }
+  .hero-search { max-width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-instrument { animation: none !important; }
+  .hero-instrument-hand { animation: none !important; }
+}
+
+/* ----- Hero instrument weather/seasonal layers -----
+   All confined to the aperture circle (clip-path on .hero-instrument-weather
+   itself, set above) except heat shimmer, which reads as "above the
+   housing" per spec and gets its own unclipped pseudo-element. Layers
+   stack by simply combining classes (glotemp-hero-instrument.js sets one
+   precip class + toggles hero-is-hot/hero-is-frost independently), so
+   "snow at night" and "snow at midday" differ only through
+   --hero-glow-opacity and the night/day filter already driving the rest
+   of the instrument. Classes are prefixed hero- throughout -- the
+   barometer weather system earlier in this file already owns bare
+   names like .weather-snow/.weather-rain/.weather-fog, and reusing them
+   here matched by class name regardless of ancestor, silently painting
+   its opaque sky-gradient backgrounds over this element too. */
+.hero-instrument-weather.hero-weather-snow .hero-snowflake {
+  position: absolute;
+  top: -8%;
+  left: var(--flake-left, 50%);
+  width: var(--flake-size, 3px);
+  height: var(--flake-size, 3px);
+  background: #F0E0C8;
+  border-radius: 50%;
+  opacity: 0;
+  animation: snow-fall var(--flake-duration, 5s) linear infinite;
+  animation-delay: var(--flake-delay, 0s);
+}
+
+.hero-instrument-weather.hero-weather-rain::before {
+  content: '';
+  position: absolute;
+  inset: -20% -20%;
+  background-image: repeating-linear-gradient(
+    100deg,
+    transparent 0px, transparent 5px,
+    rgba(220, 235, 255, 0.35) 5px, rgba(220, 235, 255, 0.5) 5.6px,
+    transparent 6.4px, transparent 13px
+  );
+  animation: rain-fall 0.35s linear infinite;
+}
+
+.hero-instrument-weather.hero-weather-thunderstorm::before {
+  content: '';
+  position: absolute;
+  inset: -20% -20%;
+  background-image: repeating-linear-gradient(
+    100deg,
+    transparent 0px, transparent 5px,
+    rgba(220, 235, 255, 0.4) 5px, rgba(220, 235, 255, 0.55) 5.6px,
+    transparent 6.4px, transparent 13px
+  );
+  animation: rain-fall 0.28s linear infinite;
+}
+.hero-instrument-weather.hero-weather-thunderstorm::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #F0E0C8;
+  opacity: 0;
+  animation: lightning-flash 6.5s ease-in-out infinite;
+}
+
+.hero-instrument-weather.hero-weather-fog {
+  backdrop-filter: blur(2.5px);
+  -webkit-backdrop-filter: blur(2.5px);
+  background: rgba(146, 152, 168, 0.28);
+}
+
+/* Frost creeping from the rim -- cold, clear/dry conditions (no
+   precipitation, so no snow class, but cold enough to fog the glass). */
+.hero-instrument-weather.hero-is-frost::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+    transparent 55%,
+    rgba(230, 240, 245, 0.18) 78%,
+    rgba(230, 240, 245, 0.42) 100%);
+  animation: frost-creep 8s ease-in-out infinite alternate;
+}
+@keyframes frost-creep {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+
+/* Heat shimmer -- unclipped, sits above the whole housing rather than
+   inside the aperture, per spec ("above the housing"). */
+.hero-instrument.hero-is-hot::after {
+  content: '';
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: -14%;
+  height: 22%;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(245, 178, 90, 0.16), transparent);
+  filter: blur(3px);
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 5px);
+  mask-image: repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 5px);
+  animation: heat-shimmer 2.2s ease-in-out infinite;
+}
+@keyframes heat-shimmer {
+  0%, 100% { transform: translateY(0) scaleY(1); opacity: 0.7; }
+  50% { transform: translateY(-4%) scaleY(1.08); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-instrument-weather .hero-snowflake,
+  .hero-instrument-weather.hero-weather-rain::before,
+  .hero-instrument-weather.hero-weather-thunderstorm::before,
+  .hero-instrument-weather.hero-weather-thunderstorm::after,
+  .hero-instrument-weather.hero-is-frost::before,
+  .hero-instrument.hero-is-hot::after {
+    animation: none !important;
+  }
 }
 
 /* Sits just above the instrument row: tells the visitor the barometers

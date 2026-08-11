@@ -1544,7 +1544,10 @@ function updateAmbientLighting() {
   else if (hour < 21) ambientClass = 'ambient-evening';
   else ambientClass = 'ambient-night';
 
-  document.body.className = ambientClass;
+  // classList, not className -- overwriting className wiped every other
+  // class on <body> (e.g. scroll-reveals-enabled) on each hourly refresh.
+  document.body.classList.remove('ambient-morning', 'ambient-day', 'ambient-evening', 'ambient-night');
+  document.body.classList.add(ambientClass);
 }
 
 function updateCity(selected) {
@@ -1828,6 +1831,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   drawPulse();
   updateCity('nyc');
   initObsSnippetRotator();
+  initVisitorAmbientWeather();
 
   const citySelect = document.getElementById('city-select');
   if (citySelect) {
@@ -2257,6 +2261,98 @@ async function getCityWeatherCategory(city) {
 
   weatherInflight.set(city.slug, promise);
   return promise;
+}
+
+// ===== Visitor ambient weather (homepage background only) =====
+// The ambient wash already reflects the visitor's own local time of day
+// with zero network dependency (see updateAmbientLighting -- it reads
+// new Date().getHours(), the browser's own clock, not a server's). This
+// layer sharpens it further with the visitor's own real weather, using
+// the browser's own geolocation (never a third-party IP-geolocation
+// service) and the same free/keyless Open-Meteo endpoint above. Pure
+// progressive enhancement: permission denied, no geolocation support, or
+// a failed fetch all just leave the wash exactly as time-of-day already
+// made it -- never a broken or stuck state.
+const VISITOR_WEATHER_CACHE_KEY = 'glotemp-visitor-weather-v1';
+const VISITOR_WEATHER_TTL_MS = 20 * 60 * 1000;
+
+// Multipliers layered on top of the existing --ambient-warmth-driven
+// filter in styles.css (see --weather-* custom properties there). Kept
+// gentle for the same reason the time-of-day hue swing was narrowed --
+// the wash should read as "this weather", not lose its multicolour
+// identity to a single flat tone.
+const WEATHER_AMBIENCE_PRESETS = {
+  'clear-day': { brightness: 1.14, saturate: 1.18, hue: 5 },
+  'clear-night': { brightness: 0.92, saturate: 1.08, hue: -4 },
+  cloudy: { brightness: 0.94, saturate: 0.82, hue: -6 },
+  fog: { brightness: 0.88, saturate: 0.62, hue: -8 },
+  rain: { brightness: 0.84, saturate: 0.78, hue: -14 },
+  snow: { brightness: 1.08, saturate: 0.6, hue: -6 },
+  thunderstorm: { brightness: 0.74, saturate: 0.9, hue: 10 },
+};
+
+function applyWeatherAmbience(category) {
+  const preset = WEATHER_AMBIENCE_PRESETS[category];
+  if (!preset) return;
+  const root = document.documentElement;
+  root.style.setProperty('--weather-brightness-mult', preset.brightness);
+  root.style.setProperty('--weather-saturate-mult', preset.saturate);
+  root.style.setProperty('--weather-hue-shift', `${preset.hue}deg`);
+  document.body.setAttribute('data-weather', category);
+}
+
+function loadVisitorWeatherCache() {
+  try {
+    const raw = localStorage.getItem(VISITOR_WEATHER_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || Date.now() - parsed.fetchedAt > VISITOR_WEATHER_TTL_MS) return null;
+    return parsed.category;
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveVisitorWeatherCache(category) {
+  try {
+    localStorage.setItem(VISITOR_WEATHER_CACHE_KEY, JSON.stringify({ category, fetchedAt: Date.now() }));
+  } catch (e) { /* storage full/unavailable -- non-fatal, just skip persistence */ }
+}
+
+async function fetchVisitorWeather(lat, lon) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 6000);
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=weather_code,is_day&timezone=auto`;
+    const res = await fetch(url, { signal: controller.signal });
+    if (!res.ok) throw new Error('weather fetch failed: ' + res.status);
+    const data = await res.json();
+    const code = data && data.current ? data.current.weather_code : undefined;
+    const isDay = !(data && data.current && data.current.is_day === 0);
+    return weatherCodeToCategory(code, isDay);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+function initVisitorAmbientWeather() {
+  const cached = loadVisitorWeatherCache();
+  if (cached) {
+    applyWeatherAmbience(cached);
+    return; // fresh enough -- do not re-prompt/re-fetch this session
+  }
+  if (!navigator.geolocation) return;
+
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      const category = await fetchVisitorWeather(pos.coords.latitude, pos.coords.longitude).catch(() => null);
+      if (!category) return;
+      applyWeatherAmbience(category);
+      saveVisitorWeatherCache(category);
+    },
+    () => { /* denied or unavailable -- stays on the time-of-day-only wash */ },
+    { timeout: 8000, maximumAge: 30 * 60 * 1000 }
+  );
 }
 
 function renderSnowflakes(container, count) {
