@@ -202,15 +202,57 @@
 
   // ---------- sign in / out ----------
   function signInWithOAuth(provider) {
-    const redirectTo = encodeURIComponent(window.location.href.split('#')[0]);
+    // Same rule as the email link: the provider must return to a host that
+    // exists in production, not whatever origin this page happens to be
+    // served from.
+    rememberReturn();
+    const redirectTo = encodeURIComponent(confirmRedirectURL());
     window.location.href = `${SUPABASE_URL}/auth/v1/authorize?provider=${provider}&redirect_to=${redirectTo}`;
   }
 
+  // Where the confirmation link must land. Always the production origin --
+  // never window.location.origin, which on a preview deploy or a local
+  // server would put an unreachable host into a link sent to a real inbox.
+  const SITE_ORIGIN = 'https://glo-temp.com';
+  const CONFIRM_PATH = '/auth/confirm/';
+  const RETURN_KEY = 'glotemp-auth-return';
+
+  function confirmRedirectURL() {
+    return SITE_ORIGIN + CONFIRM_PATH;
+  }
+
+  // Remember what the visitor was doing so the confirmation page can put
+  // them back there instead of dumping them on the homepage.
+  function rememberReturn() {
+    try {
+      const here = window.location.pathname + window.location.search + window.location.hash;
+      // Only same-site paths, and never the confirm page itself.
+      if (here.indexOf('//') === 0 || here.indexOf(CONFIRM_PATH) === 0) return;
+      localStorage.setItem(RETURN_KEY, here);
+    } catch (e) { /* private mode -- the confirm page falls back to '/' */ }
+  }
+
   async function signInWithEmail(email) {
-    const resp = await fetch(`${SUPABASE_URL}/auth/v1/otp`, {
+    rememberReturn();
+
+    // The redirect target goes in BOTH the query string and the body.
+    //
+    // This is the localhost bug. The previous call passed
+    // `options: { email_redirect_to }`, which is the supabase-js client's
+    // shape, NOT the GoTrue REST API's -- the REST endpoint reads
+    // `redirect_to` (query param, or top-level body field) and silently
+    // ignores an unknown `options` object. With no redirect it could
+    // recognise, GoTrue fell back to the project's Site URL, which is
+    // http://localhost:3000 by default. That is why every confirmation
+    // link in every real inbox pointed at a host the recipient cannot
+    // reach. Sending it both ways works whichever GoTrue version is
+    // deployed, and neither form is an error to the other.
+    const redirect = confirmRedirectURL();
+    const url = `${SUPABASE_URL}/auth/v1/otp?redirect_to=${encodeURIComponent(redirect)}`;
+    const resp = await fetch(url, {
       method: 'POST',
       headers: { apikey: SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, create_user: true, options: { email_redirect_to: window.location.href.split('#')[0] } }),
+      body: JSON.stringify({ email, create_user: true, redirect_to: redirect }),
     });
     if (!resp.ok) throw new Error('email sign-in failed: ' + resp.status);
     return true;
@@ -411,6 +453,14 @@
     getCachedProfile,
     saveProfile,
     signInWithOAuth,
+    confirmRedirectURL,
+    takeReturnPath: function () {
+      try {
+        const v = localStorage.getItem(RETURN_KEY);
+        localStorage.removeItem(RETURN_KEY);
+        return v || '/';
+      } catch (e) { return '/'; }
+    },
     signInWithEmail,
     signOut,
     requireAuth,
