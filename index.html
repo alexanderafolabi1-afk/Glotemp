@@ -50,24 +50,26 @@
          modified) plus a live SVG layer over its aperture, driven by
          whichever city is pinned. See glotemp-hero-instrument.js. -->
     <section class="hero-instrument-section" id="hero-instrument-section">
-      <div class="hero-copy">
-        <h1 class="hero-headline">Know how a city feels before you go.</h1>
-        <p class="hero-subhead">Live readings across 151 cities.</p>
-        <form class="hero-search" id="hero-city-search" role="search">
-          <input type="text" id="hero-city-input" class="hero-search-input" list="hero-city-list"
-                 placeholder="Search a city" autocomplete="off" aria-label="Search a city">
-          <datalist id="hero-city-list"></datalist>
-          <button type="submit" class="hero-search-go">Go</button>
-        </form>
-        <a href="#" class="hero-cta btn-neon" id="hero-primary-cta">View this city</a>
-      </div>
+      <div class="hero-instrument-grid">
+        <div class="hero-copy">
+          <h1 class="hero-headline">Know how a city feels before you go.</h1>
+          <p class="hero-subhead">Live readings across 151 cities.</p>
+          <form class="hero-search" id="hero-city-search" role="search">
+            <input type="text" id="hero-city-input" class="hero-search-input" list="hero-city-list"
+                   placeholder="Search a city" autocomplete="off" aria-label="Search a city">
+            <datalist id="hero-city-list"></datalist>
+            <button type="submit" class="hero-search-go">Go</button>
+          </form>
+          <a href="#" class="hero-cta btn-neon" id="hero-primary-cta">View this city</a>
+        </div>
 
-      <div class="hero-instrument" id="hero-instrument" tabindex="0" role="img" aria-label="Live instrument for the pinned city">
-        <div class="hero-instrument-inner">
-          <div class="hero-instrument-glow" id="hero-instrument-glow" aria-hidden="true"></div>
-          <img class="hero-instrument-base" src="/assets/instrument-base.png" alt="" aria-hidden="true" width="1024" height="1024">
-          <svg class="hero-instrument-live" id="hero-instrument-live" viewBox="0 0 1024 1024" aria-hidden="true"></svg>
-          <div class="hero-instrument-weather" id="hero-instrument-weather" aria-hidden="true"></div>
+        <div class="hero-instrument" id="hero-instrument" tabindex="0" role="img" aria-label="Live instrument for the pinned city">
+          <div class="hero-instrument-inner">
+            <div class="hero-instrument-glow" id="hero-instrument-glow" aria-hidden="true"></div>
+            <img class="hero-instrument-base" src="/assets/instrument-base.png" alt="" aria-hidden="true" width="1024" height="1024">
+            <svg class="hero-instrument-live" id="hero-instrument-live" viewBox="0 0 1024 1024" aria-hidden="true"></svg>
+            <div class="hero-instrument-weather" id="hero-instrument-weather" aria-hidden="true"></div>
+          </div>
         </div>
       </div>
     </section>
