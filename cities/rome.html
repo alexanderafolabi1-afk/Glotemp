@@ -69,7 +69,7 @@
       <div class="affiliate-links" id="city-affiliate-links"></div>
       <div class="sponsor-slot">
         <span class="sponsor-slot-tag">Featured by Glotemp</span>
-        <p class="sponsor-slot-copy">This placement is reserved for a local business, hotel, restaurant, or tourism board in <span id="sponsor-city-name">this city</span>. <a href="mailto:partners@glotemp.com">Partner with this city &rarr;</a></p>
+        <p class="sponsor-slot-copy">This placement is reserved for a local business, hotel, restaurant, or tourism board in <span id="sponsor-city-name">this city</span>. <a href="mailto:marketing@glo-temp.com" class="contact-link">Partner with this city &rarr;</a></p>
       </div>
     </section>
 
@@ -257,6 +257,7 @@
   <footer class="footer glass-card">
     <div class="footer-content">
       <p class="small-print" data-i18n="footer_copyright">&copy; 2026 Glotemp. Live city intelligence.</p>
+      <p class="small-print"><a href="mailto:info@glo-temp.com" class="contact-link">info@glo-temp.com</a></p>
     </div>
     <p class="small-print footer-lang-row">
       <button type="button" id="lang-switch" class="footer-lang">Language</button>
@@ -588,7 +589,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Trastevere at golden hour - ochre walls, voices, aperitivo.","language_lens":"visitor","created_at":"2026-08-10T12:43:59.463Z"},{"context":"Caffè al bar sotto casa - l'espresso migliore della giornata.","language_lens":"local","created_at":"2026-08-10T06:43:59.463Z"},{"context":"Metro A affollatissima come sempre. Roma non cambia.","language_lens":"local","created_at":"2026-08-09T22:43:59.463Z"},{"context":"Campo de' Fiori morning market - still the heart of the city.","language_lens":"visitor","created_at":"2026-08-09T11:43:59.463Z"},{"context":"Pigneto neighbourhood buzzing - new Rome mixing with the old.","language_lens":"visitor","created_at":"2026-08-09T00:43:59.463Z"}];
+      const checkins = [{"context":"Trastevere at golden hour - ochre walls, voices, aperitivo.","language_lens":"visitor","created_at":"2026-08-11T19:31:11.514Z"},{"context":"Caffè al bar sotto casa - l'espresso migliore della giornata.","language_lens":"local","created_at":"2026-08-11T13:31:11.514Z"},{"context":"Metro A affollatissima come sempre. Roma non cambia.","language_lens":"local","created_at":"2026-08-11T05:31:11.514Z"},{"context":"Campo de' Fiori morning market - still the heart of the city.","language_lens":"visitor","created_at":"2026-08-10T18:31:11.514Z"},{"context":"Pigneto neighbourhood buzzing - new Rome mixing with the old.","language_lens":"visitor","created_at":"2026-08-10T07:31:11.514Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

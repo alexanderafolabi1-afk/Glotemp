@@ -104,5 +104,5 @@ host = "env(SMTP_HOST)"
 port = 587
 user = "env(SMTP_USER)"
 pass = "env(SMTP_PASS)"
-admin_email = "hello@glo-temp.com"
+admin_email = "info@glo-temp.com"
 sender_name = "Glotemp"
