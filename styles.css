@@ -142,6 +142,15 @@ body {
   /* Derived once here so every filter below (time-of-day included) reads
      the same gentle swing instead of repeating the calc. */
   --wash-hue: calc((var(--ambient-warmth, 0.5) - 0.5) * 40deg);
+  /* Set by initVisitorAmbientWeather() in app.js when the visitor grants
+     location access -- multiplies on top of every filter below so the
+     wash can read "sunny and bright" or "grey and rainy" without a
+     separate rule per weather x time-of-day combination. Defaults are
+     neutral (no-op) so a page with no location permission, or one
+     app.js hasn't run on yet, looks exactly as before. */
+  --weather-brightness-mult: 1;
+  --weather-saturate-mult: 1;
+  --weather-hue-shift: 0deg;
 }
 
 @keyframes ambient-spin {
@@ -219,7 +228,9 @@ body::before {
      families. Saturation and brightness rise together with warmth so a
      "charged" reading actually looks more vivid, not just differently
      tinted. */
-  filter: hue-rotate(var(--wash-hue)) saturate(calc(0.95 + 0.3 * var(--ambient-warmth, 0.5))) brightness(calc(0.98 + 0.14 * var(--ambient-warmth, 0.5)));
+  filter: hue-rotate(calc(var(--wash-hue) + var(--weather-hue-shift, 0deg)))
+           saturate(calc((0.95 + 0.3 * var(--ambient-warmth, 0.5)) * var(--weather-saturate-mult, 1)))
+           brightness(calc((0.98 + 0.14 * var(--ambient-warmth, 0.5)) * var(--weather-brightness-mult, 1)));
 }
 
 /* Legibility scrim -- lighter than before so the wash actually shows;
@@ -241,11 +252,13 @@ body::after {
    the wash keeps drifting warmer/cooler across the day even on a page
    with no mood reading to key off yet. Layers on top of --wash-hue with
    a small additional offset per time of day -- still nowhere near the
-   old +/-70deg swing. */
-body.ambient-morning::before { filter: hue-rotate(calc(var(--wash-hue) + 6deg))  saturate(calc(1.00 + 0.3 * var(--ambient-warmth, 0.5))) brightness(calc(1.02 + 0.14 * var(--ambient-warmth, 0.5))); }
-body.ambient-day::before     { filter: hue-rotate(calc(var(--wash-hue) - 3deg))  saturate(calc(1.05 + 0.3 * var(--ambient-warmth, 0.5))) brightness(calc(1.06 + 0.14 * var(--ambient-warmth, 0.5))); }
-body.ambient-evening::before { filter: hue-rotate(calc(var(--wash-hue) + 10deg)) saturate(calc(1.02 + 0.3 * var(--ambient-warmth, 0.5))) brightness(calc(1.00 + 0.14 * var(--ambient-warmth, 0.5))); }
-body.ambient-night::before   { filter: hue-rotate(var(--wash-hue))               saturate(calc(0.92 + 0.3 * var(--ambient-warmth, 0.5))) brightness(calc(0.88 + 0.14 * var(--ambient-warmth, 0.5))); }
+   old +/-70deg swing. Each also folds in --weather-* (see :root above),
+   so "sunny in the afternoon" and "raining in the afternoon" read as
+   genuinely different without a rule per combination. */
+body.ambient-morning::before { filter: hue-rotate(calc(var(--wash-hue) + 6deg + var(--weather-hue-shift, 0deg)))  saturate(calc((1.00 + 0.3 * var(--ambient-warmth, 0.5)) * var(--weather-saturate-mult, 1))) brightness(calc((1.02 + 0.14 * var(--ambient-warmth, 0.5)) * var(--weather-brightness-mult, 1))); }
+body.ambient-day::before     { filter: hue-rotate(calc(var(--wash-hue) - 3deg + var(--weather-hue-shift, 0deg)))  saturate(calc((1.05 + 0.3 * var(--ambient-warmth, 0.5)) * var(--weather-saturate-mult, 1))) brightness(calc((1.06 + 0.14 * var(--ambient-warmth, 0.5)) * var(--weather-brightness-mult, 1))); }
+body.ambient-evening::before { filter: hue-rotate(calc(var(--wash-hue) + 10deg + var(--weather-hue-shift, 0deg))) saturate(calc((1.02 + 0.3 * var(--ambient-warmth, 0.5)) * var(--weather-saturate-mult, 1))) brightness(calc((1.00 + 0.14 * var(--ambient-warmth, 0.5)) * var(--weather-brightness-mult, 1))); }
+body.ambient-night::before   { filter: hue-rotate(calc(var(--wash-hue) + var(--weather-hue-shift, 0deg)))         saturate(calc((0.92 + 0.3 * var(--ambient-warmth, 0.5)) * var(--weather-saturate-mult, 1))) brightness(calc((0.88 + 0.14 * var(--ambient-warmth, 0.5)) * var(--weather-brightness-mult, 1))); }
 
 /* Respect reduced transparency */
 @media (prefers-reduced-transparency: reduce) {
@@ -257,6 +270,46 @@ body.ambient-night::before   { filter: hue-rotate(var(--wash-hue))              
 @media (prefers-contrast: more) {
   body::before { background-image: none; }
   body::after { background: var(--obsidian); }
+}
+
+/* ===== AMBIENT COMPASS: a large, faint old-compass/clock face fixed in
+   the homepage hero background (glotemp-ambient-compass.js mounts it,
+   homepage only). Bottom-right, mostly bleeding off-screen, so it reads
+   as atmosphere behind the headline rather than an object competing
+   with it -- z-index -1 puts it above the wash (body::before, -2) but
+   still below the scrim (body::after, also -1 but painted later) and
+   every real content element, which are all in the default stacking
+   layer above both. Outline-only SVG (no fill) so the colourful wash
+   glows through its strokes instead of sitting on a flat disc. */
+.ambient-compass {
+  position: fixed;
+  right: -8%;
+  bottom: -14%;
+  width: clamp(320px, 48vw, 640px);
+  aspect-ratio: 1;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.55;
+  filter: drop-shadow(0 0 60px rgba(0, 0, 0, 0.2));
+}
+.ambient-compass-svg { display: block; width: 100%; height: 100%; }
+.ambient-compass-hand { transform-origin: 200px 200px; }
+
+@keyframes ambient-clock-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .ambient-compass {
+    width: clamp(240px, 68vw, 400px);
+    right: -20%;
+    bottom: -10%;
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-compass-hand { animation: none !important; }
 }
 
 /* Mobile background optimization -- keeps the rotating wash (layer 1)
