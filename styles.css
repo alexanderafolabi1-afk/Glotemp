@@ -4996,13 +4996,89 @@ a:hover .city-landmark-photo,
      outer rim cx=50.20% cy=49.90% r=38.5%
    Re-detect and update these if instrument-base.png is ever replaced. */
 .hero-instrument-section {
+  position: relative;
+  /* Contains the internal z-index:-1/1/2 stacking (ground/instrument/copy)
+     to this section, so it paints as one normal-flow unit relative to
+     body::before/after (both negative z-index at the body level) instead
+     of the exact paint order depending on ambiguous cross-context
+     z-index comparisons. */
+  isolation: isolate;
+  /* One screen: hero + navbar fill exactly 100vh, nothing else visible
+     until scroll. Offset is #app's own top padding (16px) + the
+     navbar's rendered height (~86.6px, steady across 375-1440px) + its
+     margin-bottom (24px) = ~127px -- all three measured directly rather
+     than guessed, since a wrong number here means either a sliver of
+     the next section peeking in, or the hero falling short of full
+     height. A fixed height, not min-height: the instrument's own
+     intrinsic size (aspect-ratio 1 against its own vw-based width,
+     unrelated to viewport height) can exceed this on some viewports,
+     and min-height would let the section grow past one screen to fit
+     it -- height caps the section itself, and .hero-instrument-grid
+     (below) does the actual clipping. */
+  height: calc(100vh - 127px);
+  height: calc(100dvh - 127px);
+  /* No overflow:hidden here -- deliberately. The full-bleed ground
+     below is exactly 100vw, centred on the viewport, so it never
+     overflows the viewport itself, but it DOES overflow this section's
+     own (narrower, #app-padded) box by design, to break out to true
+     edges. overflow:hidden here would clip exactly that overhang, which
+     is what silently happened before this was split into two elements:
+     the ground's outer ~15% on each side got cropped off, leaving the
+     old sitewide wash visible in a thin strip at both edges. Clipping
+     the instrument's own bleed is now .hero-instrument-grid's job. */
+}
+.hero-instrument-grid {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(280px, 40%) 1fr;
   align-items: center;
   gap: 2rem;
-  min-height: min(88vh, 820px);
+  height: 100%;
   padding: 2rem 0 1rem;
   overflow: hidden;
+}
+/* Full-bleed dusk ground: one continuous atmosphere, edge to edge,
+   ignoring #app's own left/right padding (the previous background was
+   the sitewide rotating rainbow wash, body::before, showing through --
+   correct sitewide, but read as a hard blue-to-yellow split behind this
+   hero). This opaque layer sits between body::before/after (both
+   negative z-index, always painted first/lowest) and this section's own
+   content (.hero-copy z-index:2, .hero-instrument z-index:1) -- it
+   fully occludes the sitewide wash for exactly the hero's own box and
+   nothing else; every other section on the page still shows the
+   restored multicolour wash as before. CSS only, no image file: warmth
+   and depth come from several soft, irregular, low-alpha radial
+   gradients (a single flat gradient reads as a "colour ramp", which is
+   exactly what this replaces) plus a fine crossed-diagonal grain, the
+   same grain technique already used in body::before's texture layers. */
+.hero-instrument-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 100vw;
+  height: 100%;
+  transform: translateX(-50%);
+  z-index: -1;
+  background-color: #130C06;
+  background-image:
+    /* Warm horizon glow pooling behind/around the instrument (right of
+       centre) -- the brightest ground tone, still muted, so the
+       instrument's own aperture glow reads as the true light source. */
+    radial-gradient(ellipse 46% 58% at 70% 44%, rgba(196, 138, 78, 0.26) 0%, rgba(150, 100, 55, 0.12) 42%, transparent 72%),
+    radial-gradient(ellipse 62% 74% at 66% 52%, rgba(150, 98, 54, 0.14) 0%, transparent 68%),
+    /* A second, smaller, slightly lower glow for irregularity -- two
+       overlapping soft light pools read as atmosphere; one flat one
+       reads as a gradient swatch. */
+    radial-gradient(ellipse 30% 34% at 78% 62%, rgba(214, 158, 96, 0.14) 0%, transparent 70%),
+    /* Vertical dusk fall: near-black top and base, a hair warmer through
+       the middle band where the instrument sits. */
+    linear-gradient(180deg, #0C0704 0%, #150E07 45%, #17100A 62%, #0F0A05 100%),
+    /* Fine grain -- crossed low-alpha diagonals, matching body::before's
+       existing texture technique, so it reads as air, not a flat fill. */
+    repeating-linear-gradient(45deg, transparent 0px, transparent 2px, rgba(255, 214, 170, 0.014) 2px, rgba(255, 214, 170, 0.014) 3px),
+    repeating-linear-gradient(-45deg, transparent 0px, transparent 2px, rgba(255, 214, 170, 0.011) 2px, rgba(255, 214, 170, 0.011) 3px);
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat, repeat;
 }
 .hero-copy {
   position: relative;
@@ -5169,8 +5245,15 @@ a:hover .city-landmark-photo,
 
 @media (max-width: 900px) {
   .hero-instrument-section {
+    /* Full viewport height on mobile too -- one screen, the same as
+       desktop, not the auto-height stack this used to be. Same 127px
+       offset as the base rule -- #app's top padding is fixed regardless
+       of width, and the navbar's own height is steady across breakpoints. */
+    height: calc(100vh - 127px);
+    height: calc(100dvh - 127px);
+  }
+  .hero-instrument-grid {
     grid-template-columns: 1fr;
-    min-height: auto;
     padding: 1.5rem 0 0.5rem;
     text-align: left;
   }
