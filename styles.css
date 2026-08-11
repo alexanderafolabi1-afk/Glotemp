@@ -6162,3 +6162,154 @@ body > section {
   background: var(--ivory); border: 1px solid var(--brass);
 }
 .checkin-range:focus-visible::-webkit-slider-thumb { outline: 1px solid var(--ivory); outline-offset: 2px; }
+
+/* ==========================================================================
+   CITY TILES — the reading section's live city browser
+   Additive only. Nothing here restyles an existing selector; every rule is
+   scoped to .city-tiles / .city-tile, which nothing else on the site uses.
+   ========================================================================== */
+
+.city-tiles {
+  /* Height is reserved before the tiles render, so the strip appearing
+     never shifts the mood buttons underneath it. */
+  min-height: 92px;
+  margin: 1.75rem 0 0.75rem;
+}
+
+.city-tiles-track {
+  display: flex;
+  gap: 2rem;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding-bottom: 0.5rem;
+  /* Native swipe on touch, trackpad scroll on desktop -- no carousel
+     state to fall out of sync. The bar itself is hidden; the motion and
+     the partially-visible next tile are the affordance. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+}
+.city-tiles-track::-webkit-scrollbar { display: none; }
+
+.city-tile {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  min-width: 116px;
+  padding: 0.35rem 0 0.5rem;
+  background: none;
+  border: none;
+  /* Soft separation, not a card: one hairline under the tile, which
+     brightens to the city's own band colour when it is the active one. */
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 260ms ease, color 260ms ease;
+}
+
+.city-tile-mark {
+  width: 100%;
+  height: 2px;
+  background: var(--tile-band, var(--brass-dim));
+  opacity: 0.55;
+  transition: opacity 260ms ease;
+}
+
+.city-tile-name {
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: var(--fw-light);
+  line-height: 1.2;
+  color: var(--sand);
+  white-space: nowrap;
+  transition: color 260ms ease;
+}
+
+.city-tile-state {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.68rem;
+  letter-spacing: 0.07em;
+  color: var(--sand);
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+.city-tile:hover .city-tile-name,
+.city-tile:focus-visible .city-tile-name { color: var(--ivory); }
+.city-tile:hover .city-tile-mark,
+.city-tile:focus-visible .city-tile-mark { opacity: 1; }
+.city-tile:focus-visible { outline: none; border-bottom-color: var(--brass); }
+
+.city-tile.is-active { border-bottom-color: var(--tile-band, var(--brass)); }
+.city-tile.is-active .city-tile-name { color: var(--ivory); }
+.city-tile.is-active .city-tile-mark { opacity: 1; height: 3px; }
+.city-tile.is-active .city-tile-state { opacity: 0.9; }
+
+.city-tiles-hint {
+  margin: 0 0 1.5rem;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  color: var(--sand);
+  opacity: 0.72;
+}
+
+/* More air inside the section: the cramped feeling came from the controls
+   sitting on top of each other, not from the page edges. */
+.check-in .mood-buttons { margin: 1.5rem 0 2rem; gap: 1.75rem; }
+.check-in .observation-form .form-grid { gap: 1.5rem; margin-bottom: 1.5rem; }
+.check-in .observation-form .full-width { margin-bottom: 1.5rem; display: block; }
+.check-in .form-actions { margin-top: 1.75rem; }
+
+/* Secondary by weight, not by hiding: intensity, place and note step back
+   so the mood row stays the hero interaction. */
+.check-in .observation-form label > span,
+.check-in .observation-form .full-width > span {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  color: var(--sand);
+  opacity: 0.8;
+}
+
+/* The homepage intensity slider was still the browser default in blue --
+   the one blue control left in the reading section. */
+#intensity-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  min-height: 24px;
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+#intensity-range::-webkit-slider-runnable-track { height: 1px; background: var(--brass-dim); border: none; }
+#intensity-range::-moz-range-track { height: 1px; background: var(--brass-dim); border: none; }
+#intensity-range::-moz-range-progress { height: 1px; background: var(--brass); }
+#intensity-range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 15px; height: 15px; margin-top: -7px;
+  border-radius: 50%; background: var(--ivory);
+  border: 1px solid var(--brass); box-shadow: none;
+}
+#intensity-range::-moz-range-thumb {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--ivory); border: 1px solid var(--brass);
+}
+#intensity-range:focus-visible::-webkit-slider-thumb { outline: 1px solid var(--ivory); outline-offset: 2px; }
+
+@media (max-width: 600px) {
+  .city-tiles { min-height: 86px; margin-top: 1.35rem; }
+  .city-tiles-track { gap: 1.5rem; }
+  .city-tile { min-width: 104px; }
+  .check-in .mood-buttons { gap: 1.25rem; margin: 1.25rem 0 1.75rem; }
+}

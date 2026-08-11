@@ -233,6 +233,13 @@
         </div>
         <p class="section-copy" data-i18n="checkin_intro">Pick a mood and add a note if you like.</p>
       </div>
+
+      <!-- Live city browser. Purely additive: tiles set the existing hidden
+           #city-select and dispatch its change event, which is what app.js
+           already listens for. See city-tiles.js. -->
+      <div id="city-tiles" class="city-tiles" role="group" aria-label="Choose a city to read"></div>
+      <p class="city-tiles-hint">Live readings across 151 cities. Choose one, then add yours.</p>
+
       <div class="mood-buttons" role="group" aria-label="How does your city feel right now?">
         <button class="mood-btn" data-mood="🔥" data-band="charged"     data-label="Energized" title="Energized"><span class="mood-btn-icon" aria-hidden="true">🔥</span><span class="mood-btn-label">Energized</span></button>
         <button class="mood-btn" data-mood="😊" data-band="warm"        data-label="Good"      title="Good"><span class="mood-btn-icon" aria-hidden="true">😊</span><span class="mood-btn-label">Good</span></button>
@@ -321,6 +328,7 @@
   <script src="/glotemp-showcase.js" defer></script>
   <script src="/glotemp-spin.js" defer></script>
   <script src="/glotemp-hero-instrument.js" defer></script>
+  <script src="/city-tiles.js" defer></script>
   <script src="/app.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
   <script src="/cookie-consent.js" defer></script>
