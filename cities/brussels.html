@@ -583,7 +583,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Café dans le quartier européen - tout le monde parle de tout.","language_lens":"local","created_at":"2026-08-11T18:42:32.480Z"},{"context":"Ixelles neighbourhood - eclectic, Art Nouveau, quietly buzzing.","language_lens":"visitor","created_at":"2026-08-11T07:42:32.480Z"},{"context":"Matongé district Friday night - Belgian Congo beating in the music.","language_lens":"diaspora","created_at":"2026-08-10T16:42:32.480Z"},{"context":"Metro 5 à l'heure de pointe - bondé mais calme.","language_lens":"local","created_at":"2026-08-10T04:42:32.480Z"}];
+      const checkins = [{"context":"Café dans le quartier européen - tout le monde parle de tout.","language_lens":"local","created_at":"2026-08-12T04:07:48.982Z"},{"context":"Ixelles neighbourhood - eclectic, Art Nouveau, quietly buzzing.","language_lens":"visitor","created_at":"2026-08-11T17:07:48.982Z"},{"context":"Matongé district Friday night - Belgian Congo beating in the music.","language_lens":"diaspora","created_at":"2026-08-11T02:07:48.982Z"},{"context":"Metro 5 à l'heure de pointe - bondé mais calme.","language_lens":"local","created_at":"2026-08-10T14:07:48.982Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
@@ -650,7 +650,7 @@
       function loadCityComments() {
         getComments(citySlug).then(comments => {
           if (!comments.length) {
-            commentList.innerHTML = '<p class="inline-feedback">No comments yet. Be first to share!</p>';
+            commentList.innerHTML = '';
             return;
           }
           commentList.innerHTML = comments.slice(0, 10).map(c => `

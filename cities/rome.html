@@ -583,7 +583,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Trastevere at golden hour - ochre walls, voices, aperitivo.","language_lens":"visitor","created_at":"2026-08-11T21:42:32.480Z"},{"context":"Caffè al bar sotto casa - l'espresso migliore della giornata.","language_lens":"local","created_at":"2026-08-11T15:42:32.480Z"},{"context":"Metro A affollatissima come sempre. Roma non cambia.","language_lens":"local","created_at":"2026-08-11T07:42:32.480Z"},{"context":"Campo de' Fiori morning market - still the heart of the city.","language_lens":"visitor","created_at":"2026-08-10T20:42:32.480Z"},{"context":"Pigneto neighbourhood buzzing - new Rome mixing with the old.","language_lens":"visitor","created_at":"2026-08-10T09:42:32.480Z"}];
+      const checkins = [{"context":"Trastevere at golden hour - ochre walls, voices, aperitivo.","language_lens":"visitor","created_at":"2026-08-12T07:07:48.982Z"},{"context":"Caffè al bar sotto casa - l'espresso migliore della giornata.","language_lens":"local","created_at":"2026-08-12T01:07:48.982Z"},{"context":"Metro A affollatissima come sempre. Roma non cambia.","language_lens":"local","created_at":"2026-08-11T17:07:48.982Z"},{"context":"Campo de' Fiori morning market - still the heart of the city.","language_lens":"visitor","created_at":"2026-08-11T06:07:48.982Z"},{"context":"Pigneto neighbourhood buzzing - new Rome mixing with the old.","language_lens":"visitor","created_at":"2026-08-10T19:07:48.982Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
@@ -650,7 +650,7 @@
       function loadCityComments() {
         getComments(citySlug).then(comments => {
           if (!comments.length) {
-            commentList.innerHTML = '<p class="inline-feedback">No comments yet. Be first to share!</p>';
+            commentList.innerHTML = '';
             return;
           }
           commentList.innerHTML = comments.slice(0, 10).map(c => `

@@ -494,7 +494,7 @@ function generateCityPage(city) {
       function loadCityComments() {
         getComments(citySlug).then(comments => {
           if (!comments.length) {
-            commentList.innerHTML = '<p class="inline-feedback">No comments yet. Be first to share!</p>';
+            commentList.innerHTML = '';
             return;
           }
           commentList.innerHTML = comments.slice(0, 10).map(c => \`

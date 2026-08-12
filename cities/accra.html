@@ -583,7 +583,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Osu is buzzing tonight. Highlife from every bar.","language_lens":"local","created_at":"2026-08-11T19:42:32.480Z"},{"context":"La Pleasure Beach Saturday - the African diaspora finds itself here.","language_lens":"diaspora","created_at":"2026-08-11T15:42:32.480Z"},{"context":"Cantonments Sunday morning - new Accra at the farmer's market.","language_lens":"local","created_at":"2026-08-10T12:42:32.480Z"}];
+      const checkins = [{"context":"Osu is buzzing tonight. Highlife from every bar.","language_lens":"local","created_at":"2026-08-12T05:07:48.982Z"},{"context":"La Pleasure Beach Saturday - the African diaspora finds itself here.","language_lens":"diaspora","created_at":"2026-08-12T01:07:48.982Z"},{"context":"Cantonments Sunday morning - new Accra at the farmer's market.","language_lens":"local","created_at":"2026-08-10T22:07:48.982Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
@@ -650,7 +650,7 @@
       function loadCityComments() {
         getComments(citySlug).then(comments => {
           if (!comments.length) {
-            commentList.innerHTML = '<p class="inline-feedback">No comments yet. Be first to share!</p>';
+            commentList.innerHTML = '';
             return;
           }
           commentList.innerHTML = comments.slice(0, 10).map(c => `

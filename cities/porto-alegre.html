@@ -583,7 +583,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Commuting through Porto Alegre this morning - busy, but nothing out of the ordinary.","language_lens":"local","created_at":"2026-08-11T05:42:32.480Z"},{"context":"Walking central Porto Alegre at dusk - the streets are wide awake and unhurried.","language_lens":"visitor","created_at":"2026-08-10T07:42:32.480Z"}];
+      const checkins = [{"context":"Commuting through Porto Alegre this morning - busy, but nothing out of the ordinary.","language_lens":"local","created_at":"2026-08-11T15:07:48.982Z"},{"context":"Walking central Porto Alegre at dusk - the streets are wide awake and unhurried.","language_lens":"visitor","created_at":"2026-08-10T17:07:48.982Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
@@ -650,7 +650,7 @@
       function loadCityComments() {
         getComments(citySlug).then(comments => {
           if (!comments.length) {
-            commentList.innerHTML = '<p class="inline-feedback">No comments yet. Be first to share!</p>';
+            commentList.innerHTML = '';
             return;
           }
           commentList.innerHTML = comments.slice(0, 10).map(c => `

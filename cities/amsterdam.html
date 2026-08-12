@@ -583,7 +583,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Bikes outnumber people on Jordaan lanes. Cool, relaxed, beautiful.","language_lens":"visitor","created_at":"2026-08-11T22:42:32.480Z"},{"context":"Bruin café op de Prinsengracht - rustig en gezellig.","language_lens":"local","created_at":"2026-08-11T17:42:32.480Z"},{"context":"Leidseplein on a Friday night - every terrace full, golden light.","language_lens":"visitor","created_at":"2026-08-11T12:42:32.480Z"},{"context":"De Pijp markt zaterdag - mensenmassa, kraampjes, geuren.","language_lens":"local","created_at":"2026-08-11T02:42:32.480Z"},{"context":"Trams running smooth. City moving at its own pace.","language_lens":"visitor","created_at":"2026-08-10T13:42:32.480Z"},{"context":"Vondelpark on Sunday - families, music, open sky.","language_lens":"diaspora","created_at":"2026-08-10T04:42:32.480Z"}];
+      const checkins = [{"context":"Bikes outnumber people on Jordaan lanes. Cool, relaxed, beautiful.","language_lens":"visitor","created_at":"2026-08-12T08:07:48.982Z"},{"context":"Bruin café op de Prinsengracht - rustig en gezellig.","language_lens":"local","created_at":"2026-08-12T03:07:48.982Z"},{"context":"Leidseplein on a Friday night - every terrace full, golden light.","language_lens":"visitor","created_at":"2026-08-11T22:07:48.982Z"},{"context":"De Pijp markt zaterdag - mensenmassa, kraampjes, geuren.","language_lens":"local","created_at":"2026-08-11T12:07:48.982Z"},{"context":"Trams running smooth. City moving at its own pace.","language_lens":"visitor","created_at":"2026-08-10T23:07:48.982Z"},{"context":"Vondelpark on Sunday - families, music, open sky.","language_lens":"diaspora","created_at":"2026-08-10T14:07:48.982Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
@@ -650,7 +650,7 @@
       function loadCityComments() {
         getComments(citySlug).then(comments => {
           if (!comments.length) {
-            commentList.innerHTML = '<p class="inline-feedback">No comments yet. Be first to share!</p>';
+            commentList.innerHTML = '';
             return;
           }
           commentList.innerHTML = comments.slice(0, 10).map(c => `

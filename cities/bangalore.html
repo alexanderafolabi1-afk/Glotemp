@@ -583,7 +583,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Koramangala startup corridor - ideas moving at the speed of data.","language_lens":"local","created_at":"2026-08-11T22:42:32.480Z"},{"context":"Indiranagar coffee shops - filtered coffee and filtered ideas.","language_lens":"visitor","created_at":"2026-08-11T16:42:32.480Z"},{"context":"ಬ್ರಿಗೇಡ್ ರೋಡ್ ನಲ್ಲಿ ಸಂಜೆ ವಾಕ್ - ನಗರ ಜೀವಂತ.","language_lens":"local","created_at":"2026-08-11T10:42:32.480Z"},{"context":"Purple Line metro - efficient and mercifully air-conditioned.","language_lens":"local","created_at":"2026-08-11T01:42:32.480Z"},{"context":"UB City rooftop - Bangalore's ambition visible in every light.","language_lens":"visitor","created_at":"2026-08-10T13:42:32.480Z"}];
+      const checkins = [{"context":"Koramangala startup corridor - ideas moving at the speed of data.","language_lens":"local","created_at":"2026-08-12T08:07:48.982Z"},{"context":"Indiranagar coffee shops - filtered coffee and filtered ideas.","language_lens":"visitor","created_at":"2026-08-12T02:07:48.982Z"},{"context":"ಬ್ರಿಗೇಡ್ ರೋಡ್ ನಲ್ಲಿ ಸಂಜೆ ವಾಕ್ - ನಗರ ಜೀವಂತ.","language_lens":"local","created_at":"2026-08-11T20:07:48.982Z"},{"context":"Purple Line metro - efficient and mercifully air-conditioned.","language_lens":"local","created_at":"2026-08-11T11:07:48.982Z"},{"context":"UB City rooftop - Bangalore's ambition visible in every light.","language_lens":"visitor","created_at":"2026-08-10T23:07:48.982Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
@@ -650,7 +650,7 @@
       function loadCityComments() {
         getComments(citySlug).then(comments => {
           if (!comments.length) {
-            commentList.innerHTML = '<p class="inline-feedback">No comments yet. Be first to share!</p>';
+            commentList.innerHTML = '';
             return;
           }
           commentList.innerHTML = comments.slice(0, 10).map(c => `
