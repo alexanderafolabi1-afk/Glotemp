@@ -95,6 +95,8 @@ function pageHTML(city, v) {
         <a href="/rankings/${v.slug}/" class="secondary-link">🏆 ${v.label} rankings, all cities</a>
       </div>
     </section>
+
+    <div id="sponsor-strip"></div>
   </main>
 
   <footer class="footer glass">
@@ -116,6 +118,7 @@ function pageHTML(city, v) {
   <script src="/glotemp-listings.js" defer></script>
   <script src="/city-sports-data.js" defer></script>
   <script src="/glotemp-sports.js" defer></script>
+  <script src="/glotemp-sponsor-strip.js" defer></script>
   <script>
     // SUPABASE_URL / SUPABASE_ANON_KEY come from verticals-engine.js
     // (deferred, but resolved by the time DOMContentLoaded fires below) --
@@ -261,10 +264,16 @@ function pageHTML(city, v) {
       }
     }
 
+    function mountSponsorStrip() {
+      if (typeof GlotempSponsorStrip !== 'undefined') GlotempSponsorStrip.mount('sponsor-strip', '${city.slug}', '${v.slug}');
+    }
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', loadVerticalContent);
+      document.addEventListener('DOMContentLoaded', mountSponsorStrip);
     } else {
       loadVerticalContent();
+      mountSponsorStrip();
     }
     GlotempCore.wireCityLinks(document);
     const lang = localStorage.getItem('glotemp-lang') || 'en';
