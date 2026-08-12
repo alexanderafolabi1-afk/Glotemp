@@ -95,6 +95,7 @@ function generateVerticalSections(city) {
       <div id="${v.name}-context" class="vertical-context"></div>
       ${v.name === 'sport' ? `<div id="sport-live" class="sport-live" data-city="${city.slug}" data-city-name="${city.name.replace(/"/g, '&quot;')}" data-country="${city.country.replace(/"/g, '&quot;')}"></div>` : ''}
       ${LISTINGS_VERTICALS.has(v.name) ? `<div class="vertical-listings" data-city="${city.slug}" data-vertical="${v.name}"></div>` : ''}
+      <div id="city-credit-${v.name}"></div>
     </section>
   `).join('\n');
 }
@@ -262,6 +263,20 @@ function generateCityPage(city) {
       // source, not a Supabase reading.
       if (typeof GlotempConditions !== 'undefined' && city) {
         GlotempConditions.loadConditions(city.name, city.lat, city.lon, city.timezone);
+      }
+
+      // Sponsor credit per vertical section -- "Supported by X", a paid,
+      // curated slot sold directly (partners table, RLS already limits
+      // the anon read to active rows in their flight window). This is a
+      // different thing from the public "suggest a place" pathway above:
+      // a passive credit line, not an open call for submissions, which is
+      // exactly why it's fine on every vertical including Sport (a real
+      // brand can sponsor the Sport section; the public can't usefully
+      // "suggest a sports company" the way they can suggest a restaurant).
+      // Previously wired into the standalone per-vertical pages only --
+      // never the main city page, its highest-traffic page type.
+      if (typeof GlotempCredits !== 'undefined' && city) {
+        [...verticalSlugs, 'radio'].forEach(v => GlotempCredits.mount('city-credit-' + v, city.slug, v));
       }
 
       for (const vertical of verticalSlugs) {
