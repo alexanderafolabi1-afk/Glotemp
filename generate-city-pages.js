@@ -248,7 +248,13 @@ function generateCityPage(city) {
       // city's real coordinates) -- not a Supabase reading, so it's kept
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
-        GlotempRadio.loadRadio(city.name, city.lat, city.lon);
+        GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country);
+      }
+
+      // Conditions line: same treatment as Radio -- a live free-API
+      // source, not a Supabase reading.
+      if (typeof GlotempConditions !== 'undefined' && city) {
+        GlotempConditions.loadConditions(city.name, city.lat, city.lon, city.timezone);
       }
 
       for (const vertical of verticalSlugs) {

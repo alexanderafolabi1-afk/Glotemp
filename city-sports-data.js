@@ -65,19 +65,116 @@ const CITY_SPORTS = {
   toronto: { football: ['Toronto FC'] },
   montreal: { football: ['CF Montreal'] },
   vancouver: { football: ['Vancouver Whitecaps'] },
-  nyc: { football: ['New York City FC'] },
-  'los-angeles': { football: ['LA Galaxy'] },
-  chicago: { football: ['Chicago Fire'] },
-  atlanta: { football: ['Atlanta United'] },
-  seattle: { football: ['Seattle Sounders'] },
-  houston: { football: ['Houston Dynamo'] },
-  dallas: { football: ['FC Dallas'] },
-  philadelphia: { football: ['Philadelphia Union'] },
-  'washington-dc': { football: ['DC United'] },
-  denver: { football: ['Colorado Rapids'] },
-  minneapolis: { football: ['Minnesota United FC'] },
-  phoenix: { football: ['Phoenix Rising FC'] },
-  boston: { football: ['New England Revolution'] },
+
+  // US cities: MLS club (already curated above this comment in the
+  // original file) plus NFL/NBA/MLB/NHL, added for "locally intelligent"
+  // American sport coverage -- these are real, well-established franchise
+  // names, not a guess, so they're held to the same "only if I'm
+  // confident" bar as everything else in this file. Deliberately
+  // conservative on multi-city/relocated teams: Golden State Warriors
+  // (not "San Francisco Warriors" -- that's not the team's real name),
+  // Texas Rangers (Arlington/Dallas-Fort Worth, not literally Dallas but
+  // the correct real name), Florida Panthers for Miami (Sunrise, FL,
+  // same metro). Omitted rather than guessed: San Jose Sharks (a
+  // different city, San Jose isn't in this dataset), Anaheim Ducks (ditto
+  // for LA), and any city whose former NFL/NBA/NHL team has since
+  // relocated (Seattle NBA, Houston/Atlanta/Phoenix NHL) rather than
+  // naming a team that no longer plays there.
+  nyc: {
+    football: ['New York City FC'],
+    nfl: ['New York Giants', 'New York Jets'],
+    nba: ['New York Knicks', 'Brooklyn Nets'],
+    mlb: ['New York Yankees', 'New York Mets'],
+    nhl: ['New York Rangers', 'New York Islanders'],
+  },
+  'los-angeles': {
+    football: ['LA Galaxy'],
+    nfl: ['Los Angeles Rams', 'Los Angeles Chargers'],
+    nba: ['Los Angeles Lakers', 'LA Clippers'],
+    mlb: ['Los Angeles Dodgers', 'Los Angeles Angels'],
+    nhl: ['Los Angeles Kings'],
+  },
+  chicago: {
+    football: ['Chicago Fire'],
+    nfl: ['Chicago Bears'],
+    nba: ['Chicago Bulls'],
+    mlb: ['Chicago Cubs', 'Chicago White Sox'],
+    nhl: ['Chicago Blackhawks'],
+  },
+  atlanta: {
+    football: ['Atlanta United'],
+    nfl: ['Atlanta Falcons'],
+    nba: ['Atlanta Hawks'],
+    mlb: ['Atlanta Braves'],
+  },
+  seattle: {
+    football: ['Seattle Sounders'],
+    nfl: ['Seattle Seahawks'],
+    mlb: ['Seattle Mariners'],
+    nhl: ['Seattle Kraken'],
+  },
+  houston: {
+    football: ['Houston Dynamo'],
+    nfl: ['Houston Texans'],
+    nba: ['Houston Rockets'],
+    mlb: ['Houston Astros'],
+  },
+  dallas: {
+    football: ['FC Dallas'],
+    nfl: ['Dallas Cowboys'],
+    nba: ['Dallas Mavericks'],
+    mlb: ['Texas Rangers'],
+    nhl: ['Dallas Stars'],
+  },
+  philadelphia: {
+    football: ['Philadelphia Union'],
+    nfl: ['Philadelphia Eagles'],
+    nba: ['Philadelphia 76ers'],
+    mlb: ['Philadelphia Phillies'],
+    nhl: ['Philadelphia Flyers'],
+  },
+  'washington-dc': {
+    football: ['DC United'],
+    nfl: ['Washington Commanders'],
+    nba: ['Washington Wizards'],
+    mlb: ['Washington Nationals'],
+    nhl: ['Washington Capitals'],
+  },
+  denver: {
+    football: ['Colorado Rapids'],
+    nfl: ['Denver Broncos'],
+    nba: ['Denver Nuggets'],
+    mlb: ['Colorado Rockies'],
+    nhl: ['Colorado Avalanche'],
+  },
+  minneapolis: {
+    football: ['Minnesota United FC'],
+    nfl: ['Minnesota Vikings'],
+    nba: ['Minnesota Timberwolves'],
+    mlb: ['Minnesota Twins'],
+    nhl: ['Minnesota Wild'],
+  },
+  phoenix: {
+    football: ['Phoenix Rising FC'],
+    nfl: ['Arizona Cardinals'],
+    nba: ['Phoenix Suns'],
+    mlb: ['Arizona Diamondbacks'],
+  },
+  boston: {
+    football: ['New England Revolution'],
+    nfl: ['New England Patriots'],
+    nba: ['Boston Celtics'],
+    mlb: ['Boston Red Sox'],
+    nhl: ['Boston Bruins'],
+  },
+  'san-francisco': {
+    nfl: ['San Francisco 49ers'],
+    nba: ['Golden State Warriors'],
+    mlb: ['San Francisco Giants'],
+  },
+  'san-diego': {
+    mlb: ['San Diego Padres'],
+  },
 
   johannesburg: { football: ['Kaizer Chiefs'], rugby: ['Emirates Lions'], cricket: ['Joburg Super Kings'] },
   'cape-town': { football: ['Cape Town City FC'], rugby: ['DHL Stormers'], cricket: ['MI Cape Town'] },

@@ -1,17 +1,26 @@
 (function () {
-  // Real landmark photos, sourced live from each landmark's own Wikipedia
-  // article via the free/keyless Wikipedia REST summary API (the same one
-  // city-wiki.js already uses for the "About this city" panel, whose CC
-  // BY-SA 4.0 attribution line already covers imagery pulled from Wikipedia
-  // on the page). Every entry below resolves to a real photograph on the
-  // landmark's own article, not a placeholder.
+  // Real photos, sourced live via the free/keyless Wikipedia REST summary
+  // API (the same one city-wiki.js already uses for the "About this city"
+  // panel, whose CC BY-SA 4.0 attribution line already covers imagery
+  // pulled from Wikipedia on the page). Two tiers:
+  //
+  //   1. The 24 cities below have a hand-picked, verified landmark --
+  //      Paris gets the Eiffel Tower's own photo, not a generic Paris
+  //      street scene, which reads as more distinctive.
+  //   2. Every other city (see resolveTitle() below) falls back to its own
+  //      Wikipedia article via cities-data.js's real name field, rather
+  //      than guessing a landmark and its exact article title for 127
+  //      cities this file's author cannot personally verify -- a real
+  //      photo of the actual city is honest, a wrong or misspelled
+  //      landmark guess is not.
   //
   // This is a progressive enhancement, never a replacement: city-landmarks.js
   // (the hand-drawn SVG set) always renders first and instantly, with no
   // network dependency. If the fetch below succeeds, the SVG is swapped for
-  // the real photo; if it fails or a city has no landmark mapping, the SVG
-  // simply stands as the fallback -- this is the "clean, high-quality public
-  // domain alternative" fallback path, not an error state.
+  // the real photo; if it fails, or the resolved article turns out to be a
+  // disambiguation page with no thumbnail, the SVG simply stands as the
+  // fallback -- this is the "clean, high-quality public domain alternative"
+  // fallback path, not an error state.
   const LANDMARK_TITLES = {
     paris: 'Eiffel Tower',
     london: 'Big Ben',
@@ -43,6 +52,21 @@
   const API_BASE = 'https://en.wikipedia.org/api/rest_v1/page/summary/';
   const cache = new Map();
 
+  // For every city without a hand-picked landmark above: fall back to the
+  // city's own Wikipedia article rather than guessing a landmark name and
+  // its exact article title for 127 cities this file's author cannot
+  // personally verify. A real photo of the actual city is honest; a wrong
+  // or misspelled landmark title is not -- it either 404s (handled, see
+  // upgrade()'s existing fallback-to-SVG path) or, worse, silently
+  // resolves to the wrong place. window.CITIES_DATA (cities-data.js) is
+  // already loaded on every page that calls into this module.
+  function resolveTitle(slug) {
+    if (LANDMARK_TITLES[slug]) return LANDMARK_TITLES[slug];
+    const city = (typeof window !== 'undefined' && window.CITIES_DATA || [])
+      .find((c) => c.slug === slug);
+    return city ? city.name : null;
+  }
+
   function fetchThumbnail(title) {
     if (cache.has(title)) return cache.get(title);
     const promise = (async () => {
@@ -66,7 +90,7 @@
   // (does nothing) on any failure, including no mapping, no network, or a
   // response with no thumbnail -- the SVG is a complete UI on its own.
   async function upgrade(containerEl, slug, size) {
-    const title = LANDMARK_TITLES[slug];
+    const title = resolveTitle(slug);
     if (!title || !containerEl) return;
     const svg = containerEl.querySelector('.city-landmark-icon');
     if (!svg) return;
@@ -90,11 +114,11 @@
   // DOM swap -- e.g. the Trending cities cards, which build their own
   // markup instead of starting from a .city-landmark-icon SVG.
   function getPhotoUrl(slug) {
-    const title = LANDMARK_TITLES[slug];
+    const title = resolveTitle(slug);
     return title ? fetchThumbnail(title) : Promise.resolve(null);
   }
 
-  const api = { upgrade, hasPhoto: (slug) => !!LANDMARK_TITLES[slug], getPhotoUrl };
+  const api = { upgrade, hasPhoto: (slug) => !!resolveTitle(slug), getPhotoUrl };
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = api;
   } else {

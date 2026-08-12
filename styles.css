@@ -3487,6 +3487,24 @@ a:hover .city-landmark-photo,
   flex-wrap: wrap;
 }
 
+/* Conditions line: one quiet sentence, not a weather widget. Empty on
+   fetch failure (see city-conditions.js) rather than an "unavailable"
+   message -- :empty hides it outright so a slow/blocked API never
+   leaves a gap in the header's rhythm. */
+.conditions-line {
+  margin-top: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--sand);
+  letter-spacing: 0.01em;
+}
+.conditions-line:empty { display: none; }
+.conditions-eyebrow {
+  font-variant-caps: small-caps;
+  color: var(--brass);
+  margin-right: 0.5em;
+}
+
 .vertical-nav {
   display: flex;
   gap: 1rem;

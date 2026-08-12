@@ -27,16 +27,26 @@
     football: { icon: '⚽', label: 'Football' },
     rugby: { icon: '🏉', label: 'Rugby' },
     cricket: { icon: '🏏', label: 'Cricket' },
+    nfl: { icon: '🏈', label: 'NFL' },
+    nba: { icon: '🏀', label: 'NBA' },
+    mlb: { icon: '⚾', label: 'MLB' },
+    nhl: { icon: '🏒', label: 'NHL' },
   };
 
   // TheSportsDB's team search matches by name across every sport, so a
   // country name like "England" can return both the football and rugby
-  // national sides. Filter the results down to the sport we actually asked
-  // for rather than blindly taking the first hit.
+  // national sides -- and a club name like "Rangers" is genuinely
+  // ambiguous across football, MLB (Texas Rangers) and NHL (New York
+  // Rangers) without one. Filter the results down to the sport we
+  // actually asked for rather than blindly taking the first hit.
   var SPORT_SEARCH_HINT = {
     football: 'soccer',
     rugby: 'rugby',
     cricket: 'cricket',
+    nfl: 'american football',
+    nba: 'basketball',
+    mlb: 'baseball',
+    nhl: 'ice hockey',
   };
 
   function esc(s) {
