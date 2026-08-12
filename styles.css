@@ -1523,42 +1523,6 @@ textarea:focus:not(:focus-visible) {
   height: 1.2rem;
 }
 
-/* ===== SPONSOR / PARTNER SLOT ===== */
-/* A single, quiet placeholder per city -- not a banner, not repeated
-   per section. A dashed hairline "reserved" plaque, same restrained
-   language as the rest of the site's honest empty states, just aimed
-   at a commercial audience (local businesses, tourism boards, hotels,
-   restaurants, experiences) instead of a visitor. */
-/* Dashed top rule, not a boxed placeholder -- marks this as a reserved
-   spot rather than filled content, the same visual language as
-   .checkin-preview's draft state. */
-.sponsor-slot {
-  margin-top: 1.5rem;
-  padding: 1.1rem 0 0;
-  border: none;
-  border-top: 1px dashed var(--brass-dim);
-}
-.sponsor-slot-tag {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--brass);
-  margin-bottom: 0.5rem;
-}
-.sponsor-slot-copy {
-  color: var(--sand);
-  font-size: 0.88rem;
-  line-height: 1.6;
-  margin: 0;
-}
-.sponsor-slot-copy a {
-  color: var(--brass);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-.sponsor-slot-copy a:hover { color: var(--ivory); }
 
 /* ===== CARD MEDIA COMPONENT ===== */
 .card-media {
@@ -2510,9 +2474,9 @@ textarea:focus:not(:focus-visible) {
 }
 
 .footer .small-print {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--ash);
-  line-height: 1.4;
+  line-height: 1.5;
   margin-top: 0.5rem;
 }
 
@@ -5867,19 +5831,6 @@ time, .instr-clock, .tonight-modelled {
 }
 .trip-action:hover { border-color: var(--brass); color: var(--brass); }
 .trip-action svg { flex: 0 0 auto; }
-.trip-sponsor-note {
-  margin-top: 1.25rem; font-family: var(--font-mono);
-  font-variant-caps: small-caps; font-size: 0.7rem;
-  color: var(--sand);
-}
-.trip-sponsor-note a {
-  color: var(--brass);
-  text-decoration: underline;
-  text-decoration-color: var(--brass-dim);
-  opacity: 1;
-}
-.trip-sponsor-note a:hover { color: var(--ivory); }
-
 /* ===== AUTH MODAL: hairlines, not stacked boxes ===== */
 .gt-auth-modal { border-radius: 0; border: none; background: var(--obsidian); box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6); }
 .gt-auth-close { border-radius: 0; }
@@ -6299,7 +6250,7 @@ body > section {
   margin: 0 0 1.5rem;
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
-  font-size: 0.74rem;
+  font-size: 0.82rem;
   letter-spacing: 0.06em;
   color: var(--sand);
   opacity: 0.72;

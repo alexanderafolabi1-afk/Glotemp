@@ -220,8 +220,6 @@ function generateCityPage(city) {
         document.getElementById('city-timezone').textContent = \`📍 \${city.timezone}\`;
         document.getElementById('city-penetration').textContent = \`📡 \${(city.penetration * 100).toFixed(0)}% online\`;
         document.getElementById('city-metro-pop').textContent = \`👥 \${city.metro_pop.toLocaleString()} metro\`;
-        const sponsorCityName = document.getElementById('sponsor-city-name');
-        if (sponsorCityName) sponsorCityName.textContent = city.name;
         if (typeof GlotempCore !== 'undefined') GlotempCore.applyMoodBackground(city.mood);
       }
 
