@@ -129,7 +129,7 @@
       stations = [];
     }
     if (!stations.length) {
-      container.innerHTML = '<p class="radio-status">No local stations found yet.</p>';
+      container.innerHTML = '';
       return;
     }
     container.innerHTML = `

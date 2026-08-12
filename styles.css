@@ -3538,15 +3538,16 @@ a:hover .city-landmark-photo,
   justify-items: center;
 }
 
-/* glotemp-checkin.js reuses #city-observation-feed's .vertical-content
-   grid as its mount point (one shared anchor id rather than a second
-   container per page). That grid is sized for many small instrument-dial
-   items; the composer and reading list are each one item, so without
-   this they land in a single auto-fill track -- a ~140px column with the
-   rest of the row empty, and the heading inside it wraps to one word per
-   line. Spanning the full row fixes both. */
-.vertical-content > .checkin-composer,
-.vertical-content > .checkin-list-wrap {
+/* Several features (glotemp-checkin.js's composer, city-radio.js's
+   player) reuse a vertical section's .vertical-content grid as their
+   mount point rather than getting a second container per page. That
+   grid is sized for many small instrument-dial cards (.instrument); a
+   single wide block dropped in as one grid item lands in one ~140px
+   auto-fill track instead -- the rest of the row empty, and any text
+   inside wrapping one word per line. This bit twice (the check-in
+   composer, then the radio player) before it was made general: any
+   direct child that isn't an instrument card spans the full row. */
+.vertical-content > *:not(.instrument) {
   grid-column: 1 / -1;
   justify-self: stretch;
   width: 100%;
