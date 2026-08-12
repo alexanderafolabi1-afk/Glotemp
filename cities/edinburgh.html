@@ -275,6 +275,7 @@
   <script src="/city-trivia-data.js" defer></script>
   <script src="/glotemp-personality.js" defer></script>
   <script src="/city-wiki.js" defer></script>
+  <script src="/city-food-signature.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
   <script src="/city-radio.js" defer></script>
   <script src="/city-conditions.js" defer></script>
@@ -384,6 +385,13 @@
       const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
 
       if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('Edinburgh', 'UK');
+
+      // Synchronous and static, so it's always in the DOM before any of
+      // the async context loaders below append their own findings --
+      // reads as the headline fact for Food, with Wikipedia's Cuisine
+      // excerpt (if this city's article has one) as supplementary depth
+      // underneath it.
+      if (typeof GlotempFoodSignature !== 'undefined') GlotempFoodSignature.render('edinburgh');
 
       // Wikipedia section-matching and World Bank indicators both get a
       // turn per vertical; whatever's still empty afterward -- Fashion
@@ -591,7 +599,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Royal Mile in the afternoon - history pressed into every stone.","language_lens":"visitor","created_at":"2026-08-12T13:17:54.361Z"},{"context":"Rose Street pubs on a Saturday - Scots do hospitality properly.","language_lens":"local","created_at":"2026-08-12T00:17:54.361Z"},{"context":"Grassmarket at dusk - dramatic skyline, good cheer below.","language_lens":"visitor","created_at":"2026-08-11T11:17:54.361Z"},{"context":"Bruntsfield coffee shop, rainy Sunday - warm and unhurried.","language_lens":"local","created_at":"2026-08-11T01:17:54.361Z"}];
+      const checkins = [{"context":"Royal Mile in the afternoon - history pressed into every stone.","language_lens":"visitor","created_at":"2026-08-12T13:39:58.799Z"},{"context":"Rose Street pubs on a Saturday - Scots do hospitality properly.","language_lens":"local","created_at":"2026-08-12T00:39:58.799Z"},{"context":"Grassmarket at dusk - dramatic skyline, good cheer below.","language_lens":"visitor","created_at":"2026-08-11T11:39:58.799Z"},{"context":"Bruntsfield coffee shop, rainy Sunday - warm and unhurried.","language_lens":"local","created_at":"2026-08-11T01:39:58.799Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
