@@ -1794,6 +1794,27 @@ async function loadCitiesIntoSelector() {
   select.value = 'nyc';
 }
 
+// Picks which city this legacy trip-engine widget (dims/verdict/booking
+// links, driven by the older data/cities.json dataset -- see
+// loadCitiesData above) opens on. Was hardcoded to 'nyc' unconditionally,
+// which is the actual source of "the homepage is always New York": the
+// hero instrument and Daily Pulse rotator already resolve their own city
+// correctly (pinned city, geolocation, or randomized), this widget just
+// never asked either of them. Now it defers to the same pinned-city
+// source of truth when one exists, so the whole page names one city
+// consistently instead of two different ones in two sections, and
+// otherwise picks randomly from whichever cities this dataset actually
+// has, so a fresh visit doesn't always land on the same one.
+function resolveInitialTripCitySlug() {
+  if (typeof GlotempCore !== 'undefined' && typeof GlotempCore.getPinnedCity === 'function') {
+    const pinned = GlotempCore.getPinnedCity();
+    if (pinned && cities[pinned]) return pinned;
+  }
+  const slugs = Object.keys(cities);
+  if (!slugs.length) return 'nyc';
+  return slugs[Math.floor(Math.random() * slugs.length)];
+}
+
 // Ambient lighting (time-of-day body class driving the background wash)
 // applies to every page that loads app.js, not just the homepage -- the
 // background should feel alive everywhere, not only where the city
@@ -1817,7 +1838,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadCitiesIntoSelector();
   resizeCanvas();
   drawPulse();
-  updateCity('nyc');
+  const initialSlug = resolveInitialTripCitySlug();
+  const citySelectEl = document.getElementById('city-select');
+  if (citySelectEl) citySelectEl.value = initialSlug;
+  updateCity(initialSlug);
   initObsSnippetRotator();
   initVisitorAmbientWeather();
 
