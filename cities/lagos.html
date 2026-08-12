@@ -583,7 +583,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Victoria Island traffic heavy but the music plays.","language_lens":"local","created_at":"2026-08-11T20:42:32.480Z"},{"context":"Lekki Friday night - Afrobeats everywhere.","language_lens":"local","created_at":"2026-08-11T13:42:32.480Z"},{"context":"Balogun Market midday - energy so dense you can feel it on your skin.","language_lens":"local","created_at":"2026-08-11T22:42:32.480Z"},{"context":"Victoria Island rooftop bar - Lagos looking rich and restless.","language_lens":"diaspora","created_at":"2026-08-10T13:42:32.480Z"}];
+      const checkins = [{"context":"Victoria Island traffic heavy but the music plays.","language_lens":"local","created_at":"2026-08-12T06:07:48.982Z"},{"context":"Lekki Friday night - Afrobeats everywhere.","language_lens":"local","created_at":"2026-08-11T23:07:48.982Z"},{"context":"Balogun Market midday - energy so dense you can feel it on your skin.","language_lens":"local","created_at":"2026-08-12T08:07:48.982Z"},{"context":"Victoria Island rooftop bar - Lagos looking rich and restless.","language_lens":"diaspora","created_at":"2026-08-10T23:07:48.982Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
@@ -650,7 +650,7 @@
       function loadCityComments() {
         getComments(citySlug).then(comments => {
           if (!comments.length) {
-            commentList.innerHTML = '<p class="inline-feedback">No comments yet. Be first to share!</p>';
+            commentList.innerHTML = '';
             return;
           }
           commentList.innerHTML = comments.slice(0, 10).map(c => `

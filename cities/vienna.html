@@ -583,7 +583,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Kaffeehaus Querung - Melange und Zeitung, die Welt steht still.","language_lens":"local","created_at":"2026-08-11T20:42:32.480Z"},{"context":"Naschmarkt on Saturday - cheese, spice, and conversation.","language_lens":"visitor","created_at":"2026-08-11T14:42:32.480Z"},{"context":"U4 Karlsplatz - Studenten und Touristen, angenehme Stimmung.","language_lens":"local","created_at":"2026-08-11T05:42:32.480Z"},{"context":"Gürtel bar district late on Saturday - unexpected and alive.","language_lens":"visitor","created_at":"2026-08-10T19:42:32.480Z"},{"context":"Prater on a warm afternoon - jogging, chess, old Vienna charm.","language_lens":"diaspora","created_at":"2026-08-10T07:42:32.480Z"}];
+      const checkins = [{"context":"Kaffeehaus Querung - Melange und Zeitung, die Welt steht still.","language_lens":"local","created_at":"2026-08-12T06:07:48.982Z"},{"context":"Naschmarkt on Saturday - cheese, spice, and conversation.","language_lens":"visitor","created_at":"2026-08-12T00:07:48.982Z"},{"context":"U4 Karlsplatz - Studenten und Touristen, angenehme Stimmung.","language_lens":"local","created_at":"2026-08-11T15:07:48.982Z"},{"context":"Gürtel bar district late on Saturday - unexpected and alive.","language_lens":"visitor","created_at":"2026-08-11T05:07:48.982Z"},{"context":"Prater on a warm afternoon - jogging, chess, old Vienna charm.","language_lens":"diaspora","created_at":"2026-08-10T17:07:48.982Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
@@ -650,7 +650,7 @@
       function loadCityComments() {
         getComments(citySlug).then(comments => {
           if (!comments.length) {
-            commentList.innerHTML = '<p class="inline-feedback">No comments yet. Be first to share!</p>';
+            commentList.innerHTML = '';
             return;
           }
           commentList.innerHTML = comments.slice(0, 10).map(c => `

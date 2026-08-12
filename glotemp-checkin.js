@@ -250,7 +250,10 @@
       if (!resp.ok) throw new Error('fetch failed');
       const rows = await resp.json();
       if ((replace || offset === 0) && rows.length === 0) {
-        list.innerHTML = '<p class="checkin-empty">No readings yet -- be the first to share how this city feels.</p>';
+        // Quiet, not apologetic: no readings yet means no visible
+        // explanation, just an empty list under the heading that's
+        // already there.
+        list.innerHTML = '';
         offset = 0;
         if (moreBtn) moreBtn.hidden = true;
         return;
@@ -264,7 +267,7 @@
       offset += rows.length;
       if (moreBtn) moreBtn.hidden = rows.length < PAGE_SIZE;
     } catch (e) {
-      if (offset === 0) list.innerHTML = '<p class="checkin-empty">No readings yet -- be the first to share how this city feels.</p>';
+      if (offset === 0) list.innerHTML = '';
       if (moreBtn) moreBtn.hidden = true;
     }
   }

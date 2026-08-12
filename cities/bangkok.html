@@ -583,7 +583,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Chatuchak on Sunday morning - a beautiful chaos.","language_lens":"visitor","created_at":"2026-08-11T20:42:32.480Z"},{"context":"Khao San Road is noisy and warm, tourists and locals mixing.","language_lens":"visitor","created_at":"2026-08-11T06:42:32.480Z"},{"context":"ตลาดโรงเกลือตอนเย็น - ชีวิตกรุงเทพฯที่ไม่เคยหยุด.","language_lens":"local","created_at":"2026-08-11T22:42:32.480Z"},{"context":"Asok Silom late night - the city's neon heartbeat.","language_lens":"visitor","created_at":"2026-08-10T18:42:32.480Z"}];
+      const checkins = [{"context":"Chatuchak on Sunday morning - a beautiful chaos.","language_lens":"visitor","created_at":"2026-08-12T06:07:48.982Z"},{"context":"Khao San Road is noisy and warm, tourists and locals mixing.","language_lens":"visitor","created_at":"2026-08-11T16:07:48.982Z"},{"context":"ตลาดโรงเกลือตอนเย็น - ชีวิตกรุงเทพฯที่ไม่เคยหยุด.","language_lens":"local","created_at":"2026-08-12T08:07:48.982Z"},{"context":"Asok Silom late night - the city's neon heartbeat.","language_lens":"visitor","created_at":"2026-08-11T04:07:48.982Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
@@ -650,7 +650,7 @@
       function loadCityComments() {
         getComments(citySlug).then(comments => {
           if (!comments.length) {
-            commentList.innerHTML = '<p class="inline-feedback">No comments yet. Be first to share!</p>';
+            commentList.innerHTML = '';
             return;
           }
           commentList.innerHTML = comments.slice(0, 10).map(c => `

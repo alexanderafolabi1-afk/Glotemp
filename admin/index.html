@@ -254,9 +254,6 @@
           recentCommentsBody.appendChild(row);
         });
 
-        if (recentComments.length === 0) {
-          recentCommentsBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 1rem;">No comments yet</td></tr>';
-        }
       } catch (error) {
         console.error('Error loading admin data:', error);
       }

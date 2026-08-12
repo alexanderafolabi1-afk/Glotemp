@@ -68,7 +68,7 @@
           (band && band.color ? ' style="--tile-band: ' + esc(band.color) + '"' : '') +
         '></span>' +
         '<span class="city-tile-name">' + esc(city.name) + '</span>' +
-        '<span class="city-tile-state">' + esc(band && band.band ? band.band : 'no reading') + '</span>';
+        (band && band.band ? '<span class="city-tile-state">' + esc(band.band) + '</span>' : '');
       track.appendChild(btn);
     });
 

@@ -583,7 +583,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Hafen am Sonntagmorgen - der Hamburger Fischmarkt ist ein Spektakel.","language_lens":"local","created_at":"2026-08-11T21:42:32.480Z"},{"context":"Reeperbahn at midnight - raw and alive, nothing quite like it.","language_lens":"visitor","created_at":"2026-08-11T11:42:32.480Z"},{"context":"Altona Kaffeerösterei, ruhiger Nachmittag. Gute Energie.","language_lens":"local","created_at":"2026-08-10T22:42:32.480Z"},{"context":"Speicherstadt warehouse district - dramatic, moody, unique.","language_lens":"visitor","created_at":"2026-08-10T10:42:32.480Z"}];
+      const checkins = [{"context":"Hafen am Sonntagmorgen - der Hamburger Fischmarkt ist ein Spektakel.","language_lens":"local","created_at":"2026-08-12T07:07:48.982Z"},{"context":"Reeperbahn at midnight - raw and alive, nothing quite like it.","language_lens":"visitor","created_at":"2026-08-11T21:07:48.982Z"},{"context":"Altona Kaffeerösterei, ruhiger Nachmittag. Gute Energie.","language_lens":"local","created_at":"2026-08-11T08:07:48.982Z"},{"context":"Speicherstadt warehouse district - dramatic, moody, unique.","language_lens":"visitor","created_at":"2026-08-10T20:07:48.982Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
@@ -650,7 +650,7 @@
       function loadCityComments() {
         getComments(citySlug).then(comments => {
           if (!comments.length) {
-            commentList.innerHTML = '<p class="inline-feedback">No comments yet. Be first to share!</p>';
+            commentList.innerHTML = '';
             return;
           }
           commentList.innerHTML = comments.slice(0, 10).map(c => `

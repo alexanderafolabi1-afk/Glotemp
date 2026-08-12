@@ -153,7 +153,6 @@ const translations = {
     obs_eyebrow: "Live observations",
     obs_title: "What people are feeling in {city}",
     obs_intro: "Real notes from people there right now.",
-    obs_empty: "No observations yet. Be the first to share the pulse.",
     coverage_eyebrow: "Global pulse",
     coverage_title: "Cities in real time",
     coverage_intro: "Monitor mood shifts across cities worldwide. Each observation adds to the collective understanding of where energy is rising or settling.",
@@ -266,7 +265,6 @@ const translations = {
     obs_eyebrow: "Observaciones en vivo",
     obs_title: "Pulso reciente de {city}",
     obs_intro: "Mira lo que sienten otros observadores en esta ciudad. Cada nota forma el ánimo colectivo.",
-    obs_empty: "Sin observaciones aún. Sé el primero en compartir el pulso.",
     coverage_eyebrow: "Pulso global",
     coverage_title: "Ciudades en tiempo real",
     coverage_intro: "Monitorea cambios de ánimo en 52 ciudades. Cada observación añade comprensión colectiva de dónde la energía sube o baja.",
@@ -377,7 +375,6 @@ const translations = {
     obs_eyebrow: "Observations en direct",
     obs_title: "Pouls récent de {city}",
     obs_intro: "Voyez ce que ressentent les autres observateurs dans cette ville. Chaque note façonne l'humeur collective.",
-    obs_empty: "Pas encore d'observations. Soyez le premier à partager le pouls.",
     coverage_eyebrow: "Pouls global",
     coverage_title: "Villes en temps réel",
     coverage_intro: "Suivez les changements d'humeur dans 52 villes. Chaque observation contribue à comprendre où l'énergie monte ou baisse.",
@@ -488,7 +485,6 @@ const translations = {
     obs_eyebrow: "Live-Beobachtungen",
     obs_title: "Aktueller Puls von {city}",
     obs_intro: "Sehen Sie, was andere Beobachter gerade in dieser Stadt fühlen. Jede Notiz prägt die kollektive Stimmung.",
-    obs_empty: "Noch keine Beobachtungen. Teilen Sie als Erste den Puls.",
     coverage_eyebrow: "Globaler Puls",
     coverage_title: "Städte in Echtzeit",
     coverage_intro: "Überwachen Sie Stimmungsschwankungen in 52 Städten. Jede Beobachtung trägt zum kollektiven Verständnis bei, wo Energie steigt oder sinkt.",
@@ -599,7 +595,6 @@ const translations = {
     obs_eyebrow: "Observações ao vivo",
     obs_title: "Pulso recente de {city}",
     obs_intro: "Veja o que outros observadores estão sentindo nesta cidade. Cada nota molda o humor coletivo.",
-    obs_empty: "Sem observações ainda. Seja o primeiro a compartilhar o pulso.",
     coverage_eyebrow: "Pulso global",
     coverage_title: "Cidades em tempo real",
     coverage_intro: "Monitore mudanças de humor em 52 cidades. Cada observação contribui para a compreensão coletiva de onde a energia sobe ou cai.",
@@ -710,7 +705,6 @@ const translations = {
     obs_eyebrow: "ライブ観測",
     obs_title: "{city}の最近のパルス",
     obs_intro: "この都市の他の観測者たちが今何を感じているか見てみましょう。各ノートが集合的なムードを形成します。",
-    obs_empty: "観測はまだありません。最初にパルスを共有してください。",
     coverage_eyebrow: "グローバルパルス",
     coverage_title: "リアルタイムの都市",
     coverage_intro: "52の都市のムード変化を監視してください。各観測は、エネルギーが上昇または低下している場所の集合的理解に貢献します。",
@@ -741,7 +735,6 @@ const tempoEconomyStrings = {
     sponsored: "Sponsored",
     discover_local: "Discover local experiences in",
     city_mood_updated: "City mood updated",
-    no_comments: "No comments yet. Be the first to share!",
     timestamp: "just now"
   },
   es: {
@@ -757,7 +750,6 @@ const tempoEconomyStrings = {
     sponsored: "Patrocinado",
     discover_local: "Descubre experiencias locales en",
     city_mood_updated: "Estado de ánimo de la ciudad actualizado",
-    no_comments: "Sin comentarios aún. ¡Sé el primero en compartir!",
     timestamp: "hace poco"
   },
   fr: {
@@ -773,7 +765,6 @@ const tempoEconomyStrings = {
     sponsored: "Sponsorisé",
     discover_local: "Découvrez les expériences locales à",
     city_mood_updated: "Humeur de la ville mise à jour",
-    no_comments: "Pas encore de commentaires. Soyez le premier à partager!",
     timestamp: "à l'instant"
   },
   de: {
@@ -789,7 +780,6 @@ const tempoEconomyStrings = {
     sponsored: "Gesponsert",
     discover_local: "Entdecken Sie lokale Erlebnisse in",
     city_mood_updated: "Stimmung der Stadt aktualisiert",
-    no_comments: "Noch keine Kommentare. Seien Sie der Erste, der teilt!",
     timestamp: "gerade eben"
   },
   pt: {
@@ -805,7 +795,6 @@ const tempoEconomyStrings = {
     sponsored: "Patrocinado",
     discover_local: "Descubra experiências locais em",
     city_mood_updated: "Humor da cidade atualizado",
-    no_comments: "Ainda sem comentários. Seja o primeiro a compartilhar!",
     timestamp: "agora mesmo"
   },
   ja: {
@@ -821,7 +810,6 @@ const tempoEconomyStrings = {
     sponsored: "スポンサー付き",
     discover_local: "の地元体験を発見",
     city_mood_updated: "都市の気分が更新されました",
-    no_comments: "まだコメントなし。最初に共有してください！",
     timestamp: "たった今"
   }
 };
