@@ -226,6 +226,15 @@ function generateCityPage(city) {
 
       const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
 
+      // Header photo: kicked off first so it's the earliest possible
+      // trigger of the shared Wikipedia summary fetch (see city-wiki.js
+      // getCityImageUrl / city-header-photo.js) -- whichever of this or
+      // loadCityWiki below actually wins the race is the only network
+      // call; the other reuses its cached promise.
+      if (typeof GlotempHeaderPhoto !== 'undefined' && city) {
+        GlotempHeaderPhoto.loadHeaderPhoto(city.name, city.country);
+      }
+
       if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('${city.name}', '${city.country}');
 
       // Synchronous and static, so it's always in the DOM before any of

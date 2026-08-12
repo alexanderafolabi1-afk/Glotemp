@@ -28,6 +28,9 @@
 
   <main class="page-content">
     <section class="city-header glass-card">
+      <div class="city-header-photo" id="city-header-photo" aria-hidden="true">
+        <img id="city-header-photo-img" alt="" decoding="async">
+      </div>
       <div class="city-header-content">
         <p class="city-live-badge checkin-live-eyebrow live-mark">Live</p>
         <h1 id="city-name"></h1>
@@ -290,6 +293,7 @@
   <script src="/city-trivia-data.js" defer></script>
   <script src="/glotemp-personality.js" defer></script>
   <script src="/city-wiki.js" defer></script>
+  <script src="/city-header-photo.js" defer></script>
   <script src="/city-food-signature.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
   <script src="/city-radio.js" defer></script>
@@ -398,6 +402,15 @@
       }
 
       const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
+
+      // Header photo: kicked off first so it's the earliest possible
+      // trigger of the shared Wikipedia summary fetch (see city-wiki.js
+      // getCityImageUrl / city-header-photo.js) -- whichever of this or
+      // loadCityWiki below actually wins the race is the only network
+      // call; the other reuses its cached promise.
+      if (typeof GlotempHeaderPhoto !== 'undefined' && city) {
+        GlotempHeaderPhoto.loadHeaderPhoto(city.name, city.country);
+      }
 
       if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('Rome', 'Italy');
 
@@ -628,7 +641,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Trastevere at golden hour - ochre walls, voices, aperitivo.","language_lens":"visitor","created_at":"2026-08-12T18:07:14.474Z"},{"context":"Caffè al bar sotto casa - l'espresso migliore della giornata.","language_lens":"local","created_at":"2026-08-12T12:07:14.474Z"},{"context":"Metro A affollatissima come sempre. Roma non cambia.","language_lens":"local","created_at":"2026-08-12T04:07:14.474Z"},{"context":"Campo de' Fiori morning market - still the heart of the city.","language_lens":"visitor","created_at":"2026-08-11T17:07:14.474Z"},{"context":"Pigneto neighbourhood buzzing - new Rome mixing with the old.","language_lens":"visitor","created_at":"2026-08-11T06:07:14.474Z"}];
+      const checkins = [{"context":"Trastevere at golden hour - ochre walls, voices, aperitivo.","language_lens":"visitor","created_at":"2026-08-12T18:41:07.944Z"},{"context":"Caffè al bar sotto casa - l'espresso migliore della giornata.","language_lens":"local","created_at":"2026-08-12T12:41:07.944Z"},{"context":"Metro A affollatissima come sempre. Roma non cambia.","language_lens":"local","created_at":"2026-08-12T04:41:07.944Z"},{"context":"Campo de' Fiori morning market - still the heart of the city.","language_lens":"visitor","created_at":"2026-08-11T17:41:07.944Z"},{"context":"Pigneto neighbourhood buzzing - new Rome mixing with the old.","language_lens":"visitor","created_at":"2026-08-11T06:41:07.944Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
