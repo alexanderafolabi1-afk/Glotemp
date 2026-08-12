@@ -227,6 +227,13 @@ function generateCityPage(city) {
 
       if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('${city.name}', '${city.country}');
 
+      // Synchronous and static, so it's always in the DOM before any of
+      // the async context loaders below append their own findings --
+      // reads as the headline fact for Food, with Wikipedia's Cuisine
+      // excerpt (if this city's article has one) as supplementary depth
+      // underneath it.
+      if (typeof GlotempFoodSignature !== 'undefined') GlotempFoodSignature.render('${city.slug}');
+
       // Wikipedia section-matching and World Bank indicators both get a
       // turn per vertical; whatever's still empty afterward -- Fashion
       // and Pulse always are, since neither has a real per-vertical

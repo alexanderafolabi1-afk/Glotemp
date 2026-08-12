@@ -113,6 +113,7 @@ function pageHTML(city, v) {
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
   <script src="/city-wiki.js" defer></script>
+  <script src="/city-food-signature.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
   <script src="/glotemp-listings.js" defer></script>
@@ -209,6 +210,7 @@ function pageHTML(city, v) {
     // replaces the live reading above; both render nothing if there's no
     // honest match, same rule as every empty state on the site.
     document.addEventListener('DOMContentLoaded', async function () {
+      ${v.slug === 'food' ? `if (typeof GlotempFoodSignature !== 'undefined') GlotempFoodSignature.render('${city.slug}');` : ''}
       const loaders = [];
       if (typeof GlotempWiki !== 'undefined') loaders.push(GlotempWiki.loadVerticalContext('${city.name}', '${city.country}', '${v.slug}'));
       if (typeof GlotempWorldBank !== 'undefined') loaders.push(GlotempWorldBank.loadVerticalIndicator('${city.iso}', '${v.slug}', '${city.country}'));

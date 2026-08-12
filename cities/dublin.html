@@ -275,6 +275,7 @@
   <script src="/city-trivia-data.js" defer></script>
   <script src="/glotemp-personality.js" defer></script>
   <script src="/city-wiki.js" defer></script>
+  <script src="/city-food-signature.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
   <script src="/city-radio.js" defer></script>
   <script src="/city-conditions.js" defer></script>
@@ -384,6 +385,13 @@
       const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
 
       if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('Dublin', 'Ireland');
+
+      // Synchronous and static, so it's always in the DOM before any of
+      // the async context loaders below append their own findings --
+      // reads as the headline fact for Food, with Wikipedia's Cuisine
+      // excerpt (if this city's article has one) as supplementary depth
+      // underneath it.
+      if (typeof GlotempFoodSignature !== 'undefined') GlotempFoodSignature.render('dublin');
 
       // Wikipedia section-matching and World Bank indicators both get a
       // turn per vertical; whatever's still empty afterward -- Fashion
@@ -591,7 +599,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Temple Bar on a Saturday - packed, loud, irresistibly Irish.","language_lens":"visitor","created_at":"2026-08-12T16:17:54.361Z"},{"context":"Portobello café on a weekday morning - quiet and honest.","language_lens":"local","created_at":"2026-08-12T05:17:54.361Z"},{"context":"Dart line towards Howth - commuter peace along the coast.","language_lens":"local","created_at":"2026-08-11T16:17:54.361Z"},{"context":"Grafton Street buskers at noon - city humming with good spirit.","language_lens":"visitor","created_at":"2026-08-11T05:17:54.361Z"},{"context":"Parnell Street Sunday - Dublin's newer face, diverse and warm.","language_lens":"diaspora","created_at":"2026-08-10T21:17:54.361Z"}];
+      const checkins = [{"context":"Temple Bar on a Saturday - packed, loud, irresistibly Irish.","language_lens":"visitor","created_at":"2026-08-12T16:39:58.799Z"},{"context":"Portobello café on a weekday morning - quiet and honest.","language_lens":"local","created_at":"2026-08-12T05:39:58.799Z"},{"context":"Dart line towards Howth - commuter peace along the coast.","language_lens":"local","created_at":"2026-08-11T16:39:58.799Z"},{"context":"Grafton Street buskers at noon - city humming with good spirit.","language_lens":"visitor","created_at":"2026-08-11T05:39:58.799Z"},{"context":"Parnell Street Sunday - Dublin's newer face, diverse and warm.","language_lens":"diaspora","created_at":"2026-08-10T21:39:58.799Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

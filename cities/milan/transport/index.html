@@ -77,6 +77,7 @@
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
   <script src="/city-wiki.js" defer></script>
+  <script src="/city-food-signature.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
   <script src="/glotemp-listings.js" defer></script>
@@ -173,6 +174,7 @@
     // replaces the live reading above; both render nothing if there's no
     // honest match, same rule as every empty state on the site.
     document.addEventListener('DOMContentLoaded', async function () {
+      
       const loaders = [];
       if (typeof GlotempWiki !== 'undefined') loaders.push(GlotempWiki.loadVerticalContext('Milan', 'Italy', 'transport'));
       if (typeof GlotempWorldBank !== 'undefined') loaders.push(GlotempWorldBank.loadVerticalIndicator('IT', 'transport', 'Italy'));
