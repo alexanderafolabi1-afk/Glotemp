@@ -5166,6 +5166,30 @@ a:hover .city-landmark-photo,
 .hero-search-go:hover { border-color: var(--brass); color: var(--brass); }
 .hero-cta { margin-top: 0.2rem; }
 
+/* One-day-only eclipse note, see eclipse-2026.js. Hidden by default and
+   toggled by the script -- [hidden] wins the cascade so there's no flash
+   of empty space on every day this isn't live. */
+.eclipse-note {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.eclipse-note[hidden] { display: none; }
+.eclipse-note-eyebrow {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.78rem;
+  letter-spacing: 0.09em;
+  color: var(--brass);
+}
+.eclipse-note-line {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--sand);
+  max-width: 42ch;
+}
+
 .hero-instrument {
   position: relative;
   z-index: 1;
@@ -5262,6 +5286,35 @@ a:hover .city-landmark-photo,
   overflow: hidden;
 }
 
+/* One-day-only eclipse mark, see eclipse-2026.js. Floats in the open sky
+   above the instrument, inside the dusk photo's own space rather than
+   the instrument itself -- the crescent is cut from an inline SVG mask,
+   so it reads correctly against the photo behind it with no asset of
+   its own. */
+.eclipse-mark {
+  position: absolute;
+  top: 6%;
+  right: 8%;
+  width: min(11vw, 130px);
+  aspect-ratio: 1;
+  z-index: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 0 18px rgba(240, 184, 90, 0.25));
+}
+.eclipse-mark[hidden] { display: none; }
+.eclipse-mark .eclipse-corona {
+  filter: blur(4px);
+}
+.eclipse-mark .eclipse-rays {
+  animation: eclipse-rays-turn 90s linear infinite;
+}
+@keyframes eclipse-rays-turn {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eclipse-mark .eclipse-rays { animation: none; }
+}
+
 @media (max-width: 900px) {
   .hero-instrument-section {
     /* Full viewport height on mobile too -- one screen, the same as
@@ -5289,6 +5342,17 @@ a:hover .city-landmark-photo,
   }
   .hero-copy { order: 1; padding-bottom: 0.5rem; align-items: flex-start; }
   .hero-search { max-width: 100%; }
+  /* Single-column layout stacks .hero-copy above the instrument, so the
+     top-right anchor used on desktop would sit over the headline text
+     instead of the open sky above it -- pull it down into the instrument's
+     own row (order:2) and shrink it so it reads as a mark near the
+     instrument rather than competing with the copy above. */
+  .eclipse-mark {
+    top: auto;
+    bottom: 2%;
+    right: 4%;
+    width: min(20vw, 76px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

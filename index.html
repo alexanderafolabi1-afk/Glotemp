@@ -50,8 +50,12 @@
          modified) plus a live SVG layer over its aperture, driven by
          whichever city is pinned. See glotemp-hero-instrument.js. -->
     <section class="hero-instrument-section" id="hero-instrument-section">
+      <!-- One-day-only: see eclipse-2026.js. Empty and [hidden] on every
+           other date, self-populated (and self-clearing) by the script. -->
+      <div class="eclipse-mark" id="eclipse-mark" aria-hidden="true" hidden></div>
       <div class="hero-instrument-grid">
         <div class="hero-copy">
+          <div class="eclipse-note" id="eclipse-note" hidden></div>
           <h1 class="hero-headline">Know how a city feels before you go.</h1>
           <p class="hero-subhead">Live readings across 151 cities.</p>
           <form class="hero-search" id="hero-city-search" role="search">
@@ -327,6 +331,7 @@
   <script src="/glotemp-showcase.js" defer></script>
   <script src="/glotemp-spin.js" defer></script>
   <script src="/glotemp-hero-instrument.js" defer></script>
+  <script src="/eclipse-2026.js" defer></script>
   <script src="/city-tiles.js" defer></script>
   <script src="/app.js" defer></script>
   <script src="/tempo-economy.js" defer></script>

@@ -167,11 +167,32 @@
         '<p class="confirm-eyebrow">Link not accepted</p>' +
         '<h1 class="confirm-title">That link has expired.</h1>' +
         '<p class="confirm-copy">' + esc(reason || 'Confirmation links are single use and time limited.') +
-        ' Ask for a fresh one and it will arrive in a moment.</p>' +
+        ' Enter your email below and a fresh one will arrive in a moment.</p>' +
+        '<form class="gt-auth-email-form" id="confirm-resend-form">' +
+        '<label class="gt-auth-label" for="confirm-resend-email">Email</label>' +
+        '<input class="gt-auth-input" type="email" id="confirm-resend-email" placeholder="you@example.com" required autocomplete="email">' +
+        '<button class="confirm-action" type="submit">Send me a new link</button>' +
+        '</form>' +
+        '<p class="confirm-copy" id="confirm-resend-status" role="status" aria-live="polite"></p>' +
         '<hr class="confirm-rule">' +
-        '<a class="confirm-action" href="/">Send me a new link</a>' +
         '<a class="confirm-secondary" href="/explore">Browse all 151 cities</a>'
       );
+      var form = document.getElementById('confirm-resend-form');
+      if (form) {
+        form.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          var statusEl = document.getElementById('confirm-resend-status');
+          var email = document.getElementById('confirm-resend-email').value.trim();
+          if (!email || !window.GlotempAuth) return;
+          statusEl.textContent = 'Sending…';
+          try {
+            await GlotempAuth.signInWithEmail(email);
+            statusEl.textContent = 'Check your inbox for a fresh link.';
+          } catch (err) {
+            statusEl.textContent = 'Could not send that link. Try again shortly.';
+          }
+        });
+      }
     }
 
     async function run() {
