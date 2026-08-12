@@ -37,6 +37,7 @@
           <span id="city-penetration"></span>
           <span id="city-metro-pop"></span>
         </div>
+        <p class="conditions-line" id="conditions-line" aria-live="polite"></p>
         <div class="city-action-row">
           <button id="watch-city-btn" class="btn-neon" type="button">Follow this city</button>
           <button id="share-city-btn" class="btn-neon" type="button" style="--btn-band: var(--band-restrained);">Share</button>
@@ -276,6 +277,7 @@
   <script src="/city-wiki.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
   <script src="/city-radio.js" defer></script>
+  <script src="/city-conditions.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
   
@@ -405,6 +407,12 @@
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
         GlotempRadio.loadRadio(city.name, city.lat, city.lon);
+      }
+
+      // Conditions line: same treatment as Radio -- a live free-API
+      // source, not a Supabase reading.
+      if (typeof GlotempConditions !== 'undefined' && city) {
+        GlotempConditions.loadConditions(city.name, city.lat, city.lon, city.timezone);
       }
 
       for (const vertical of verticalSlugs) {
@@ -583,7 +591,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Drizzle on Oxford Street but the pubs are warm inside.","language_lens":"visitor","created_at":"2026-08-12T13:52:15.576Z"},{"context":"City desks are busy. Post-market close energy.","language_lens":"local","created_at":"2026-08-12T10:52:15.576Z"},{"context":"Borough Market on a Saturday - the place is alive.","language_lens":"diaspora","created_at":"2026-08-12T01:52:15.576Z"},{"context":"Brixton Market on a Saturday - cultures colliding beautifully.","language_lens":"visitor","created_at":"2026-08-12T16:22:15.576Z"},{"context":"Northern Line rush hour - everyone managing their own peace.","language_lens":"local","created_at":"2026-08-11T11:52:15.576Z"}];
+      const checkins = [{"context":"Drizzle on Oxford Street but the pubs are warm inside.","language_lens":"visitor","created_at":"2026-08-12T17:09:56.132Z"},{"context":"City desks are busy. Post-market close energy.","language_lens":"local","created_at":"2026-08-12T14:09:56.132Z"},{"context":"Borough Market on a Saturday - the place is alive.","language_lens":"diaspora","created_at":"2026-08-12T05:09:56.132Z"},{"context":"Brixton Market on a Saturday - cultures colliding beautifully.","language_lens":"visitor","created_at":"2026-08-12T19:39:56.132Z"},{"context":"Northern Line rush hour - everyone managing their own peace.","language_lens":"local","created_at":"2026-08-11T15:09:56.132Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

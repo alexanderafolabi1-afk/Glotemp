@@ -251,6 +251,12 @@ function generateCityPage(city) {
         GlotempRadio.loadRadio(city.name, city.lat, city.lon);
       }
 
+      // Conditions line: same treatment as Radio -- a live free-API
+      // source, not a Supabase reading.
+      if (typeof GlotempConditions !== 'undefined' && city) {
+        GlotempConditions.loadConditions(city.name, city.lat, city.lon, city.timezone);
+      }
+
       for (const vertical of verticalSlugs) {
         const contentEl = document.getElementById(\`\${vertical}-content\`);
         try {
