@@ -94,23 +94,65 @@
     return !!(s && s.access_token);
   }
 
-  // ---------- OAuth redirect handling ----------
-  // GoTrue returns tokens in the URL fragment. Consume and scrub them so
-  // the access token never lingers in the address bar or in history.
+  // ---------- OAuth / email-link redirect handling ----------
+  // GoTrue's /verify endpoint lands the browser back here in one of two
+  // shapes, and this page has to handle both:
+  //
+  //   1. Implicit flow: finished tokens in the URL FRAGMENT
+  //      (#access_token=...&refresh_token=...). Consume and scrub them so
+  //      the access token never lingers in the address bar or in history.
+  //
+  //   2. Verify-link flow: a #token_hash= / #type= pair in the fragment
+  //      instead of finished tokens (current Supabase/GoTrue default for
+  //      confirmation and magic-link emails). GoTrue did the actual token
+  //      verification server-side already -- what lands here is a second,
+  //      short-lived credential that this page has to exchange itself with
+  //      one more call to /auth/v1/verify. Previously this page only ever
+  //      checked for `access_token=`, so a token_hash-shaped link matched
+  //      neither branch and consumeRedirect() returned false immediately --
+  //      the page would sit on "Confirming..." until the 3s poll in
+  //      auth/confirm/index.html gave up, which is exactly what "I click
+  //      verify and nothing happens" looks like from the outside.
   async function consumeRedirect() {
-    if (!window.location.hash || window.location.hash.indexOf('access_token=') === -1) return false;
+    if (!window.location.hash) return false;
     const params = new URLSearchParams(window.location.hash.slice(1));
-    const session = normalizeSession({
-      access_token: params.get('access_token'),
-      refresh_token: params.get('refresh_token'),
-      expires_in: Number(params.get('expires_in')) || 3600,
-    });
-    if (!session) return false;
-    writeSession(session);
-    history.replaceState(null, '', window.location.pathname + window.location.search);
-    // Fetch the user record so first-sign-in profile capture has an email.
-    await fetchUser();
-    return true;
+
+    if (params.has('access_token')) {
+      const session = normalizeSession({
+        access_token: params.get('access_token'),
+        refresh_token: params.get('refresh_token'),
+        expires_in: Number(params.get('expires_in')) || 3600,
+      });
+      if (!session) return false;
+      writeSession(session);
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+      // Fetch the user record so first-sign-in profile capture has an email.
+      await fetchUser();
+      return true;
+    }
+
+    const tokenHash = params.get('token_hash');
+    const type = params.get('type');
+    if (tokenHash && type) {
+      try {
+        const resp = await fetch(`${SUPABASE_URL}/auth/v1/verify`, {
+          method: 'POST',
+          headers: { apikey: SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type, token_hash: tokenHash }),
+        });
+        if (!resp.ok) return false;
+        const session = normalizeSession(await resp.json());
+        if (!session) return false;
+        writeSession(session);
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+        await fetchUser();
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    return false;
   }
 
   async function fetchUser() {
