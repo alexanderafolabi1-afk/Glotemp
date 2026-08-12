@@ -6357,3 +6357,89 @@ body > section {
   .city-tile { min-width: 104px; }
   .check-in .mood-buttons { gap: 1.25rem; margin: 1.25rem 0 1.75rem; }
 }
+
+/* ===== SPONSOR STRIP (luxury register credit) ===== */
+/* A sponsorship credit, not a banner: the sponsor page of a fine magazine,
+   not an ad unit. Stillness reads as expensive -- no box, no fill, no
+   radius, no marquee, just brass hairlines and generous air. JS (see
+   glotemp-sponsor-strip.js) injects the link markup only when a placement
+   actually matches; the wrapper itself carries no border or padding, so an
+   empty/unmatched page collapses to zero height and leaves no gap. */
+.sponsor-strip-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.85rem;
+  padding: 3.5rem 1.5rem;
+  border-top: 1px solid var(--brass-dim);
+  border-bottom: 1px solid var(--brass-dim);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.sponsor-strip-kicker {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  color: var(--sand);
+  opacity: 0.85;
+}
+.sponsor-strip-logo {
+  height: 32px;
+  width: auto;
+  display: block;
+  margin: 0.35rem 0;
+}
+.sponsor-strip-name {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 1.3rem;
+  color: var(--ivory);
+}
+.sponsor-strip-tagline {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--sand);
+  max-width: 46ch;
+}
+.sponsor-strip-url {
+  position: relative;
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  text-transform: uppercase;
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  color: var(--sand);
+  padding-bottom: 4px;
+  margin-top: 0.15rem;
+}
+.sponsor-strip-url::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  bottom: 0;
+  height: 1px;
+  background: var(--brass);
+  transition: left var(--transition), right var(--transition);
+}
+.sponsor-strip-link:hover {
+  transform: translateY(-2px);
+}
+.sponsor-strip-link:hover .sponsor-strip-url::after {
+  left: 0;
+  right: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sponsor-strip-link,
+  .sponsor-strip-url::after {
+    transition: none;
+  }
+  .sponsor-strip-link:hover {
+    transform: none;
+  }
+}
