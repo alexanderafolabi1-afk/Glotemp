@@ -6387,9 +6387,14 @@ body > section {
   color: var(--sand);
   opacity: 0.85;
 }
+/* object-fit: cover on a fixed square box crops any letterboxing/margin a
+   source file carries around its mark, centred, without ever touching the
+   asset itself -- the right default for a logo mark generally, not just
+   this one file. */
 .sponsor-strip-logo {
   height: 32px;
-  width: auto;
+  width: 32px;
+  object-fit: cover;
   display: block;
   margin: 0.35rem 0;
 }
