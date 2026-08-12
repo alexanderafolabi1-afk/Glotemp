@@ -31,7 +31,7 @@ const VERTICALS = [
 ];
 
 // Kept identical to generate-city-pages.js's copy.
-const LISTINGS_VERTICALS = new Set(['entertainment', 'fashion', 'food', 'property', 'work', 'tech', 'transport']);
+const LISTINGS_VERTICALS = new Set(['entertainment', 'fashion', 'food', 'property', 'work', 'tech', 'transport', 'finance', 'education', 'health']);
 
 function pageHTML(city, v) {
   return `<!DOCTYPE html>

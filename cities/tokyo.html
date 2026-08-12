@@ -125,7 +125,7 @@
       <div id="finance-content" class="vertical-content"></div>
       <div id="finance-context" class="vertical-context"></div>
       
-      
+      <div class="vertical-listings" data-city="tokyo" data-vertical="finance"></div>
     </section>
   
 
@@ -158,7 +158,7 @@
       <div id="education-content" class="vertical-content"></div>
       <div id="education-context" class="vertical-context"></div>
       
-      
+      <div class="vertical-listings" data-city="tokyo" data-vertical="education"></div>
     </section>
   
 
@@ -213,7 +213,7 @@
       <div id="health-content" class="vertical-content"></div>
       <div id="health-context" class="vertical-context"></div>
       
-      
+      <div class="vertical-listings" data-city="tokyo" data-vertical="health"></div>
     </section>
   
 
@@ -599,7 +599,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"渋谷のスクランブル交差点はいつもより人が多い。エネルギーが充電されている。","language_lens":"local","created_at":"2026-08-12T19:39:58.799Z"},{"context":"Perfect matcha in Shimokitazawa. The neighbourhood hums quietly.","language_lens":"visitor","created_at":"2026-08-12T15:39:58.799Z"},{"context":"Shibuya at 23h - the city never stops. Charged.","language_lens":"visitor","created_at":"2026-08-12T10:39:58.799Z"},{"context":"山手線は混雑しているが、秩序がある。普通の朝だ。","language_lens":"local","created_at":"2026-08-12T02:39:58.799Z"},{"context":"Akihabara on a weekend - neon, arcades, and beautiful obsession.","language_lens":"visitor","created_at":"2026-08-12T20:09:58.799Z"},{"context":"新宿の月曜朝-スーツの波。東京式の秩序。","language_lens":"local","created_at":"2026-08-11T20:39:58.799Z"},{"context":"Shimokitazawa record shop café - Tokyo's anti-Tokyo alive and well.","language_lens":"diaspora","created_at":"2026-08-11T08:39:58.799Z"}];
+      const checkins = [{"context":"渋谷のスクランブル交差点はいつもより人が多い。エネルギーが充電されている。","language_lens":"local","created_at":"2026-08-12T19:58:09.758Z"},{"context":"Perfect matcha in Shimokitazawa. The neighbourhood hums quietly.","language_lens":"visitor","created_at":"2026-08-12T15:58:09.758Z"},{"context":"Shibuya at 23h - the city never stops. Charged.","language_lens":"visitor","created_at":"2026-08-12T10:58:09.758Z"},{"context":"山手線は混雑しているが、秩序がある。普通の朝だ。","language_lens":"local","created_at":"2026-08-12T02:58:09.758Z"},{"context":"Akihabara on a weekend - neon, arcades, and beautiful obsession.","language_lens":"visitor","created_at":"2026-08-12T20:28:09.758Z"},{"context":"新宿の月曜朝-スーツの波。東京式の秩序。","language_lens":"local","created_at":"2026-08-11T20:58:09.758Z"},{"context":"Shimokitazawa record shop café - Tokyo's anti-Tokyo alive and well.","language_lens":"diaspora","created_at":"2026-08-11T08:58:09.758Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

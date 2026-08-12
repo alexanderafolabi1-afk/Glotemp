@@ -1,11 +1,14 @@
 // Glotemp Listings: curated content + partner/nomination system for the
 // commercial verticals (entertainment, fashion, food, property, work,
-// tech, transport). Sport is covered by glotemp-sports.js's live feed
-// instead -- fixtures and results don't need manual curation. Reads
-// approved rows from curated_listings;
-// unfilled slots become an editorial "open slot" inviting a nomination.
-// Nothing here is fabricated -- an empty table means every slot on every
-// page shows the open-slot prompt, honestly, until a real submission is
+// tech, transport, finance, education, health). Sport is covered by
+// glotemp-sports.js's live feed instead -- fixtures and results don't
+// need manual curation -- and Pulse is the core reading system, not a
+// listings category. Every other vertical gets this: no vertical should
+// be a dead end just because it has no live reading yet and no matching
+// Wikipedia section. Reads approved rows from curated_listings; unfilled
+// slots become an editorial "open slot" inviting a suggestion. Nothing
+// here is fabricated -- an empty table means every slot on every page
+// shows the open-slot prompt, honestly, until a real submission is
 // reviewed and approved.
 (function () {
   'use strict';
@@ -69,6 +72,30 @@
       cta: 'Suggest a service',
       modalTitle: 'Suggest a service',
       modalCopy: 'Tell us about a transport or mobility service that belongs in this city’s reading.',
+    },
+    finance: {
+      slots: 3, kind: 'partner',
+      eyebrow: 'Notable in finance',
+      emptyLabel: 'A place belongs here',
+      cta: 'Suggest a company',
+      modalTitle: 'Suggest a company',
+      modalCopy: 'Tell us about a bank, advisor, or fintech that belongs in this city’s reading.',
+    },
+    education: {
+      slots: 3, kind: 'partner',
+      eyebrow: 'Notable in education',
+      emptyLabel: 'A place belongs here',
+      cta: 'Suggest a school',
+      modalTitle: 'Suggest a school',
+      modalCopy: 'Tell us about a school, university, or language centre that belongs in this city’s reading.',
+    },
+    health: {
+      slots: 3, kind: 'partner',
+      eyebrow: 'Notable in health',
+      emptyLabel: 'A place belongs here',
+      cta: 'Suggest a clinic',
+      modalTitle: 'Suggest a clinic',
+      modalCopy: 'Tell us about a clinic, gym, or wellness space that belongs in this city’s reading.',
     },
   };
 
