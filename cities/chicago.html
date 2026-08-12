@@ -406,7 +406,7 @@
       // city's real coordinates) -- not a Supabase reading, so it's kept
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
-        GlotempRadio.loadRadio(city.name, city.lat, city.lon);
+        GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country);
       }
 
       // Conditions line: same treatment as Radio -- a live free-API
@@ -591,7 +591,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Magnificent Mile at noon - wind off the lake, city in full stride.","language_lens":"visitor","created_at":"2026-08-12T19:09:56.132Z"},{"context":"Wicker Park on a Friday - live music bleeding out of every bar.","language_lens":"local","created_at":"2026-08-12T14:09:56.132Z"},{"context":"Logan Square brunch spot - relaxed Midwest energy at its best.","language_lens":"visitor","created_at":"2026-08-12T07:09:56.132Z"},{"context":"Pilsen murals on a Sunday afternoon - culture breathing loud.","language_lens":"diaspora","created_at":"2026-08-11T22:09:56.132Z"},{"context":"Red Line El train - city soundtrack, familiar and grounding.","language_lens":"local","created_at":"2026-08-11T10:09:56.132Z"},{"context":"Millennium Park on a summer evening - jazz, kids, the whole city gathered.","language_lens":"visitor","created_at":"2026-08-11T00:09:56.132Z"}];
+      const checkins = [{"context":"Magnificent Mile at noon - wind off the lake, city in full stride.","language_lens":"visitor","created_at":"2026-08-12T19:17:54.361Z"},{"context":"Wicker Park on a Friday - live music bleeding out of every bar.","language_lens":"local","created_at":"2026-08-12T14:17:54.361Z"},{"context":"Logan Square brunch spot - relaxed Midwest energy at its best.","language_lens":"visitor","created_at":"2026-08-12T07:17:54.361Z"},{"context":"Pilsen murals on a Sunday afternoon - culture breathing loud.","language_lens":"diaspora","created_at":"2026-08-11T22:17:54.361Z"},{"context":"Red Line El train - city soundtrack, familiar and grounding.","language_lens":"local","created_at":"2026-08-11T10:17:54.361Z"},{"context":"Millennium Park on a summer evening - jazz, kids, the whole city gathered.","language_lens":"visitor","created_at":"2026-08-11T00:17:54.361Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

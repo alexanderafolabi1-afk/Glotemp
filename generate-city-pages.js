@@ -248,7 +248,7 @@ function generateCityPage(city) {
       // city's real coordinates) -- not a Supabase reading, so it's kept
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
-        GlotempRadio.loadRadio(city.name, city.lat, city.lon);
+        GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country);
       }
 
       // Conditions line: same treatment as Radio -- a live free-API

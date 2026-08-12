@@ -406,7 +406,7 @@
       // city's real coordinates) -- not a Supabase reading, so it's kept
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
-        GlotempRadio.loadRadio(city.name, city.lat, city.lon);
+        GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country);
       }
 
       // Conditions line: same treatment as Radio -- a live free-API
@@ -591,7 +591,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Koramangala startup corridor - ideas moving at the speed of data.","language_lens":"local","created_at":"2026-08-12T18:09:56.132Z"},{"context":"Indiranagar coffee shops - filtered coffee and filtered ideas.","language_lens":"visitor","created_at":"2026-08-12T12:09:56.132Z"},{"context":"ಬ್ರಿಗೇಡ್ ರೋಡ್ ನಲ್ಲಿ ಸಂಜೆ ವಾಕ್ - ನಗರ ಜೀವಂತ.","language_lens":"local","created_at":"2026-08-12T06:09:56.132Z"},{"context":"Purple Line metro - efficient and mercifully air-conditioned.","language_lens":"local","created_at":"2026-08-11T21:09:56.132Z"},{"context":"UB City rooftop - Bangalore's ambition visible in every light.","language_lens":"visitor","created_at":"2026-08-11T09:09:56.132Z"}];
+      const checkins = [{"context":"Koramangala startup corridor - ideas moving at the speed of data.","language_lens":"local","created_at":"2026-08-12T18:17:54.361Z"},{"context":"Indiranagar coffee shops - filtered coffee and filtered ideas.","language_lens":"visitor","created_at":"2026-08-12T12:17:54.361Z"},{"context":"ಬ್ರಿಗೇಡ್ ರೋಡ್ ನಲ್ಲಿ ಸಂಜೆ ವಾಕ್ - ನಗರ ಜೀವಂತ.","language_lens":"local","created_at":"2026-08-12T06:17:54.361Z"},{"context":"Purple Line metro - efficient and mercifully air-conditioned.","language_lens":"local","created_at":"2026-08-11T21:17:54.361Z"},{"context":"UB City rooftop - Bangalore's ambition visible in every light.","language_lens":"visitor","created_at":"2026-08-11T09:17:54.361Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

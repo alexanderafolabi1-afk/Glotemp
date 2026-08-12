@@ -406,7 +406,7 @@
       // city's real coordinates) -- not a Supabase reading, so it's kept
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
-        GlotempRadio.loadRadio(city.name, city.lat, city.lon);
+        GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country);
       }
 
       // Conditions line: same treatment as Radio -- a live free-API
@@ -591,7 +591,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Aker Brygge waterfront - clean, prosperous, quietly content.","language_lens":"visitor","created_at":"2026-08-12T14:39:56.132Z"},{"context":"Grünerløkka søndag morgen - kaffe, aviser, ingen hast.","language_lens":"local","created_at":"2026-08-12T02:09:56.132Z"},{"context":"Frognerparken om sommeren - familier og turister, harmonisk.","language_lens":"local","created_at":"2026-08-11T10:09:56.132Z"},{"context":"Youngstorget district on a Friday - Oslo after dark, surprisingly warm.","language_lens":"visitor","created_at":"2026-08-11T01:09:56.132Z"}];
+      const checkins = [{"context":"Aker Brygge waterfront - clean, prosperous, quietly content.","language_lens":"visitor","created_at":"2026-08-12T14:47:54.361Z"},{"context":"Grünerløkka søndag morgen - kaffe, aviser, ingen hast.","language_lens":"local","created_at":"2026-08-12T02:17:54.361Z"},{"context":"Frognerparken om sommeren - familier og turister, harmonisk.","language_lens":"local","created_at":"2026-08-11T10:17:54.361Z"},{"context":"Youngstorget district on a Friday - Oslo after dark, surprisingly warm.","language_lens":"visitor","created_at":"2026-08-11T01:17:54.361Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

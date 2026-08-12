@@ -406,7 +406,7 @@
       // city's real coordinates) -- not a Supabase reading, so it's kept
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
-        GlotempRadio.loadRadio(city.name, city.lat, city.lon);
+        GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country);
       }
 
       // Conditions line: same treatment as Radio -- a live free-API
@@ -591,7 +591,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Хрещатик у неділю - люди гуляють, музиканти грають.","language_lens":"local","created_at":"2026-08-12T12:09:56.132Z"},{"context":"Coffee in Podil - the neighbourhood holds its rhythm.","language_lens":"visitor","created_at":"2026-08-11T22:09:56.132Z"},{"context":"Andriyivskyy descent - artists still selling, city still beautiful.","language_lens":"visitor","created_at":"2026-08-12T15:09:56.132Z"},{"context":"Arsenal neighbourhood coffee - Kyiv's defiant creative pulse.","language_lens":"diaspora","created_at":"2026-08-11T07:09:56.132Z"}];
+      const checkins = [{"context":"Хрещатик у неділю - люди гуляють, музиканти грають.","language_lens":"local","created_at":"2026-08-12T12:17:54.361Z"},{"context":"Coffee in Podil - the neighbourhood holds its rhythm.","language_lens":"visitor","created_at":"2026-08-11T22:17:54.361Z"},{"context":"Andriyivskyy descent - artists still selling, city still beautiful.","language_lens":"visitor","created_at":"2026-08-12T15:17:54.361Z"},{"context":"Arsenal neighbourhood coffee - Kyiv's defiant creative pulse.","language_lens":"diaspora","created_at":"2026-08-11T07:17:54.361Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

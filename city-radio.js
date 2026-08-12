@@ -41,13 +41,22 @@
     });
   }
 
-  async function searchStations(lat, lon) {
+  async function searchStations(lat, lon, country) {
     const base = `&hidebroken=true&order=clickcount&reverse=true&limit=20`;
     let stations = await fetchJSON(`/json/stations/search?geo_lat=${lat}&geo_long=${lon}&geo_distance=50000${base}`);
     if (!stations || !stations.length) {
       // Sparse coverage near this city -- widen the search radius once
       // rather than showing nothing.
       stations = await fetchJSON(`/json/stations/search?geo_lat=${lat}&geo_long=${lon}&geo_distance=200000${base}`);
+    }
+    if ((!stations || !stations.length) && country) {
+      // Still nothing within 200km -- the geo index itself is sparse for
+      // this whole area (small country, or Radio Browser's geotagging
+      // just hasn't reached it), not something a wider radius fixes.
+      // Country-tag search is a genuinely different index in Radio
+      // Browser, not a bigger radius, so it surfaces stations a pure
+      // geo search never will.
+      stations = await fetchJSON(`/json/stations/search?country=${encodeURIComponent(country)}${base}`);
     }
     if (!stations) return [];
     return sortHttpsFirst(stations).slice(0, 8);
@@ -118,13 +127,13 @@
     });
   }
 
-  async function loadRadio(cityName, lat, lon) {
+  async function loadRadio(cityName, lat, lon, country) {
     const container = document.getElementById('radio-content');
     if (!container || lat == null || lon == null) return;
     container.innerHTML = '<p class="radio-status">Tuning in&hellip;</p>';
     let stations = [];
     try {
-      stations = await searchStations(lat, lon);
+      stations = await searchStations(lat, lon, country);
     } catch (e) {
       stations = [];
     }

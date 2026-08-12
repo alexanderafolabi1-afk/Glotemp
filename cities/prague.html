@@ -406,7 +406,7 @@
       // city's real coordinates) -- not a Supabase reading, so it's kept
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
-        GlotempRadio.loadRadio(city.name, city.lat, city.lon);
+        GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country);
       }
 
       // Conditions line: same treatment as Radio -- a live free-API
@@ -591,7 +591,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Charles Bridge at sunrise - almost empty, golden and surreal.","language_lens":"visitor","created_at":"2026-08-12T15:39:56.132Z"},{"context":"Kavárna na Žižkově - klidné ráno, dobrá káva.","language_lens":"local","created_at":"2026-08-12T06:09:56.132Z"},{"context":"Vinohrady on a weekend night - locals, craft beer, no tourists.","language_lens":"visitor","created_at":"2026-08-11T21:09:56.132Z"},{"context":"Metro C, ráno normálně rušné. Všichni tiší a ospalí.","language_lens":"local","created_at":"2026-08-11T11:09:56.132Z"},{"context":"Holešovice neighbourhood - art, markets, a quiet revolution.","language_lens":"diaspora","created_at":"2026-08-10T23:09:56.132Z"}];
+      const checkins = [{"context":"Charles Bridge at sunrise - almost empty, golden and surreal.","language_lens":"visitor","created_at":"2026-08-12T15:47:54.361Z"},{"context":"Kavárna na Žižkově - klidné ráno, dobrá káva.","language_lens":"local","created_at":"2026-08-12T06:17:54.361Z"},{"context":"Vinohrady on a weekend night - locals, craft beer, no tourists.","language_lens":"visitor","created_at":"2026-08-11T21:17:54.361Z"},{"context":"Metro C, ráno normálně rušné. Všichni tiší a ospalí.","language_lens":"local","created_at":"2026-08-11T11:17:54.361Z"},{"context":"Holešovice neighbourhood - art, markets, a quiet revolution.","language_lens":"diaspora","created_at":"2026-08-10T23:17:54.361Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

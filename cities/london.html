@@ -406,7 +406,7 @@
       // city's real coordinates) -- not a Supabase reading, so it's kept
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
-        GlotempRadio.loadRadio(city.name, city.lat, city.lon);
+        GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country);
       }
 
       // Conditions line: same treatment as Radio -- a live free-API
@@ -591,7 +591,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Drizzle on Oxford Street but the pubs are warm inside.","language_lens":"visitor","created_at":"2026-08-12T17:09:56.132Z"},{"context":"City desks are busy. Post-market close energy.","language_lens":"local","created_at":"2026-08-12T14:09:56.132Z"},{"context":"Borough Market on a Saturday - the place is alive.","language_lens":"diaspora","created_at":"2026-08-12T05:09:56.132Z"},{"context":"Brixton Market on a Saturday - cultures colliding beautifully.","language_lens":"visitor","created_at":"2026-08-12T19:39:56.132Z"},{"context":"Northern Line rush hour - everyone managing their own peace.","language_lens":"local","created_at":"2026-08-11T15:09:56.132Z"}];
+      const checkins = [{"context":"Drizzle on Oxford Street but the pubs are warm inside.","language_lens":"visitor","created_at":"2026-08-12T17:17:54.361Z"},{"context":"City desks are busy. Post-market close energy.","language_lens":"local","created_at":"2026-08-12T14:17:54.361Z"},{"context":"Borough Market on a Saturday - the place is alive.","language_lens":"diaspora","created_at":"2026-08-12T05:17:54.361Z"},{"context":"Brixton Market on a Saturday - cultures colliding beautifully.","language_lens":"visitor","created_at":"2026-08-12T19:47:54.361Z"},{"context":"Northern Line rush hour - everyone managing their own peace.","language_lens":"local","created_at":"2026-08-11T15:17:54.361Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

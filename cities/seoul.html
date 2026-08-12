@@ -406,7 +406,7 @@
       // city's real coordinates) -- not a Supabase reading, so it's kept
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
-        GlotempRadio.loadRadio(city.name, city.lat, city.lon);
+        GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country);
       }
 
       // Conditions line: same treatment as Radio -- a live free-API
@@ -591,7 +591,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"홍대 거리는 토요일 오후에 항상 활기차다. 좋은 에너지.","language_lens":"local","created_at":"2026-08-12T15:09:56.132Z"},{"context":"Bukchon Hanok Village - serene, slow, beautiful.","language_lens":"visitor","created_at":"2026-08-12T00:09:56.132Z"},{"context":"Itaewon on Saturday - globalness compressed into one neighbourhood.","language_lens":"visitor","created_at":"2026-08-12T18:09:56.132Z"},{"context":"강남구 클럽 구역 밤 11시 - 에너지가 폭발하고 있다.","language_lens":"local","created_at":"2026-08-11T10:09:56.132Z"}];
+      const checkins = [{"context":"홍대 거리는 토요일 오후에 항상 활기차다. 좋은 에너지.","language_lens":"local","created_at":"2026-08-12T15:17:54.361Z"},{"context":"Bukchon Hanok Village - serene, slow, beautiful.","language_lens":"visitor","created_at":"2026-08-12T00:17:54.361Z"},{"context":"Itaewon on Saturday - globalness compressed into one neighbourhood.","language_lens":"visitor","created_at":"2026-08-12T18:17:54.361Z"},{"context":"강남구 클럽 구역 밤 11시 - 에너지가 폭발하고 있다.","language_lens":"local","created_at":"2026-08-11T10:17:54.361Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
