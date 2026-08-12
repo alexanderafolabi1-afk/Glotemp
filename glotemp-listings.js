@@ -17,58 +17,58 @@
     entertainment: {
       slots: 5, kind: 'event',
       eyebrow: 'Upcoming events',
-      emptyLabel: 'Event listing open',
-      cta: 'List your event',
-      modalTitle: 'List an event',
-      modalCopy: 'Tell us about an upcoming show, gig, or exhibition worth featuring here.',
+      emptyLabel: 'A place belongs here',
+      cta: 'Suggest an event',
+      modalTitle: 'Suggest an event',
+      modalCopy: 'Tell us about an upcoming show, gig, or exhibition that belongs in this city’s reading.',
     },
     food: {
       slots: 5, kind: 'recommendation',
       eyebrow: 'Where to eat',
-      emptyLabel: 'Local recommendation open',
-      cta: 'Nominate a place',
-      modalTitle: 'Nominate a place',
-      modalCopy: 'Tell us about a restaurant worth featuring here.',
+      emptyLabel: 'A place belongs here',
+      cta: 'Suggest a place',
+      modalTitle: 'Suggest a place',
+      modalCopy: 'Tell us about a restaurant that belongs in this city’s reading.',
     },
     property: {
       slots: 3, kind: 'partner',
-      eyebrow: 'Featured listings',
-      emptyLabel: 'Partner slot open',
-      cta: 'List your listing',
-      modalTitle: 'List your listing',
-      modalCopy: 'Tell us about a property listing or agency worth featuring here.',
+      eyebrow: 'Notable listings',
+      emptyLabel: 'A place belongs here',
+      cta: 'Suggest a listing',
+      modalTitle: 'Suggest a listing',
+      modalCopy: 'Tell us about a property listing or agency that belongs in this city’s reading.',
     },
     work: {
       slots: 3, kind: 'partner',
-      eyebrow: 'Featured employers',
-      emptyLabel: 'Partner slot open',
-      cta: 'Feature your company',
-      modalTitle: 'Feature your company',
-      modalCopy: 'Tell us about a company hiring here worth featuring.',
+      eyebrow: 'Notable employers',
+      emptyLabel: 'A place belongs here',
+      cta: 'Suggest a company',
+      modalTitle: 'Suggest a company',
+      modalCopy: 'Tell us about a company hiring here that belongs in this city’s reading.',
     },
     tech: {
       slots: 3, kind: 'partner',
-      eyebrow: 'Featured in tech',
-      emptyLabel: 'Partner slot open',
-      cta: 'Feature your company',
-      modalTitle: 'Feature your company',
-      modalCopy: 'Tell us about a startup, studio, or space worth featuring here.',
+      eyebrow: 'Notable in tech',
+      emptyLabel: 'A place belongs here',
+      cta: 'Suggest a company',
+      modalTitle: 'Suggest a company',
+      modalCopy: 'Tell us about a startup, studio, or space that belongs in this city’s reading.',
     },
     fashion: {
       slots: 3, kind: 'partner',
-      eyebrow: 'Featured brands',
-      emptyLabel: 'Partner slot open',
-      cta: 'Feature your brand',
-      modalTitle: 'Feature your brand',
-      modalCopy: 'Tell us about a designer, boutique, or label worth featuring here.',
+      eyebrow: 'Notable brands',
+      emptyLabel: 'A place belongs here',
+      cta: 'Suggest a brand',
+      modalTitle: 'Suggest a brand',
+      modalCopy: 'Tell us about a designer, boutique, or label that belongs in this city’s reading.',
     },
     transport: {
       slots: 3, kind: 'partner',
-      eyebrow: 'Featured services',
-      emptyLabel: 'Partner slot open',
-      cta: 'Feature your service',
-      modalTitle: 'Feature your service',
-      modalCopy: 'Tell us about a transport or mobility service worth featuring here.',
+      eyebrow: 'Notable services',
+      emptyLabel: 'A place belongs here',
+      cta: 'Suggest a service',
+      modalTitle: 'Suggest a service',
+      modalCopy: 'Tell us about a transport or mobility service that belongs in this city’s reading.',
     },
   };
 
@@ -149,13 +149,13 @@
     modalEl.id = 'nominate-overlay';
     modalEl.setAttribute('role', 'dialog');
     modalEl.setAttribute('aria-modal', 'true');
-    modalEl.setAttribute('aria-label', 'Nominate');
+    modalEl.setAttribute('aria-label', 'Suggest a place');
     modalEl.hidden = true;
     modalEl.innerHTML =
       '<div class="gt-auth-modal">' +
         '<button class="gt-auth-close" type="button" aria-label="Close">&#10005;</button>' +
-        '<p class="eyebrow">Nominate</p>' +
-        '<h2 class="gt-auth-title" id="nominate-title">Nominate</h2>' +
+        '<p class="eyebrow">Suggest</p>' +
+        '<h2 class="gt-auth-title" id="nominate-title">Suggest a place</h2>' +
         '<p class="gt-auth-copy" id="nominate-copy"></p>' +
         '<form class="gt-auth-email-form" id="nominate-form">' +
           '<label class="gt-auth-label" for="nominate-name-field">Name</label>' +
@@ -164,10 +164,10 @@
           '<textarea class="gt-auth-input nominate-textarea" id="nominate-desc-field" rows="3" maxlength="400"></textarea>' +
           '<label class="gt-auth-label" for="nominate-email-field">Your email (optional, in case we have questions)</label>' +
           '<input class="gt-auth-input" type="email" id="nominate-email-field" maxlength="160" autocomplete="email">' +
-          '<button class="btn-neon gt-auth-submit" type="submit">Submit nomination</button>' +
+          '<button class="btn-neon gt-auth-submit" type="submit">Submit suggestion</button>' +
         '</form>' +
         '<p class="gt-auth-status" id="nominate-status" role="status" aria-live="polite"></p>' +
-        '<p class="gt-auth-copy gt-auth-microcopy">Every nomination is reviewed before it goes live -- nothing appears automatically.</p>' +
+        '<p class="gt-auth-copy gt-auth-microcopy">Every suggestion is reviewed before it goes live -- nothing appears automatically, and nothing here is a paid or self-promoted listing.</p>' +
       '</div>';
     document.body.appendChild(modalEl);
     modalEl.querySelector('.gt-auth-close').addEventListener('click', closeModal);
