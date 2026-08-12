@@ -6323,14 +6323,18 @@ body > section {
   .check-in .mood-buttons { gap: 1.25rem; margin: 1.25rem 0 1.75rem; }
 }
 
-/* ===== SPONSOR STRIP (luxury register credit) ===== */
-/* A sponsorship credit, not a banner: the sponsor page of a fine magazine,
-   not an ad unit. Stillness reads as expensive -- no box, no fill, no
-   radius, no marquee, just brass hairlines and generous air. JS (see
-   glotemp-sponsor-strip.js) injects the link markup only when a placement
-   actually matches; the wrapper itself carries no border or padding, so an
-   empty/unmatched page collapses to zero height and leaves no gap. */
-.sponsor-strip-link {
+/* ===== CITY CREDIT (luxury register) ===== */
+/* A sponsorship credit, not a banner: the credits page of a fine
+   magazine, not an ad unit. Stillness reads as expensive -- no box, no
+   fill, no radius, no marquee, just brass hairlines and generous air.
+   JS (see glotemp-credits.js) injects the link markup only when a
+   placement actually matches; the wrapper itself carries no border or
+   padding, so an empty/unmatched page collapses to zero height and
+   leaves no gap. Named to avoid ad-blocker filter-list substrings
+   ("sponsor", "advertis-") in its id/class/table/URL -- those were
+   silently eating the element and its data request for anyone running
+   one. */
+.city-credit-link {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -6343,7 +6347,7 @@ body > section {
   color: inherit;
   transition: transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
-.sponsor-strip-kicker {
+.city-credit-kicker {
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
   text-transform: uppercase;
@@ -6356,26 +6360,26 @@ body > section {
    source file carries around its mark, centred, without ever touching the
    asset itself -- the right default for a logo mark generally, not just
    this one file. */
-.sponsor-strip-logo {
+.city-credit-logo {
   height: 32px;
   width: 32px;
   object-fit: cover;
   display: block;
   margin: 0.35rem 0;
 }
-.sponsor-strip-name {
+.city-credit-name {
   font-family: var(--font-display);
   font-weight: 300;
   font-size: 1.3rem;
   color: var(--ivory);
 }
-.sponsor-strip-tagline {
+.city-credit-tagline {
   font-family: var(--font-body);
   font-size: 0.95rem;
   color: var(--sand);
   max-width: 46ch;
 }
-.sponsor-strip-url {
+.city-credit-url {
   position: relative;
   display: inline-block;
   font-family: var(--font-mono);
@@ -6387,7 +6391,7 @@ body > section {
   padding-bottom: 4px;
   margin-top: 0.15rem;
 }
-.sponsor-strip-url::after {
+.city-credit-url::after {
   content: '';
   position: absolute;
   left: 50%;
@@ -6397,19 +6401,19 @@ body > section {
   background: var(--brass);
   transition: left var(--transition), right var(--transition);
 }
-.sponsor-strip-link:hover {
+.city-credit-link:hover {
   transform: translateY(-2px);
 }
-.sponsor-strip-link:hover .sponsor-strip-url::after {
+.city-credit-link:hover .city-credit-url::after {
   left: 0;
   right: 0;
 }
 @media (prefers-reduced-motion: reduce) {
-  .sponsor-strip-link,
-  .sponsor-strip-url::after {
+  .city-credit-link,
+  .city-credit-url::after {
     transition: none;
   }
-  .sponsor-strip-link:hover {
+  .city-credit-link:hover {
     transform: none;
   }
 }

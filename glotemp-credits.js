@@ -1,5 +1,5 @@
-// Glotemp sponsor strip: a sponsorship credit for the exact (city, vertical)
-// a page represents. RLS on `advertisers` already restricts the anon read to
+// Glotemp city credit: a sponsorship credit for the exact (city, vertical)
+// a page represents. RLS on `partners` already restricts the anon read to
 // active rows inside their flight window -- the client only has to match
 // city_slug/vertical, nothing else.
 (function () {
@@ -18,14 +18,14 @@
     return String(url || '').replace(/^https?:\/\//, '').replace(/\/$/, '');
   }
 
-  function render(container, ad) {
+  function render(container, row) {
     container.innerHTML = `
-      <a class="sponsor-strip-link" href="${esc(ad.url)}" target="_blank" rel="noopener sponsored" aria-label="Supported by ${esc(ad.name)}">
-        <span class="sponsor-strip-kicker">Supported by</span>
-        <img class="sponsor-strip-logo" src="${esc(ad.logo_path)}" alt="${esc(ad.name)}" height="32" loading="lazy">
-        <span class="sponsor-strip-name">${esc(ad.name)}</span>
-        ${ad.tagline ? `<span class="sponsor-strip-tagline">${esc(ad.tagline)}</span>` : ''}
-        <span class="sponsor-strip-url">${esc(displayUrl(ad.url))}</span>
+      <a class="city-credit-link" href="${esc(row.url)}" target="_blank" rel="noopener sponsored" aria-label="Supported by ${esc(row.name)}">
+        <span class="city-credit-kicker">Supported by</span>
+        <img class="city-credit-logo" src="${esc(row.logo_path)}" alt="${esc(row.name)}" height="32" loading="lazy">
+        <span class="city-credit-name">${esc(row.name)}</span>
+        ${row.tagline ? `<span class="city-credit-tagline">${esc(row.tagline)}</span>` : ''}
+        <span class="city-credit-url">${esc(displayUrl(row.url))}</span>
       </a>
     `;
   }
@@ -37,18 +37,18 @@
     if (!container) return;
     try {
       const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/advertisers?city_slug=eq.${encodeURIComponent(citySlug)}&vertical=eq.${encodeURIComponent(vertical)}&select=*`,
+        `${SUPABASE_URL}/rest/v1/partners?city_slug=eq.${encodeURIComponent(citySlug)}&vertical=eq.${encodeURIComponent(vertical)}&select=*`,
         { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
       );
       if (!response.ok) { container.innerHTML = ''; return; }
-      const ads = await response.json();
-      if (!ads.length) { container.innerHTML = ''; return; }
-      render(container, ads[Math.floor(Math.random() * ads.length)]);
+      const rows = await response.json();
+      if (!rows.length) { container.innerHTML = ''; return; }
+      render(container, rows[Math.floor(Math.random() * rows.length)]);
     } catch (error) {
-      console.error('Error loading sponsor strip:', error);
+      console.error('Error loading city credit:', error);
       container.innerHTML = '';
     }
   }
 
-  window.GlotempSponsorStrip = { mount };
+  window.GlotempCredits = { mount };
 })();
