@@ -67,10 +67,6 @@
     <section class="glass-card city-affiliate-row">
       <p class="eyebrow">Plan your visit</p>
       <div class="affiliate-links" id="city-affiliate-links"></div>
-      <div class="sponsor-slot">
-        <span class="sponsor-slot-tag">Featured by Glotemp</span>
-        <p class="sponsor-slot-copy">This placement is reserved for a local business, hotel, restaurant, or tourism board in <span id="sponsor-city-name">this city</span>. <a href="mailto:marketing@glo-temp.com" class="contact-link">Partner with this city &rarr;</a></p>
-      </div>
     </section>
 
     <!-- Live from Wikipedia: fetched client-side on load, never stored --
@@ -380,8 +376,6 @@
         document.getElementById('city-timezone').textContent = `📍 ${city.timezone}`;
         document.getElementById('city-penetration').textContent = `📡 ${(city.penetration * 100).toFixed(0)}% online`;
         document.getElementById('city-metro-pop').textContent = `👥 ${city.metro_pop.toLocaleString()} metro`;
-        const sponsorCityName = document.getElementById('sponsor-city-name');
-        if (sponsorCityName) sponsorCityName.textContent = city.name;
         if (typeof GlotempCore !== 'undefined') GlotempCore.applyMoodBackground(city.mood);
       }
 
@@ -589,7 +583,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"أحياء المدينة في حركة. يوم جمعة عادي.","language_lens":"local","created_at":"2026-08-11T08:31:11.514Z"},{"context":"Morocco Mall area Friday evening - modernity and tradition in balance.","language_lens":"visitor","created_at":"2026-08-11T13:31:11.514Z"}];
+      const checkins = [{"context":"أحياء المدينة في حركة. يوم جمعة عادي.","language_lens":"local","created_at":"2026-08-11T10:42:32.480Z"},{"context":"Morocco Mall area Friday evening - modernity and tradition in balance.","language_lens":"visitor","created_at":"2026-08-11T15:42:32.480Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
