@@ -816,7 +816,7 @@ main > .glass:first-child,
 
 .instrument-band-name {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.8rem;
   font-weight: var(--fw-medium);
   text-transform: uppercase;
   letter-spacing: 0.16em;
@@ -1169,7 +1169,7 @@ body.scroll-reveals-enabled section.revealed {
 .nav-tagline {
   display: none;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -1227,6 +1227,87 @@ body.scroll-reveals-enabled section.revealed {
 .nav-links a.active::after {
   right: 0;
   background: var(--ivory);
+}
+
+/* Account control: the one persistent sign-in entry point, always visible
+   in the nav rather than only surfacing contextually when an action
+   requires it. Styled as a quiet outlined pill so it reads as a distinct
+   control, not just another nav link. */
+.nav-account {
+  position: relative;
+  display: inline-block;
+  margin-left: 1.75rem;
+}
+.nav-account-btn {
+  margin-left: 0 !important;
+  padding: 0.35rem 0.85rem !important;
+  border: 1px solid var(--brass-dim);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  max-width: 11rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nav-account-btn:hover,
+.nav-account-btn[aria-expanded="true"] {
+  color: var(--ivory);
+  border-color: var(--brass);
+}
+.nav-account-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 40;
+  background: var(--basalt-raised);
+  border: 1px solid var(--brass-dim);
+  border-radius: 10px;
+  padding: 0.4rem;
+  min-width: 9rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+}
+.nav-account-signout {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--sand);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  text-transform: none;
+  letter-spacing: normal;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.nav-account-signout:hover {
+  background: rgba(176, 141, 87, 0.16);
+  color: var(--ivory);
+}
+
+/* Mobile panel: full-width like the language switch, sitting under the
+   stacked nav links rather than floating a dropdown over a full-screen
+   panel. */
+.nav-panel .nav-account {
+  margin: 1.5rem 0 0;
+  display: block;
+  width: 100%;
+  max-width: 220px;
+}
+.nav-panel .nav-account-btn {
+  width: 100%;
+  max-width: none;
+  font-size: 16px;
+  padding: 0.6rem 1rem !important;
+}
+.nav-panel .nav-account-menu {
+  position: static;
+  margin-top: 0.5rem;
+  box-shadow: none;
+  width: 100%;
 }
 
 .btn-icon {
@@ -1320,7 +1401,8 @@ a:focus,
 button:focus,
 input:focus,
 select:focus,
-textarea:focus {
+textarea:focus,
+summary:focus {
   outline: 2px solid var(--ion);
   outline-offset: 2px;
 }
@@ -1329,7 +1411,8 @@ a:focus:not(:focus-visible),
 button:focus:not(:focus-visible),
 input:focus:not(:focus-visible),
 select:focus:not(:focus-visible),
-textarea:focus:not(:focus-visible) {
+textarea:focus:not(:focus-visible),
+summary:focus:not(:focus-visible) {
   outline: none;
 }
 
@@ -1726,7 +1809,7 @@ textarea:focus:not(:focus-visible) {
 }
 
 .blog-card-date {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: rgba(156, 153, 171, 0.6);
   margin-top: 0.2rem;
   font-family: var(--font-mono);
@@ -1848,7 +1931,7 @@ textarea:focus:not(:focus-visible) {
 
 .eyebrow {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.2em;
@@ -1911,6 +1994,7 @@ textarea:focus:not(:focus-visible) {
   font-weight: var(--fw-light);
 }
 .mood-btn-icon {
+  position: relative;
   font-size: 1.3rem;
   line-height: 1;
   width: 32px;
@@ -1930,11 +2014,30 @@ textarea:focus:not(:focus-visible) {
   filter: saturate(0.92) contrast(1.05);
   transition: transform var(--transition), filter var(--transition), box-shadow var(--transition);
 }
+/* The photo alone (Fog, Thunderstorm, Golden hour...) doesn't obviously
+   read as a mood to a first-time visitor -- the emoji is what actually
+   carries the meaning, so it rides along as a small badge on the photo
+   rather than being dropped for the sake of visual polish. */
+.mood-btn-emoji-badge {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  font-size: 0.75rem;
+  line-height: 1;
+  width: 15px;
+  height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--obsidian);
+  border: 1px solid var(--brass-dim);
+  border-radius: 50%;
+}
 .mood-btn:hover .mood-btn-photo { transform: scale(1.08); filter: saturate(1.05) contrast(1.1); }
 .mood-btn.active .mood-btn-photo { box-shadow: 0 0 0 2px var(--brass); }
 .mood-btn-label {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.65rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -2112,7 +2215,7 @@ textarea:focus:not(:focus-visible) {
 
 .obs-sentiment {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--ash);
@@ -2147,13 +2250,13 @@ textarea:focus:not(:focus-visible) {
 
 .obs-time {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: var(--ash);
 }
 
 .obs-intensity {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   background: rgba(240, 224, 200, 0.08);
   padding: 0.25rem 0.5rem;
   border-radius: 12px;
@@ -2418,7 +2521,7 @@ textarea:focus:not(:focus-visible) {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   color: var(--ember);
   font-weight: var(--fw-medium);
   letter-spacing: 1px;
@@ -2811,7 +2914,7 @@ small {
     font-size: 1.15rem;
   }
   .mood-btn-label {
-    font-size: 0.58rem;
+    font-size: 0.75rem;
   }
 
   .form-grid {
@@ -2846,7 +2949,7 @@ small {
   }
 
   .bar-chart-label {
-    font-size: 0.65rem;
+    font-size: 0.8rem;
   }
 }
 
@@ -2858,7 +2961,7 @@ small {
     font-size: 1.05rem;
   }
   .mood-btn-label {
-    font-size: 0.55rem;
+    font-size: 0.75rem;
   }
 
   .form-grid {
@@ -3069,7 +3172,8 @@ a:focus,
 button:focus,
 input:focus,
 select:focus,
-textarea:focus {
+textarea:focus,
+summary:focus {
   outline: 2px solid var(--ion);
   outline-offset: 2px;
 }
@@ -3078,7 +3182,8 @@ a:focus:not(:focus-visible),
 button:focus:not(:focus-visible),
 input:focus:not(:focus-visible),
 select:focus:not(:focus-visible),
-textarea:focus:not(:focus-visible) {
+textarea:focus:not(:focus-visible),
+summary:focus:not(:focus-visible) {
   outline: none;
 }
 
@@ -3180,7 +3285,7 @@ button:hover:not(:focus-visible) {
 .stat-label {
   font-family: var(--font-mono);
   color: var(--ash);
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -3391,7 +3496,7 @@ button:hover:not(:focus-visible) {
 }
 
 .score-label {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: var(--ash);
 }
 
@@ -3590,13 +3695,52 @@ a:hover .city-landmark-photo,
 }
 
 .vertical-section {
-  padding: 1.5rem;
+  padding: 0;
   margin-bottom: 1.25rem;
 }
 
 .vertical-section h2 {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
   color: var(--ivory);
+}
+
+/* Accordion: collapsible native <details>/<summary> instead of 13
+   sections spread down the page -- expand/collapse, keyboard operation
+   (Enter/Space) and screen-reader semantics all come from the browser for
+   free. The default disclosure triangle is stripped and replaced with a
+   plain "+" that rotates into a "x" on open -- same quiet typographic
+   language as the rest of the site, no icon font. */
+.vertical-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem;
+  cursor: pointer;
+  list-style: none;
+  transition: background var(--transition);
+}
+.vertical-summary::-webkit-details-marker { display: none; }
+.vertical-summary::marker { content: ''; }
+.vertical-summary:hover { background: rgba(176, 141, 87, 0.08); }
+.vertical-summary::after {
+  content: '+';
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  color: var(--brass);
+  transition: transform 200ms ease;
+}
+.vertical-section[open] > .vertical-summary::after {
+  transform: rotate(45deg);
+}
+.vertical-body {
+  padding: 0 1.5rem 1.5rem;
 }
 
 .vertical-description {
@@ -3666,7 +3810,7 @@ a:hover .city-landmark-photo,
 }
 
 .instrument-value-compact {
-  font-size: 0.74rem;
+  font-size: 0.85rem;
   letter-spacing: -0.02em;
 }
 
@@ -3679,7 +3823,7 @@ a:hover .city-landmark-photo,
 
 .instrument-time {
   margin-top: 0.25rem;
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   color: var(--sand);
   opacity: 0.6;
   white-space: nowrap;
@@ -3712,7 +3856,7 @@ a:hover .city-landmark-photo,
    reduced-motion override already in place. */
 .empty-state .empty-state-cta {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--band-warm);
@@ -3736,7 +3880,7 @@ a:hover .city-landmark-photo,
 }
 .vertical-content--secondary .empty-state p {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   color: var(--sand);
   display: inline;
   margin: 0;
@@ -3762,7 +3906,7 @@ a:hover .city-landmark-photo,
 .context-tag {
   display: block;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--sand);
@@ -3786,7 +3930,7 @@ a:hover .city-landmark-photo,
 .listings-eyebrow {
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   letter-spacing: 0.05em;
   color: var(--brass);
   margin-bottom: 1rem;
@@ -3813,7 +3957,7 @@ a:hover .city-landmark-photo,
 .listing-title a:hover { border-color: var(--brass); color: var(--brass); }
 .listing-date {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: var(--sand);
   white-space: nowrap;
 }
@@ -3845,7 +3989,7 @@ a:hover .city-landmark-photo,
 }
 .listing-open-cta {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   color: var(--brass);
   white-space: nowrap;
   transition: color var(--transition);
@@ -3877,7 +4021,7 @@ a:hover .city-landmark-photo,
 .sport-form {
   margin-top: 0.35rem;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   letter-spacing: 0.15em;
 }
 .sport-form span { margin-right: 0.35rem; }
@@ -3895,7 +4039,7 @@ a:hover .city-landmark-photo,
 }
 .sport-live-tag {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--brass);
@@ -3903,7 +4047,7 @@ a:hover .city-landmark-photo,
 }
 .sport-live-date {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: var(--sand);
   opacity: 0.75;
   white-space: nowrap;
@@ -3942,7 +4086,7 @@ a:hover .city-landmark-photo,
   font-family: var(--cloud-font, Quicksand), sans-serif;
   font-weight: 600;
   font-style: normal;
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   letter-spacing: 0.01em;
   color: #7A6650;
   margin: 0 0 0.45rem;
@@ -3970,7 +4114,7 @@ a:hover .city-landmark-photo,
   border: none;
   border-radius: 50%;
   color: #6B5643;
-  font-size: 0.76rem;
+  font-size: 0.85rem;
   line-height: 1;
   cursor: pointer;
   opacity: 0.6;
@@ -4004,7 +4148,7 @@ a:hover .city-landmark-photo,
   display: block;
   margin-top: 0.3rem;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   color: var(--sand);
 }
 
@@ -4054,7 +4198,7 @@ a:hover .city-landmark-photo,
   flex: none;
   width: 1.4rem;
   text-align: center;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: var(--brass);
 }
 .radio-station.is-playing .radio-station-play { color: var(--band-warm); }
@@ -4067,7 +4211,7 @@ a:hover .city-landmark-photo,
 .radio-station-tag {
   flex: none;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--sand);
@@ -4076,7 +4220,7 @@ a:hover .city-landmark-photo,
 .radio-attribution {
   margin-top: 1rem;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   color: var(--sand);
 }
 
@@ -4395,7 +4539,7 @@ a:hover .city-landmark-photo,
 .wiki-attribution {
   margin-top: 1rem;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   color: var(--sand);
 }
 @media (max-width: 600px) {
@@ -4586,7 +4730,7 @@ a:hover .city-landmark-photo,
   color: var(--sand);
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
 }
 .gt-auth-divider::before,
 .gt-auth-divider::after {
@@ -4601,7 +4745,7 @@ a:hover .city-landmark-photo,
 .gt-auth-label {
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   letter-spacing: 0.04em;
   color: var(--sand);
   margin-top: 0.35rem;
@@ -4627,7 +4771,7 @@ a:hover .city-landmark-photo,
   margin-top: 0.85rem;
   min-height: 1.2em;
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   color: var(--sand);
 }
 
@@ -4719,7 +4863,7 @@ a:hover .city-landmark-photo,
   gap: 0.4rem;
   color: var(--brass);
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   letter-spacing: 0.03em;
   opacity: 0.9;
   margin-bottom: 1.5rem;
@@ -4774,7 +4918,7 @@ a:hover .city-landmark-photo,
    underline as the check-in eyebrow so both read as one visual language. */
 .city-live-badge {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -4831,7 +4975,7 @@ a:hover .city-landmark-photo,
   display: block;
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   letter-spacing: 0.04em;
   color: var(--sand);
   margin-bottom: 0.4rem;
@@ -4859,7 +5003,7 @@ a:hover .city-landmark-photo,
 .checkin-preview-label {
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   letter-spacing: 0.04em;
   color: var(--sand);
   margin-bottom: 0.4rem;
@@ -4880,7 +5024,7 @@ a:hover .city-landmark-photo,
 .checkin-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .checkin-status {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   color: var(--sand);
   min-height: 1.2em;
 }
@@ -4930,13 +5074,13 @@ a:hover .city-landmark-photo,
 .checkin-item-mode {
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   letter-spacing: 0.06em;
   color: var(--brass);
 }
 .checkin-item-intensity {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   color: var(--sand);
 }
 .checkin-item-note {
@@ -4948,7 +5092,7 @@ a:hover .city-landmark-photo,
 }
 .checkin-item-time {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   color: var(--sand);
 }
 
@@ -5018,11 +5162,11 @@ a:hover .city-landmark-photo,
   font-size: 1.3rem;
   color: var(--tonight-band, var(--ivory));
 }
-.tonight-of { font-size: 0.72rem; color: var(--sand); margin-left: 1px; }
+.tonight-of { font-size: 0.82rem; color: var(--sand); margin-left: 1px; }
 .tonight-mode-status {
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: var(--sand);
 }
 .tonight-mode-blurb {
@@ -5035,7 +5179,7 @@ a:hover .city-landmark-photo,
 .tonight-curve { display: block; width: 100%; height: 56px; margin-bottom: 0.6rem; }
 .tonight-now {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   color: var(--sand);
   margin-bottom: 0.35rem;
   max-width: none;
@@ -5043,7 +5187,7 @@ a:hover .city-landmark-photo,
 .tonight-now strong { color: var(--tonight-band, var(--ivory)); }
 .tonight-facts {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   color: var(--sand);
   line-height: 1.5;
   margin-bottom: 0.35rem;
@@ -5051,7 +5195,7 @@ a:hover .city-landmark-photo,
 }
 .tonight-prov {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   color: var(--sand);
   line-height: 1.45;
   max-width: none;
@@ -5252,7 +5396,7 @@ a:hover .city-landmark-photo,
 .eclipse-note-eyebrow {
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   letter-spacing: 0.09em;
   color: var(--brass);
 }
@@ -5767,14 +5911,14 @@ a:hover .city-landmark-photo,
 .spin-aff-kind {
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   color: var(--brass);
   letter-spacing: 0.06em;
 }
 .spin-prov {
   margin-top: 0.9rem;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   color: var(--sand);
   min-height: 1.2em;
   max-width: none;
@@ -5854,7 +5998,7 @@ time, .instr-clock, .tonight-modelled {
   color: var(--sand);
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
-  font-size: 11px;
+  font-size: 13px;
   padding: 0 0 2px;
   cursor: pointer;
   min-height: 24px;
@@ -5875,14 +6019,14 @@ time, .instr-clock, .tonight-modelled {
 .obs-row:first-child { border-top: none; }
 .obs-head { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; margin-bottom: 0.3rem; }
 .obs-city { font-family: var(--font-display); font-size: 1rem; color: var(--obs-band, var(--ivory)); }
-.obs-meta { font-size: 0.72rem; color: var(--sand); letter-spacing: 0.05em; }
-.obs-intensity { font-size: 0.72rem; color: var(--obs-band, var(--sand)); }
+.obs-meta { font-size: 0.82rem; color: var(--sand); letter-spacing: 0.05em; }
+.obs-intensity { font-size: 0.82rem; color: var(--obs-band, var(--sand)); }
 .obs-text { color: var(--sand); font-size: 0.94rem; line-height: 1.6; max-width: 68ch; }
 
 /* ===== SPARKLINES ===== */
 .sparkline { display: block; width: 100%; height: 22px; margin-top: 0.45rem; overflow: visible; }
 .sparkline-label {
-  font-size: 0.68rem; color: var(--sand);
+  font-size: 0.8rem; color: var(--sand);
   letter-spacing: 0.06em; margin-top: 0.15rem; display: block;
 }
 
@@ -5893,7 +6037,7 @@ time, .instr-clock, .tonight-modelled {
   min-height: 58px;
 }
 .sun-item { display: flex; align-items: center; gap: 0.55rem; }
-.sun-label { font-family: var(--font-mono); font-variant-caps: small-caps; font-size: 0.72rem; color: var(--sand); letter-spacing: 0.06em; }
+.sun-label { font-family: var(--font-mono); font-variant-caps: small-caps; font-size: 0.82rem; color: var(--sand); letter-spacing: 0.06em; }
 .sun-time { font-size: 1rem; color: var(--ivory); }
 
 /* ===== RIVALS ===== */
@@ -5904,7 +6048,7 @@ time, .instr-clock, .tonight-modelled {
 .rival-city { font-size: 1.15rem; color: var(--ivory); }
 .rival-reading { font-family: var(--font-mono); font-size: 1.35rem; color: var(--rival-band, var(--ivory)); }
 .rival-vs { font-family: var(--font-mono); font-variant-caps: small-caps; font-size: 0.8rem; color: var(--brass); }
-.rival-verdict { font-family: var(--font-mono); font-size: 0.78rem; color: var(--sand); margin-top: 0.9rem; }
+.rival-verdict { font-family: var(--font-mono); font-size: 0.88rem; color: var(--sand); margin-top: 0.9rem; }
 
 /* ===== EMPTY STATES THAT RECRUIT ===== */
 .empty-recruit {
@@ -5960,7 +6104,7 @@ time, .instr-clock, .tonight-modelled {
   display: block;
   margin-top: 0.4rem;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--trip-band, var(--sand));
@@ -6013,7 +6157,7 @@ time, .instr-clock, .tonight-modelled {
 .instrument-slot { width: 118px !important; padding: 0.6rem 0.4rem 0.9rem !important; background: transparent !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; }
 .instrument-visual { max-width: 84px !important; border-radius: 6px; }
 .instrument-city-name { font-size: 0.82rem; min-height: 2.2em; }
-.instrument-band-name { font-size: 0.58rem; }
+.instrument-band-name { font-size: 0.75rem; }
 .instrument-images { gap: 10px !important; }
 
 /* More air between sections, less inside them. */
@@ -6068,7 +6212,7 @@ time, .instr-clock, .tonight-modelled {
 .spin-dial { width: clamp(88px, 14vw, 116px); }
 .spin-title { font-size: clamp(17px, 1.9vw, 22px); margin-bottom: 0.5rem; }
 .spin-variants { margin-bottom: 0.6rem; gap: 0.35rem; }
-.spin-variant { min-height: 32px; padding: 0.2rem 0.15rem; font-size: 0.7rem; }
+.spin-variant { min-height: 32px; padding: 0.2rem 0.15rem; font-size: 0.8rem; }
 .spin-stage { gap: 0.5rem; }
 .spin-go { min-height: 38px; padding: 0.45rem 1.4rem; font-size: 0.85rem; }
 .spin-sentence { font-size: clamp(13px, 1.4vw, 16px); margin-top: 0.6rem; min-height: 4.2em; }
@@ -6276,7 +6420,7 @@ body > section {
   display: inline-flex; align-items: center; justify-content: center;
   width: 22px; height: 22px; flex-shrink: 0;
   border: 1px solid var(--brass-dim); border-radius: 50%;
-  font-family: var(--font-mono); font-size: 0.72rem; color: var(--brass);
+  font-family: var(--font-mono); font-size: 0.82rem; color: var(--brass);
   transition: color var(--transition), border-color var(--transition);
 }
 .checkin-step-head.is-done .checkin-step-num { color: var(--ivory); border-color: var(--ivory); }
@@ -6285,7 +6429,7 @@ body > section {
   font-size: 0.82rem; letter-spacing: 0.07em; color: var(--sand);
 }
 .checkin-step-head.is-done .checkin-step-title { color: var(--ivory); }
-.checkin-optional { font-size: 0.72rem; opacity: 0.6; letter-spacing: 0.04em; }
+.checkin-optional { font-size: 0.82rem; opacity: 0.6; letter-spacing: 0.04em; }
 .checkin-insignia-mark { width: 22px; height: 22px; color: var(--brass); }
 
 /* accent-color only recolours the default widget; the track and thumb were
@@ -6381,7 +6525,7 @@ body > section {
 .city-tile-state {
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   letter-spacing: 0.07em;
   color: var(--sand);
   opacity: 0.6;
@@ -6422,7 +6566,7 @@ body > section {
 .check-in .observation-form .full-width > span {
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
-  font-size: 0.74rem;
+  font-size: 0.85rem;
   letter-spacing: 0.06em;
   color: var(--sand);
   opacity: 0.8;
@@ -6490,7 +6634,7 @@ body > section {
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
   text-transform: uppercase;
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   letter-spacing: 0.22em;
   color: var(--sand);
   opacity: 0.85;
@@ -6524,7 +6668,7 @@ body > section {
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
   text-transform: uppercase;
-  font-size: 0.76rem;
+  font-size: 0.85rem;
   letter-spacing: 0.12em;
   color: var(--sand);
   padding-bottom: 4px;

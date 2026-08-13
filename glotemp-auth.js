@@ -296,7 +296,21 @@
       headers: { apikey: SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, create_user: true, redirect_to: redirect }),
     });
-    if (!resp.ok) throw new Error('email sign-in failed: ' + resp.status);
+    if (!resp.ok) {
+      // A rate-limit response here almost always means an earlier request
+      // for the same email already went through server-side (most often a
+      // double tap on the submit button, or a slow connection making a
+      // visitor tap again before anything on screen changed) -- GoTrue's
+      // per-address send limit is what's blocking the SECOND request, not
+      // evidence that no email was ever sent. Surfacing that distinction
+      // to the caller means the UI can tell the truth instead of reporting
+      // a hard failure while an email is genuinely on its way.
+      let code = null;
+      try { code = (await resp.json()).error_code || null; } catch (e) { /* no JSON body */ }
+      const err = new Error('email sign-in failed: ' + resp.status);
+      err.rateLimited = resp.status === 429 || code === 'over_email_send_rate_limit';
+      throw err;
+    }
     return true;
   }
 
@@ -359,14 +373,20 @@
     modalEl.querySelector('#gt-auth-email-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const statusEl = modalEl.querySelector('#gt-auth-status');
+      const submitBtn = modalEl.querySelector('.gt-auth-submit');
       const email = modalEl.querySelector('#gt-auth-email').value.trim();
-      if (!email) return;
+      if (!email || submitBtn.disabled) return;
       statusEl.textContent = 'Sending…';
+      submitBtn.disabled = true;
       try {
         await signInWithEmail(email);
         statusEl.textContent = 'Check your inbox for a sign-in link.';
       } catch (err) {
-        statusEl.textContent = 'Could not send that link. Try again shortly.';
+        statusEl.textContent = err && err.rateLimited
+          ? "A link is already on its way to that address -- check your inbox (it can take a minute to arrive)."
+          : 'Could not send that link. Try again shortly.';
+      } finally {
+        submitBtn.disabled = false;
       }
     });
 

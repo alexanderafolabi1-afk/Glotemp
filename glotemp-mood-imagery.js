@@ -74,6 +74,7 @@
       // markup so a load failure restores it instead of leaving the
       // button blank.
       const fallbackHTML = iconEl.innerHTML;
+      const emoji = btn.getAttribute('data-mood') || '';
       const img = document.createElement('img');
       img.src = src;
       img.alt = '';
@@ -84,6 +85,19 @@
       img.onerror = () => { iconEl.innerHTML = fallbackHTML; };
       iconEl.innerHTML = '';
       iconEl.appendChild(img);
+      // A real photo (Fog, Thunderstorm, Golden hour...) reads as an
+      // arbitrary thumbnail on its own -- what actually communicates the
+      // mood is the original emoji, so it stays as a small badge on the
+      // photo rather than being dropped entirely. Photo for visual
+      // richness, emoji for instant meaning; the text label underneath
+      // backs both up.
+      if (emoji) {
+        const badge = document.createElement('span');
+        badge.className = 'mood-btn-emoji-badge';
+        badge.setAttribute('aria-hidden', 'true');
+        badge.textContent = emoji;
+        iconEl.appendChild(badge);
+      }
     }));
   }
 

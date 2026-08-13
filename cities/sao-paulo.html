@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&family=Fredoka:wght@400..600&family=Baloo+2:wght@400..600&family=Quicksand:wght@400..600&family=Comfortaa:wght@400..600&family=Varela+Round&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=54">
+  <link rel="stylesheet" href="/styles.css?v=56">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -100,159 +100,185 @@
 
     
     <!-- 💓 Pulse Vertical -->
-    <section id="pulse" class="vertical-section glass-card">
-      <h2>💓 Pulse</h2>
-      <p class="vertical-description">How does this city feel right now?</p>
-      <div id="pulse-content" class="vertical-content"></div>
-      <div id="pulse-context" class="vertical-context"></div>
-      
-      
-      <div id="city-credit-pulse"></div>
-    </section>
+    <details id="pulse" class="vertical-section glass-card" open>
+      <summary class="vertical-summary"><h2>💓 Pulse</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">How does this city feel right now?</p>
+        <div id="pulse-content" class="vertical-content"></div>
+        <div id="pulse-context" class="vertical-context"></div>
+        
+        
+        <div id="city-credit-pulse"></div>
+      </div>
+    </details>
   
 
     <!-- 💻 Tech Vertical -->
-    <section id="tech" class="vertical-section glass-card">
-      <h2>💻 Tech</h2>
-      <p class="vertical-description">Should I build or work here?</p>
-      <div id="tech-content" class="vertical-content"></div>
-      <div id="tech-context" class="vertical-context"></div>
-      
-      <div class="vertical-listings" data-city="sao-paulo" data-vertical="tech"></div>
-      <div id="city-credit-tech"></div>
-    </section>
+    <details id="tech" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>💻 Tech</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Should I build or work here?</p>
+        <div id="tech-content" class="vertical-content"></div>
+        <div id="tech-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="sao-paulo" data-vertical="tech"></div>
+        <div id="city-credit-tech"></div>
+      </div>
+    </details>
   
 
     <!-- 💰 Finance Vertical -->
-    <section id="finance" class="vertical-section glass-card">
-      <h2>💰 Finance</h2>
-      <p class="vertical-description">Should I invest or trade here?</p>
-      <div id="finance-content" class="vertical-content"></div>
-      <div id="finance-context" class="vertical-context"></div>
-      
-      <div class="vertical-listings" data-city="sao-paulo" data-vertical="finance"></div>
-      <div id="city-credit-finance"></div>
-    </section>
+    <details id="finance" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>💰 Finance</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Should I invest or trade here?</p>
+        <div id="finance-content" class="vertical-content"></div>
+        <div id="finance-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="sao-paulo" data-vertical="finance"></div>
+        <div id="city-credit-finance"></div>
+      </div>
+    </details>
   
 
     <!-- 💼 Work Vertical -->
-    <section id="work" class="vertical-section glass-card">
-      <h2>💼 Work</h2>
-      <p class="vertical-description">Where should you work and live?</p>
-      <div id="work-content" class="vertical-content"></div>
-      <div id="work-context" class="vertical-context"></div>
-      
-      <div class="vertical-listings" data-city="sao-paulo" data-vertical="work"></div>
-      <div id="city-credit-work"></div>
-    </section>
+    <details id="work" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>💼 Work</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Where should you work and live?</p>
+        <div id="work-content" class="vertical-content"></div>
+        <div id="work-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="sao-paulo" data-vertical="work"></div>
+        <div id="city-credit-work"></div>
+      </div>
+    </details>
   
 
     <!-- 🏠 Property Vertical -->
-    <section id="property" class="vertical-section glass-card">
-      <h2>🏠 Property</h2>
-      <p class="vertical-description">Where should you invest in real estate?</p>
-      <div id="property-content" class="vertical-content"></div>
-      <div id="property-context" class="vertical-context"></div>
-      
-      <div class="vertical-listings" data-city="sao-paulo" data-vertical="property"></div>
-      <div id="city-credit-property"></div>
-    </section>
+    <details id="property" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>🏠 Property</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Where should you invest in real estate?</p>
+        <div id="property-content" class="vertical-content"></div>
+        <div id="property-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="sao-paulo" data-vertical="property"></div>
+        <div id="city-credit-property"></div>
+      </div>
+    </details>
   
 
     <!-- 🎓 Education Vertical -->
-    <section id="education" class="vertical-section glass-card">
-      <h2>🎓 Education</h2>
-      <p class="vertical-description">Where should you study?</p>
-      <div id="education-content" class="vertical-content"></div>
-      <div id="education-context" class="vertical-context"></div>
-      
-      <div class="vertical-listings" data-city="sao-paulo" data-vertical="education"></div>
-      <div id="city-credit-education"></div>
-    </section>
+    <details id="education" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>🎓 Education</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Where should you study?</p>
+        <div id="education-content" class="vertical-content"></div>
+        <div id="education-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="sao-paulo" data-vertical="education"></div>
+        <div id="city-credit-education"></div>
+      </div>
+    </details>
   
 
     <!-- ⚽ Sport Vertical -->
-    <section id="sport" class="vertical-section glass-card">
-      <h2>⚽ Sport</h2>
-      <p class="vertical-description">Where should you play and watch sports?</p>
-      <div id="sport-content" class="vertical-content"></div>
-      <div id="sport-context" class="vertical-context"></div>
-      <div id="sport-live" class="sport-live" data-city="sao-paulo" data-city-name="São Paulo" data-country="Brazil"></div>
-      
-      <div id="city-credit-sport"></div>
-    </section>
+    <details id="sport" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>⚽ Sport</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Where should you play and watch sports?</p>
+        <div id="sport-content" class="vertical-content"></div>
+        <div id="sport-context" class="vertical-context"></div>
+        <div id="sport-live" class="sport-live" data-city="sao-paulo" data-city-name="São Paulo" data-country="Brazil"></div>
+        
+        <div id="city-credit-sport"></div>
+      </div>
+    </details>
   
 
     <!-- 🎭 Entertainment Vertical -->
-    <section id="entertainment" class="vertical-section glass-card">
-      <h2>🎭 Entertainment</h2>
-      <p class="vertical-description">Where should you experience culture and nightlife?</p>
-      <div id="entertainment-content" class="vertical-content"></div>
-      <div id="entertainment-context" class="vertical-context"></div>
-      
-      <div class="vertical-listings" data-city="sao-paulo" data-vertical="entertainment"></div>
-      <div id="city-credit-entertainment"></div>
-    </section>
+    <details id="entertainment" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>🎭 Entertainment</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Where should you experience culture and nightlife?</p>
+        <div id="entertainment-content" class="vertical-content"></div>
+        <div id="entertainment-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="sao-paulo" data-vertical="entertainment"></div>
+        <div id="city-credit-entertainment"></div>
+      </div>
+    </details>
   
 
     <!-- 👗 Fashion Vertical -->
-    <section id="fashion" class="vertical-section glass-card">
-      <h2>👗 Fashion</h2>
-      <p class="vertical-description">Where is the center of global style?</p>
-      <div id="fashion-content" class="vertical-content"></div>
-      <div id="fashion-context" class="vertical-context"></div>
-      
-      <div class="vertical-listings" data-city="sao-paulo" data-vertical="fashion"></div>
-      <div id="city-credit-fashion"></div>
-    </section>
+    <details id="fashion" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>👗 Fashion</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Where is the center of global style?</p>
+        <div id="fashion-content" class="vertical-content"></div>
+        <div id="fashion-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="sao-paulo" data-vertical="fashion"></div>
+        <div id="city-credit-fashion"></div>
+      </div>
+    </details>
   
 
     <!-- 🍽️ Food Vertical -->
-    <section id="food" class="vertical-section glass-card">
-      <h2>🍽️ Food</h2>
-      <p class="vertical-description">Where should you eat and explore cuisine?</p>
-      <div id="food-content" class="vertical-content"></div>
-      <div id="food-context" class="vertical-context"></div>
-      
-      <div class="vertical-listings" data-city="sao-paulo" data-vertical="food"></div>
-      <div id="city-credit-food"></div>
-    </section>
+    <details id="food" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>🍽️ Food</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Where should you eat and explore cuisine?</p>
+        <div id="food-content" class="vertical-content"></div>
+        <div id="food-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="sao-paulo" data-vertical="food"></div>
+        <div id="city-credit-food"></div>
+      </div>
+    </details>
   
 
     <!-- 🩺 Health Vertical -->
-    <section id="health" class="vertical-section glass-card">
-      <h2>🩺 Health</h2>
-      <p class="vertical-description">Where is it healthiest to live?</p>
-      <div id="health-content" class="vertical-content"></div>
-      <div id="health-context" class="vertical-context"></div>
-      
-      <div class="vertical-listings" data-city="sao-paulo" data-vertical="health"></div>
-      <div id="city-credit-health"></div>
-    </section>
+    <details id="health" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>🩺 Health</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Where is it healthiest to live?</p>
+        <div id="health-content" class="vertical-content"></div>
+        <div id="health-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="sao-paulo" data-vertical="health"></div>
+        <div id="city-credit-health"></div>
+      </div>
+    </details>
   
 
     <!-- 🚇 Transport Vertical -->
-    <section id="transport" class="vertical-section glass-card">
-      <h2>🚇 Transport</h2>
-      <p class="vertical-description">Which cities have the best mobility?</p>
-      <div id="transport-content" class="vertical-content"></div>
-      <div id="transport-context" class="vertical-context"></div>
-      
-      <div class="vertical-listings" data-city="sao-paulo" data-vertical="transport"></div>
-      <div id="city-credit-transport"></div>
-    </section>
+    <details id="transport" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>🚇 Transport</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Which cities have the best mobility?</p>
+        <div id="transport-content" class="vertical-content"></div>
+        <div id="transport-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="sao-paulo" data-vertical="transport"></div>
+        <div id="city-credit-transport"></div>
+      </div>
+    </details>
   
 
     <!-- 📻 Radio Vertical -->
-    <section id="radio" class="vertical-section glass-card">
-      <h2>📻 Radio</h2>
-      <p class="vertical-description">What is this city listening to right now?</p>
-      <div id="radio-content" class="vertical-content"></div>
-      <div id="radio-context" class="vertical-context"></div>
-      
-      
-      <div id="city-credit-radio"></div>
-    </section>
+    <details id="radio" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>📻 Radio</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">What is this city listening to right now?</p>
+        <div id="radio-content" class="vertical-content"></div>
+        <div id="radio-context" class="vertical-context"></div>
+        
+        
+        <div id="city-credit-radio"></div>
+      </div>
+    </details>
   
     <!-- Compare Section -->
     <section class="compare-section glass-card">
@@ -298,6 +324,7 @@
   <script src="/city-worldbank.js" defer></script>
   <script src="/city-radio.js" defer></script>
   <script src="/city-conditions.js" defer></script>
+  <script src="/verticals-accordion.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
   
@@ -641,7 +668,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Paulistanos nas ruas do Ibirapuera - domingo tranquilo.","language_lens":"local","created_at":"2026-08-12T15:41:07.944Z"},{"context":"Vila Madalena à noite - arte, música, vida urbana plena.","language_lens":"local","created_at":"2026-08-12T07:41:07.944Z"}];
+      const checkins = [{"context":"Paulistanos nas ruas do Ibirapuera - domingo tranquilo.","language_lens":"local","created_at":"2026-08-12T20:02:59.073Z"},{"context":"Vila Madalena à noite - arte, música, vida urbana plena.","language_lens":"local","created_at":"2026-08-12T12:02:59.073Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');
