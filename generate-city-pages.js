@@ -85,18 +85,29 @@ function generateVerticalNav() {
 // pure-reading verticals -- untouched.
 const LISTINGS_VERTICALS = new Set(['entertainment', 'fashion', 'food', 'property', 'work', 'tech', 'transport', 'finance', 'education', 'health']);
 
+// Collapsible accordion, not 13 stacked sections spread down the page --
+// native <details>/<summary> so expand/collapse, keyboard operation, and
+// screen-reader semantics all come free instead of a hand-rolled JS
+// toggle. Pulse opens by default (it's the page's primary reading);
+// everything else starts closed so the page reads as a compact index
+// first, an "open what you care about" list, not a wall of content.
+// Modern browsers additionally auto-expand whichever <details> a URL
+// fragment targets; verticals-accordion.js is the click-time fallback for
+// browsers that don't.
 function generateVerticalSections(city) {
-  return VERTICALS.map(v => `
+  return VERTICALS.map((v, i) => `
     <!-- ${v.label} Vertical -->
-    <section id="${v.name}" class="vertical-section glass-card">
-      <h2>${v.label}</h2>
-      <p class="vertical-description">${v.desc}</p>
-      <div id="${v.name}-content" class="vertical-content"></div>
-      <div id="${v.name}-context" class="vertical-context"></div>
-      ${v.name === 'sport' ? `<div id="sport-live" class="sport-live" data-city="${city.slug}" data-city-name="${city.name.replace(/"/g, '&quot;')}" data-country="${city.country.replace(/"/g, '&quot;')}"></div>` : ''}
-      ${LISTINGS_VERTICALS.has(v.name) ? `<div class="vertical-listings" data-city="${city.slug}" data-vertical="${v.name}"></div>` : ''}
-      <div id="city-credit-${v.name}"></div>
-    </section>
+    <details id="${v.name}" class="vertical-section glass-card"${i === 0 ? ' open' : ''}>
+      <summary class="vertical-summary"><h2>${v.label}</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">${v.desc}</p>
+        <div id="${v.name}-content" class="vertical-content"></div>
+        <div id="${v.name}-context" class="vertical-context"></div>
+        ${v.name === 'sport' ? `<div id="sport-live" class="sport-live" data-city="${city.slug}" data-city-name="${city.name.replace(/"/g, '&quot;')}" data-country="${city.country.replace(/"/g, '&quot;')}"></div>` : ''}
+        ${LISTINGS_VERTICALS.has(v.name) ? `<div class="vertical-listings" data-city="${city.slug}" data-vertical="${v.name}"></div>` : ''}
+        <div id="city-credit-${v.name}"></div>
+      </div>
+    </details>
   `).join('\n');
 }
 

@@ -32,6 +32,16 @@
     return String(s).replace(/"/g, '&quot;');
   }
 
+  // Full HTML-escape, not just quotes -- unlike NAV_ITEMS labels (which
+  // are hardcoded strings above), the account control renders a
+  // visitor-supplied display_name, so this has to be safe as text content
+  // too (&, <, >), not merely as an attribute value.
+  function escapeHTML(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
   // Items carrying an icon are represented by the mark alone -- no
   // visible label -- but still need an accessible name for screen
   // readers and title-attribute hover text, since there's no text left
@@ -54,6 +64,104 @@
     }).join('\n        ');
   }
 
+  // Account control: the ONE persistent, always-visible sign-in entry
+  // point on the site. Every other sign-in trigger (Follow, comment,
+  // check-in) is contextual -- gated behind an action someone was already
+  // taking -- so a visitor who just wants to know "am I signed in, and if
+  // not, where do I do that" had nowhere to look. This renders into both
+  // the desktop nav and the mobile panel and re-renders itself whenever
+  // auth state changes, including on first load for an already-signed-in
+  // returning visitor.
+  //
+  // GlotempAuth loads via a later <script> tag than this file (nav mounts
+  // synchronously near the top of <body>, auth is one of the last scripts
+  // before the page's own bootstrap), so at first render() it may not
+  // exist yet. Rendered as signed-out by default and corrected the moment
+  // GlotempAuth is ready -- see wireAccountControl below.
+  function accountLabel() {
+    if (!window.GlotempAuth || !window.GlotempAuth.isSignedIn()) return null;
+    var profile = window.GlotempAuth.getCachedProfile();
+    var user = window.GlotempAuth.getUser();
+    return (profile && profile.display_name) || (user && user.email) || 'Account';
+  }
+
+  function accountControlHTML(idSuffix) {
+    var signedIn = window.GlotempAuth && window.GlotempAuth.isSignedIn();
+    var label = signedIn ? accountLabel() : 'Sign in';
+    return (
+      '<div class="nav-account" id="nav-account' + idSuffix + '">' +
+        '<button type="button" class="nav-account-btn" id="nav-account-btn' + idSuffix + '" aria-haspopup="true" aria-expanded="false">' + escapeHTML(label) + '</button>' +
+        '<div class="nav-account-menu" id="nav-account-menu' + idSuffix + '" hidden>' +
+          '<button type="button" class="nav-account-signout" id="nav-account-signout' + idSuffix + '">Sign out</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function refreshAccountControls() {
+    ['', '-mobile'].forEach(function (idSuffix) {
+      var root = document.getElementById('nav-account' + idSuffix);
+      if (!root) return;
+      var signedIn = window.GlotempAuth && window.GlotempAuth.isSignedIn();
+      var btn = document.getElementById('nav-account-btn' + idSuffix);
+      var menu = document.getElementById('nav-account-menu' + idSuffix);
+      if (btn) btn.textContent = signedIn ? (accountLabel() || 'Account') : 'Sign in';
+      if (menu && !signedIn) { menu.hidden = true; if (btn) btn.setAttribute('aria-expanded', 'false'); }
+    });
+  }
+
+  function wireAccountControl(idSuffix) {
+    var btn = document.getElementById('nav-account-btn' + idSuffix);
+    var menu = document.getElementById('nav-account-menu' + idSuffix);
+    var signoutBtn = document.getElementById('nav-account-signout' + idSuffix);
+    if (!btn || !menu || !signoutBtn) return;
+
+    btn.addEventListener('click', function () {
+      var signedIn = window.GlotempAuth && window.GlotempAuth.isSignedIn();
+      if (!signedIn) {
+        if (window.GlotempAuth) window.GlotempAuth.openModal('Sign in to Glotemp', 'signin');
+        return;
+      }
+      var open = !menu.hidden;
+      menu.hidden = open;
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+    });
+    signoutBtn.addEventListener('click', function () {
+      if (window.GlotempAuth) window.GlotempAuth.signOut();
+      menu.hidden = true;
+      btn.setAttribute('aria-expanded', 'false');
+      refreshAccountControls();
+    });
+    document.addEventListener('click', function (e) {
+      if (!menu.hidden && !btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.hidden = true;
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  var accountEventsWired = false;
+  function wireAccountEvents() {
+    if (accountEventsWired) return;
+    accountEventsWired = true;
+    document.addEventListener('glotemp:auth-changed', refreshAccountControls);
+    // GlotempAuth's own init() (consuming a magic-link redirect, checking
+    // an existing session) is async and may still be in flight when nav
+    // renders -- poll briefly until it's defined, then do one refresh to
+    // catch an already-signed-in returning visitor whose profile fetch
+    // resolves without necessarily firing the change event in every path.
+    var attempts = 0;
+    var iv = setInterval(function () {
+      attempts++;
+      if (window.GlotempAuth) {
+        refreshAccountControls();
+        clearInterval(iv);
+      } else if (attempts > 40) {
+        clearInterval(iv); // ~10s -- give up quietly, stays "Sign in"
+      }
+    }, 250);
+  }
+
   function render() {
     var mount = document.getElementById('site-nav');
     if (!mount) return;
@@ -69,6 +177,7 @@
       '</div>' +
       '<div class="nav-links" id="nav-links-desktop">\n        ' +
         linksHTML(active) +
+        accountControlHTML('') +
       '\n      </div>' +
       '<button id="nav-hamburger" class="nav-hamburger" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-panel">' +
         '<span></span><span></span><span></span>' +
@@ -76,6 +185,9 @@
 
     buildPanel(active);
     wireHamburger();
+    wireAccountControl('');
+    wireAccountControl('-mobile');
+    wireAccountEvents();
   }
 
   function buildPanel(active) {
@@ -99,7 +211,8 @@
           var title = item.icon ? ' title="' + escapeAttr(item.label) + '"' : '';
           return '<a href="' + escapeAttr(item.href) + '"' + cls + title + '>' + itemInnerHTML(item) + '</a>';
         }).join('\n        ') +
-      '\n      </nav>';
+      '\n      </nav>' +
+      accountControlHTML('-mobile');
   }
 
   function wireHamburger() {

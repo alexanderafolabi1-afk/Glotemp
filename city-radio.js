@@ -30,36 +30,42 @@
   }
 
   // Radio streams served over plain http:// get silently blocked by
-  // mixed-content rules on an https:// page. Pulling extra candidates
-  // and sorting https-first maximizes the odds the visible list is
-  // actually playable, without hiding stations outright.
-  function sortHttpsFirst(stations) {
-    return stations.slice().sort((a, b) => {
-      const aHttps = /^https:/i.test(a.url_resolved || a.url || '') ? 0 : 1;
-      const bHttps = /^https:/i.test(b.url_resolved || b.url || '') ? 0 : 1;
-      return aHttps - bHttps;
-    });
+  // mixed-content rules on this https:// page -- the button sits there
+  // looking clickable but every single station in the list can fail with
+  // no clear reason. Filtering to https-only (rather than just sorting
+  // https-first, which still surfaced an all-http list as "the top
+  // choice" whenever a region has no https stations at all) means every
+  // station actually shown has a real chance of playing.
+  function httpsOnly(stations) {
+    return stations.filter((s) => /^https:/i.test(s.url_resolved || s.url || ''));
   }
 
+  // Each tier is progressively less city-specific -- the caller needs to
+  // know which one actually matched so it can be honest about it (see
+  // "near" below) instead of silently presenting a country-wide station
+  // as if it were this exact city's local radio.
   async function searchStations(lat, lon, country) {
-    const base = `&hidebroken=true&order=clickcount&reverse=true&limit=20`;
-    let stations = await fetchJSON(`/json/stations/search?geo_lat=${lat}&geo_long=${lon}&geo_distance=50000${base}`);
-    if (!stations || !stations.length) {
-      // Sparse coverage near this city -- widen the search radius once
-      // rather than showing nothing.
-      stations = await fetchJSON(`/json/stations/search?geo_lat=${lat}&geo_long=${lon}&geo_distance=200000${base}`);
-    }
-    if ((!stations || !stations.length) && country) {
+    const base = `&hidebroken=true&order=clickcount&reverse=true&limit=30`;
+    let stations = httpsOnly(await fetchJSON(`/json/stations/search?geo_lat=${lat}&geo_long=${lon}&geo_distance=50000${base}`) || []);
+    if (stations.length) return { stations: stations.slice(0, 8), near: true };
+
+    // Sparse coverage right around this city -- widen the search radius
+    // once rather than showing nothing. Still geographically local.
+    stations = httpsOnly(await fetchJSON(`/json/stations/search?geo_lat=${lat}&geo_long=${lon}&geo_distance=200000${base}`) || []);
+    if (stations.length) return { stations: stations.slice(0, 8), near: true };
+
+    if (country) {
       // Still nothing within 200km -- the geo index itself is sparse for
       // this whole area (small country, or Radio Browser's geotagging
       // just hasn't reached it), not something a wider radius fixes.
       // Country-tag search is a genuinely different index in Radio
-      // Browser, not a bigger radius, so it surfaces stations a pure
-      // geo search never will.
-      stations = await fetchJSON(`/json/stations/search?country=${encodeURIComponent(country)}${base}`);
+      // Browser, not a bigger radius, so it surfaces stations a pure geo
+      // search never will -- but it's no longer city-specific, so the
+      // caller marks it as such rather than passing it off as local.
+      stations = httpsOnly(await fetchJSON(`/json/stations/search?country=${encodeURIComponent(country)}${base}`) || []);
+      if (stations.length) return { stations: stations.slice(0, 8), near: false };
     }
-    if (!stations) return [];
-    return sortHttpsFirst(stations).slice(0, 8);
+    return { stations: [], near: true };
   }
 
   function stationRowHTML(station, i) {
@@ -132,13 +138,19 @@
     if (!container || lat == null || lon == null) return;
     container.innerHTML = '<p class="radio-status">Tuning in&hellip;</p>';
     let stations = [];
+    let near = true;
     try {
-      stations = await searchStations(lat, lon, country);
+      const result = await searchStations(lat, lon, country);
+      stations = result.stations;
+      near = result.near;
     } catch (e) {
       stations = [];
     }
     if (!stations.length) {
-      container.innerHTML = '';
+      // Honest empty state instead of a silently vanished section: Radio
+      // Browser genuinely has nothing streamable (https-capable) for this
+      // city or its country right now.
+      container.innerHTML = `<p class="radio-status">No streamable stations found for ${escapeHTML(cityName)} right now.</p>`;
       return;
     }
     container.innerHTML = `
@@ -147,7 +159,9 @@
         <span class="radio-now-playing" id="radio-now-playing">Pick a station to listen</span>
       </div>
       <div class="radio-stations">${stations.map(stationRowHTML).join('')}</div>
-      <p class="radio-attribution">Stations via Radio Browser, a free community directory. Streams play directly from each station.</p>
+      <p class="radio-attribution">${near
+        ? 'Stations via Radio Browser, a free community directory. Streams play directly from each station.'
+        : `No station geotagged right at ${escapeHTML(cityName)} -- these are ${escapeHTML(country || 'the country')}-wide stations via Radio Browser, a free community directory.`}</p>
     `;
     wireStations(container, stations);
   }
