@@ -3433,8 +3433,64 @@ button:hover:not(:focus-visible) {
 
 /* City Profile Pages */
 .city-header {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
   padding: 2rem;
   margin-bottom: 2rem;
+}
+
+/* Header photo: the same already-fetched "About this city" Wikipedia
+   thumbnail (see city-wiki.js / city-header-photo.js), full-bleed behind
+   the header text only. The image starts fully transparent and fades in
+   once loaded -- ground colour (page background) shows immediately, so
+   this never delays first contentful paint. No src is set at all when a
+   city has no photo, so there is no broken-image icon and no gap: the
+   scrim below (which is the same colour as the page ground) simply reads
+   as plain ground, identical to a page with no photo layer at all.
+   ::after carries a warm scrim whose opacity only ever increases toward
+   the bottom, reaching fully solid ground colour at the section's lower
+   edge -- guarantees text contrast everywhere text can sit (verified:
+   >=4.5:1 for ivory even against a pure-white worst-case source pixel at
+   the lightest, top-most point of the gradient) while also producing the
+   seamless fade into the next section, in one gradient. */
+.city-header-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.city-header-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+
+.city-header-photo.is-loaded img {
+  opacity: 1;
+}
+
+.city-header-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(20, 16, 11, 0.76) 0%,
+    rgba(20, 16, 11, 0.9) 55%,
+    var(--obsidian) 100%
+  );
+}
+
+.city-header-content {
+  position: relative;
+  z-index: 1;
 }
 
 .city-header-content h1 {

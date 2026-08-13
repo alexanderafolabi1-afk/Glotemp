@@ -28,6 +28,9 @@
 
   <main class="page-content">
     <section class="city-header glass-card">
+      <div class="city-header-photo" id="city-header-photo" aria-hidden="true">
+        <img id="city-header-photo-img" alt="" decoding="async">
+      </div>
       <div class="city-header-content">
         <p class="city-live-badge checkin-live-eyebrow live-mark">Live</p>
         <h1 id="city-name"></h1>
@@ -290,6 +293,7 @@
   <script src="/city-trivia-data.js" defer></script>
   <script src="/glotemp-personality.js" defer></script>
   <script src="/city-wiki.js" defer></script>
+  <script src="/city-header-photo.js" defer></script>
   <script src="/city-food-signature.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
   <script src="/city-radio.js" defer></script>
@@ -398,6 +402,15 @@
       }
 
       const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
+
+      // Header photo: kicked off first so it's the earliest possible
+      // trigger of the shared Wikipedia summary fetch (see city-wiki.js
+      // getCityImageUrl / city-header-photo.js) -- whichever of this or
+      // loadCityWiki below actually wins the race is the only network
+      // call; the other reuses its cached promise.
+      if (typeof GlotempHeaderPhoto !== 'undefined' && city) {
+        GlotempHeaderPhoto.loadHeaderPhoto(city.name, city.country);
+      }
 
       if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('Prague', 'Czechia');
 
@@ -628,7 +641,7 @@
       // Pre-filtered to this city at generation time -- see
       // observationsForCity() in generate-city-pages.js -- rather than
       // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"Charles Bridge at sunrise - almost empty, golden and surreal.","language_lens":"visitor","created_at":"2026-08-12T16:37:14.474Z"},{"context":"Kavárna na Žižkově - klidné ráno, dobrá káva.","language_lens":"local","created_at":"2026-08-12T07:07:14.474Z"},{"context":"Vinohrady on a weekend night - locals, craft beer, no tourists.","language_lens":"visitor","created_at":"2026-08-11T22:07:14.474Z"},{"context":"Metro C, ráno normálně rušné. Všichni tiší a ospalí.","language_lens":"local","created_at":"2026-08-11T12:07:14.474Z"},{"context":"Holešovice neighbourhood - art, markets, a quiet revolution.","language_lens":"diaspora","created_at":"2026-08-11T00:07:14.474Z"}];
+      const checkins = [{"context":"Charles Bridge at sunrise - almost empty, golden and surreal.","language_lens":"visitor","created_at":"2026-08-12T17:11:07.944Z"},{"context":"Kavárna na Žižkově - klidné ráno, dobrá káva.","language_lens":"local","created_at":"2026-08-12T07:41:07.944Z"},{"context":"Vinohrady on a weekend night - locals, craft beer, no tourists.","language_lens":"visitor","created_at":"2026-08-11T22:41:07.944Z"},{"context":"Metro C, ráno normálně rušné. Všichni tiší a ospalí.","language_lens":"local","created_at":"2026-08-11T12:41:07.944Z"},{"context":"Holešovice neighbourhood - art, markets, a quiet revolution.","language_lens":"diaspora","created_at":"2026-08-11T00:41:07.944Z"}];
 
       if (!checkins.length) {
         const section = container.closest('.city-feed-section');

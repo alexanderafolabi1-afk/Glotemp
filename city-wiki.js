@@ -245,11 +245,26 @@
     } catch (e) { /* still no invented content -- just leave it empty */ }
   }
 
+  // Same cached promise as loadCityWiki/getSummaryCached above -- whichever
+  // caller (this or the "About this city" panel) runs first is the only
+  // one that ever hits the network; the other just reads the resolved
+  // value. Used by city-header-photo.js to reuse the exact same image.
+  async function getCityImageUrl(cityName, country) {
+    if (!cityName) return null;
+    try {
+      const data = await getSummaryCached(cityName, country);
+      return (data && data.thumbnail && data.thumbnail.source) || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   window.GlotempWiki = {
     loadCityWiki,
     loadVerticalContext,
     loadAllVerticalContexts,
     fillEmptyVerticalContexts,
+    getCityImageUrl,
     _renderSummary: renderSummary,
     _renderError: renderError,
   };
