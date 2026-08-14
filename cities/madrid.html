@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&family=Fredoka:wght@400..600&family=Baloo+2:wght@400..600&family=Quicksand:wght@400..600&family=Comfortaa:wght@400..600&family=Varela+Round&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=56">
+  <link rel="stylesheet" href="/styles.css?v=57">
 </head>
 <body>
   <nav id="site-nav"></nav>
@@ -286,11 +286,6 @@
       <select id="compare-city-select" class="filter-select"></select>
     </section>
 
-    <!-- Comments -->
-    <section class="glass-card city-comments-section">
-      <h2>Add your voice</h2>
-      <div class="comment-section" id="city-comment-section"></div>
-    </section>
   </main>
 
   <footer class="footer glass-card">
@@ -326,7 +321,6 @@
   <script src="/city-conditions.js" defer></script>
   <script src="/verticals-accordion.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
-  <script src="/tempo-economy.js" defer></script>
   
   <script>
     // Reasonable ceiling per metric, used only to normalise how much of
@@ -657,126 +651,14 @@
       });
     })();
 
-    // ---- Live observation feed for this city ----
-    // Uses GlotempCore.getTimeAgo (loaded non-deferred, synchronously
-    // available) rather than verticals.getTimeAgo -- this runs
-    // immediately below, before verticals-engine.js's deferred script
-    // has executed.
-    function renderObservationFeed() {
-      const container = document.getElementById('city-observation-feed');
-      if (!container) return;
-      // Pre-filtered to this city at generation time -- see
-      // observationsForCity() in generate-city-pages.js -- rather than
-      // shipping the full ~75KB seed-observations.js to every page.
-      const checkins = [{"context":"La Gran Vía a las 10 de la noche - viva y llena de vida.","language_lens":"local","created_at":"2026-08-12T23:32:59.073Z"},{"context":"Vermut time in Malasaña - everyone talks at once, nobody minds.","language_lens":"visitor","created_at":"2026-08-12T18:02:59.073Z"},{"context":"Chueca sábado noche - música y gente, todo vibrante.","language_lens":"local","created_at":"2026-08-12T11:02:59.073Z"},{"context":"El Retiro park at noon - families, paddle boats, sun.","language_lens":"visitor","created_at":"2026-08-12T01:02:59.073Z"},{"context":"Metro L2 tranquilo por la tarde. Nada especial.","language_lens":"local","created_at":"2026-08-11T13:02:59.073Z"},{"context":"Lavapiés en domingo - mezcla de culturas y buena energía.","language_lens":"diaspora","created_at":"2026-08-11T04:02:59.073Z"}];
-
-      if (!checkins.length) {
-        const section = container.closest('.city-feed-section');
-        if (section) section.style.display = 'none';
-        return;
-      }
-
-      container.innerHTML = checkins.map(obs => `
-        <div class="reading glass-card">
-          <div class="reading-header">
-            <span class="reading-metric">Reading</span>
-          </div>
-          <div class="reading-value"><span class="reading-label">${obs.context}</span></div>
-          <div class="reading-footer">
-            <span class="reading-source">${obs.language_lens || 'visitor'}</span>
-            <time class="reading-time" datetime="${obs.created_at}">${GlotempCore.getTimeAgo(new Date(obs.created_at))}</time>
-          </div>
-        </div>
-      `).join('');
-    }
-    renderObservationFeed();
-
-    // ---- Comments ----
-    // getComments/submitComment come from tempo-economy.js, which is
-    // deferred -- gate init behind DOMContentLoaded like loadCityData,
-    // not an immediate IIFE, or the typeof guard below would silently
-    // skip forever (it runs once, before that script has executed).
-    function initCityComments() {
-      const container = document.getElementById('city-comment-section');
-      if (!container || typeof getComments === 'undefined') return;
-      const citySlug = 'madrid';
-
-      container.innerHTML = `
-        <div class="comment-input-wrap">
-          <textarea class="comment-input" placeholder="Share the vibe (max 280 chars)..." maxlength="280"></textarea>
-          <div class="mood-picker">
-            <button class="mood-emoji" data-mood="🔥" title="Energized">▲</button>
-            <button class="mood-emoji" data-mood="😊" title="Good">◆</button>
-            <button class="mood-emoji" data-mood="😐" title="Neutral">●</button>
-            <button class="mood-emoji" data-mood="😞" title="Low">▼</button>
-            <button class="mood-emoji" data-mood="😡" title="Cautious">◇</button>
-          </div>
-          <button class="btn-neon comment-submit">Post Comment</button>
-        </div>
-        <div class="comment-list"></div>
-      `;
-
-      let selectedMood = '😐';
-      const moodBtns = container.querySelectorAll('.mood-emoji');
-      const textarea = container.querySelector('.comment-input');
-      const submitBtn = container.querySelector('.comment-submit');
-      const commentList = container.querySelector('.comment-list');
-
-      moodBtns.forEach(btn => {
-        btn.style.opacity = btn.dataset.mood === selectedMood ? '1' : '0.5';
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          moodBtns.forEach(b => b.style.opacity = '0.5');
-          btn.style.opacity = '1';
-          selectedMood = btn.dataset.mood;
-        });
-      });
-
-      function loadCityComments() {
-        getComments(citySlug).then(comments => {
-          if (!comments.length) {
-            commentList.innerHTML = '';
-            return;
-          }
-          commentList.innerHTML = comments.slice(0, 10).map(c => `
-            <div class="comment-item">
-              <div style="display:flex; gap:0.5rem; align-items:flex-start;">
-                <div style="font-size:1.5rem; flex-shrink:0;">${c.mood_emoji}</div>
-                <div style="flex:1; min-width:0;">
-                  <p>${c.text}</p>
-                  <small>${new Date(c.created_at).toLocaleString()}</small>
-                </div>
-              </div>
-            </div>
-          `).join('');
-        });
-      }
-
-      submitBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const text = textarea.value.trim();
-        if (!text) return;
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Posting...';
-        try {
-          await submitComment(citySlug, text, selectedMood);
-          textarea.value = '';
-          loadCityComments();
-        } catch (err) {
-          console.error('Comment submission failed:', err);
-        }
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Post Comment';
-      });
-
-      loadCityComments();
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initCityComments);
-    } else {
-      initCityComments();
-    }
+    // The static seed-data flash into #city-observation-feed and the
+    // separate, entirely broken #city-comment-section widget (its INSERT
+    // payload named columns -- city_slug, text, mood_emoji, user_id,
+    // stars_awarded -- that don't exist on any live table, so every "Post
+    // Comment" click 400'd silently) both used to live here.
+    // glotemp-checkin.js now owns the whole check-in + comment experience
+    // for #city-observation-feed; #city-comment-section and its markup are
+    // removed from the template.
   </script>
   
   <script src="/app.js" defer></script>

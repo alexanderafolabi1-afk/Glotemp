@@ -1,27 +1,84 @@
-// Glotemp per-city check-in layer: composer, recent check-ins list, and
-// the watch button + watcher count. Mounts itself on any city page (it
-// derives the slug from /cities/<slug>.html) so all 151 pages get this
-// from one shared file rather than 151 copies of the same markup.
+// Glotemp per-city check-in + comment layer: examples panel, hanging
+// "Check in" sign, five-mood composer, moderation, and the recent
+// check-ins list. Mounts itself on any city page (it derives the slug
+// from /cities/<slug>.html) so every city page gets this from one
+// shared file rather than one copy per page.
 (function () {
-  const MODES = [
-    { slug: 'eat', label: 'Eat', icon: '<path d="M5 3v8a2 2 0 002 2h0a2 2 0 002-2V3M7 13v8M17 3c-1.7 0-2.5 2-2.5 4.5S15.3 12 17 12v9"/>' },
-    { slug: 'drink', label: 'Drink', icon: '<path d="M7 8h10l-1 11a2 2 0 01-2 2H10a2 2 0 01-2-2L7 8z"/><path d="M9 8V5a3 3 0 016 0v3"/>' },
-    { slug: 'watch', label: 'Watch', icon: '<rect x="3" y="5" width="18" height="13" rx="2"/><path d="M10 9l5 3-5 3V9z"/>' },
-    { slug: 'move', label: 'Move', icon: '<path d="M4 12h13M12 6l6 6-6 6"/>' },
-    { slug: 'make', label: 'Make', icon: '<path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/>' },
+  // Five bands, same vocabulary as moodToBand() in app.js (charged / warm /
+  // equilibrium-here-called-steady / restrained / low). Labels are written
+  // in normal case on purpose -- .checkin-mood-label renders them with
+  // font-variant-caps: small-caps, which only has an effect on mixed-case
+  // source text; typing them pre-uppercased here would just print flat
+  // capitals with no small-caps distinction.
+  const MOODS = [
+    { key: 'charged', label: 'Charged', glyph: '<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/>' },
+    { key: 'warm', label: 'Warm', glyph: '<circle cx="12" cy="12" r="4"/><path d="M12 3v2.2M12 18.8V21M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M3 12h2.2M18.8 12H21M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/>' },
+    { key: 'steady', label: 'Steady', glyph: '<path d="M3 12h6M15 12h6"/><circle cx="12" cy="12" r="2.4"/>' },
+    { key: 'restrained', label: 'Restrained', glyph: '<path d="M14.5 3.5a8.5 8.5 0 100 17 7 7 0 010-17z"/>' },
+    { key: 'low', label: 'Low', glyph: '<path d="M12 4v9M8 10l4 3 4-3"/><path d="M4 18h16"/>' },
   ];
-  // Rough word for each intensity value, so the slider reads as a feeling
-  // ("Buzzing") rather than a bare number a visitor has to interpret.
-  const INTENSITY_WORDS = ['', 'Quiet', 'Calm', 'Easy', 'Steady', 'Comfortable', 'Lively', 'Energetic', 'Buzzing', 'Intense', 'Packed'];
+  const MOOD_BY_KEY = MOODS.reduce((acc, m) => { acc[m.key] = m; return acc; }, {});
+  const DEFAULT_MOOD = 'steady';
+
+  const EMOJI_CHOICES = ['😀', '😂', '❤️', '🔥', '👍', '😢', '🙏', '🎉', '😮', '🥳', '😡', '🤔', '👀', '🌍', '✨', '🍻'];
+
+  // Static, hand-written -- never sent to Supabase, never rendered inside
+  // #checkin-list, never touches the observations table. Purely a model
+  // for what a useful check-in reads like, in four languages.
+  const EXAMPLES = [
+    { lang: 'English', mood: 'warm', text: 'Cafe terraces are full and everyone is out walking after dinner. Feels easy tonight.' },
+    { lang: 'Yoruba', mood: 'charged', text: 'Ilu naa kun fun eniyan, orin n dun ni gbogbo igun, gbogbo eniyan n jo lode.' },
+    { lang: 'French', mood: 'steady', text: "Rien de special a signaler, la ville tourne a son rythme habituel ce soir." },
+    { lang: 'Japanese', mood: 'restrained', text: '雨が降っていて、通りは静かです。みんな家にいるみたい。' },
+  ];
+
+  // ---------- moderation ----------
+  // Not exhaustive -- a real deployment would pair this with a managed
+  // moderation API -- but every submit is checked against these before
+  // anything reaches the observations table, and every block is logged.
+  const SLURS = ['nigger', 'nigga', 'faggot', 'fag', 'retard', 'retarded', 'chink', 'spic', 'kike', 'gook', 'tranny', 'coon', 'beaner', 'wetback', 'towelhead'];
+  const PROFANITY = ['fuck', 'fucking', 'fucker', 'motherfucker', 'shit', 'bullshit', 'bitch', 'asshole', 'cunt', 'bastard', 'dick', 'pussy', 'cock', 'wanker', 'slut', 'whore', 'douchebag'];
+  const HARASSMENT_PHRASES = [
+    'kill you', 'kill yourself', 'kys', 'i will find you', "i'll find you", 'i will hurt you', "i'll hurt you",
+    'i will kill', 'going to kill', 'beat you up', 'i will beat you', 'you should die', 'go die', 'hope you die',
+    'i know where you live', 'watch your back', "i'll kill", 'rape you',
+  ];
+
+  function containsWord(lowerText, word) {
+    const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp('\\b' + escaped + '\\b', 'i').test(lowerText);
+  }
+
+  function moderateText(text) {
+    const lower = text.toLowerCase();
+    for (const p of HARASSMENT_PHRASES) {
+      if (lower.indexOf(p) !== -1) {
+        return { ok: false, reason: 'harassment_or_threats', message: "That can't be posted -- it reads as harassment or a threat. Please rewrite it." };
+      }
+    }
+    for (const w of SLURS) {
+      if (containsWord(lower, w)) {
+        return { ok: false, reason: 'slurs', message: "That can't be posted -- it appears to contain a slur. Please rewrite it." };
+      }
+    }
+    for (const w of PROFANITY) {
+      if (containsWord(lower, w)) {
+        return { ok: false, reason: 'profanity', message: "That can't be posted -- please remove the profanity and try again." };
+      }
+    }
+    return { ok: true };
+  }
+
   const PAGE_SIZE = 20;
-  const NOTE_MAX = 200;
+  const NOTE_MAX = 280;
 
   const SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
 
   let citySlug = null;
   let offset = 0;
-  let selectedMode = 'eat';
+  let selectedMood = DEFAULT_MOOD;
+  let postAnonymously = false;
 
   function detectCitySlug() {
     const m = window.location.pathname.match(/\/cities\/([a-z0-9-]+)\.html$/i);
@@ -58,115 +115,152 @@
     };
   }
 
+  function moodGlyphSVG(key, extraClass) {
+    const m = MOOD_BY_KEY[key] || MOOD_BY_KEY[DEFAULT_MOOD];
+    return `<svg class="checkin-mood-glyph${extraClass ? ' ' + extraClass : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${m.glyph}</svg>`;
+  }
+
+  // ---------- examples panel ----------
+  function examplesHTML() {
+    return `
+      <div class="checkin-examples" aria-label="Example check-ins, not real posts">
+        <p class="checkin-examples-eyebrow">What a good check-in looks like</p>
+        <div class="checkin-examples-grid">
+          ${EXAMPLES.map(ex => `
+            <div class="checkin-example">
+              <span class="checkin-example-tag">Example &middot; ${esc(ex.lang)}</span>
+              <div class="checkin-example-head">
+                ${moodGlyphSVG(ex.mood, 'checkin-example-glyph')}
+                <span class="checkin-example-mood">${esc(MOOD_BY_KEY[ex.mood].label)}</span>
+              </div>
+              <p class="checkin-example-text">${esc(ex.text)}</p>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  // ---------- insignia ----------
+  function insigniaHTML() {
+    return `
+      <div class="checkin-insignia" aria-hidden="true">
+        <div class="checkin-insignia-sign">
+          <svg class="checkin-insignia-chain" viewBox="0 0 12 16" aria-hidden="true">
+            <line x1="6" y1="0" x2="6" y2="10" stroke="currentColor" stroke-width="1.1"/>
+            <circle cx="6" cy="3.4" r="1.9" fill="none" stroke="currentColor" stroke-width="1.1"/>
+          </svg>
+          <div class="checkin-insignia-panel">
+            <span class="checkin-insignia-glow"></span>
+            <span class="checkin-insignia-text">Check<br>in</span>
+          </div>
+          <svg class="checkin-insignia-arrow" viewBox="0 0 16 10" aria-hidden="true">
+            <path d="M2 1l6 7 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>`;
+  }
+
   // ---------- composer ----------
   function composerHTML(cityName) {
     const name = cityName || 'this city';
+    const moodButtons = MOODS.map(m => `
+      <button type="button" class="checkin-mood-btn" data-mood="${m.key}" aria-pressed="${m.key === DEFAULT_MOOD ? 'true' : 'false'}">
+        ${moodGlyphSVG(m.key)}
+        <span class="checkin-mood-label">${esc(m.label)}</span>
+      </button>`).join('');
+
+    const emojiButtons = EMOJI_CHOICES.map(e => `<button type="button" class="checkin-emoji-btn" data-emoji="${e}">${e}</button>`).join('');
+
     return `
+      ${examplesHTML()}
       <div class="checkin-composer" id="checkin-composer">
         <p class="eyebrow">City reading</p>
         <h2 class="checkin-neon-title">How <span class="checkin-glow">${esc(name)}</span> feels right now</h2>
-        <div class="checkin-insignia" aria-hidden="true">
-          <svg class="checkin-insignia-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>
-          </svg>
-          <span class="checkin-insignia-label">Check in</span>
-        </div>
+        ${insigniaHTML()}
         <div class="checkin-signedout" id="checkin-signedout">
-          <p class="checkin-copy">Sign in to add a reading. Browsing stays anonymous.</p>
+          <p class="checkin-copy">Sign in to add a check-in. Browsing stays anonymous.</p>
           <button class="btn-neon checkin-neon-btn" type="button" id="checkin-signin-btn">Sign in</button>
         </div>
         <form class="checkin-form" id="checkin-form" hidden>
-          <p class="checkin-step-head" id="checkin-step-1"><span class="checkin-step-num">1</span><span class="checkin-step-title">Pick what you are doing</span></p>
-          <div class="checkin-modes" role="group" aria-label="Mode">
-            ${MODES.map((m, i) => `<button type="button" class="checkin-mode" data-mode="${m.slug}" aria-pressed="${i === 0 ? 'true' : 'false'}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${m.icon}</svg><span>${m.label}</span></button>`).join('')}
+          <div class="checkin-moods" role="group" aria-label="Mood">
+            ${moodButtons}
           </div>
-          <p class="checkin-step-head" id="checkin-step-2"><span class="checkin-step-num">2</span><span class="checkin-step-title">Set how intense it is</span></p>
-          <label class="checkin-label" for="checkin-intensity">Intensity <span class="checkin-intensity-value" id="checkin-intensity-value">${INTENSITY_WORDS[5]} (5/10)</span></label>
-          <input type="range" id="checkin-intensity" min="1" max="10" step="1" value="5" class="checkin-range">
-          <p class="checkin-step-head" id="checkin-step-3"><span class="checkin-step-num">3</span><span class="checkin-step-title">Add a note <span class="checkin-optional">optional</span></span></p>
-          <label class="checkin-label" for="checkin-note">Note <span class="checkin-count" id="checkin-count">0/${NOTE_MAX}</span></label>
-          <textarea id="checkin-note" class="checkin-note" rows="2" maxlength="${NOTE_MAX}" placeholder="A short note - what does it feel like?"></textarea>
-          <p class="checkin-preview-label">This is what will post</p>
-          <div class="checkin-preview" id="checkin-preview">
-            <div class="checkin-item-head">
-              <span class="checkin-item-name">You</span>
-              <span class="checkin-item-mode" id="checkin-preview-mode">Eat</span>
-              <span class="checkin-item-intensity" id="checkin-preview-intensity">5/10</span>
-            </div>
-            <p class="checkin-item-note" id="checkin-preview-note" hidden></p>
+          <label class="checkin-label" for="checkin-note">Comment <span class="checkin-count" id="checkin-count">0/${NOTE_MAX}</span></label>
+          <textarea id="checkin-note" class="checkin-note" rows="3" maxlength="${NOTE_MAX}" placeholder="What does it feel like right now?"></textarea>
+          <button type="button" class="checkin-emoji-toggle" id="checkin-emoji-toggle" aria-expanded="false">&#128522; Add emoji</button>
+          <div class="checkin-emoji-row" id="checkin-emoji-row" hidden>${emojiButtons}</div>
+          <div class="checkin-visibility" role="group" aria-label="Post as">
+            <button type="button" class="checkin-visibility-btn" data-visibility="name" aria-pressed="true">Show my name</button>
+            <button type="button" class="checkin-visibility-btn" data-visibility="anon" aria-pressed="false">Post anonymously</button>
           </div>
-          <p class="checkin-step-head" id="checkin-step-4"><span class="checkin-step-num">4</span><span class="checkin-step-title">Post it</span></p>
           <div class="checkin-actions">
-            <button type="submit" class="btn-neon checkin-neon-btn" id="checkin-submit">Add reading</button>
+            <button type="submit" class="btn-neon checkin-neon-btn" id="checkin-submit">Post check-in</button>
             <span class="checkin-status" id="checkin-status" role="status" aria-live="polite"></span>
           </div>
         </form>
       </div>
-      <div class="checkin-list-wrap">
-        <h3 class="checkin-heading">Recent readings</h3>
-        <div class="checkin-list" id="checkin-list"><p class="checkin-empty">Loading…</p></div>
+      <div class="checkin-list-wrap" id="checkin-list-wrap" hidden>
+        <h3 class="checkin-heading">Recent check-ins</h3>
+        <div class="checkin-list" id="checkin-list"></div>
         <div class="checkin-more-row"><button class="pagination-btn" type="button" id="checkin-more" hidden>Load more</button></div>
       </div>`;
   }
 
   function wireComposer() {
     const form = document.getElementById('checkin-form');
-    const signedOut = document.getElementById('checkin-signedout');
     const signInBtn = document.getElementById('checkin-signin-btn');
-    const range = document.getElementById('checkin-intensity');
-    const rangeVal = document.getElementById('checkin-intensity-value');
     const note = document.getElementById('checkin-note');
     const count = document.getElementById('checkin-count');
     const status = document.getElementById('checkin-status');
+    const emojiToggle = document.getElementById('checkin-emoji-toggle');
+    const emojiRow = document.getElementById('checkin-emoji-row');
 
-    const previewMode = document.getElementById('checkin-preview-mode');
-    const previewIntensity = document.getElementById('checkin-preview-intensity');
-    const previewNote = document.getElementById('checkin-preview-note');
-
-    function updatePreviewNote() {
-      if (!previewNote || !note) return;
-      const val = note.value.trim();
-      previewNote.textContent = val;
-      previewNote.hidden = !val;
-    }
-
-    if (range && rangeVal) {
-      range.addEventListener('input', () => {
-        rangeVal.textContent = `${INTENSITY_WORDS[Number(range.value)]} (${range.value}/10)`;
-        if (previewIntensity) previewIntensity.textContent = `${range.value}/10`;
-      });
-    }
     if (note && count) {
       note.addEventListener('input', () => {
         count.textContent = `${note.value.length}/${NOTE_MAX}`;
-        updatePreviewNote();
       });
     }
 
-    // Each step marks itself done as it is satisfied, so what to do next is
-    // visible rather than guessed at.
-    function markDone(id, done) {
-      const el = document.getElementById(id);
-      if (el) el.classList.toggle('is-done', !!done);
-    }
-    markDone('checkin-step-1', true);
-    if (range) range.addEventListener('input', () => markDone('checkin-step-2', true));
-    if (note) note.addEventListener('input', () => markDone('checkin-step-3', note.value.trim().length > 0));
-
-    document.querySelectorAll('.checkin-mode').forEach(btn => {
+    document.querySelectorAll('.checkin-mood-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        markDone('checkin-step-1', true);
-        document.querySelectorAll('.checkin-mode').forEach(b => b.setAttribute('aria-pressed', 'false'));
+        document.querySelectorAll('.checkin-mood-btn').forEach(b => b.setAttribute('aria-pressed', 'false'));
         btn.setAttribute('aria-pressed', 'true');
-        selectedMode = btn.getAttribute('data-mode');
-        if (previewMode) previewMode.textContent = btn.querySelector('span').textContent;
+        selectedMood = btn.getAttribute('data-mood');
       });
     });
 
+    document.querySelectorAll('.checkin-visibility-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.checkin-visibility-btn').forEach(b => b.setAttribute('aria-pressed', 'false'));
+        btn.setAttribute('aria-pressed', 'true');
+        postAnonymously = btn.getAttribute('data-visibility') === 'anon';
+      });
+    });
+
+    if (emojiToggle && emojiRow) {
+      emojiToggle.addEventListener('click', () => {
+        const open = emojiRow.hidden;
+        emojiRow.hidden = !open;
+        emojiToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      emojiRow.querySelectorAll('.checkin-emoji-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (!note) return;
+          const start = note.selectionStart == null ? note.value.length : note.selectionStart;
+          const end = note.selectionEnd == null ? note.value.length : note.selectionEnd;
+          const emoji = btn.getAttribute('data-emoji');
+          const next = note.value.slice(0, start) + emoji + note.value.slice(end);
+          note.value = next.slice(0, NOTE_MAX);
+          note.focus();
+          const caret = Math.min(start + emoji.length, NOTE_MAX);
+          note.setSelectionRange(caret, caret);
+          if (count) count.textContent = `${note.value.length}/${NOTE_MAX}`;
+        });
+      });
+    }
+
     if (signInBtn) {
       signInBtn.addEventListener('click', async () => {
-        const ok = await GlotempAuth.requireAuth('Sign in to add a reading for this city.');
+        const ok = await GlotempAuth.requireAuth('Sign in to add a check-in for this city.');
         if (ok) refreshAuthState();
       });
     }
@@ -174,12 +268,35 @@
     if (form) {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const ok = await GlotempAuth.requireAuth('Sign in to add a reading for this city.');
+        const ok = await GlotempAuth.requireAuth('Sign in to add a check-in for this city.');
         if (!ok) return;
         refreshAuthState();
         const session = await GlotempAuth.getSession();
         const user = GlotempAuth.getUser();
         if (!session || !user) return;
+
+        const text = note.value.trim();
+        if (!text) {
+          status.textContent = 'Write a short comment before posting.';
+          return;
+        }
+
+        const verdict = moderateText(text);
+        if (!verdict.ok) {
+          status.textContent = verdict.message;
+          fetch(`${SUPABASE_URL}/rest/v1/comment_rejections`, {
+            method: 'POST',
+            headers: Object.assign(authHeaders(session), { Prefer: 'return=minimal' }),
+            body: JSON.stringify({
+              user_id: user.id,
+              city_slug: citySlug,
+              reason: verdict.reason,
+              attempted_text: text.slice(0, NOTE_MAX),
+            }),
+          }).catch(() => {});
+          return;
+        }
+
         const submitBtn = document.getElementById('checkin-submit');
         submitBtn.disabled = true;
         status.textContent = 'Posting…';
@@ -190,16 +307,15 @@
             body: JSON.stringify({
               user_id: user.id,
               city_slug: citySlug,
-              mode: selectedMode,
-              intensity: Number(range.value),
-              note: note.value.trim() || null,
+              mood: selectedMood,
+              note: text,
+              is_anonymous: postAnonymously,
             }),
           });
           if (!resp.ok) throw new Error('post failed ' + resp.status);
           status.textContent = 'Posted.';
           note.value = '';
           count.textContent = `0/${NOTE_MAX}`;
-          updatePreviewNote();
           offset = 0;
           await loadCheckins({ replace: true });
           setTimeout(() => { status.textContent = ''; }, 3000);
@@ -218,46 +334,54 @@
     const signedIn = window.GlotempAuth && GlotempAuth.isSignedIn() && !!GlotempAuth.getCachedProfile();
     form.hidden = !signedIn;
     signedOut.hidden = signedIn;
+
+    if (signedIn) {
+      const profile = GlotempAuth.getCachedProfile();
+      const nameBtn = document.querySelector('.checkin-visibility-btn[data-visibility="name"]');
+      if (nameBtn && profile) nameBtn.textContent = `Show my name (${profile.display_name})`;
+    }
   }
 
   // ---------- check-ins list ----------
   function checkinHTML(row) {
-    const name = (row.profiles && row.profiles.display_name) ? row.profiles.display_name : 'Anonymous';
-    const mode = MODES.find(m => m.slug === row.mode);
+    const name = row.is_anonymous ? 'Anonymous' : ((row.profiles && row.profiles.display_name) || 'Anonymous');
+    const mood = MOOD_BY_KEY[row.mood];
     return `
       <article class="checkin-item">
         <div class="checkin-item-head">
+          ${mood ? moodGlyphSVG(row.mood, 'checkin-item-glyph') : ''}
           <span class="checkin-item-name">${esc(name)}</span>
-          <span class="checkin-item-mode">${esc(mode ? mode.label : row.mode)}</span>
-          <span class="checkin-item-intensity">${Number(row.intensity)}/10</span>
+          <span class="checkin-item-mood">${esc(mood ? mood.label : row.mood)}</span>
+          <time class="checkin-item-time" datetime="${esc(row.created_at)}">${esc(timeAgo(row.created_at))}</time>
         </div>
         ${row.note ? `<p class="checkin-item-note">${esc(row.note)}</p>` : ''}
-        <time class="checkin-item-time" datetime="${esc(row.created_at)}">${esc(timeAgo(row.created_at))}</time>
       </article>`;
   }
 
   async function loadCheckins({ replace } = {}) {
     const list = document.getElementById('checkin-list');
+    const wrap = document.getElementById('checkin-list-wrap');
     const moreBtn = document.getElementById('checkin-more');
     if (!list) return;
     try {
       const resp = await fetch(
         `${SUPABASE_URL}/rest/v1/observations?city_slug=eq.${encodeURIComponent(citySlug)}` +
-        `&select=id,mode,intensity,note,created_at,profiles(display_name)` +
+        `&select=id,mood,is_anonymous,note,created_at,profiles(display_name)` +
         `&order=created_at.desc&offset=${offset}&limit=${PAGE_SIZE}`,
         { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
       );
       if (!resp.ok) throw new Error('fetch failed');
       const rows = await resp.json();
       if ((replace || offset === 0) && rows.length === 0) {
-        // Quiet, not apologetic: no readings yet means no visible
-        // explanation, just an empty list under the heading that's
-        // already there.
+        // No text announcing absence -- the list section simply isn't
+        // shown. The composer and examples panel above it are enough.
         list.innerHTML = '';
         offset = 0;
+        if (wrap) wrap.hidden = true;
         if (moreBtn) moreBtn.hidden = true;
         return;
       }
+      if (wrap) wrap.hidden = false;
       const html = rows.map(checkinHTML).join('');
       if (replace || offset === 0) {
         list.innerHTML = html;
@@ -267,7 +391,10 @@
       offset += rows.length;
       if (moreBtn) moreBtn.hidden = rows.length < PAGE_SIZE;
     } catch (e) {
-      if (offset === 0) list.innerHTML = '';
+      if (offset === 0) {
+        list.innerHTML = '';
+        if (wrap) wrap.hidden = true;
+      }
       if (moreBtn) moreBtn.hidden = true;
     }
   }
@@ -374,17 +501,12 @@
     if (!citySlug) return;
     const cityName = cityDisplayName();
 
-    // Replace the generated static "Live observations" body with the live
-    // composer + list. Falls back to appending a section if that anchor
-    // is missing so a re-themed page still gets the feature.
+    // Replace the generated static "City reading" body with the live
+    // examples + composer + list. Falls back to appending a section if
+    // that anchor is missing so a re-themed page still gets the feature.
     let host = document.getElementById('city-observation-feed');
     if (host) {
       const section = host.closest('section') || host;
-      // The static seed-data render hides this section with display:none
-      // when a city has zero seed check-ins (e.g. a newly added city). The
-      // live composer replaces that content entirely, so it must also
-      // undo that hide -- otherwise a brand-new city's check-in form is
-      // invisible even though it works.
       section.style.display = '';
       // The composer now carries its own "How {City} feels right now"
       // heading -- the static one this section shipped with would just
