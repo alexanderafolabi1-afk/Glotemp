@@ -294,9 +294,44 @@
           stat(m.prompt_dismissed || 0, 'dismissed') +
         '</div>' +
         '<div class="adm-section-head"><h2 class="adm-h2">Visitors</h2></div>' +
-        '<p><a class="adm-action" href="https://dash.cloudflare.com/?to=/:account/web-analytics" target="_blank" rel="noopener noreferrer">Open Cloudflare Web Analytics</a>' +
-        '<a class="adm-secondary" href="#" id="adm-signout">Sign out</a></p>'
+        '<p><a class="adm-action" href="https://dash.cloudflare.com/?to=/:account/web-analytics" target="_blank" rel="noopener noreferrer">Open Cloudflare Web Analytics</a></p>' +
+
+        '<div class="adm-section-head"><h2 class="adm-h2">Your account</h2></div>' +
+        '<form id="adm-pw-form">' +
+          '<label class="adm-label" for="adm-new-pw">New password</label>' +
+          '<input class="adm-input" type="password" id="adm-new-pw" required minlength="8" autocomplete="new-password">' +
+          '<label class="adm-label" for="adm-new-pw2">Repeat it</label>' +
+          '<input class="adm-input" type="password" id="adm-new-pw2" required minlength="8" autocomplete="new-password">' +
+          '<p><button class="adm-action" type="submit" id="adm-pw-submit">Change password</button>' +
+          '<a class="adm-secondary" href="#" id="adm-signout">Sign out</a></p>' +
+        '</form>' +
+        '<p class="adm-status" id="adm-pw-status" role="status" aria-live="polite"></p>'
       );
+
+      document.getElementById('adm-pw-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var a = document.getElementById('adm-new-pw').value;
+        var bb = document.getElementById('adm-new-pw2').value;
+        var st = document.getElementById('adm-pw-status');
+        var btn = document.getElementById('adm-pw-submit');
+        if (btn.disabled) return;
+        // Checked here as well as by minlength, because a paste can leave
+        // a field the browser never validated on input.
+        if (a.length < 8) { st.textContent = 'Use at least 8 characters.'; return; }
+        if (a !== bb) { st.textContent = 'Those two do not match.'; return; }
+        st.textContent = 'Saving...';
+        btn.disabled = true;
+        try {
+          await GlotempAuth.updatePassword(a);
+          st.textContent = 'Password changed. Use it next time you sign in.';
+          document.getElementById('adm-new-pw').value = '';
+          document.getElementById('adm-new-pw2').value = '';
+        } catch (err) {
+          st.textContent = (err && err.friendly) || 'Could not change it.';
+        } finally {
+          btn.disabled = false;
+        }
+      });
 
       root.querySelectorAll('.adm-range button').forEach(function (b) {
         b.addEventListener('click', function () {
