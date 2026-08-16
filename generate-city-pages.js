@@ -84,6 +84,7 @@ function generateVerticalSections(city) {
       <div class="vertical-body">
         <p class="vertical-description">${v.desc}</p>
         <div id="${v.name}-content" class="vertical-content"></div>
+        ${v.name === 'food' ? `<div id="food-venues" class="vertical-venues"></div>` : ''}
         <div id="${v.name}-context" class="vertical-context"></div>
         ${v.name === 'sport' ? `<div id="sport-live" class="sport-live" data-city="${city.slug}" data-city-name="${city.name.replace(/"/g, '&quot;')}" data-country="${city.country.replace(/"/g, '&quot;')}"></div>` : ''}
         ${LISTINGS_VERTICALS.has(v.name) ? `<div class="vertical-listings" data-city="${city.slug}" data-vertical="${v.name}"></div>` : ''}
@@ -259,6 +260,12 @@ function generateCityPage(city) {
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
         GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country);
+      }
+
+      // Real named places from OpenStreetMap. Same treatment as Radio:
+      // a live keyless source, not a Supabase reading.
+      if (typeof GlotempVenues !== 'undefined' && city) {
+        GlotempVenues.loadVenues(city.slug, city.name, city.lat, city.lon);
       }
 
       // Conditions line: same treatment as Radio -- a live free-API

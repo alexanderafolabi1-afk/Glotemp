@@ -1416,6 +1416,74 @@ summary:focus:not(:focus-visible) {
   outline: none;
 }
 
+/* ===== LOCAL BUSINESSES (city-venues.js) =====
+   Real named places from OpenStreetMap. Rows on hairlines, matching the
+   check-ins-by-city treatment rather than introducing a card. */
+.vertical-venues { margin: 0.75rem 0 1rem; }
+
+.venue-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.venue {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.75rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--hairline);
+  /* Flex children refuse to shrink below their content without this,
+     which is what pushes the page sideways at 320px. */
+  min-width: 0;
+}
+
+.venue-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--ivory);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.venue-name a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--brass-dim);
+}
+.venue-name a:hover { color: var(--brass); border-bottom-color: var(--brass); }
+
+.venue-kind {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  color: var(--sand);
+  white-space: nowrap;
+}
+
+.venue-where {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--sand);
+  opacity: 0.72;
+  flex-basis: 100%;
+}
+
+.venue-status,
+.venue-attribution {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--sand);
+  opacity: 0.8;
+  margin: 0.75rem 0 0;
+  line-height: 1.6;
+}
+.venue-attribution a { color: var(--sand); }
+.venue-attribution a:hover { color: var(--brass); }
+
 /* ===== INSTALL BANNER =====
    The markup carries its own classes rather than .glass-card, so every
    surface it needs is declared here. Mobile first: a full-width sheet

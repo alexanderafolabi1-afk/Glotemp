@@ -232,6 +232,7 @@
       <div class="vertical-body">
         <p class="vertical-description">Where should you eat and explore cuisine?</p>
         <div id="food-content" class="vertical-content"></div>
+        <div id="food-venues" class="vertical-venues"></div>
         <div id="food-context" class="vertical-context"></div>
         
         <div class="vertical-listings" data-city="sydney" data-vertical="food"></div>
@@ -319,6 +320,7 @@
   <script src="/city-food-signature.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
   <script src="/city-radio.js" defer></script>
+  <script src="/city-venues.js" defer></script>
   <script src="/city-conditions.js" defer></script>
   <script src="/verticals-accordion.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
@@ -465,6 +467,12 @@
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
         GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country);
+      }
+
+      // Real named places from OpenStreetMap. Same treatment as Radio:
+      // a live keyless source, not a Supabase reading.
+      if (typeof GlotempVenues !== 'undefined' && city) {
+        GlotempVenues.loadVenues(city.slug, city.name, city.lat, city.lon);
       }
 
       // Conditions line: same treatment as Radio -- a live free-API
