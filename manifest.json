@@ -1,6 +1,6 @@
 {
   "id": "/",
-  "name": "Glotemp — The Living City Atlas",
+  "name": "Glotemp: The Living City Atlas",
   "short_name": "Glotemp",
   "start_url": "/?source=pwa",
   "scope": "/",
@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#06060A",
   "theme_color": "#06060A",
-  "description": "A private companion that reveals how a city truly feels — before you arrive, while you are there, and long after you leave. Real-time collective mood infrastructure for the discerning traveller.",
+  "description": "A private companion that reveals how a city truly feels, before you arrive, while you are there, and long after you leave. Real-time collective mood infrastructure for the discerning traveller.",
   "lang": "en",
   "dir": "ltr",
   "categories": ["travel", "lifestyle", "news", "social"],

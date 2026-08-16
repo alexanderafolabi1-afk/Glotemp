@@ -131,7 +131,7 @@
 
     const streak = stats.current_streak || 0;
     const streakHint = streak > 0
-      ? (streak === 1 ? '1 day so far — keep the chain.' : streak + ' days so far — keep the chain.')
+      ? (streak === 1 ? '1 day so far. Keep the chain.' : streak + ' days so far. Keep the chain.')
       : 'Your first day begins here.';
 
     root.innerHTML = `

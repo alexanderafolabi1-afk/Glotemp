@@ -24,7 +24,7 @@ async function fetchGitHubActivity(city: string, repoInfo: { org: string; repos:
     const token = Deno.env.get("GITHUB_TOKEN");
     // IMPORTANT: only send an Authorization header when a real token exists.
     // Sending "Authorization: token " with an empty value causes GitHub to
-    // reject every request with 401 Bad credentials — even ones that would
+    // reject every request with 401 Bad credentials - even ones that would
     // otherwise succeed unauthenticated.
     const headers: Record<string, string> = {
       "Accept": "application/vnd.github.v3+json",
@@ -41,7 +41,7 @@ async function fetchGitHubActivity(city: string, repoInfo: { org: string; repos:
       const response = await fetch(url, { headers });
       if (!response.ok) {
         const body = await response.text().catch(() => "");
-        console.warn(`[github-tech-activity] ${city}/${repo}: HTTP ${response.status} — ${body.slice(0, 200)}`);
+        console.warn(`[github-tech-activity] ${city}/${repo}: HTTP ${response.status} - ${body.slice(0, 200)}`);
         continue;
       }
 
@@ -66,7 +66,7 @@ async function fetchGitHubActivity(city: string, repoInfo: { org: string; repos:
       confidence: 0.7 + Math.random() * 0.3,
     };
   } catch (error) {
-    console.error(`[github-tech-activity] ${city}: exception — ${error.message}`);
+    console.error(`[github-tech-activity] ${city}: exception - ${error.message}`);
     return null;
   }
 }
@@ -128,7 +128,7 @@ Deno.serve(async (_req: Request) => {
 
     if (rowsWritten === 0) {
       return new Response(
-        JSON.stringify({ success: false, error: "No rows written — all fetches or inserts failed", cities: 0 }),
+        JSON.stringify({ success: false, error: "No rows written - all fetches or inserts failed", cities: 0 }),
         { headers: { "Content-Type": "application/json" }, status: 502 }
       );
     }

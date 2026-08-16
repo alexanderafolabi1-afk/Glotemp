@@ -76,19 +76,19 @@ enable_confirmations = true
 # brass hairlines, Fraunces headings, Manrope body, no boxes, and a text
 # link rather than a filled button.
 [auth.email.template.confirmation]
-subject = "Confirm your email — Glotemp"
+subject = "Confirm your email - Glotemp"
 content_path = "./supabase/email-templates/confirmation.html"
 
 [auth.email.template.magic_link]
-subject = "Your sign-in link — Glotemp"
+subject = "Your sign-in link - Glotemp"
 content_path = "./supabase/email-templates/magic-link.html"
 
 [auth.email.template.recovery]
-subject = "Reset your password — Glotemp"
+subject = "Reset your password - Glotemp"
 content_path = "./supabase/email-templates/recovery.html"
 
 [auth.email.template.email_change]
-subject = "Confirm your new email — Glotemp"
+subject = "Confirm your new email - Glotemp"
 content_path = "./supabase/email-templates/email-change.html"
 
 # Custom SMTP, so mail comes from glo-temp.com rather than Supabase's

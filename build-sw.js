@@ -25,6 +25,7 @@ const SOURCES = [
   'glotemp-tonight.js', 'glotemp-spin.js', 'glotemp-features.js',
   'glotemp-gem.js', 'glotemp-movers.js', 'glotemp-showcase.js',
   'living-index.js', 'cities-data.js', 'tempo-economy.js',
+  'glotemp-analytics.js',
   'city-tiles.js',
   'verticals-engine.js', 'stories.js', 'cookie-consent.js',
   'about/index.html', 'explore/index.html', 'feed/index.html',

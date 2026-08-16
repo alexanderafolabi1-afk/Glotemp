@@ -59,7 +59,7 @@ async function fetchTransitData(city: string, coords: { lat: number; lon: number
 
     if (!response.ok) {
       const body = await response.text().catch(() => "");
-      console.warn(`[transitland-transport] ${city}: HTTP ${response.status} — ${body.slice(0, 200)}, using synthetic fallback`);
+      console.warn(`[transitland-transport] ${city}: HTTP ${response.status} - ${body.slice(0, 200)}, using synthetic fallback`);
       return {
         transit_quality: 5 + Math.random() * 4,
         bike_share_bikes: Math.floor(Math.random() * 5000),
@@ -79,7 +79,7 @@ async function fetchTransitData(city: string, coords: { lat: number; lon: number
       confidence: Math.min(0.85, (stopCount + routeCount) / 200),
     };
   } catch (error) {
-    console.error(`[transitland-transport] ${city}: exception — ${error.message}, using synthetic fallback`);
+    console.error(`[transitland-transport] ${city}: exception - ${error.message}, using synthetic fallback`);
     return {
       transit_quality: 5 + Math.random() * 4,
       bike_share_bikes: Math.floor(Math.random() * 5000),
@@ -146,7 +146,7 @@ Deno.serve(async (_req: Request) => {
 
     if (rowsWritten === 0) {
       return new Response(
-        JSON.stringify({ success: false, error: "No rows written — all inserts failed (check Supabase credentials)", cities: 0 }),
+        JSON.stringify({ success: false, error: "No rows written - all inserts failed (check Supabase credentials)", cities: 0 }),
         { headers: { "Content-Type": "application/json" }, status: 502 }
       );
     }

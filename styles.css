@@ -1416,15 +1416,145 @@ summary:focus:not(:focus-visible) {
   outline: none;
 }
 
-/* ===== INSTALL BANNER ===== */
+/* ===== INSTALL BANNER =====
+   The markup carries its own classes rather than .glass-card, so every
+   surface it needs is declared here. Mobile first: a full-width sheet
+   pinned to the bottom edge at 320px, becoming a centred card once there
+   is room. */
 #install-banner {
   position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 1rem 2rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 1000;
-  width: auto;
+  padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg, var(--basalt-raised) 0%, var(--basalt) 100%);
+  border-top: 1px solid var(--brass-dim);
+  box-shadow: 0 -18px 44px rgba(0, 0, 0, 0.55);
+  color: var(--ivory);
+}
+
+.install-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  max-width: 640px;
+  margin: 0 auto;
+  /* Flex children default to min-width:auto, which refuses to shrink and
+     is what produces horizontal scroll at 320px. */
+  min-width: 0;
+}
+
+.install-icon-wrap {
+  flex: none;
+}
+
+.install-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: block;
+}
+
+.install-copy {
+  min-width: 0;
+}
+
+.install-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin: 0 0 0.35rem;
+}
+
+.install-headline {
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.25;
+  font-weight: var(--fw-semibold);
+  color: var(--ivory);
+  margin: 0 0 0.4rem;
+}
+
+.install-body {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--sand);
+  margin: 0;
+}
+
+.install-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.install-cta,
+.install-later {
+  min-height: 44px;
+  width: 100%;
+  font-size: 15px;
+}
+
+.install-later {
+  color: var(--sand);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.install-dismiss {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  min-width: 44px;
+  min-height: 44px;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--sand);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+@media (min-width: 640px) {
+  #install-banner {
+    left: 50%;
+    right: auto;
+    bottom: 20px;
+    transform: translateX(-50%);
+    width: min(640px, calc(100vw - 2rem));
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--brass-dim);
+    border-radius: 18px;
+  }
+
+  .install-inner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    align-items: start;
+    column-gap: 1rem;
+    row-gap: 0.85rem;
+  }
+
+  .install-icon-wrap { grid-row: 1 / -1; }
+
+  .install-actions {
+    grid-column: 2;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .install-cta { width: auto; }
+  .install-later { width: auto; }
 }
 
 .flex-between {
@@ -6406,7 +6536,7 @@ body > section {
 }
 
 /* ==========================================================================
-   CITY TILES — the reading section's live city browser
+   CITY TILES - the reading section's live city browser
    Additive only. Nothing here restyles an existing selector; every rule is
    scoped to .city-tiles / .city-tile, which nothing else on the site uses.
    ========================================================================== */
@@ -6649,4 +6779,63 @@ body > section {
   .city-credit-link:hover {
     transform: none;
   }
+}
+
+/* ==========================================================================
+   MOBILE STANDING RULES
+   The site is a PWA judged on the phone first, so these are floors rather
+   than refinements.
+   ========================================================================== */
+
+/* iOS zooms the whole page when a focused input is under 16px, which then
+   leaves the layout scrolled sideways with no way back. Applied only up to
+   tablet so desktop type scale is untouched. */
+@media (max-width: 900px) {
+  input,
+  select,
+  textarea,
+  .checkin-note,
+  .cities-search-input,
+  .cities-select,
+  .filter-select,
+  .filter-input,
+  .comment-input,
+  .gt-auth-input {
+    font-size: 16px !important;
+  }
+}
+
+/* The city name in a feed row is a standalone navigation link, not a link
+   inside a sentence, so the 44px floor applies to it. Padding would push
+   the row apart; a min-height with centred content grows the hit area
+   while leaving the text exactly where it was. */
+.feed-city {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+/* A flex item defaults to min-width: auto, which means it will not shrink
+   below its content's intrinsic width. The ticker track is the doubled
+   observation list, hundreds of thousands of pixels wide, so `flex: 1`
+   alone made the container demand that width and pushed the document
+   sideways at 320px. overflow: hidden cannot clip what the box has already
+   been sized to. min-width: 0 lets it shrink so the clip applies. */
+.ticker-content { min-width: 0; }
+
+/* At narrow widths the mood row is a rigid `repeat(5, 1fr)` grid. On a
+   248px container that is a 40px column, while "ENERGIZED" needs 65px, so
+   every label overflowed its own cell and pushed the document 27px wider
+   than the viewport. auto-fit with a 64px floor keeps five across wherever
+   they fit and drops to two rows when they do not, which is what the 320px
+   case actually needs. */
+@media (max-width: 900px) {
+  .mood-buttons,
+  .check-in .mood-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
+    gap: 0.6rem;
+  }
+  .mood-btn { min-width: 0; padding-left: 0.2rem; padding-right: 0.2rem; }
+  .mood-btn-label { font-size: 0.62rem; letter-spacing: 0.04em; }
 }

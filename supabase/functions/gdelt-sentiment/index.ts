@@ -44,7 +44,7 @@ async function fetchGDELTSentiment(city: string, keywords: string[]) {
 
     if (!response.ok) {
       const body = await response.text().catch(() => "");
-      console.error(`[gdelt-sentiment] ${city}: HTTP ${response.status} ${response.statusText} — ${body.slice(0, 300)}`);
+      console.error(`[gdelt-sentiment] ${city}: HTTP ${response.status} ${response.statusText} - ${body.slice(0, 300)}`);
       return null;
     }
 
@@ -76,7 +76,7 @@ async function fetchGDELTSentiment(city: string, keywords: string[]) {
       signalVolume: totalCount,
     };
   } catch (error) {
-    console.error(`[gdelt-sentiment] ${city}: exception — ${error.message}`);
+    console.error(`[gdelt-sentiment] ${city}: exception - ${error.message}`);
     return null;
   }
 }
@@ -135,7 +135,7 @@ Deno.serve(async (_req: Request) => {
 
     if (rowsWritten === 0) {
       return new Response(
-        JSON.stringify({ success: false, error: "No rows written — all fetches or inserts failed", cities: 0 }),
+        JSON.stringify({ success: false, error: "No rows written - all fetches or inserts failed", cities: 0 }),
         { headers: { "Content-Type": "application/json" }, status: 502 }
       );
     }

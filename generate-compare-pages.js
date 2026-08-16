@@ -108,6 +108,7 @@ function pageHTML(a, b) {
     .compare-metric-value.right { text-align: left; }
     .compare-metric-value.winner { color: var(--band-warm); font-weight: 600; }
   </style>
+  <script src="/glotemp-analytics.js" defer></script>
 </head>
 <body>
   <nav id="site-nav"></nav>

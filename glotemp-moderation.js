@@ -49,7 +49,7 @@
           ok: false,
           action: 'block',
           reason: 'profanity',
-          message: "That can't be posted — please remove the strong language and try again.",
+          message: "That can't be posted. Please remove the strong language and try again.",
         };
       }
     }
@@ -60,7 +60,7 @@
           ok: true,
           action: 'auto_hide',
           reason: 'negative_language',
-          message: 'Posted quietly — we prioritise constructive notes on the public feed.',
+          message: 'Posted quietly. We prioritise constructive notes on the public feed.',
         };
       }
     }

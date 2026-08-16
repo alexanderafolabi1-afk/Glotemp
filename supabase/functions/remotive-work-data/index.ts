@@ -37,7 +37,7 @@ async function fetchRemotiveData(city: string, keyword: string) {
 
     if (!response.ok) {
       const body = await response.text().catch(() => "");
-      console.error(`[remotive-work-data] ${city}: HTTP ${response.status} — ${body.slice(0, 300)}`);
+      console.error(`[remotive-work-data] ${city}: HTTP ${response.status} - ${body.slice(0, 300)}`);
       return null;
     }
 
@@ -65,7 +65,7 @@ async function fetchRemotiveData(city: string, keyword: string) {
       confidence: Math.min(0.85, cityJobs.length / 50),
     };
   } catch (error) {
-    console.error(`[remotive-work-data] ${city}: exception — ${error.message}`);
+    console.error(`[remotive-work-data] ${city}: exception - ${error.message}`);
     return null;
   }
 }
@@ -127,7 +127,7 @@ Deno.serve(async (_req: Request) => {
 
     if (rowsWritten === 0) {
       return new Response(
-        JSON.stringify({ success: false, error: "No rows written — all fetches or inserts failed", cities: 0 }),
+        JSON.stringify({ success: false, error: "No rows written - all fetches or inserts failed", cities: 0 }),
         { headers: { "Content-Type": "application/json" }, status: 502 }
       );
     }

@@ -83,6 +83,7 @@ function pageHTML(v) {
     .rank-movement { font-family: var(--font-mono); font-size: 0.78rem; color: var(--sand); width: 4.5rem; text-align: right; flex-shrink: 0; }
     .threshold-note { padding: 0 1.5rem 1.5rem; color: var(--sand); font-size: 0.85rem; font-family: var(--font-mono); }
   </style>
+  <script src="/glotemp-analytics.js" defer></script>
 </head>
 <body>
   <nav id="site-nav"></nav>

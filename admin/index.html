@@ -2,270 +2,334 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#06060A" />
-  <title>Glotemp Admin Dashboard</title>
-  <!-- Type system: Fraunces (display), Manrope (body), IBM Plex Mono (data) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#14100B" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Glotemp Admin</title>
+
+  <!-- Its own manifest, so adding this to a home screen gives it its own
+       icon and opens it full screen at /admin rather than at the public
+       site's start_url. -->
+  <link rel="manifest" href="/admin/manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Glotemp Admin" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
-  <!-- Version must be bumped on CSS-affecting deploys -->
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css?v=57" />
+
   <style>
-    .admin-locked { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-    .pin-modal { background: rgba(23, 25, 38, 0.82); backdrop-filter: blur(12px); padding: 3rem; border-radius: 24px; text-align: center; max-width: 400px; border: 1px solid rgba(233,231,240,0.10); }
-    .pin-input { width: 100%; padding: 1rem; margin: 1rem 0; background: rgba(233,231,240,0.08); border: 1px solid rgba(233,231,240,0.1); border-radius: 12px; color: #E9E7F0; font-size: 1.2rem; letter-spacing: 2px; }
-    .pin-submit { background: linear-gradient(135deg, #4FD8E8, #8B6BF5); border: none; padding: 1rem 2rem; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; margin-top: 1rem; width: 100%; }
-    .pin-submit:hover { transform: scale(1.05); }
-    .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-    .stat-card { background: rgba(23, 25, 38, 0.82); backdrop-filter: blur(12px); padding: 2rem; border-radius: 16px; border: 1px solid rgba(233,231,240,0.1); text-align: center; }
-    .stat-number { font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #4FD8E8, #8B6BF5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .stat-label { font-size: 0.9rem; color: #9C99AB; margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 1px; }
-    .table-section { background: rgba(23, 25, 38, 0.82); backdrop-filter: blur(12px); padding: 1.5rem; border-radius: 16px; border: 1px solid rgba(233,231,240,0.1); margin-bottom: 1.5rem; overflow-x: auto; }
-    .table-section h3 { margin-top: 0; }
-    table { width: 100%; font-size: 0.9rem; }
-    th { text-align: left; padding: 0.75rem; border-bottom: 1px solid rgba(233,231,240,0.1); }
-    td { padding: 0.75rem; border-bottom: 1px solid rgba(233,231,240,0.05); }
-    tr:hover { background: rgba(233,231,240,0.03); }
-    .admin-logout { margin-top: 2rem; }
-    .btn-logout { background: rgba(200,107,224,0.2); border: 1px solid rgba(200,107,224,0.5); color: #C86BE0; padding: 0.8rem 1.5rem; border-radius: 20px; cursor: pointer; font-weight: 600; }
-    .btn-logout:hover { background: rgba(200,107,224,0.3); }
+    /* Mobile first throughout. This is read on a phone before a desktop. */
+    .adm { padding: 1.5rem 0 3rem; }
+    .adm-eyebrow {
+      font-family: var(--font-mono); font-variant-caps: small-caps;
+      font-size: 0.74rem; letter-spacing: 0.1em; color: var(--sand); margin: 0 0 0.5rem;
+    }
+    .adm-title {
+      font-family: var(--font-display); font-weight: var(--fw-light);
+      font-size: clamp(1.7rem, 6vw, 2.6rem); color: var(--ivory); margin: 0 0 1.5rem; line-height: 1.15;
+    }
+    .adm-copy { color: var(--sand); line-height: 1.65; max-width: 54ch; margin: 0 0 1rem; }
+
+    /* Numbers, on hairlines. No cards. */
+    .adm-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1.5rem 1.25rem; margin: 1.5rem 0 2.5rem;
+    }
+    .adm-stat { border-top: 1px solid var(--hairline); padding-top: 0.85rem; min-width: 0; }
+    .adm-stat-value {
+      font-family: var(--font-mono); font-size: clamp(1.6rem, 7vw, 2.2rem);
+      color: var(--ivory); font-variant-numeric: tabular-nums; line-height: 1.1; display: block;
+    }
+    .adm-stat-label {
+      font-family: var(--font-mono); font-variant-caps: small-caps; font-size: 0.72rem;
+      letter-spacing: 0.07em; color: var(--sand); margin-top: 0.3rem; display: block;
+    }
+
+    .adm-section-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 1rem; flex-wrap: wrap; margin: 2.5rem 0 1rem;
+      border-top: 1px solid var(--hairline); padding-top: 1.25rem;
+    }
+    .adm-h2 { font-family: var(--font-display); font-weight: var(--fw-light); font-size: 1.25rem; color: var(--ivory); margin: 0; }
+
+    .adm-row {
+      display: flex; align-items: baseline; gap: 1rem;
+      padding: 0.8rem 0; border-bottom: 1px solid var(--hairline);
+    }
+    .adm-row-city { font-family: var(--font-display); font-size: 1rem; color: var(--ivory); flex: 1; min-width: 0; }
+    .adm-row-count { font-family: var(--font-mono); font-size: 1rem; color: var(--ivory); font-variant-numeric: tabular-nums; }
+    .adm-row-when { font-family: var(--font-mono); font-size: 0.7rem; color: var(--sand); opacity: 0.75; white-space: nowrap; }
+
+    /* Range picker: text with a hairline under the active one. */
+    .adm-range { display: flex; gap: 1.25rem; }
+    .adm-range button {
+      background: none; border: none; border-bottom: 1px solid transparent; border-radius: 0;
+      padding: 0.4rem 0; min-height: 44px; cursor: pointer;
+      font-family: var(--font-mono); font-variant-caps: small-caps; font-size: 0.8rem;
+      letter-spacing: 0.07em; color: var(--sand);
+    }
+    .adm-range button[aria-pressed="true"] { color: var(--ivory); border-bottom-color: var(--brass); }
+
+    .adm-action {
+      display: inline-flex; align-items: center; min-height: 44px;
+      background: none; border: none; border-bottom: 1px solid var(--brass); border-radius: 0;
+      padding: 0.35rem 0; cursor: pointer; text-decoration: none;
+      font-family: var(--font-mono); font-variant-caps: small-caps;
+      font-size: 0.88rem; letter-spacing: 0.09em; color: var(--ivory);
+    }
+    .adm-action:hover { color: var(--brass); }
+    .adm-secondary {
+      display: inline-flex; align-items: center; min-height: 44px; margin-left: 1.5rem;
+      font-family: var(--font-mono); font-variant-caps: small-caps; font-size: 0.78rem;
+      letter-spacing: 0.07em; color: var(--sand); text-decoration: none;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .adm-secondary:hover { color: var(--ivory); }
+
+    /* 16px minimum, or iOS zooms the page when the field takes focus. */
+    .adm-input {
+      width: 100%; max-width: 22rem; font-size: 16px; min-height: 44px;
+      background: transparent; border: none; border-bottom: 1px solid var(--brass-dim);
+      border-radius: 0; color: var(--ivory); font-family: var(--font-body); padding: 0.5rem 0;
+    }
+    .adm-input:focus { outline: none; border-bottom-color: var(--brass); }
+    .adm-label {
+      display: block; font-family: var(--font-mono); font-variant-caps: small-caps;
+      font-size: 0.74rem; letter-spacing: 0.07em; color: var(--sand); margin-bottom: 0.4rem;
+    }
+    .adm-status { font-family: var(--font-mono); font-size: 0.78rem; color: var(--sand); margin: 0.75rem 0 0; }
+    .adm-note { border-left: 2px solid var(--brass); padding-left: 0.9rem; max-width: 54ch; }
+
+    @media (max-width: 400px) {
+      .adm-row { flex-wrap: wrap; gap: 0.4rem 1rem; }
+      .adm-row-when { width: 100%; }
+    }
   </style>
+  <script src="/glotemp-analytics.js" defer></script>
 </head>
 <body>
-  <div id="app">
-    <!-- PIN Lock -->
-    <div id="admin-lock" class="admin-locked">
-      <div class="pin-modal">
-        <h2>Glotemp Admin</h2>
-        <p style="color: var(--text-secondary); margin: 1rem 0;">Enter PIN to continue</p>
-        <input type="password" id="pin-input" class="pin-input" placeholder="••••" maxlength="4" />
-        <button class="pin-submit" onclick="checkPin()">Unlock</button>
+  <nav id="site-nav"></nav>
+<script src="/nav-component.js"></script>
+
+  <main class="page-main">
+    <section class="glass-card">
+      <div class="adm" id="adm-root">
+        <p class="adm-eyebrow">Admin</p>
+        <h1 class="adm-title">Checking your access.</h1>
       </div>
-    </div>
+    </section>
+  </main>
 
-    <!-- Admin Dashboard (hidden until PIN entered) -->
-    <div id="admin-dashboard" style="display: none;">
-      <!-- Navigation -->
-      <nav class="navbar glass">
-        <div class="nav-brand">
-          <img src="/assets/logo.png" alt="Glotemp" class="nav-logo">
-          <span class="logo-text">Glotemp Admin</span>
-        </div>
-        <div class="nav-links">
-          <span style="color: var(--text-secondary);">Mission Control</span>
-          <button class="btn-icon" onclick="logoutAdmin()" title="Logout">✕</button>
-        </div>
-      </nav>
+  <footer class="footer glass">
+    <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
+  </footer>
 
-      <div style="max-width: 1200px; margin: 0 auto; padding: 1rem;">
-        <h1>Dashboard</h1>
-        <p style="color: var(--text-secondary);">Real-time platform metrics</p>
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
+  <script src="/glotemp-auth.js"></script>
+  <script src="/cookie-consent.js" defer></script>
+  <script>
+  (function () {
+    'use strict';
 
-        <!-- Stats Grid -->
-        <div class="admin-grid">
-          <div class="stat-card">
-            <div class="stat-number" id="total-comments">0</div>
-            <div class="stat-label">Total Comments</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number" id="total-stars">0</div>
-            <div class="stat-label">Stars Awarded</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number" id="total-reporters">0</div>
-            <div class="stat-label">Active Reporters</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number" id="revenue-estimate">$0</div>
-            <div class="stat-label">Est. Daily Revenue</div>
-          </div>
-        </div>
+    // This page holds no secret of its own. Access is decided by the
+    // database: every function it calls refuses to run unless
+    // profiles.is_admin is true for the signed-in user. Reading this
+    // source tells an attacker nothing they can use, which is the whole
+    // difference from the PIN this replaced.
+    var SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
+    var SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
 
-        <!-- Top Reporters Table -->
-        <div class="table-section">
-          <h3>🏆 Top 10 Reporters</h3>
-          <table id="top-reporters-table">
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>User ID</th>
-                <th>Stars</th>
-                <th>Rank</th>
-              </tr>
-            </thead>
-            <tbody id="top-reporters-body">
-              <tr><td colspan="4" style="text-align: center; padding: 2rem;">Loading...</td></tr>
-            </tbody>
-          </table>
-        </div>
+    var root = document.getElementById('adm-root');
+    var days = 7;
 
-        <!-- Recent Comments -->
-        <div class="table-section">
-          <h3>📝 Recent Comments (Last 10)</h3>
-          <table id="recent-comments-table">
-            <thead>
-              <tr>
-                <th>City</th>
-                <th>Mood</th>
-                <th>Text</th>
-                <th>Time</th>
-              </tr>
-            </thead>
-            <tbody id="recent-comments-body">
-              <tr><td colspan="4" style="text-align: center; padding: 2rem;">Loading...</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Revenue Placeholders -->
-        <div class="table-section">
-          <h3>💰 Revenue Streams</h3>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-            <div style="padding: 1rem; background: rgba(79,216,232,0.1); border-radius: 8px; border-left: 3px solid #4FD8E8;">
-              <strong>API Subscriptions</strong>
-              <div style="font-size: 1.8rem; margin-top: 0.5rem;">$2,450</div>
-              <small style="color: #9C99AB;">estimated monthly</small>
-            </div>
-            <div style="padding: 1rem; background: rgba(139,107,245,0.1); border-radius: 8px; border-left: 3px solid #8B6BF5;">
-              <strong>Sponsored Cards</strong>
-              <div style="font-size: 1.8rem; margin-top: 0.5rem;">$890</div>
-              <small style="color: #9C99AB;">estimated monthly</small>
-            </div>
-            <div style="padding: 1rem; background: rgba(200,107,224,0.1); border-radius: 8px; border-left: 3px solid #C86BE0;">
-              <strong>Affiliate Commissions</strong>
-              <div style="font-size: 1.8rem; margin-top: 0.5rem;">$340</div>
-              <small style="color: #9C99AB;">estimated monthly</small>
-            </div>
-          </div>
-        </div>
-
-        <!-- Logout -->
-        <div class="admin-logout">
-          <button class="btn-logout" onclick="logoutAdmin()">Logout</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="/tempo-economy.js" defer></script>
-  <script defer>
-    const ADMIN_PIN = '1234';
-
-    function checkPin() {
-      const pin = document.getElementById('pin-input').value;
-      if (pin === ADMIN_PIN) {
-        sessionStorage.setItem('glotemp-admin-session', 'true');
-        document.getElementById('admin-lock').style.display = 'none';
-        document.getElementById('admin-dashboard').style.display = 'block';
-        loadAdminData();
-      } else {
-        alert('Incorrect PIN');
-        document.getElementById('pin-input').value = '';
-      }
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
+    function render(html) { root.innerHTML = html; }
 
-    function logoutAdmin() {
-      sessionStorage.removeItem('glotemp-admin-session');
-      document.getElementById('admin-lock').style.display = 'flex';
-      document.getElementById('admin-dashboard').style.display = 'none';
-      document.getElementById('pin-input').value = '';
-    }
-
-    function checkSession() {
-      if (sessionStorage.getItem('glotemp-admin-session') === 'true') {
-        document.getElementById('admin-lock').style.display = 'none';
-        document.getElementById('admin-dashboard').style.display = 'block';
-        loadAdminData();
-      }
-    }
-
-    async function loadAdminData() {
-      try {
-        const stats = await getAdminStats();
-
-        // Update stats
-        document.getElementById('total-comments').textContent = stats.totalComments || 0;
-        document.getElementById('total-stars').textContent = stats.totalStars || 0;
-        document.getElementById('total-reporters').textContent = stats.reporters.length || 0;
-        document.getElementById('revenue-estimate').textContent = '$' + Math.floor((stats.totalStars / 100) * 12);
-
-        // Update top reporters table
-        const topReportersBody = document.getElementById('top-reporters-body');
-        topReportersBody.innerHTML = '';
-
-        (stats.reporters || []).slice(0, 10).forEach((reporter, idx) => {
-          const row = document.createElement('tr');
-          const rankCell = document.createElement('td');
-          rankCell.textContent = idx + 1;
-
-          const userCell = document.createElement('td');
-          userCell.style.fontSize = '0.8rem';
-          userCell.style.color = '#9C99AB';
-          userCell.textContent = reporter.user_id.substring(0, 12);
-
-          const starsCell = document.createElement('td');
-          starsCell.textContent = reporter.total_stars;
-
-          const rankNameCell = document.createElement('td');
-          rankNameCell.textContent = reporter.current_rank || 'Contributor';
-
-          row.appendChild(rankCell);
-          row.appendChild(userCell);
-          row.appendChild(starsCell);
-          row.appendChild(rankNameCell);
-          topReportersBody.appendChild(row);
-        });
-
-        if (stats.reporters.length === 0) {
-          topReportersBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 1rem;">No reporters yet</td></tr>';
-        }
-
-        // Update recent comments
-        const recentComments = await getRecentComments(10);
-        const recentCommentsBody = document.getElementById('recent-comments-body');
-        recentCommentsBody.innerHTML = '';
-
-        recentComments.forEach(comment => {
-          const row = document.createElement('tr');
-          const time = new Date(comment.created_at).toLocaleString();
-
-          const cityCell = document.createElement('td');
-          cityCell.textContent = comment.city_slug;
-
-          const moodCell = document.createElement('td');
-          moodCell.textContent = comment.mood_emoji;
-
-          const textCell = document.createElement('td');
-          textCell.style.maxWidth = '300px';
-          textCell.style.overflow = 'hidden';
-          textCell.style.textOverflow = 'ellipsis';
-          textCell.textContent = comment.text;
-
-          const timeCell = document.createElement('td');
-          timeCell.style.fontSize = '0.8rem';
-          timeCell.style.color = '#9C99AB';
-          timeCell.textContent = time;
-
-          row.appendChild(cityCell);
-          row.appendChild(moodCell);
-          row.appendChild(textCell);
-          row.appendChild(timeCell);
-          recentCommentsBody.appendChild(row);
-        });
-
-      } catch (error) {
-        console.error('Error loading admin data:', error);
-      }
-    }
-
-    // Allow Enter key to submit PIN
-    document.addEventListener('DOMContentLoaded', () => {
-      checkSession();
-      document.getElementById('pin-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') checkPin();
+    async function rpc(fn, args) {
+      var session = await GlotempAuth.getSession();
+      if (!session) throw new Error('no session');
+      var resp = await fetch(SUPABASE_URL + '/rest/v1/rpc/' + fn, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: 'Bearer ' + session.access_token,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(args || {}),
       });
-    });
+      if (!resp.ok) throw new Error(fn + ' ' + resp.status);
+      return resp.json();
+    }
+
+    function cityName(slug) {
+      var rec = (window.CITIES_DATA || []).find(function (c) { return c.slug === slug; });
+      return rec ? rec.name : slug;
+    }
+    function ago(iso) {
+      if (!iso) return '';
+      var mins = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 60000));
+      if (mins < 60) return mins + 'm ago';
+      var h = Math.floor(mins / 60);
+      if (h < 24) return h + 'h ago';
+      return Math.floor(h / 24) + 'd ago';
+    }
+
+    // ---------- states ----------
+    function signedOut() {
+      render(
+        '<p class="adm-eyebrow">Admin</p>' +
+        '<h1 class="adm-title">Sign in to continue.</h1>' +
+        '<p class="adm-copy">This dashboard is tied to your Glotemp account. There is no shared password.</p>' +
+        '<form id="adm-signin-form">' +
+          '<label class="adm-label" for="adm-email">Email</label>' +
+          '<input class="adm-input" type="email" id="adm-email" placeholder="you@example.com" required autocomplete="email">' +
+          '<p><button class="adm-action" type="submit">Send me a sign-in link</button></p>' +
+        '</form>' +
+        '<p class="adm-status" id="adm-status" role="status" aria-live="polite"></p>'
+      );
+      document.getElementById('adm-signin-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var email = document.getElementById('adm-email').value.trim();
+        var status = document.getElementById('adm-status');
+        if (!email) return;
+        status.textContent = 'Sending...';
+        try {
+          await GlotempAuth.signInWithEmail(email);
+          status.textContent = 'Check your email. The link signs you in on this device.';
+        } catch (err) {
+          status.textContent = 'Could not send that just now. Try again shortly.';
+        }
+      });
+    }
+
+    function notAdmin() {
+      render(
+        '<p class="adm-eyebrow">Admin</p>' +
+        '<h1 class="adm-title">This account is not an admin.</h1>' +
+        '<div class="adm-note">' +
+          '<p class="adm-copy">Admin access is granted in the database, never from a page. ' +
+          'Nothing you can click here will grant it.</p>' +
+        '</div>' +
+        '<p style="margin-top:1.5rem"><a class="adm-action" href="/">Back to Glotemp</a></p>'
+      );
+    }
+
+    function stat(value, label) {
+      return '<div class="adm-stat"><span class="adm-stat-value">' + esc(value) + '</span>' +
+             '<span class="adm-stat-label">' + esc(label) + '</span></div>';
+    }
+
+    function dashboard(overview, byCity) {
+      var m = {};
+      (overview || []).forEach(function (r) { m[r.metric] = r.value; });
+
+      var rows = (byCity || []).length
+        ? byCity.map(function (r) {
+            return '<div class="adm-row">' +
+              '<span class="adm-row-city">' + esc(cityName(r.city_slug)) + '</span>' +
+              '<span class="adm-row-count">' + esc(r.checkins) + '</span>' +
+              '<span class="adm-row-when">' + esc(ago(r.last_at)) + '</span>' +
+            '</div>';
+          }).join('')
+        : '<p class="adm-copy">No check-ins in this window.</p>';
+
+      render(
+        '<p class="adm-eyebrow">Admin</p>' +
+        '<h1 class="adm-title">The instrument, from the inside.</h1>' +
+
+        '<div class="adm-range" role="group" aria-label="Range">' +
+          [1, 7, 30].map(function (d) {
+            return '<button type="button" data-days="' + d + '" aria-pressed="' + (d === days) + '">' +
+              (d === 1 ? 'Today' : 'Last ' + d + ' days') + '</button>';
+          }).join('') +
+        '</div>' +
+
+        '<div class="adm-grid">' +
+          stat(m.checkins || 0, 'check-ins') +
+          stat(m.cities_active || 0, 'cities active') +
+          stat(m.signed_up || 0, 'new accounts') +
+          stat(m.installs || 0, 'installs') +
+          stat(m.sessions_standalone || 0, 'home screen opens') +
+          stat(m.sessions || 0, 'sessions') +
+        '</div>' +
+
+        '<div class="adm-section-head"><h2 class="adm-h2">Check-ins by city</h2></div>' +
+        rows +
+
+        '<div class="adm-section-head"><h2 class="adm-h2">Install prompt</h2></div>' +
+        '<div class="adm-grid">' +
+          stat(m.prompt_shown || 0, 'prompt shown') +
+          stat(m.prompt_dismissed || 0, 'dismissed') +
+        '</div>' +
+        '<div class="adm-note"><p class="adm-copy">Shown minus dismissed is not the same as installed. ' +
+        'Someone who was never asked and someone who declined are counted separately on purpose.</p></div>' +
+
+        '<div class="adm-section-head"><h2 class="adm-h2">Visitors</h2></div>' +
+        '<p class="adm-copy">Visitor counts are kept by Cloudflare, which sets no cookies and so needs no consent banner.</p>' +
+        '<p><a class="adm-action" href="https://dash.cloudflare.com/?to=/:account/web-analytics" target="_blank" rel="noopener noreferrer">Open Cloudflare Web Analytics</a>' +
+        '<a class="adm-secondary" href="#" id="adm-signout">Sign out</a></p>'
+      );
+
+      root.querySelectorAll('.adm-range button').forEach(function (b) {
+        b.addEventListener('click', function () {
+          days = Number(b.getAttribute('data-days')) || 7;
+          load();
+        });
+      });
+      var out = document.getElementById('adm-signout');
+      if (out) out.addEventListener('click', function (e) {
+        e.preventDefault(); GlotempAuth.signOut(); signedOut();
+      });
+    }
+
+    function failed(msg) {
+      render(
+        '<p class="adm-eyebrow">Admin</p>' +
+        '<h1 class="adm-title">Could not load that.</h1>' +
+        '<p class="adm-copy">' + esc(msg) + '</p>' +
+        '<p><button class="adm-action" type="button" onclick="location.reload()">Try again</button></p>'
+      );
+    }
+
+    async function load() {
+      try {
+        var results = await Promise.all([
+          rpc('admin_overview', { days: days }),
+          rpc('admin_checkins_by_city', { days: days, max_rows: 50 }),
+        ]);
+        dashboard(results[0], results[1]);
+      } catch (err) {
+        // The functions raise "not authorised" for a signed-in non-admin,
+        // which PostgREST returns as a 4xx. Treat that as the answer
+        // rather than an error.
+        failed('The numbers could not be read. If you were just made an admin, sign out and back in so the change is picked up.');
+      }
+    }
+
+    async function boot() {
+      if (!window.GlotempAuth) { failed('Sign-in did not load.'); return; }
+      if (!GlotempAuth.isSignedIn()) { signedOut(); return; }
+      try {
+        var admin = await rpc('is_admin', {});
+        if (admin !== true) { notAdmin(); return; }
+        await load();
+      } catch (err) {
+        notAdmin();
+      }
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+    else boot();
+  })();
   </script>
 </body>
 </html>

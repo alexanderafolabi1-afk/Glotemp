@@ -50,7 +50,7 @@
     if (now < CONTACTS.p1) {
       return {
         eyebrow: 'Today',
-        line: 'A total solar eclipse crosses the Arctic, Greenland, Iceland and northern Spain later today — peak 17:47 UTC, in ' + fmtDelta(CONTACTS.p1 - now) + '.',
+        line: 'A total solar eclipse crosses the Arctic, Greenland, Iceland and northern Spain later today - peak 17:47 UTC, in ' + fmtDelta(CONTACTS.p1 - now) + '.',
       };
     }
     if (now < CONTACTS.totalityStart) {
@@ -139,7 +139,7 @@
     if (noteEl) {
       noteEl.hidden = false;
       noteEl.innerHTML =
-        '<span class="eclipse-note-eyebrow">☀︎ Solar eclipse — ' + copy.eyebrow + '</span>' +
+        '<span class="eclipse-note-eyebrow">☀︎ Solar eclipse - ' + copy.eyebrow + '</span>' +
         '<span class="eclipse-note-line">' + copy.line + '</span>';
     }
     if (markEl) {

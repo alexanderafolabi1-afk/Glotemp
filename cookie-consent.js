@@ -145,6 +145,9 @@
     var banner = document.getElementById('cookie-consent-banner');
     if (banner) banner.remove();
     document.body.style.paddingBottom = '';
+    // The install banner is also pinned to the viewport bottom. It waits
+    // for this rather than stacking two dialogs on the same edge.
+    window.dispatchEvent(new CustomEvent('glotemp:consent-dismissed'));
     if (resizeHandler) {
       window.removeEventListener('resize', resizeHandler);
       resizeHandler = null;

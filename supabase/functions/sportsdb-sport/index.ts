@@ -6,7 +6,7 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const supabase = createClient(SUPABASE_URL ?? "", SUPABASE_SERVICE_ROLE_KEY ?? "");
 
 // TheSportsDB's public free test key. eventslast.php requires a numeric
-// team ID, not a team name — the old code passed names directly as `id`,
+// team ID, not a team name - the old code passed names directly as `id`,
 // which never matches anything and always returns {"results":null}.
 const SPORTSDB_KEY = "3";
 
@@ -87,7 +87,7 @@ async function fetchSportData(city: string, teams: string[]) {
       confidence: eventCount > 0 ? 0.75 + Math.random() * 0.25 : 0.5,
     };
   } catch (error) {
-    console.error(`[sportsdb-sport] ${city}: exception — ${error.message}`);
+    console.error(`[sportsdb-sport] ${city}: exception - ${error.message}`);
     return null;
   }
 }
@@ -149,7 +149,7 @@ Deno.serve(async (_req: Request) => {
 
     if (rowsWritten === 0) {
       return new Response(
-        JSON.stringify({ success: false, error: "No rows written — all fetches or inserts failed", cities: 0 }),
+        JSON.stringify({ success: false, error: "No rows written - all fetches or inserts failed", cities: 0 }),
         { headers: { "Content-Type": "application/json" }, status: 502 }
       );
     }

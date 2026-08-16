@@ -1,14 +1,14 @@
-# GLOTEMP — THE GLOBAL HUMAN + DATA PULSE ENGINE
+# GLOTEMP - THE GLOBAL HUMAN + DATA PULSE ENGINE
 
 > *Every city is a character. Every pulse is a story. Every check-in is a ritual.*
 
-**glotemp.com** · Seed Stage · Global · PWA
+**glo-temp.com** · Global · PWA
 
 -----
 
 ## What is Glotemp?
 
-Glotemp is the world’s first **real-time collective mood infrastructure** — a cinematic intelligence layer built at the intersection of human experience, machine signals, and city DNA.
+Glotemp is the world’s first **real-time collective mood infrastructure** - a cinematic intelligence layer built at the intersection of human experience, machine signals, and city DNA.
 
 It is not a weather app. Not a travel app. Not a social network. Not a dashboard.
 
@@ -20,7 +20,7 @@ It is a **living atlas**. A **decision oracle**. A **global nervous system**.
 
 Cities are not static. A city on a Friday night in Lagos feels nothing like the same city on a Tuesday morning. A city during exam season is not the same as a city during carnival. A city during political unrest is not the same as a city during a championship win.
 
-Yet every tool we have — travel platforms, investment research, tourism apps — treats cities as if they never change. They give you a city’s **average**, not its **now**.
+Yet every tool we have - travel platforms, investment research, tourism apps - treats cities as if they never change. They give you a city’s **average**, not its **now**.
 
 **Glotemp gives you now.**
 
@@ -123,10 +123,10 @@ Each scenario uses a different dimensional weighting. Each result includes a sco
 
 ## Revenue Streams
 
-1. **City Sponsorships** — $500–$5,000+/mo per city
-1. **Pulse Data API** — $99–$2,499/mo tiered SaaS
-1. **Premium Contributor Tier** — $9.99/mo subscription
-1. **Trip Intelligence Reports** — $4.99–$19.99 per report
+1. **City Sponsorships** - $500–$5,000+/mo per city
+1. **Pulse Data API** - $99–$2,499/mo tiered SaaS
+1. **Premium Contributor Tier** - $9.99/mo subscription
+1. **Trip Intelligence Reports** - $4.99–$19.99 per report
 
 -----
 
@@ -134,34 +134,34 @@ Each scenario uses a different dimensional weighting. Each result includes a sco
 
 |       |                                                           |
 |-------|-----------------------------------------------------------|
-|**TAM**|$180B — location intelligence, social listening, city data |
-|**SAM**|$22B — experiential marketing, city sponsorships, mood APIs|
-|**SOM**|$420M — conservative 5-year capture, 50+ cities            |
+|**TAM**|$180B - location intelligence, social listening, city data |
+|**SAM**|$22B - experiential marketing, city sponsorships, mood APIs|
+|**SOM**|$420M - conservative 5-year capture, 50+ cities            |
 
 -----
 
 ## Tech Stack
 
-- **Frontend:** Vanilla JS PWA (HTML5 / CSS3 / JS) — no framework, maximum performance
+- **Frontend:** Vanilla JS PWA (HTML5 / CSS3 / JS) - no framework, maximum performance
 - **Logic Engine:** In-browser pulse engine with multi-dimensional city scoring
 - **Storage:** localStorage (client-side persistence, privacy-preserving)
-- **Hosting:** Static PWA — Netlify / Vercel / GitHub Pages compatible
+- **Hosting:** Static PWA - Netlify / Vercel / GitHub Pages compatible
 - **Service Worker:** Offline capability built in
 
 ### Files
 
 ```
-index.html          — Main app interface
-about.html          — Brand manifesto
-investors.html      — Investor deck
-styles.css          — Full design system (Syne + DM Sans)
-app.js              — Core engine (pulse, trip, check-in, contributor)
-app-ui-patch.js     — UI render overrides for new design system
-sw.js               — Service worker
-manifest.json       — PWA manifest
+index.html          - Main app interface
+about.html          - Brand manifesto
+investors.html      - Investor deck
+styles.css          - Full design system (Syne + DM Sans)
+app.js              - Core engine (pulse, trip, check-in, contributor)
+app-ui-patch.js     - UI render overrides for new design system
+sw.js               - Service worker
+manifest.json       - PWA manifest
 ```
 
-### Integration Roadmap
+### Integrations
 
 - **Phase 1** (Live): In-browser pulse simulation + human check-ins
 - **Phase 2**: Real API integrations (OpenWeather, News APIs, Ticketmaster, etc.)
@@ -197,4 +197,4 @@ Decks, data-rooms, and founder calls available on request.
 
 -----
 
-*Glotemp — The world’s pulse, in motion.*
+*Glotemp - The world’s pulse, in motion.*

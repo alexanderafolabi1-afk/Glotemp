@@ -1,6 +1,6 @@
 # Glotemp Project Guidelines
 
-## STANDING RULE — Assets Directory
+## STANDING RULE - Assets Directory
 
 **Never generate, overwrite, replace, convert or delete any file in `/assets/`.**
 
