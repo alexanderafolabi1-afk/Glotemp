@@ -73,7 +73,7 @@ async function fetchPropertyData(city: string, bounds: any) {
 
       console.warn(`[overpass-property] ${city}: ${url} HTTP ${response.status}, trying next mirror`);
     } catch (error) {
-      console.warn(`[overpass-property] ${city}: mirror ${url} failed — ${error.message}`);
+      console.warn(`[overpass-property] ${city}: mirror ${url} failed - ${error.message}`);
     }
   }
 
@@ -143,7 +143,7 @@ Deno.serve(async (_req: Request) => {
 
     if (rowsWritten === 0) {
       return new Response(
-        JSON.stringify({ success: false, error: "No rows written — all inserts failed (check Supabase credentials)", cities: 0 }),
+        JSON.stringify({ success: false, error: "No rows written - all inserts failed (check Supabase credentials)", cities: 0 }),
         { headers: { "Content-Type": "application/json" }, status: 502 }
       );
     }

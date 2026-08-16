@@ -30,10 +30,9 @@ if (typeof translations !== 'undefined') {
       source_events_desc: "Concert, festival, and cultural event calendars",
       tech_sources: "Data Sources",
       finance_sources: "Data Sources",
-      ranking_data_building: "Data is currently building. Check back soon.",
+      ranking_data_building: "This vertical is reading quietly right now.",
       error_loading: "Error loading rankings. Please try again later.",
       loading: "Loading rankings...",
-      coming_soon: "Coming Soon",
       footer_copyright: "© 2026 Glotemp. Live city intelligence.",
       compare_title: "Compare with Another City"
     },
@@ -56,10 +55,9 @@ if (typeof translations !== 'undefined') {
       show_details: "Mostrar detalles",
       what_is_pulse: "¿Qué es el Pulso?",
       pulse_explanation: "El Pulso mide la temperatura emocional de una ciudad en este momento.",
-      ranking_data_building: "Los datos se están construyendo. Vuelve pronto.",
+      ranking_data_building: "Esta vertical está en calma ahora mismo.",
       error_loading: "Error al cargar los rankings.",
       loading: "Cargando rankings...",
-      coming_soon: "Próximamente",
       footer_copyright: "© 2026 Glotemp. Inteligencia de ciudades en vivo."
     },
     fr: {
@@ -73,7 +71,6 @@ if (typeof translations !== 'undefined') {
       pulse_description: "Comment se sent cette ville maintenant?",
       tech_description: "Devrais-je construire ou travailler ici?",
       finance_description: "Devrais-je investir ou commercer ici?",
-      coming_soon: "Bientôt disponible",
       footer_copyright: "© 2026 Glotemp. Intelligence des villes en direct."
     },
     de: {
@@ -87,7 +84,6 @@ if (typeof translations !== 'undefined') {
       pulse_description: "Wie fühlt sich diese Stadt gerade an?",
       tech_description: "Sollte ich hier bauen oder arbeiten?",
       finance_description: "Sollte ich hier investieren oder handeln?",
-      coming_soon: "Demnächst verfügbar",
       footer_copyright: "© 2026 Glotemp. Live-Stadtnachrichten."
     },
     pt: {
@@ -101,7 +97,6 @@ if (typeof translations !== 'undefined') {
       pulse_description: "Como esta cidade se sente agora?",
       tech_description: "Devo construir ou trabalhar aqui?",
       finance_description: "Devo investir ou negociar aqui?",
-      coming_soon: "Em breve",
       footer_copyright: "© 2026 Glotemp. Inteligência de cidades ao vivo."
     },
     ja: {
@@ -115,7 +110,6 @@ if (typeof translations !== 'undefined') {
       pulse_description: "この都市は今どう感じていますか?",
       tech_description: "ここで構築または仕事をすべきですか?",
       finance_description: "ここで投資または取引をすべきですか?",
-      coming_soon: "近日公開",
       footer_copyright: "© 2026 Glotemp。ライブシティインテリジェンス。"
     }
   };

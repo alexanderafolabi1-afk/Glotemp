@@ -492,17 +492,17 @@ jobs:
 
 ## Next After Edge Functions
 
-1. **Ranking Algorithm** — Aggregate readings into `vertical_rankings` table
+1. **Ranking Algorithm** - Aggregate readings into `vertical_rankings` table
    - Average scores weighted by confidence
    - Calculate momentum (week-over-week change)
    - Publish only if signal_volume > threshold
 
-2. **Dynamic City Profiles** — Render `/cities/<slug>` with all 12 verticals
+2. **Dynamic City Profiles** - Render `/cities/<slug>` with all 12 verticals
    - Load from template
    - Fetch vertical data for that city
    - Display in tabs
 
-3. **Remaining 9 Verticals** — Repeat pattern for:
+3. **Remaining 9 Verticals** - Repeat pattern for:
    - Work (LinkedIn, Indeed data)
    - Property & Cost (Zillow, AirBnB data)
    - Education (QS World Rankings)

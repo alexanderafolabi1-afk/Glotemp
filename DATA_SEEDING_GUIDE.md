@@ -17,7 +17,7 @@ Run this in your Supabase SQL Editor:
 
 ```sql
 -- File: supabase-verticals-schema.sql
--- [Full schema contents — see supabase-verticals-schema.sql]
+-- [Full schema contents - see supabase-verticals-schema.sql]
 ```
 
 This creates:
@@ -132,20 +132,20 @@ After all seeding:
 ## Ranking Pages Status After Seeding
 
 ### Pulse Rankings
-✅ **Live** — `/verticals/pulse` will display top 50 cities ranked by mood
+✅ **Live** - `/verticals/pulse` will display top 50 cities ranked by mood
 - Fetches from `latest_readings` view
 - Aggregates by `city_slug`
 - Sorts by mood value descending
 - Shows mood scores (0–10) and signal volume
 
 ### Tech Rankings
-⚠️ **Data Building** — `/verticals/tech` shows "Tech data is currently building"
+⚠️ **Data Building** - `/verticals/tech` shows "Tech data is currently building"
 - Needs edge function to fetch real-time GitHub data
 - Can be populated manually with more metrics
 - Ready for automation with `github_activity` source
 
 ### Finance Rankings
-⚠️ **Data Building** — `/verticals/finance` shows "Finance data is currently building"
+⚠️ **Data Building** - `/verticals/finance` shows "Finance data is currently building"
 - Needs edge function to fetch World Bank/FX data
 - Can be populated manually with economic indicators
 - Ready for automation with `world_bank` and `frankfurter` sources
@@ -188,26 +188,26 @@ SELECT COUNT(*) FROM readings WHERE source = 'pulse_story';
 
 After seeding, the next phases are:
 
-1. **Edge Functions** — Automate data fetching from APIs
+1. **Edge Functions** - Automate data fetching from APIs
    - GitHub activity (hourly)
    - World Bank data (daily)
    - GDELT sentiment (6-hourly)
    - FX rates (hourly)
 
-2. **Ranking Algorithm** — Calculate ranking scores
+2. **Ranking Algorithm** - Calculate ranking scores
    - Aggregate readings by date
    - Weight by confidence
    - Calculate momentum (week-over-week)
    - Publish only if signal_volume > threshold
 
-3. **Remaining 9 Verticals** — Repeat for:
+3. **Remaining 9 Verticals** - Repeat for:
    - Work, Property & Cost, Education, Sport, Entertainment, Fashion, Food, Health & Environment, Transport
 
 ## Files Reference
 
-- `supabase-verticals-schema.sql` — Database schema (tables, views, RLS policies)
-- `supabase-seed-pulse-stories.sql` — Pulse initial data
-- `supabase-seed-tech-data.sql` — Tech initial data
-- `supabase-seed-finance-data.sql` — Finance initial data
-- `verticals-engine.js` — Frontend data fetching and rendering
-- `verticals-i18n.js` — Translations for all new UI strings
+- `supabase-verticals-schema.sql` - Database schema (tables, views, RLS policies)
+- `supabase-seed-pulse-stories.sql` - Pulse initial data
+- `supabase-seed-tech-data.sql` - Tech initial data
+- `supabase-seed-finance-data.sql` - Finance initial data
+- `verticals-engine.js` - Frontend data fetching and rendering
+- `verticals-i18n.js` - Translations for all new UI strings

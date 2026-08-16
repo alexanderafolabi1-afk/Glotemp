@@ -31,7 +31,7 @@ const cityKeywords: Record<string, string[]> = {
 
 async function fetchFashionSentiment(city: string, keywords: string[]) {
   try {
-    // GDELT 2.0 DOC API — the old /v2/news/news endpoint does not exist.
+    // GDELT 2.0 DOC API - the old /v2/news/news endpoint does not exist.
     const baseUrl = "https://api.gdeltproject.org/api/v2/doc/doc";
     const query = keywords[0];
     const url = `${baseUrl}?query=${encodeURIComponent(query)}&mode=artlist&format=json&maxrecords=50`;
@@ -42,7 +42,7 @@ async function fetchFashionSentiment(city: string, keywords: string[]) {
 
     if (!response.ok) {
       const body = await response.text().catch(() => "");
-      console.error(`[gdelt-fashion] ${city}: HTTP ${response.status} — ${body.slice(0, 300)}`);
+      console.error(`[gdelt-fashion] ${city}: HTTP ${response.status} - ${body.slice(0, 300)}`);
       return null;
     }
 
@@ -63,7 +63,7 @@ async function fetchFashionSentiment(city: string, keywords: string[]) {
       confidence: Math.min(0.8, data.articles.length / 50),
     };
   } catch (error) {
-    console.error(`[gdelt-fashion] ${city}: exception — ${error.message}`);
+    console.error(`[gdelt-fashion] ${city}: exception - ${error.message}`);
     return null;
   }
 }
@@ -125,7 +125,7 @@ Deno.serve(async (_req: Request) => {
 
     if (rowsWritten === 0) {
       return new Response(
-        JSON.stringify({ success: false, error: "No rows written — all fetches or inserts failed", cities: 0 }),
+        JSON.stringify({ success: false, error: "No rows written - all fetches or inserts failed", cities: 0 }),
         { headers: { "Content-Type": "application/json" }, status: 502 }
       );
     }

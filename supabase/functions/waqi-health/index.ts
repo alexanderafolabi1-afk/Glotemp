@@ -49,7 +49,7 @@ async function fetchAirQuality(city: string, cityName: string) {
 
     if (!response.ok) {
       const body = await response.text().catch(() => "");
-      console.warn(`[waqi-health] ${city}: HTTP ${response.status} — ${body.slice(0, 200)}, using synthetic fallback`);
+      console.warn(`[waqi-health] ${city}: HTTP ${response.status} - ${body.slice(0, 200)}, using synthetic fallback`);
       return {
         air_quality_index: 30 + Math.random() * 150,
         hospital_quality: 6 + Math.random() * 3,
@@ -78,7 +78,7 @@ async function fetchAirQuality(city: string, cityName: string) {
       confidence: data.data.aqi ? 0.85 : 0.6,
     };
   } catch (error) {
-    console.error(`[waqi-health] ${city}: exception — ${error.message}, using synthetic fallback`);
+    console.error(`[waqi-health] ${city}: exception - ${error.message}, using synthetic fallback`);
     return {
       air_quality_index: 30 + Math.random() * 150,
       hospital_quality: 6 + Math.random() * 3,
@@ -145,7 +145,7 @@ Deno.serve(async (_req: Request) => {
 
     if (rowsWritten === 0) {
       return new Response(
-        JSON.stringify({ success: false, error: "No rows written — all inserts failed (check Supabase credentials)", cities: 0 }),
+        JSON.stringify({ success: false, error: "No rows written - all inserts failed (check Supabase credentials)", cities: 0 }),
         { headers: { "Content-Type": "application/json" }, status: 502 }
       );
     }

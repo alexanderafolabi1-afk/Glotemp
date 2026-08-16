@@ -6406,7 +6406,7 @@ body > section {
 }
 
 /* ==========================================================================
-   CITY TILES — the reading section's live city browser
+   CITY TILES - the reading section's live city browser
    Additive only. Nothing here restyles an existing selector; every rule is
    scoped to .city-tiles / .city-tile, which nothing else on the site uses.
    ========================================================================== */
@@ -6649,4 +6649,63 @@ body > section {
   .city-credit-link:hover {
     transform: none;
   }
+}
+
+/* ==========================================================================
+   MOBILE STANDING RULES
+   The site is a PWA judged on the phone first, so these are floors rather
+   than refinements.
+   ========================================================================== */
+
+/* iOS zooms the whole page when a focused input is under 16px, which then
+   leaves the layout scrolled sideways with no way back. Applied only up to
+   tablet so desktop type scale is untouched. */
+@media (max-width: 900px) {
+  input,
+  select,
+  textarea,
+  .checkin-note,
+  .cities-search-input,
+  .cities-select,
+  .filter-select,
+  .filter-input,
+  .comment-input,
+  .gt-auth-input {
+    font-size: 16px !important;
+  }
+}
+
+/* The city name in a feed row is a standalone navigation link, not a link
+   inside a sentence, so the 44px floor applies to it. Padding would push
+   the row apart; a min-height with centred content grows the hit area
+   while leaving the text exactly where it was. */
+.feed-city {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+/* A flex item defaults to min-width: auto, which means it will not shrink
+   below its content's intrinsic width. The ticker track is the doubled
+   observation list, hundreds of thousands of pixels wide, so `flex: 1`
+   alone made the container demand that width and pushed the document
+   sideways at 320px. overflow: hidden cannot clip what the box has already
+   been sized to. min-width: 0 lets it shrink so the clip applies. */
+.ticker-content { min-width: 0; }
+
+/* At narrow widths the mood row is a rigid `repeat(5, 1fr)` grid. On a
+   248px container that is a 40px column, while "ENERGIZED" needs 65px, so
+   every label overflowed its own cell and pushed the document 27px wider
+   than the viewport. auto-fit with a 64px floor keeps five across wherever
+   they fit and drops to two rows when they do not, which is what the 320px
+   case actually needs. */
+@media (max-width: 900px) {
+  .mood-buttons,
+  .check-in .mood-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
+    gap: 0.6rem;
+  }
+  .mood-btn { min-width: 0; padding-left: 0.2rem; padding-right: 0.2rem; }
+  .mood-btn-label { font-size: 0.62rem; letter-spacing: 0.04em; }
 }

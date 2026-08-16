@@ -1379,6 +1379,9 @@ function recordObservation(event) {
     city: cities[citySlug]?.name || 'New York',
     createdAt: new Date().toISOString()
   };
+  window.dispatchEvent(new CustomEvent('glotemp:checkin', {
+    detail: { city: document.getElementById('city-select')?.value || null }
+  }));
   observatoryState.observations.unshift(observation);
   observatoryState.observations = observatoryState.observations.slice(0, 24);
   saveObservatory();
@@ -1884,8 +1887,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   document.getElementById('install-btn').addEventListener('click', async () => {
     if (deferredPrompt) {
+      // Announced rather than measured here, so glotemp-analytics.js owns
+      // every event and this file keeps owning the banner.
+      window.dispatchEvent(new CustomEvent('glotemp:install-prompt-shown'));
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
+      window.dispatchEvent(new CustomEvent('glotemp:install-prompt-outcome', { detail: { outcome } }));
       deferredPrompt = null;
       document.getElementById('install-banner').style.display = 'none';
     }

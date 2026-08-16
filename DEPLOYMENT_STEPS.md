@@ -6,7 +6,7 @@ Follow these exact steps. Copy-paste commands as written.
 
 ## Part 1: Install Supabase CLI
 
-### Step 1.1 — Install Node.js (if you don't have it)
+### Step 1.1 - Install Node.js (if you don't have it)
 Check if you have Node.js:
 ```bash
 node --version
@@ -20,7 +20,7 @@ If it says "command not found", install Node.js:
 - Install it
 - Verify: `node --version`
 
-### Step 1.2 — Install Supabase CLI
+### Step 1.2 - Install Supabase CLI
 ```bash
 npm install -g supabase
 ```
@@ -36,14 +36,14 @@ This should print a version number like `1.173.0` or higher.
 
 ## Part 2: Link Your Supabase Project
 
-### Step 2.1 — Authenticate with Supabase
+### Step 2.1 - Authenticate with Supabase
 ```bash
 supabase login
 ```
 
 This will open a browser tab asking you to log in to Supabase. Do it.
 
-### Step 2.2 — Link to your project
+### Step 2.2 - Link to your project
 From the Glotemp repository directory, run:
 ```bash
 supabase link --project-ref hnysztednzqfzbmiqqgl
@@ -59,64 +59,64 @@ Type `y` and press Enter.
 
 Each function is deployed individually. Copy-paste each command exactly:
 
-### Step 3.1 — Deploy Pulse (Sentiment)
+### Step 3.1 - Deploy Pulse (Sentiment)
 ```bash
 supabase functions deploy gdelt-sentiment
 ```
 
 Wait for it to complete (you'll see `✓ Function deployed successfully`).
 
-### Step 3.2 — Deploy Tech
+### Step 3.2 - Deploy Tech
 ```bash
 supabase functions deploy github-tech-activity
 ```
 
-### Step 3.3 — Deploy Finance
+### Step 3.3 - Deploy Finance
 ```bash
 supabase functions deploy world-bank-finance
 ```
 
-### Step 3.4 — Deploy Work
+### Step 3.4 - Deploy Work
 ```bash
 supabase functions deploy remotive-work-data
 ```
 
-### Step 3.5 — Deploy Education
+### Step 3.5 - Deploy Education
 ```bash
 supabase functions deploy hipolabs-education
 ```
 
-### Step 3.6 — Deploy Sport
+### Step 3.6 - Deploy Sport
 ```bash
 supabase functions deploy sportsdb-sport
 ```
 
-### Step 3.7 — Deploy Entertainment
+### Step 3.7 - Deploy Entertainment
 ```bash
 supabase functions deploy ticketmaster-entertainment
 ```
 
-### Step 3.8 — Deploy Health
+### Step 3.8 - Deploy Health
 ```bash
 supabase functions deploy waqi-health
 ```
 
-### Step 3.9 — Deploy Transport
+### Step 3.9 - Deploy Transport
 ```bash
 supabase functions deploy transitland-transport
 ```
 
-### Step 3.10 — Deploy Property
+### Step 3.10 - Deploy Property
 ```bash
 supabase functions deploy overpass-property
 ```
 
-### Step 3.11 — Deploy Fashion
+### Step 3.11 - Deploy Fashion
 ```bash
 supabase functions deploy gdelt-fashion
 ```
 
-### Step 3.12 — Deploy Food
+### Step 3.12 - Deploy Food
 ```bash
 supabase functions deploy overpass-food
 ```
@@ -127,23 +127,23 @@ supabase functions deploy overpass-food
 
 ## Part 4: Run the Seed Data Script
 
-### Step 4.1 — Open Supabase Dashboard
+### Step 4.1 - Open Supabase Dashboard
 Go to: https://app.supabase.com
 
 Select your project: `Glotemp` (or the one with ID starting with `hnysztednzqfzbmiqqgl`)
 
-### Step 4.2 — Open SQL Editor
+### Step 4.2 - Open SQL Editor
 In the left sidebar, click: **SQL Editor**
 
-### Step 4.3 — Create New Query
+### Step 4.3 - Create New Query
 Click the blue **+ New** button
 
-### Step 4.4 — Paste the Seed Script
+### Step 4.4 - Paste the Seed Script
 Copy the entire contents of: `/home/user/Glotemp/supabase-seed-all-verticals.sql`
 
 Paste it into the SQL editor (the white text area).
 
-### Step 4.5 — Run the Query
+### Step 4.5 - Run the Query
 Click the blue **Run** button (or press `Ctrl+Enter`).
 
 **Wait 30-60 seconds for the query to complete.**
@@ -157,10 +157,10 @@ Successfully inserted 600+ rows
 
 ## Part 5: Trigger All Edge Functions
 
-### Step 5.1 — Open Supabase Dashboard
+### Step 5.1 - Open Supabase Dashboard
 Go to: https://app.supabase.com/project/hnysztednzqfzbmiqqgl/functions
 
-### Step 5.2 — Trigger Each Function
+### Step 5.2 - Trigger Each Function
 
 **For each function listed below:**
 
@@ -197,12 +197,12 @@ Each should return:
 
 ## Part 6: Verification Queries
 
-### Step 6.1 — Open SQL Editor Again
+### Step 6.1 - Open SQL Editor Again
 https://app.supabase.com/project/hnysztednzqfzbmiqqgl/editor
 
 Click **+ New** for a new query.
 
-### Step 6.2 — Run Verification Query #1: Seed Data Count
+### Step 6.2 - Run Verification Query #1: Seed Data Count
 
 Paste this:
 ```sql
@@ -219,7 +219,7 @@ Click **Run**.
 
 ---
 
-### Step 6.3 — Run Verification Query #2: Real Data by Vertical
+### Step 6.3 - Run Verification Query #2: Real Data by Vertical
 
 Paste this (new query):
 ```sql
@@ -256,7 +256,7 @@ finance         20             20          0.85            2026-08-07 14:25:00
 
 ---
 
-### Step 6.4 — Run Verification Query #3: Cities with Complete Coverage
+### Step 6.4 - Run Verification Query #3: Cities with Complete Coverage
 
 Paste this (new query):
 ```sql
@@ -289,7 +289,7 @@ dubai           12
 
 ---
 
-### Step 6.5 — Run Verification Query #4: Data Quality Check
+### Step 6.5 - Run Verification Query #4: Data Quality Check
 
 Paste this (new query):
 ```sql

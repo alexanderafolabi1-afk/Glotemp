@@ -82,7 +82,7 @@ self.addEventListener('fetch', (event) => {
       } catch (e) {
         const cached = await caches.match(req);
         if (cached) return cached;
-        return new Response('Offline — please check your connection.', {
+        return new Response('Offline - please check your connection.', {
           status: 503,
           headers: { 'Content-Type': 'text/plain' },
         });

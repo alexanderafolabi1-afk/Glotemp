@@ -123,12 +123,15 @@
   // ---------- examples panel ----------
   function examplesHTML() {
     return `
-      <div class="checkin-examples" aria-label="Example check-ins, not real posts">
+      <div class="checkin-examples" aria-label="What a good check-in looks like">
         <p class="checkin-examples-eyebrow">What a good check-in looks like</p>
         <div class="checkin-examples-grid">
           ${EXAMPLES.map(ex => `
             <div class="checkin-example">
-              <span class="checkin-example-tag">Example &middot; ${esc(ex.lang)}</span>
+              <!-- The language alone. The section heading above already says
+                   what these are, so labelling each one made the page read
+                   as a tutorial rather than a product. -->
+              <span class="checkin-example-tag">${esc(ex.lang)}</span>
               <div class="checkin-example-head">
                 ${moodGlyphSVG(ex.mood, 'checkin-example-glyph')}
                 <span class="checkin-example-mood">${esc(MOOD_BY_KEY[ex.mood].label)}</span>
@@ -313,6 +316,10 @@
             }),
           });
           if (!resp.ok) throw new Error('post failed ' + resp.status);
+          // Per city, because growth has to be readable one city at a time.
+          // Announced rather than measured here, so glotemp-analytics.js
+          // owns every event and this file keeps owning the composer.
+          window.dispatchEvent(new CustomEvent('glotemp:checkin', { detail: { city: citySlug } }));
           status.textContent = 'Posted.';
           note.value = '';
           count.textContent = `0/${NOTE_MAX}`;
