@@ -1,1 +1,85 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#06060A" />
+  <meta name="description" content="Glotemp — real-time collective mood infrastructure. Know how a city feels before you go." />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+  <title>Glotemp – Live City Pulse</title>
+
+  <!-- Type system: Fraunces (display), Manrope (body), IBM Plex Mono (data) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+
+  <!-- Version must be bumped on CSS-affecting deploys -->
+  <link rel="stylesheet" href="/styles.css?v=58" />
+
+  <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
+</head>
+<body>
+  <div id="app">
+    <!-- Install Banner — elevated, legacy-toned A2HS -->
+    <div id="install-banner" class="install-banner" style="display:none;" role="dialog" aria-labelledby="install-headline" aria-describedby="install-body">
+      <button id="dismiss-install" class="install-dismiss" aria-label="Dismiss" data-i18n="dismiss">×</button>
+      <div class="install-inner">
+        <div class="install-icon-wrap" aria-hidden="true">
+          <img src="/assets/icon-192.png" alt="" width="56" height="56" class="install-icon">
+        </div>
+        <div class="install-copy">
+          <p class="install-eyebrow" data-i18n="install_eyebrow">A private companion</p>
+          <h2 id="install-headline" class="install-headline" data-i18n="install_title">Keep the world’s pulse close.</h2>
+          <p id="install-body" class="install-body" data-i18n="install_body">Add Glotemp to your home screen. A quiet instrument that tells you how a city truly feels — before you arrive, while you are there, and long after you leave.</p>
+        </div>
+        <div class="install-actions">
+          <button id="install-btn" class="btn-neon install-cta" data-i18n="install_btn">Place among your essentials</button>
+          <button id="install-later" class="btn-text install-later" data-i18n="install_later">Not now</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="site-nav"></nav>
+<script src="/nav-component.js"></script>
+
+    
+    <!-- Hero instrument: instrument-base.png (uploaded artwork, never
+         modified) plus a live SVG layer over its aperture, driven by
+         the pinned city. -->
+    <section class="hero-instrument-section">
+      <div class="hero-instrument-layout">
+        <div class="hero-copy">
+          <div class="eclipse-note" id="eclipse-note" hidden></div>
+          <h1 class="hero-headline">Know how a city feels before you go.</h1>
+          <p class="hero-subhead">Live readings across 151 cities.</p>
+          <form class="hero-search" id="hero-city-search" role="search">
+            <input type="text" id="hero-city-input" class="hero-search-input" list="hero-city-list"
+                   placeholder="Search a city" autocomplete="off" aria-label="Search a city">
+            <datalist id="hero-city-list"></datalist>
+            <button type="submit" class="hero-search-go">Go</button>
+          </form>
+          <a href="#" class="hero-cta btn-neon" id="hero-primary-cta">View this city</a>
+        </div>
+
+        <div class="hero-instrument" id="hero-instrument" tabindex="0" role="img" aria-label="Live instrument for the pinned city">
+          <div class="hero-instrument-inner">
+            <div class="hero-instrument-glow" id="hero-instrument-glow" aria-hidden="true"></div>
+            <img class="hero-instrument-base" src="/assets/instrument-base.png" alt="" aria-hidden="true" width="1024" height="1024">
+            <svg class="hero-instrument-live" id="hero-instrument-live" viewBox="0 0 1024 1024" aria-hidden="true"></svg>
+            <div class="hero-instrument-weather" id="hero-instrument-weather" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rest of page content is loaded by app.js and other modules -->
+    <div id="main-content"></div>
+  </div>
+
+  <script src="/cities-data.js"></script>
+  <script src="/app.js?v=58"></script>
+</body>
+</html>
