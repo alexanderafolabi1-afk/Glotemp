@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moderation queue — Glotemp Admin</title>
+  <link rel="stylesheet" href="/styles.css?v=58" />
+  <style>
+    .mod-wrap { max-width: 880px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    .mod-wrap h1 { font-family: var(--font-display, Georgia, serif); font-weight: 500; font-size: 1.6rem; margin-bottom: 0.35rem; }
+    .mod-sub { color: rgba(244,241,234,0.55); font-size: 0.9rem; margin-bottom: 1.75rem; }
+    .mod-item { border-top: 1px solid rgba(255,255,255,0.08); padding: 1.1rem 0; }
+    .mod-meta { font-family: var(--font-mono, monospace); font-size: 0.75rem; color: rgba(244,241,234,0.45); letter-spacing: 0.04em; margin-bottom: 0.4rem; }
+    .mod-snippet { color: rgba(244,241,234,0.82); font-size: 0.95rem; line-height: 1.5; margin-bottom: 0.75rem; }
+    .mod-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .mod-actions button { background: transparent; border: 1px solid rgba(255,255,255,0.15); color: rgba(244,241,234,0.8); padding: 0.4rem 0.85rem; font-size: 0.82rem; cursor: pointer; }
+    .mod-actions button:hover { border-color: rgba(255,255,255,0.35); color: #f4f1ea; }
+    .mod-actions .approve { border-color: rgba(127,217,154,0.4); }
+    .mod-actions .remove { border-color: rgba(242,155,155,0.4); }
+    .mod-empty { color: rgba(244,241,234,0.5); padding: 2rem 0; }
+    .mod-status { font-size: 0.82rem; color: rgba(244,241,234,0.5); min-height: 1.2em; margin-top: 1rem; }
+    .mod-locked { text-align: center; padding: 4rem 1rem; }
+    .mod-locked input { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #f4f1ea; padding: 0.7rem 1rem; font-size: 1rem; letter-spacing: 0.2em; text-align: center; width: 10rem; }
+  </style>
+</head>
+<body>
+  <div class="mod-wrap">
+    <div id="mod-lock" class="mod-locked">
+      <h1>Moderation queue</h1>
+      <p class="mod-sub">Enter admin PIN to continue.</p>
+      <input type="password" id="mod-pin" maxlength="8" autocomplete="off" />
+      <p class="mod-status" id="mod-lock-status"></p>
+    </div>
+    <div id="mod-app" hidden>
+      <h1>Moderation queue</h1>
+      <p class="mod-sub">Positive-only product. Review auto-hidden and flagged items.</p>
+      <div id="mod-list"></div>
+      <p class="mod-status" id="mod-status"></p>
+    </div>
+  </div>
+  <script src="/glotemp-auth.js"></script>
+  <script>
+  (function () {
+    const PIN = 'glotemp';
+    const SUPABASE_URL = (window.GlotempAuth && GlotempAuth.SUPABASE_URL) || 'https://hnysztednzqfzbmiqqgl.supabase.co';
+    const ANON = (window.GlotempAuth && GlotempAuth.SUPABASE_ANON_KEY) || '';
+    const lock = document.getElementById('mod-lock');
+    const app = document.getElementById('mod-app');
+    const pinInput = document.getElementById('mod-pin');
+    const lockStatus = document.getElementById('mod-lock-status');
+    pinInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') tryUnlock(); });
+    pinInput.addEventListener('input', function () { if (pinInput.value.length >= PIN.length) tryUnlock(); });
+    function tryUnlock() {
+      if (pinInput.value === PIN) { lock.hidden = true; app.hidden = false; loadQueue(); }
+      else if (pinInput.value.length >= PIN.length) { lockStatus.textContent = 'Incorrect PIN.'; }
+    }
+    async function headers() {
+      const session = window.GlotempAuth ? await GlotempAuth.getSession() : null;
+      const h = { apikey: ANON, 'Content-Type': 'application/json' };
+      if (session && session.access_token) h.Authorization = 'Bearer ' + session.access_token;
+      else h.Authorization = 'Bearer ' + ANON;
+      return h;
+    }
+    async function loadQueue() {
+      const list = document.getElementById('mod-list');
+      const status = document.getElementById('mod-status');
+      status.textContent = 'Loading…';
+      try {
+        const h = await headers();
+        const url = SUPABASE_URL + '/rest/v1/moderation_queue?status=eq.pending&order=created_at.desc&limit=50';
+        const resp = await fetch(url, { headers: h });
+        if (!resp.ok) {
+          status.textContent = 'Queue not readable with current credentials (add admin select policy). Status ' + resp.status;
+          list.innerHTML = '';
+          return;
+        }
+        const rows = await resp.json();
+        if (!rows.length) {
+          list.innerHTML = '<p class="mod-empty">Queue is clear. Nothing pending.</p>';
+          status.textContent = '';
+          return;
+        }
+        list.innerHTML = rows.map(function (r) {
+          return '<div class="mod-item" data-id="' + r.id + '">' +
+            '<div class="mod-meta">' + (r.source || '') + ' · ' + (r.reason || '') + ' · ' + (r.created_at || '').slice(0, 16) + '</div>' +
+            '<div class="mod-snippet">' + escapeHtml(r.snippet || '(no text)') + '</div>' +
+            '<div class="mod-actions">' +
+            '<button type="button" class="approve" data-decision="approved">Approve</button>' +
+            '<button type="button" class="remove" data-decision="removed">Remove</button>' +
+            '<button type="button" data-decision="dismissed">Dismiss flag</button>' +
+            '</div></div>';
+        }).join('');
+        status.textContent = rows.length + ' pending';
+        list.querySelectorAll('button[data-decision]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            resolve(btn.closest('.mod-item').getAttribute('data-id'), btn.getAttribute('data-decision'));
+          });
+        });
+      } catch (e) {
+        status.textContent = 'Could not load queue.';
+      }
+    }
+    async function resolve(id, decision) {
+      const status = document.getElementById('mod-status');
+      status.textContent = 'Saving…';
+      try {
+        const h = await headers();
+        const resp = await fetch(SUPABASE_URL + '/rest/v1/rpc/resolve_moderation_item', {
+          method: 'POST', headers: h,
+          body: JSON.stringify({ p_queue_id: id, p_decision: decision }),
+        });
+        if (!resp.ok) { status.textContent = 'Resolve failed (' + resp.status + ').'; return; }
+        await loadQueue();
+      } catch (e) { status.textContent = 'Resolve failed.'; }
+    }
+    function escapeHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+  })();
+  </script>
+</body>
+</html>

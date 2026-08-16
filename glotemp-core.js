@@ -73,9 +73,6 @@
     return `${days}d ago`;
   }
 
-  // Shared hover-preview tooltip: band, reading, last-known movement.
-  // One element reused for every [data-city-link] on the page rather
-  // than building a tooltip per instance.
   let previewEl = null;
   function ensurePreviewEl() {
     if (previewEl) return previewEl;
@@ -104,10 +101,6 @@
     if (previewEl) previewEl.classList.remove('is-visible');
   }
 
-  // Makes any element with data-city-link="<slug>" clickable: pins the
-  // city and navigates to its profile, and hover/focus shows a small
-  // live preview (band, reading). Call once per page after content is
-  // in the DOM (safe to call repeatedly -- idempotent via a marker).
   function wireCityLinks(root) {
     (root || document).querySelectorAll('[data-city-link]:not([data-city-wired])').forEach((el) => {
       el.setAttribute('data-city-wired', '1');
@@ -127,9 +120,6 @@
     });
   }
 
-  // Image slot with safe onerror fallback -- never writes a file, only
-  // toggles a CSS class that reveals the typographic panel already in
-  // the markup.
   function imgSlotHTML(src, alt, label, extraClass) {
     const safeAlt = String(alt || '').replace(/"/g, '&quot;');
     const safeLabel = String(label || '').replace(/</g, '&lt;');
@@ -140,28 +130,12 @@
     </div>`;
   }
 
-  // Hamburger + full-screen nav panel now come from nav-component.js,
-  // the single shared nav source every page mounts -- it builds and
-  // wires #nav-hamburger/#nav-panel itself, so this module no longer
-  // needs to duplicate that.
-
-  // Ties the ambient background to a real mood reading (0-10) so the
-  // page actually shows the temperature the product is named for,
-  // rather than sitting at a fixed neutral tone. --ambient-warmth
-  // feed the rotating wash layer in styles.css's body::before.
   function applyMoodBackground(mood) {
     const m = typeof mood === 'number' && !Number.isNaN(mood) ? mood : 5.0;
     const normalized = m / 10;
-    // Strength of one warm tone, not a hue rotation. This used to rotate
-    // the ground's hue by up to +/-70 degrees, which dragged the warm
-    // brown-black through purple, green and red depending on the city.
     document.documentElement.style.setProperty('--ambient-warmth', normalized.toFixed(2));
   }
 
-  // On load, tint the background using whatever mood is already known --
-  // the pinned city's, if one is set. Pages that know their own city more
-  // precisely (a city profile, the homepage selector) call
-  // applyMoodBackground again once they have it, overriding this default.
   function initAmbientMood() {
     const pinned = getPinnedCity();
     const city = pinned && window.CITIES_DATA ? window.CITIES_DATA.find((c) => c.slug === pinned) : null;
@@ -173,13 +147,6 @@
     initAmbientMood();
   }
 
-  // A vertical with no live reading yet should still open on substance:
-  // if real sourced context (Wikipedia/World Bank -- see city-wiki.js,
-  // city-worldbank.js) exists for this vertical, it belongs ahead of the
-  // "nobody has spoken" invitation, not after it. Content and context
-  // load independently and async, in either order, so this is called
-  // from both sides and just re-checks live DOM state each time -- safe
-  // to call repeatedly, a no-op once already in the right order.
   function reconcileVerticalOrder(verticalSlug) {
     const content = document.getElementById(`${verticalSlug}-content`);
     const context = document.getElementById(`${verticalSlug}-context`);
@@ -195,6 +162,18 @@
       content.classList.remove('vertical-content--secondary');
     }
   }
+
+  // Step 3: load positive-only moderation engine on city pages
+  (function loadModeration() {
+    function inject(src) {
+      if (document.querySelector('script[src="' + src + '"]')) return;
+      var s = document.createElement('script');
+      s.src = src;
+      document.head.appendChild(s);
+    }
+    inject('/glotemp-moderation.js');
+    inject('/glotemp-moderation-wire.js');
+  })();
 
   window.GlotempCore = {
     moodToBand,
