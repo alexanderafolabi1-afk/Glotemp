@@ -335,10 +335,17 @@
         err.friendly = 'That email and password do not match an account.';
       } else if (code === 'email_not_confirmed' || /email not confirmed/i.test(msg)) {
         err.friendly = 'That account has not been confirmed yet. Confirm it in the Supabase dashboard.';
+      } else if (code === 'email_provider_disabled' || /email logins are disabled/i.test(msg)) {
+        err.friendly = 'Email and password sign-in is switched off for this project. Turn it on in Supabase, under Authentication, Sign In / Providers, Email.';
       } else if (resp.status === 429) {
         err.friendly = 'Too many attempts. Wait a minute and try again.';
       } else {
-        err.friendly = 'Could not sign in. Try again shortly.';
+        // Never swallow a reason we do not recognise. "Try again shortly"
+        // sent someone chasing a problem that was never going to clear on
+        // its own, so whatever the server actually said is shown instead.
+        err.friendly = msg
+          ? msg + ' (' + resp.status + (code ? ', ' + code : '') + ')'
+          : 'Sign-in failed with status ' + resp.status + '. Nothing more was returned.';
       }
       throw err;
     }
