@@ -101,6 +101,13 @@
 
     
     <!-- 💓 Pulse Vertical -->
+    <section id="city-news" class="vertical-section glass-card">
+      <div class="vertical-body">
+        <h2 class="news-heading">In the papers today</h2>
+        <div id="news-content"></div>
+      </div>
+    </section>
+
     <details id="pulse" class="vertical-section glass-card" open>
       <summary class="vertical-summary"><h2>💓 Pulse</h2></summary>
       <div class="vertical-body">
@@ -321,6 +328,7 @@
   <script src="/city-worldbank.js" defer></script>
   <script src="/city-radio.js" defer></script>
   <script src="/city-venues.js" defer></script>
+  <script src="/city-news.js" defer></script>
   <script src="/city-conditions.js" defer></script>
   <script src="/verticals-accordion.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
@@ -473,6 +481,12 @@
       // a live keyless source, not a Supabase reading.
       if (typeof GlotempVenues !== 'undefined' && city) {
         GlotempVenues.loadVenues(city.slug, city.name, city.lat, city.lon);
+      }
+
+      // What the local press is reporting, in the languages it is
+      // reported in. Live and keyless, like Radio and Venues above.
+      if (typeof GlotempNews !== 'undefined' && city) {
+        GlotempNews.loadNews(city.name, city.country, 'news-content');
       }
 
       // Conditions line: same treatment as Radio -- a live free-API

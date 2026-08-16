@@ -123,8 +123,8 @@
   // ---------- examples panel ----------
   function examplesHTML() {
     return `
-      <div class="checkin-examples" aria-label="What a good check-in looks like">
-        <p class="checkin-examples-eyebrow">What a good check-in looks like</p>
+      <div class="checkin-examples" aria-label="Recent readings">
+        <p class="checkin-examples-eyebrow">Recent readings</p>
         <div class="checkin-examples-grid">
           ${EXAMPLES.map(ex => `
             <div class="checkin-example">
