@@ -314,6 +314,42 @@
     return true;
   }
 
+  // Email and password. Used by /admin only; the public sign-in box on
+  // the rest of the site is unchanged and still uses the magic link
+  // above. This exists because the admin has to be reachable when email
+  // is not, and Supabase's built-in sender does not reliably deliver.
+  async function signInWithPassword(email, password) {
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: password }),
+    });
+    if (!resp.ok) {
+      let body = {};
+      try { body = await resp.json(); } catch (e) { /* no JSON body */ }
+      const code = body.error_code || body.error || '';
+      const msg = body.msg || body.error_description || '';
+      const err = new Error(msg || 'sign-in failed: ' + resp.status);
+      // GoTrue's own wording explains nothing, so it is translated here.
+      if (code === 'invalid_credentials' || /invalid login credentials/i.test(msg)) {
+        err.friendly = 'That email and password do not match an account.';
+      } else if (code === 'email_not_confirmed' || /email not confirmed/i.test(msg)) {
+        err.friendly = 'That account has not been confirmed yet. Confirm it in the Supabase dashboard.';
+      } else if (resp.status === 429) {
+        err.friendly = 'Too many attempts. Wait a minute and try again.';
+      } else {
+        err.friendly = 'Could not sign in. Try again shortly.';
+      }
+      throw err;
+    }
+    const session = normalizeSession(await resp.json());
+    if (!session) throw new Error('no session returned');
+    writeSession(session);
+    cachedProfile = null;
+    document.dispatchEvent(new CustomEvent('glotemp:auth-changed', { detail: { signedIn: true } }));
+    return session;
+  }
+
   function signOut() {
     writeSession(null);
     cachedProfile = null;
@@ -524,6 +560,7 @@
       } catch (e) { return '/'; }
     },
     signInWithEmail,
+    signInWithPassword,
     signOut,
     requireAuth,
     openModal,

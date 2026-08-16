@@ -188,25 +188,32 @@
       render(
         '<p class="adm-eyebrow">Admin</p>' +
         '<h1 class="adm-title">Sign in to continue.</h1>' +
-        '<p class="adm-copy">This dashboard is tied to your Glotemp account. There is no shared password.</p>' +
+        '<p class="adm-copy">Your own account and password. Signing in does not by itself grant access: admin is decided in the database.</p>' +
         '<form id="adm-signin-form">' +
           '<label class="adm-label" for="adm-email">Email</label>' +
           '<input class="adm-input" type="email" id="adm-email" placeholder="you@example.com" required autocomplete="email">' +
-          '<p><button class="adm-action" type="submit">Send me a sign-in link</button></p>' +
+          '<label class="adm-label" for="adm-password">Password</label>' +
+          '<input class="adm-input" type="password" id="adm-password" required autocomplete="current-password">' +
+          '<p><button class="adm-action" type="submit" id="adm-submit">Sign in</button></p>' +
         '</form>' +
         '<p class="adm-status" id="adm-status" role="status" aria-live="polite"></p>'
       );
       document.getElementById('adm-signin-form').addEventListener('submit', async function (e) {
         e.preventDefault();
         var email = document.getElementById('adm-email').value.trim();
+        var password = document.getElementById('adm-password').value;
         var status = document.getElementById('adm-status');
-        if (!email) return;
-        status.textContent = 'Sending...';
+        var btn = document.getElementById('adm-submit');
+        if (!email || !password || btn.disabled) return;
+        status.textContent = 'Signing in...';
+        btn.disabled = true;
         try {
-          await GlotempAuth.signInWithEmail(email);
-          status.textContent = 'Check your email. The link signs you in on this device.';
+          await GlotempAuth.signInWithPassword(email, password);
+          await boot();
         } catch (err) {
-          status.textContent = 'Could not send that just now. Try again shortly.';
+          status.textContent = (err && err.friendly) || 'Could not sign in. Try again shortly.';
+        } finally {
+          btn.disabled = false;
         }
       });
     }
