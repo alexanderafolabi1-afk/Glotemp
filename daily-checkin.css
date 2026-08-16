@@ -1,0 +1,177 @@
+/* ===== DAILY CHECK-IN RITUAL (Step 2) ===== */
+.daily-checkin-section {
+  padding: 2.5rem 0 2rem;
+}
+
+.daily-checkin-card {
+  max-width: 36rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.daily-checkin-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.42);
+  margin: 0 0 0.6rem;
+}
+
+.daily-checkin-title {
+  font-family: var(--font-display, Georgia, serif);
+  font-weight: 500;
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  line-height: 1.25;
+  color: #f4f1ea;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+.daily-checkin-copy {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(244,241,234,0.68);
+  margin: 0 0 1.25rem;
+}
+
+.daily-checkin-copy.subtle {
+  font-size: 0.85rem;
+  color: rgba(244,241,234,0.48);
+  margin-top: 0.75rem;
+}
+
+.daily-checkin-streak-hint,
+.daily-checkin-streak {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: rgba(244,241,234,0.55);
+  margin: 0 0 1.25rem;
+}
+
+.daily-checkin-streak {
+  font-size: 0.95rem;
+  color: #f4f1ea;
+  margin-top: 1rem;
+}
+
+.daily-moods {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.45rem;
+  margin-bottom: 1.25rem;
+}
+
+.daily-mood-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 999px;
+  color: rgba(244,241,234,0.7);
+  padding: 0.45rem 0.9rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.daily-mood-btn:hover {
+  border-color: rgba(255,255,255,0.28);
+  color: #f4f1ea;
+}
+
+.daily-mood-btn[aria-pressed="true"] {
+  border-color: rgba(244,241,234,0.55);
+  background: rgba(244,241,234,0.08);
+  color: #f4f1ea;
+}
+
+.daily-note-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: rgba(244,241,234,0.5);
+  margin-bottom: 0.4rem;
+  text-align: left;
+}
+
+.daily-note-count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  opacity: 0.7;
+}
+
+.daily-checkin-note {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  color: #f4f1ea;
+  font-family: inherit;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  padding: 0.85rem 1rem;
+  resize: vertical;
+  min-height: 5.5rem;
+  margin-bottom: 1rem;
+}
+
+.daily-checkin-note::placeholder {
+  color: rgba(244,241,234,0.32);
+}
+
+.daily-checkin-note:focus {
+  outline: none;
+  border-color: rgba(244,241,234,0.28);
+}
+
+.daily-checkin-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.daily-checkin-submit,
+.daily-checkin-signin {
+  min-width: 11rem;
+}
+
+.daily-checkin-status {
+  font-size: 0.82rem;
+  color: rgba(244,241,234,0.55);
+  min-height: 1.2em;
+}
+
+.daily-checkin-mood-line {
+  margin: 0.5rem 0;
+}
+
+.daily-checkin-mood-label {
+  display: inline-block;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(244,241,234,0.75);
+  border-bottom: 1px solid rgba(244,241,234,0.2);
+  padding-bottom: 0.15rem;
+}
+
+.daily-checkin-note-echo {
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(244,241,234,0.72);
+  margin: 0.75rem 0 0;
+  max-width: 28rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.daily-checkin-done .daily-checkin-title {
+  color: rgba(244,241,234,0.9);
+}

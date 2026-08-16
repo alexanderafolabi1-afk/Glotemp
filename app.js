@@ -33,8 +33,14 @@ function buildTripLine(city, reading) {
 // ----- i18n Setup -----
 const translations = {
   en: {
-    install_title: "Add Glotemp to Home Screen",
-    install_btn: "Install",
+    // These four must stay in step with the banner markup in index.html.
+    // The i18n pass overwrites element text at runtime, so leaving the old
+    // short strings here would silently replace the elevated copy.
+    install_eyebrow: "A private companion",
+    install_title: "Keep the world's pulse close.",
+    install_body: "Add Glotemp to your home screen. A quiet instrument that tells you how a city truly feels, before you arrive, while you are there, and long after you leave.",
+    install_btn: "Place among your essentials",
+    install_later: "Not now",
     dismiss: "✕",
     mood: "Mood",
     trip_engine_title: "Trip Engine",
@@ -1880,12 +1886,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Install prompt
   let deferredPrompt;
+  // Both this and the cookie strip are fixed to the bottom edge, and the
+  // cookie strip sits at a higher z-index, so showing them together buries
+  // this one. It waits its turn instead.
+  function showInstallBanner() {
+    const banner = document.getElementById('install-banner');
+    if (!banner) return;
+    if (document.getElementById('cookie-consent-banner')) {
+      window.addEventListener('glotemp:consent-dismissed', showInstallBanner, { once: true });
+      return;
+    }
+    banner.style.display = 'block';
+  }
+
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    document.getElementById('install-banner').style.display = 'block';
+    showInstallBanner();
   });
-  document.getElementById('install-btn').addEventListener('click', async () => {
+  // Guarded: cities/ and verticals/ load this file but carry no banner.
+  const installBtn = document.getElementById('install-btn');
+  if (installBtn) installBtn.addEventListener('click', async () => {
     if (deferredPrompt) {
       // Announced rather than measured here, so glotemp-analytics.js owns
       // every event and this file keeps owning the banner.
@@ -1897,8 +1918,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('install-banner').style.display = 'none';
     }
   });
-  document.getElementById('dismiss-install').addEventListener('click', () => {
-    document.getElementById('install-banner').style.display = 'none';
+  // Two ways out of the banner: the corner cross and the "Not now" button.
+  // Both close it, so neither is a control that appears to do nothing.
+  ['dismiss-install', 'install-later'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('click', () => {
+      document.getElementById('install-banner').style.display = 'none';
+    });
   });
 
 });

@@ -26,19 +26,30 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=57" />
+  <link rel="stylesheet" href="/styles.css?v=58" />
+  <link rel="stylesheet" href="/daily-checkin.css" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
   <script src="/glotemp-analytics.js" defer></script>
 </head>
 <body>
   <div id="app">
-    <!-- Install Banner -->
-    <div id="install-banner" class="glass-card" style="display:none;">
-      <div class="flex-between">
-        <span data-i18n="install_title">Get the app</span>
-        <button id="install-btn" class="btn-neon" data-i18n="install_btn">Install</button>
-        <button id="dismiss-install" class="btn-text" data-i18n="dismiss" style="font-size:1.2rem;">×</button>
+    <!-- Install Banner: elevated, legacy-toned add-to-home-screen -->
+    <div id="install-banner" class="install-banner" style="display:none;" role="dialog" aria-labelledby="install-headline" aria-describedby="install-body">
+      <button id="dismiss-install" class="install-dismiss" aria-label="Dismiss" data-i18n="dismiss">×</button>
+      <div class="install-inner">
+        <div class="install-icon-wrap" aria-hidden="true">
+          <img src="/assets/icon-192.png" alt="" width="56" height="56" class="install-icon">
+        </div>
+        <div class="install-copy">
+          <p class="install-eyebrow" data-i18n="install_eyebrow">A private companion</p>
+          <h2 id="install-headline" class="install-headline" data-i18n="install_title">Keep the world's pulse close.</h2>
+          <p id="install-body" class="install-body" data-i18n="install_body">Add Glotemp to your home screen. A quiet instrument that tells you how a city truly feels, before you arrive, while you are there, and long after you leave.</p>
+        </div>
+        <div class="install-actions">
+          <button id="install-btn" class="btn-neon install-cta" data-i18n="install_btn">Place among your essentials</button>
+          <button id="install-later" class="btn-text install-later" data-i18n="install_later">Not now</button>
+        </div>
       </div>
     </div>
 
@@ -81,6 +92,11 @@
 
     <!-- Spin: most prominent interactive element on the page -->
     <section id="spin-section" class="glass-card spin-section"></section>
+
+    <!-- Daily check-in ritual. Populated by glotemp-daily-checkin.js. -->
+    <section class="daily-checkin-section" aria-label="Daily check-in">
+      <div id="daily-checkin-root"></div>
+    </section>
 
     <!-- Hero City Pulse -->
     <section class="hero-section">
@@ -301,7 +317,9 @@
   <script src="/glotemp-hero-instrument.js" defer></script>
   <script src="/eclipse-2026.js" defer></script>
   <script src="/city-tiles.js" defer></script>
-  <script src="/app.js" defer></script>
+  <script src="/app.js?v=58" defer></script>
+  <script src="/glotemp-auth.js" defer></script>
+  <script src="/glotemp-daily-checkin.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
   <script src="/cookie-consent.js" defer></script>
   <script defer>
