@@ -1611,6 +1611,70 @@ summary:focus:not(:focus-visible) {
   .elsewhere-strands { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
 }
 
+/* ===== LIGHTWEIGHT VERIFICATION (glotemp-verify.js) =====
+   The offer is quiet by design. It appears only after a post, it is
+   optional, and declining must never look like a failure state. */
+.verify-offer {
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  min-width: 0;
+}
+
+.verify-copy {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--sand);
+  max-width: 52ch;
+}
+
+.verify-btn {
+  min-height: 44px;
+  padding: 0.35rem 0;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--brass);
+  border-radius: 0;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.82rem;
+  letter-spacing: 0.09em;
+  color: var(--ivory);
+}
+.verify-btn:hover { color: var(--brass); }
+.verify-btn:disabled { opacity: 0.5; cursor: default; }
+
+.verify-status {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--sand);
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+/* The badge on a posted reading. Understated: it marks a reading as a
+   little more grounded, not as certified. */
+.verify-badge {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--hairline);
+  border-radius: 0;
+  white-space: nowrap;
+}
+.verify-badge-presence { color: var(--brass); border-color: var(--brass-dim); }
+.verify-badge-standing { color: var(--sand); }
+
 /* ===== WHAT IS BEING REPORTED (city-news.js) ===== */
 .news-heading {
   font-family: var(--font-display);
