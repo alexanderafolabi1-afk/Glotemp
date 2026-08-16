@@ -7224,3 +7224,351 @@ body > section {
   .mood-btn { min-width: 0; padding-left: 0.2rem; padding-right: 0.2rem; }
   .mood-btn-label { font-size: 0.62rem; letter-spacing: 0.04em; }
 }
+
+/* ============================================================
+   AESTHETIC ENHANCEMENT LAYER
+   Aesthetic enhancement - safe to remove
+
+   Appended last on purpose. Everything below is additive and wins by
+   cascade position rather than by !important, so deleting this whole
+   block from here to the end of the file returns the site to exactly
+   what it looked like before, with no other edit required.
+
+   Nothing here changes behaviour, markup meaning, routing or data. It
+   sets colour, depth, motion and rhythm only. Two exceptions are
+   deliberate corrections rather than decoration, both flagged at their
+   own rule: the hero search field was 14.7px (iOS zooms the page below
+   16px) and its controls were 38px tall (below the 44px touch floor).
+   ============================================================ */
+
+/* Aesthetic enhancement - safe to remove
+   Tokens. Layered onto the existing warm palette rather than replacing
+   it: --obsidian/--brass/--ivory/--sand keep their meanings, and these
+   add the depth, glow and rhythm scales that were previously hard-coded
+   per rule. */
+:root {
+  /* Living accent. Teal is the cool pole, amber the warm one; the hero
+     already reads amber, so teal is used for focus and interaction to
+     give the eye somewhere else to land. */
+  --accent-cool: #4FD8E8;
+  --accent-warm: #F5A25A;
+  --accent-cool-soft: rgba(79, 216, 232, 0.28);
+  --accent-warm-soft: rgba(245, 162, 90, 0.26);
+
+  /* Glows, as complete shadow values so a rule states intent, not maths. */
+  --glow-sm: 0 0 12px var(--accent-cool-soft);
+  --glow-md: 0 0 28px var(--accent-cool-soft);
+  --glow-warm-lg: 0 0 90px var(--accent-warm-soft);
+
+  /* Shadows that read as weight rather than as a grey box. Two layers:
+     a tight contact shadow and a wide ambient one. */
+  --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.34);
+  --shadow-lifted: 0 2px 4px rgba(0, 0, 0, 0.44), 0 18px 44px rgba(0, 0, 0, 0.42);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* One easing for everything, so the whole page moves with one hand. */
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-fast: 160ms;
+  --dur-mid: 320ms;
+
+  --touch-min: 44px;
+}
+
+/* Aesthetic enhancement - safe to remove
+   Focus. One ring, accent-coloured, on everything focusable. Uses
+   :focus-visible so it appears for keyboards and not for mouse clicks,
+   and sits on an outline rather than a box-shadow so it survives
+   Windows high contrast mode. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent-cool);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* Aesthetic enhancement - safe to remove
+   Header. Translucent with a blur, so the sky behind it stays part of
+   the composition instead of being cut off by a hard bar. */
+.navbar {
+  background: linear-gradient(180deg, rgba(20, 16, 11, 0.72) 0%, rgba(20, 16, 11, 0.32) 100%);
+  backdrop-filter: blur(14px) saturate(1.25);
+  -webkit-backdrop-filter: blur(14px) saturate(1.25);
+  border-bottom-color: rgba(176, 141, 87, 0.28);
+  transition: background var(--dur-mid) var(--ease-out);
+}
+
+/* Nav links: the underline already exists; this gives it a soft
+   under-glow and makes the hover feel lit rather than merely coloured. */
+.nav-links a::after {
+  box-shadow: 0 0 10px var(--accent-warm-soft);
+}
+.nav-links a,
+.nav-links button {
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+/* The logo breathes at the same period as the compass, so the two read
+   as one system rather than two unrelated animations. */
+.nav-logo {
+  border-radius: 50%;
+  animation: gt-logo-pulse var(--hero-breathe-period, 6s) ease-in-out infinite;
+  will-change: filter;
+}
+@keyframes gt-logo-pulse {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(245, 162, 90, 0.18)); }
+  50%      { filter: drop-shadow(0 0 14px rgba(245, 162, 90, 0.42)); }
+}
+
+/* Aesthetic enhancement - safe to remove
+   Hero grain. A single inline SVG turbulence, no file, no request. It
+   sits above the photo and below the content, at an opacity low enough
+   to read as film rather than as texture. pointer-events:none so it can
+   never intercept a click on the instrument beneath it. */
+.hero-instrument-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Aesthetic enhancement - safe to remove
+   Hero copy. Tighter tracking on the headline, a longer ladder of
+   opacity down the column, and a glow on the headline tuned to the
+   sky behind it rather than a generic drop shadow. */
+.hero-headline {
+  letter-spacing: -0.018em;
+  text-wrap: balance;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 0 34px rgba(245, 162, 90, 0.14);
+}
+.hero-subhead {
+  letter-spacing: 0.004em;
+  color: rgba(201, 183, 156, 0.92);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+/* Search field and its button. The font-size and min-height here are
+   corrections, not styling: 0.92rem is 14.7px, and iOS zooms the whole
+   page when a field under 16px takes focus; 44px is the touch floor. */
+.hero-search-input,
+.hero-search-go {
+  min-height: var(--touch-min);
+  border-radius: var(--radius-md);
+  transition: border-color var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out),
+              background var(--dur-fast) var(--ease-out);
+}
+.hero-search-input {
+  font-size: 16px;
+  background: rgba(240, 224, 200, 0.07);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.hero-search-input::placeholder { color: rgba(201, 183, 156, 0.62); }
+.hero-search-input:focus {
+  box-shadow: var(--glow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.hero-search-go {
+  background: linear-gradient(180deg, rgba(240, 224, 200, 0.1), rgba(240, 224, 200, 0.03));
+  box-shadow: var(--shadow-raised), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.hero-search-go:hover {
+  box-shadow: var(--shadow-lifted), var(--glow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Aesthetic enhancement - safe to remove
+   The compass. Ambient glow behind the housing, so it sits in light
+   rather than on top of the photo. Behind the base image (z-index -1
+   inside .hero-instrument's own stacking context) and click-through. */
+.hero-instrument::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 78%;
+  height: 78%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle,
+    rgba(245, 162, 90, 0.20) 0%,
+    rgba(245, 162, 90, 0.08) 42%,
+    rgba(245, 162, 90, 0) 70%);
+  opacity: 0.85;
+  transition: opacity var(--dur-mid) var(--ease-out),
+              transform var(--dur-mid) var(--ease-out);
+}
+.hero-instrument:hover::before,
+.hero-instrument:focus-visible::before {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+/* Micro-rotation lives on .hero-instrument-inner, NOT on
+   .hero-instrument: the outer element already animates transform:scale
+   for the existing breathe, and a second transform animation on the same
+   element would replace it rather than compose with it. Two elements,
+   two transforms, both survive. */
+.hero-instrument-inner {
+  animation: gt-instrument-drift calc(var(--hero-breathe-period, 6s) * 3) ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes gt-instrument-drift {
+  0%, 100% { transform: rotate(-0.9deg); }
+  50%      { transform: rotate(0.9deg); }
+}
+
+/* Magnetic shimmer: a light sweep across the housing on hover, drawn
+   with a mask so it only ever touches the instrument's own disc. */
+.hero-instrument-base {
+  transition: filter var(--dur-mid) var(--ease-out);
+}
+.hero-instrument:hover .hero-instrument-base,
+.hero-instrument:focus-visible .hero-instrument-base {
+  filter: drop-shadow(0 30px 70px rgba(0, 0, 0, 0.55))
+          drop-shadow(0 0 26px rgba(245, 162, 90, 0.30));
+}
+
+/* Aesthetic enhancement - safe to remove
+   Staggered entrance. Scoped to no-preference so that reduced motion,
+   and any engine without animation support, gets fully visible content
+   with no opacity:0 to recover from. Transform and opacity only, so it
+   cannot move layout and cannot contribute to CLS. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-copy > * {
+    animation: gt-rise 620ms var(--ease-out) backwards;
+  }
+  .hero-copy > *:nth-child(1) { animation-delay: 60ms; }
+  .hero-copy > *:nth-child(2) { animation-delay: 140ms; }
+  .hero-copy > *:nth-child(3) { animation-delay: 220ms; }
+  .hero-copy > *:nth-child(4) { animation-delay: 300ms; }
+  .hero-copy > *:nth-child(5) { animation-delay: 380ms; }
+  .hero-instrument { animation-delay: 0s, 120ms; }
+}
+@keyframes gt-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Aesthetic enhancement - safe to remove
+   Interaction. Lift and glow, applied only to controls that already had
+   a hover state, so nothing newly announces itself as clickable. */
+.btn-neon,
+.adm-action,
+.elsewhere-go,
+.elsewhere-chip {
+  transition: transform var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+.btn-neon:hover,
+.adm-action:hover,
+.elsewhere-go:hover,
+.elsewhere-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-raised), var(--glow-sm);
+}
+.btn-neon:active,
+.adm-action:active,
+.elsewhere-go:active,
+.elsewhere-chip:active {
+  transform: translateY(0);
+}
+
+/* Glass cards get depth and a top highlight, the way a lit surface
+   actually behaves. Radius only softens; no geometry changes. */
+.glass-card {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-raised), inset 0 1px 0 rgba(255, 255, 255, 0.045);
+}
+
+/* Aesthetic enhancement - safe to remove
+   Mobile. The compass stays the hero even when the grid stacks: it is
+   ordered under the copy, centred, and given back the margin the
+   desktop overhang took, so it can never push the document sideways. */
+/* Breakpoint deliberately matches the existing 900px block above, which
+   already owns the stacking order, centring and instrument width on
+   mobile, and whose own comment records that sizing the instrument in vw
+   was the original overflow bug. Nothing here re-states any of that. */
+@media (max-width: 900px) {
+  .hero-instrument-grid {
+    /* minmax(0, 1fr), never a bare 1fr. A bare 1fr is minmax(auto, 1fr),
+       and that auto floor is the largest item's min-content, so the track
+       refuses to shrink below it and silently grows wider than the grid.
+       Raising the search field to 16px (the iOS zoom floor) widened the
+       input's intrinsic size, which pushed that floor to 335px inside a
+       318px container; the section's overflow:hidden then clipped the
+       right edge off the field. Letting the track reach zero fixes it at
+       the cause rather than capping the input's width. */
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+  }
+  .hero-instrument-section {
+    /* clamp rather than a fixed 100vh: a fixed viewport height on a phone
+       fights the browser chrome appearing and disappearing on scroll. */
+    height: auto;
+    min-height: clamp(30rem, 82svh, 46rem);
+  }
+  .navbar { padding: 0.7rem 1rem; }
+}
+
+@media (max-width: 480px) {
+  /* Side by side, the field and its button each get too little room to
+     read at 16px. Stacked, both are full width and comfortably tappable. */
+  .hero-search { flex-direction: column; }
+  .hero-search-go { width: 100%; }
+}
+
+/* Aesthetic enhancement - safe to remove
+   Reduced motion. Explicit, in addition to the file's existing global
+   catch-all: that one sets a 0.01ms duration, which still runs an
+   animation and leaves the element at the keyframe end state. These
+   remove the animation outright so every element rests at its natural
+   value. */
+@media (prefers-reduced-motion: reduce) {
+  .nav-logo,
+  .hero-instrument-inner {
+    animation: none !important;
+  }
+  .hero-copy > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .hero-instrument::before { transition: none; }
+}
+
+/* Aesthetic enhancement - safe to remove
+   High contrast. Glow is decoration and carries no meaning, so it is
+   dropped entirely and borders are made explicit instead. */
+@media (prefers-contrast: more), (forced-colors: active) {
+  :root {
+    --glow-sm: none;
+    --glow-md: none;
+    --glow-warm-lg: none;
+  }
+  .hero-instrument-section::after { display: none; }
+  .hero-headline,
+  .hero-subhead { text-shadow: none; }
+  .navbar {
+    background: var(--obsidian);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .hero-search-input,
+  .hero-search-go { border-color: var(--ivory); }
+}
