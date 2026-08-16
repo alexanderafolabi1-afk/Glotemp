@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -48,9 +48,12 @@
     
     <!-- Hero instrument: instrument-base.png (uploaded artwork, never
          modified) plus a live SVG layer over its aperture, driven by
-         the pinned city. -->
-    <section class="hero-instrument-section">
-      <div class="hero-instrument-layout">
+         whichever city is pinned. See glotemp-hero-instrument.js. -->
+    <section class="hero-instrument-section" id="hero-instrument-section">
+      <!-- One-day-only: see eclipse-2026.js. Empty and [hidden] on every
+           other date, self-populated (and self-clearing) by the script. -->
+      <div class="eclipse-mark" id="eclipse-mark" aria-hidden="true" hidden></div>
+      <div class="hero-instrument-grid">
         <div class="hero-copy">
           <div class="eclipse-note" id="eclipse-note" hidden></div>
           <h1 class="hero-headline">Know how a city feels before you go.</h1>
@@ -75,7 +78,30 @@
       </div>
     </section>
 
-    <!-- Rest of page content is loaded by app.js and other modules -->
+    <!-- Spin: most prominent interactive element on the page -->
+    <section id="spin-section" class="glass-card spin-section"></section>
+
+    <!-- Hero City Pulse -->
+    <section class="hero-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow" data-i18n="pulse_eyebrow">Live instruments</p>
+          <h2 data-i18n="pulse_title">Instrument room</h2>
+        </div>
+        <p class="section-copy" data-i18n="pulse_intro">Watch the mood of cities turning over in real time. Select any city to pin it and dive deeper.</p>
+      </div>
+
+      <p class="instrument-hint" data-i18n="instrument_hint">Tap any city below to see if today's the day to go.</p>
+      <div class="instrument-images" id="instrument-row">
+        <div class="instrument-slot" data-slot="0">
+          <div class="instrument-visual">
+            <div class="instrument-weather" aria-hidden="true"></div>
+            <img class="instrument-image" src="/assets/barometer-equilibrium.png" alt="Barometer" width="300" height="537">
+          </div>
+        </div>
+      </div>
+    </section>
+
     <div id="main-content"></div>
   </div>
 
