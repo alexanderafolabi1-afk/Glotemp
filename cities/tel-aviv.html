@@ -101,6 +101,13 @@
 
     
     <!-- 💓 Pulse Vertical -->
+    <section id="city-news" class="vertical-section glass-card">
+      <div class="vertical-body">
+        <h2 class="news-heading">In the papers today</h2>
+        <div id="news-content"></div>
+      </div>
+    </section>
+
     <details id="pulse" class="vertical-section glass-card" open>
       <summary class="vertical-summary"><h2>💓 Pulse</h2></summary>
       <div class="vertical-body">
@@ -232,6 +239,7 @@
       <div class="vertical-body">
         <p class="vertical-description">Where should you eat and explore cuisine?</p>
         <div id="food-content" class="vertical-content"></div>
+        <div id="food-venues" class="vertical-venues"></div>
         <div id="food-context" class="vertical-context"></div>
         
         <div class="vertical-listings" data-city="tel-aviv" data-vertical="food"></div>
@@ -305,6 +313,7 @@
   <script src="/city-landmarks.js"></script>
   <script src="/city-landmark-photos.js"></script>
   <script src="/glotemp-auth.js"></script>
+  <script src="/glotemp-verify.js"></script>
   <script src="/glotemp-checkin.js"></script>
   <script src="/glotemp-tonight.js"></script>
   <script src="/glotemp-features.js"></script>
@@ -319,6 +328,8 @@
   <script src="/city-food-signature.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
   <script src="/city-radio.js" defer></script>
+  <script src="/city-venues.js" defer></script>
+  <script src="/city-news.js" defer></script>
   <script src="/city-conditions.js" defer></script>
   <script src="/verticals-accordion.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
@@ -465,6 +476,18 @@
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
         GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country);
+      }
+
+      // Real named places from OpenStreetMap. Same treatment as Radio:
+      // a live keyless source, not a Supabase reading.
+      if (typeof GlotempVenues !== 'undefined' && city) {
+        GlotempVenues.loadVenues(city.slug, city.name, city.lat, city.lon);
+      }
+
+      // What the local press is reporting, in the languages it is
+      // reported in. Live and keyless, like Radio and Venues above.
+      if (typeof GlotempNews !== 'undefined' && city) {
+        GlotempNews.loadNews(city.name, city.country, 'news-content');
       }
 
       // Conditions line: same treatment as Radio -- a live free-API

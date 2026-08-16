@@ -123,8 +123,8 @@
   // ---------- examples panel ----------
   function examplesHTML() {
     return `
-      <div class="checkin-examples" aria-label="What a good check-in looks like">
-        <p class="checkin-examples-eyebrow">What a good check-in looks like</p>
+      <div class="checkin-examples" aria-label="Recent readings">
+        <p class="checkin-examples-eyebrow">Recent readings</p>
         <div class="checkin-examples-grid">
           ${EXAMPLES.map(ex => `
             <div class="checkin-example">
@@ -199,6 +199,9 @@
             <button type="submit" class="btn-neon checkin-neon-btn" id="checkin-submit">Post check-in</button>
             <span class="checkin-status" id="checkin-status" role="status" aria-live="polite"></span>
           </div>
+          <!-- Filled only after a successful post, by glotemp-verify.js.
+               Empty and silent until then. -->
+          <div id="checkin-verify"></div>
         </form>
       </div>
       <div class="checkin-list-wrap" id="checkin-list-wrap" hidden>
@@ -304,9 +307,12 @@
         submitBtn.disabled = true;
         status.textContent = 'Posting…';
         try {
-          const resp = await fetch(`${SUPABASE_URL}/rest/v1/observations`, {
+          // representation rather than minimal: the new row's id is what
+          // the optional verification step needs, and asking for it here
+          // avoids a second round trip to find the row again.
+          const resp = await fetch(`${SUPABASE_URL}/rest/v1/observations?select=id`, {
             method: 'POST',
-            headers: Object.assign(authHeaders(session), { Prefer: 'return=minimal' }),
+            headers: Object.assign(authHeaders(session), { Prefer: 'return=representation' }),
             body: JSON.stringify({
               user_id: user.id,
               city_slug: citySlug,
@@ -316,6 +322,18 @@
             }),
           });
           if (!resp.ok) throw new Error('post failed ' + resp.status);
+
+          // The offer is made only after a successful post. Asking for a
+          // position before someone has written anything is a toll gate.
+          let newId = null;
+          try {
+            const rows = await resp.json();
+            newId = Array.isArray(rows) && rows[0] ? rows[0].id : null;
+          } catch (e) { /* older PostgREST, or no body: verification is optional anyway */ }
+          const verifySlot = document.getElementById('checkin-verify');
+          if (newId && verifySlot && window.GlotempVerify) {
+            GlotempVerify.mountOffer(verifySlot, newId);
+          }
           // Per city, because growth has to be readable one city at a time.
           // Announced rather than measured here, so glotemp-analytics.js
           // owns every event and this file keeps owning the composer.
@@ -359,6 +377,7 @@
           ${mood ? moodGlyphSVG(row.mood, 'checkin-item-glyph') : ''}
           <span class="checkin-item-name">${esc(name)}</span>
           <span class="checkin-item-mood">${esc(mood ? mood.label : row.mood)}</span>
+          ${window.GlotempVerify ? GlotempVerify.badgeHTML(row.verify_method) : ''}
           <time class="checkin-item-time" datetime="${esc(row.created_at)}">${esc(timeAgo(row.created_at))}</time>
         </div>
         ${row.note ? `<p class="checkin-item-note">${esc(row.note)}</p>` : ''}
@@ -373,7 +392,7 @@
     try {
       const resp = await fetch(
         `${SUPABASE_URL}/rest/v1/observations?city_slug=eq.${encodeURIComponent(citySlug)}` +
-        `&select=id,mood,is_anonymous,note,created_at,profiles(display_name)` +
+        `&select=id,mood,is_anonymous,note,created_at,verify_method,profiles(display_name)` +
         `&order=created_at.desc&offset=${offset}&limit=${PAGE_SIZE}`,
         { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
       );

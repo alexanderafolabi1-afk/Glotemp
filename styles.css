@@ -1416,6 +1416,391 @@ summary:focus:not(:focus-visible) {
   outline: none;
 }
 
+/* ===== A CITY YOU KEEP (glotemp-elsewhere.js) =====
+   Mobile first. Single column at 320px, two strands side by side once
+   there is room. No card, no radius: the same hairline language as the
+   rest of the instrument. */
+.elsewhere-section { margin: var(--section-gap, 2rem) 0; min-width: 0; }
+
+/* Not defined anywhere else in this file, and the picker's label needs
+   it: visible to a screen reader, absent from the layout. */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.elsewhere-head { margin-bottom: 1.25rem; }
+
+.elsewhere-title {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: clamp(1.6rem, 6.5vw, 2.6rem);
+  line-height: 1.15;
+  color: var(--ivory);
+  margin: 0.4rem 0 0.5rem;
+}
+
+.elsewhere-sub {
+  color: var(--sand);
+  line-height: 1.6;
+  max-width: 46ch;
+  margin: 0;
+}
+
+.elsewhere-pick {
+  display: flex;
+  align-items: stretch;
+  gap: 0.75rem;
+  margin: 1.25rem 0 0.85rem;
+  max-width: 30rem;
+  min-width: 0;
+}
+
+.elsewhere-input {
+  flex: 1 1 auto;
+  min-width: 0;               /* or the field refuses to shrink at 320px */
+  font-size: 16px;            /* below this, iOS zooms the page on focus */
+  min-height: 48px;
+  padding: 0.6rem 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--brass-dim);
+  border-radius: 0;
+  color: var(--ivory);
+  font-family: var(--font-body);
+}
+.elsewhere-input:focus { outline: none; border-bottom-color: var(--brass); }
+
+.elsewhere-go {
+  flex: none;
+  min-height: 48px;
+  padding: 0 0.25rem;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--brass);
+  border-radius: 0;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  color: var(--ivory);
+}
+.elsewhere-go:hover { color: var(--brass); }
+
+.elsewhere-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.elsewhere-chips-label {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--brass);
+}
+
+.elsewhere-chip {
+  min-height: 44px;
+  padding: 0.35rem 0;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--sand);
+}
+.elsewhere-chip:hover { color: var(--ivory); border-bottom-color: var(--brass); }
+
+/* The window itself. The tint is the only thing that changes between a
+   city that is awake and one that is asleep, and it carries most of the
+   feeling. */
+.elsewhere-panel {
+  border-top: 1px solid var(--brass-dim);
+  padding-top: 1.5rem;
+  min-width: 0;
+}
+.elsewhere-panel-day {
+  background: linear-gradient(180deg, rgba(245, 162, 90, 0.07) 0%, transparent 60%);
+}
+.elsewhere-panel-night {
+  background: linear-gradient(180deg, rgba(107, 168, 245, 0.09) 0%, transparent 60%);
+}
+
+.elsewhere-now {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.elsewhere-clock {
+  font-family: var(--font-mono);
+  font-size: clamp(2.6rem, 14vw, 4rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--ivory);
+}
+
+.elsewhere-place {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--ivory);
+}
+
+.elsewhere-country {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.75rem;
+  letter-spacing: 0.09em;
+  color: var(--sand);
+  margin-left: 0.6rem;
+}
+
+.elsewhere-line {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--sand);
+}
+
+.elsewhere-strands {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.elsewhere-strand { min-width: 0; }
+
+.elsewhere-strand-title {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  color: var(--brass);
+  font-weight: var(--fw-regular);
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.elsewhere-more { margin: 1.75rem 0 0; }
+.elsewhere-more a {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.82rem;
+  letter-spacing: 0.09em;
+  color: var(--ivory);
+  text-decoration: none;
+  border-bottom: 1px solid var(--brass);
+  padding-bottom: 0.2rem;
+}
+.elsewhere-more a:hover { color: var(--brass); }
+
+@media (min-width: 800px) {
+  .elsewhere-strands { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+}
+
+/* ===== LIGHTWEIGHT VERIFICATION (glotemp-verify.js) =====
+   The offer is quiet by design. It appears only after a post, it is
+   optional, and declining must never look like a failure state. */
+.verify-offer {
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  min-width: 0;
+}
+
+.verify-copy {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--sand);
+  max-width: 52ch;
+}
+
+.verify-btn {
+  min-height: 44px;
+  padding: 0.35rem 0;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--brass);
+  border-radius: 0;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.82rem;
+  letter-spacing: 0.09em;
+  color: var(--ivory);
+}
+.verify-btn:hover { color: var(--brass); }
+.verify-btn:disabled { opacity: 0.5; cursor: default; }
+
+.verify-status {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--sand);
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+/* The badge on a posted reading. Understated: it marks a reading as a
+   little more grounded, not as certified. */
+.verify-badge {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--hairline);
+  border-radius: 0;
+  white-space: nowrap;
+}
+.verify-badge-presence { color: var(--brass); border-color: var(--brass-dim); }
+.verify-badge-standing { color: var(--sand); }
+
+/* ===== WHAT IS BEING REPORTED (city-news.js) ===== */
+.news-heading {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: 1.25rem;
+  color: var(--ivory);
+  margin: 0 0 1rem;
+}
+
+.news-list { list-style: none; margin: 0; padding: 0; }
+
+.news-item {
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--hairline);
+  min-width: 0;
+}
+
+.news-title {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--ivory);
+  text-decoration: none;
+  overflow-wrap: anywhere;   /* headlines carry unbroken foreign strings */
+}
+.news-title:hover { color: var(--brass); }
+
+.news-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.9rem;
+  margin-top: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--sand);
+  opacity: 0.8;
+}
+
+.news-lang {
+  font-variant-caps: small-caps;
+  letter-spacing: 0.08em;
+  color: var(--brass);
+  opacity: 0.95;
+}
+
+.news-status,
+.news-attribution {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--sand);
+  opacity: 0.8;
+  line-height: 1.6;
+  margin: 0.75rem 0 0;
+}
+.news-attribution a { color: var(--sand); }
+.news-attribution a:hover { color: var(--brass); }
+
+/* ===== LOCAL BUSINESSES (city-venues.js) =====
+   Real named places from OpenStreetMap. Rows on hairlines, matching the
+   check-ins-by-city treatment rather than introducing a card. */
+.vertical-venues { margin: 0.75rem 0 1rem; }
+
+.venue-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.venue {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.75rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--hairline);
+  /* Flex children refuse to shrink below their content without this,
+     which is what pushes the page sideways at 320px. */
+  min-width: 0;
+}
+
+.venue-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--ivory);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.venue-name a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--brass-dim);
+}
+.venue-name a:hover { color: var(--brass); border-bottom-color: var(--brass); }
+
+.venue-kind {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  color: var(--sand);
+  white-space: nowrap;
+}
+
+.venue-where {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--sand);
+  opacity: 0.72;
+  flex-basis: 100%;
+}
+
+.venue-status,
+.venue-attribution {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--sand);
+  opacity: 0.8;
+  margin: 0.75rem 0 0;
+  line-height: 1.6;
+}
+.venue-attribution a { color: var(--sand); }
+.venue-attribution a:hover { color: var(--brass); }
+
 /* ===== INSTALL BANNER =====
    The markup carries its own classes rather than .glass-card, so every
    surface it needs is declared here. Mobile first: a full-width sheet
