@@ -27,6 +27,15 @@ verify_jwt = false
 [functions.overpass-food]
 verify_jwt = false
 
+# The public API. Different reason from the collectors above: this one is
+# authenticated, just not by a Supabase JWT. Callers present a glo_live_
+# key which api_authorise hashes and checks. Leaving verify_jwt at its
+# default true would have Supabase's gateway reject every customer request
+# before the handler ever runs, and reject it for the wrong reason, since
+# an API key is not a JWT and never will parse as one.
+[functions.api-v1]
+verify_jwt = false
+
 [functions.hipolabs-education]
 verify_jwt = false
 
