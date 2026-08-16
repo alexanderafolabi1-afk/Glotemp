@@ -36,6 +36,12 @@ verify_jwt = false
 [functions.api-v1]
 verify_jwt = false
 
+# Read by every visitor's browser on every city page, signed in or not,
+# so it cannot require a JWT. It takes one city name, calls GDELT, and
+# returns public headlines; there is nothing here to protect.
+[functions.city-news]
+verify_jwt = false
+
 [functions.hipolabs-education]
 verify_jwt = false
 

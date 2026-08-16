@@ -9,23 +9,27 @@
 // somebody back daily rather than once before a trip.
 //
 // WHY GDELT
-// It monitors news in 65+ languages worldwide, is keyless, free, and
-// CORS-enabled. Critically it indexes the LOCAL press, not just the
-// English wires, so a reader from Warsaw or Lima or Ho Chi Minh City gets
-// their own outlets in their own language rather than a foreign desk's
-// summary of their home.
+// It monitors news in 65+ languages worldwide, is keyless and free.
+// Critically it indexes the LOCAL press, not just the English wires, so a
+// reader from Warsaw or Lima or Ho Chi Minh City gets their own outlets
+// in their own language rather than a foreign desk's summary of home.
+//
+// GDELT IS NOT CORS-ENABLED
+// An earlier version of this file said it was and called it directly from
+// the browser. It is not, and every one of those requests was blocked
+// before a response could be read, which showed up as "Nothing filed" on
+// all 151 cities at once. The fetch now happens in
+// supabase/functions/city-news and this file talks to that. Unlike
+// city-radio.js and city-venues.js, whose sources really do send the
+// header, this one needs the hop.
 //
 // WHAT IS NOT DONE HERE
 // Nothing is written, rewritten, summarised or invented. Each item is a
 // real headline from a real outlet, linked to the outlet. Glotemp is the
 // window, not the author.
-//
-// Client-side, keyless, never stored -- the same pattern as
-// city-radio.js, city-wiki.js and city-venues.js.
 (function () {
   'use strict';
 
-  var ENDPOINT = 'https://api.gdeltproject.org/api/v2/doc/doc';
   var SHOW = 6;
 
   function esc(s) {
@@ -71,27 +75,31 @@
     return Math.floor(h / 24) + 'd ago';
   }
 
-  // The city name alone matches too much (Cordoba is in Spain and
-  // Argentina; Santiago is in several countries). Pairing it with the
-  // country in a near-operator keeps it to the right place, and asking
-  // GDELT to sort by date is what makes this a feed rather than an
-  // archive.
-  function buildURL(cityName, country) {
-    var q = '"' + cityName + '"';
-    if (country) q += ' "' + country + '"';
+  // Via our own function, NOT api.gdeltproject.org directly.
+  //
+  // GDELT sends no Access-Control-Allow-Origin header. Every direct
+  // browser fetch to it was blocked before a response could be read, and
+  // the catch below turned that into "Nothing filed" for all 151 cities
+  // at once. Server to server has no CORS check, so supabase/functions/
+  // city-news does the fetch and sets the headers a browser needs.
+  //
+  // The query moved there too. It used to be `"City" "Country"`, and two
+  // quoted phrases in GDELT are an implicit AND: local coverage of a city
+  // rarely repeats its own country's name, so that returned almost
+  // nothing even where CORS was not the problem.
+  var ENDPOINT = 'https://hnysztednzqfzbmiqqgl.supabase.co/functions/v1/city-news';
+
+  function buildURL(cityName, limit) {
     return ENDPOINT +
-      '?query=' + encodeURIComponent(q) +
-      '&mode=ArtList&maxrecords=40&sort=DateDesc&format=json';
+      '?city=' + encodeURIComponent(cityName) +
+      '&limit=' + encodeURIComponent(limit || SHOW);
   }
 
-  async function fetchNews(cityName, country) {
-    var resp = await fetch(buildURL(cityName, country), { headers: { Accept: 'application/json' } });
+  async function fetchNews(cityName) {
+    var resp = await fetch(buildURL(cityName, SHOW), { headers: { Accept: 'application/json' } });
     if (!resp.ok) return [];
-    // GDELT answers a rate-limited or malformed query with an HTML/text
-    // body and a 200, so this cannot assume JSON just because it is ok.
-    var text = await resp.text();
     var data;
-    try { data = JSON.parse(text); } catch (e) { return []; }
+    try { data = await resp.json(); } catch (e) { return []; }
     return (data && Array.isArray(data.articles)) ? data.articles : [];
   }
 
@@ -141,7 +149,7 @@
 
     var articles = [];
     try {
-      articles = await fetchNews(cityName, country);
+      articles = await fetchNews(cityName);
     } catch (e) {
       articles = [];
     }
