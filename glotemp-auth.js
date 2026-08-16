@@ -357,6 +357,47 @@
     return session;
   }
 
+  // Change the signed-in user's own password. GoTrue takes this on the
+  // user endpoint with the caller's own access token, so it can only ever
+  // change the password of whoever is signed in.
+  async function updatePassword(newPassword) {
+    const session = await getSession();
+    if (!session) {
+      const err = new Error('not signed in');
+      err.friendly = 'You are not signed in.';
+      throw err;
+    }
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      method: 'PUT',
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: 'Bearer ' + session.access_token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ password: newPassword }),
+    });
+    if (!resp.ok) {
+      let body = {};
+      try { body = await resp.json(); } catch (e) { /* no JSON body */ }
+      const code = body.error_code || body.error || '';
+      const msg = body.msg || body.error_description || '';
+      const err = new Error(msg || 'password change failed: ' + resp.status);
+      if (code === 'weak_password' || /password should be at least/i.test(msg)) {
+        err.friendly = msg || 'That password is too short.';
+      } else if (code === 'same_password' || /should be different/i.test(msg)) {
+        err.friendly = 'That is the password you already have.';
+      } else {
+        // Same rule as sign-in: show what the server said rather than a
+        // reassurance that hides a problem which will not clear itself.
+        err.friendly = msg
+          ? msg + ' (' + resp.status + (code ? ', ' + code : '') + ')'
+          : 'Password change failed with status ' + resp.status + '.';
+      }
+      throw err;
+    }
+    return true;
+  }
+
   function signOut() {
     writeSession(null);
     cachedProfile = null;
@@ -568,6 +609,7 @@
     },
     signInWithEmail,
     signInWithPassword,
+    updatePassword,
     signOut,
     requireAuth,
     openModal,

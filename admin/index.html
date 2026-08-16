@@ -105,6 +105,26 @@
     .adm-status { font-family: var(--font-mono); font-size: 0.78rem; color: var(--sand); margin: 0.75rem 0 0; }
     .adm-note { border-left: 2px solid var(--brass); padding-left: 0.9rem; max-width: 54ch; }
 
+    .adm-key-prefix {
+      display: block; font-family: var(--font-mono); font-size: 0.7rem;
+      color: var(--sand); opacity: 0.7; margin-top: 0.2rem;
+    }
+    .adm-row-dead { opacity: 0.45; }
+    .adm-revoke {
+      background: none; border: none; border-bottom: 1px solid var(--hairline);
+      border-radius: 0; padding: 0.35rem 0; min-height: 44px; cursor: pointer;
+      font-family: var(--font-mono); font-variant-caps: small-caps;
+      font-size: 0.74rem; letter-spacing: 0.07em; color: var(--sand);
+    }
+    .adm-revoke:hover { color: var(--ivory); border-bottom-color: var(--brass); }
+    .adm-reveal { border-left: 2px solid var(--brass); padding: 0.25rem 0 0.25rem 0.9rem; margin: 1rem 0; }
+    .adm-key {
+      display: block; font-family: var(--font-mono); font-size: 0.8rem;
+      color: var(--ivory); word-break: break-all; margin: 0.4rem 0 0.6rem;
+      /* Long enough to push the page sideways at 320px without this. */
+      max-width: 100%; overflow-wrap: anywhere;
+    }
+
     .adm-bar {
       display: flex; align-items: center; min-height: 56px;
       padding: 0 1.25rem; border-bottom: 1px solid var(--hairline);
@@ -251,9 +271,28 @@
              '<span class="adm-stat-label">' + esc(label) + '</span></div>';
     }
 
-    function dashboard(overview, byCity) {
+    function dashboard(overview, byCity, apiOverview, apiKeys) {
       var m = {};
       (overview || []).forEach(function (r) { m[r.metric] = r.value; });
+      var a = {};
+      (apiOverview || []).forEach(function (r) { a[r.metric] = r.value; });
+
+      var keyRows = (apiKeys || []).length
+        ? (apiKeys || []).map(function (k) {
+            var used = k.monthly_limit
+              ? k.calls_this_month + ' / ' + k.monthly_limit
+              : String(k.calls_this_month);
+            return '<div class="adm-row' + (k.revoked_at ? ' adm-row-dead' : '') + '">' +
+              '<span class="adm-row-city">' + esc(k.label) +
+                '<span class="adm-key-prefix">' + esc(k.key_prefix) + '...</span></span>' +
+              '<span class="adm-row-count">' + esc(used) + '</span>' +
+              '<span class="adm-row-when">' + esc(k.plan) +
+                (k.revoked_at ? ', revoked' : '') + '</span>' +
+              (k.revoked_at ? ''
+                : '<button type="button" class="adm-revoke" data-key-id="' + esc(k.id) + '">Revoke</button>') +
+            '</div>';
+          }).join('')
+        : '<p class="adm-copy">No keys issued yet.</p>';
 
       var rows = (byCity || []).length
         ? byCity.map(function (r) {
@@ -294,9 +333,130 @@
           stat(m.prompt_dismissed || 0, 'dismissed') +
         '</div>' +
         '<div class="adm-section-head"><h2 class="adm-h2">Visitors</h2></div>' +
-        '<p><a class="adm-action" href="https://dash.cloudflare.com/?to=/:account/web-analytics" target="_blank" rel="noopener noreferrer">Open Cloudflare Web Analytics</a>' +
-        '<a class="adm-secondary" href="#" id="adm-signout">Sign out</a></p>'
+        '<p><a class="adm-action" href="https://dash.cloudflare.com/?to=/:account/web-analytics" target="_blank" rel="noopener noreferrer">Open Cloudflare Web Analytics</a></p>' +
+
+        '<div class="adm-section-head"><h2 class="adm-h2">API keys</h2></div>' +
+        '<div class="adm-grid">' +
+          stat(a.keys_active || 0, 'active keys') +
+          stat(a.paying_keys || 0, 'paying') +
+          stat(a.calls || 0, 'calls, 30 days') +
+          stat(a.calls_rejected || 0, 'rejected') +
+        '</div>' +
+        keyRows +
+        '<form id="adm-key-form">' +
+          '<label class="adm-label" for="adm-key-label">Who is it for</label>' +
+          '<input class="adm-input" type="text" id="adm-key-label" maxlength="80" required placeholder="Acme Corp">' +
+          '<label class="adm-label" for="adm-key-email">Their email (optional)</label>' +
+          '<input class="adm-input" type="email" id="adm-key-email" placeholder="dev@acme.com">' +
+          '<label class="adm-label" for="adm-key-plan">Plan</label>' +
+          '<select class="adm-input" id="adm-key-plan">' +
+            '<option value="free">Free, 1,000 calls</option>' +
+            '<option value="starter">Starter, 50,000 calls</option>' +
+            '<option value="growth">Growth, 500,000 calls</option>' +
+            '<option value="scale">Scale, no ceiling</option>' +
+          '</select>' +
+          '<p><button class="adm-action" type="submit" id="adm-key-submit">Issue key</button></p>' +
+        '</form>' +
+        '<p class="adm-status" id="adm-key-status" role="status" aria-live="polite"></p>' +
+        '<div id="adm-key-reveal"></div>' +
+
+        '<div class="adm-section-head"><h2 class="adm-h2">Your account</h2></div>' +
+        '<form id="adm-pw-form">' +
+          '<label class="adm-label" for="adm-new-pw">New password</label>' +
+          '<input class="adm-input" type="password" id="adm-new-pw" required minlength="8" autocomplete="new-password">' +
+          '<label class="adm-label" for="adm-new-pw2">Repeat it</label>' +
+          '<input class="adm-input" type="password" id="adm-new-pw2" required minlength="8" autocomplete="new-password">' +
+          '<p><button class="adm-action" type="submit" id="adm-pw-submit">Change password</button>' +
+          '<a class="adm-secondary" href="#" id="adm-signout">Sign out</a></p>' +
+        '</form>' +
+        '<p class="adm-status" id="adm-pw-status" role="status" aria-live="polite"></p>'
       );
+
+      // Limits live here rather than in the database default so the plan
+      // named on screen and the ceiling actually applied are one thing.
+      var PLAN_LIMITS = { free: 1000, starter: 50000, growth: 500000, scale: null };
+
+      document.getElementById('adm-key-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var label = document.getElementById('adm-key-label').value.trim();
+        var email = document.getElementById('adm-key-email').value.trim();
+        var plan = document.getElementById('adm-key-plan').value;
+        var st = document.getElementById('adm-key-status');
+        var btn = document.getElementById('adm-key-submit');
+        if (!label || btn.disabled) return;
+        st.textContent = 'Issuing...';
+        btn.disabled = true;
+        try {
+          var res = await rpc('admin_issue_api_key', {
+            p_label: label,
+            p_contact_email: email || null,
+            p_plan: plan,
+            p_monthly_limit: PLAN_LIMITS[plan],
+          });
+          var row = Array.isArray(res) ? res[0] : res;
+          st.textContent = '';
+          // Shown once. There is no way to recover it afterwards, so the
+          // warning is not decoration.
+          document.getElementById('adm-key-reveal').innerHTML =
+            '<div class="adm-reveal">' +
+              '<p class="adm-label">Copy this now. It cannot be shown again.</p>' +
+              '<code class="adm-key">' + esc(row.api_key) + '</code>' +
+              '<p><button type="button" class="adm-action" id="adm-key-copy">Copy</button></p>' +
+            '</div>';
+          document.getElementById('adm-key-copy').addEventListener('click', function () {
+            navigator.clipboard.writeText(row.api_key).then(function () {
+              document.getElementById('adm-key-copy').textContent = 'Copied';
+            }, function () {
+              document.getElementById('adm-key-copy').textContent = 'Select it by hand';
+            });
+          });
+          document.getElementById('adm-key-label').value = '';
+          document.getElementById('adm-key-email').value = '';
+        } catch (err) {
+          st.textContent = 'Could not issue that key.';
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      root.querySelectorAll('.adm-revoke').forEach(function (b) {
+        b.addEventListener('click', async function () {
+          if (!window.confirm('Revoke this key? Whoever holds it stops working immediately.')) return;
+          b.disabled = true;
+          try {
+            await rpc('admin_revoke_api_key', { p_id: b.getAttribute('data-key-id') });
+            await load();
+          } catch (err) {
+            b.disabled = false;
+            document.getElementById('adm-key-status').textContent = 'Could not revoke that key.';
+          }
+        });
+      });
+
+      document.getElementById('adm-pw-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var a = document.getElementById('adm-new-pw').value;
+        var bb = document.getElementById('adm-new-pw2').value;
+        var st = document.getElementById('adm-pw-status');
+        var btn = document.getElementById('adm-pw-submit');
+        if (btn.disabled) return;
+        // Checked here as well as by minlength, because a paste can leave
+        // a field the browser never validated on input.
+        if (a.length < 8) { st.textContent = 'Use at least 8 characters.'; return; }
+        if (a !== bb) { st.textContent = 'Those two do not match.'; return; }
+        st.textContent = 'Saving...';
+        btn.disabled = true;
+        try {
+          await GlotempAuth.updatePassword(a);
+          st.textContent = 'Password changed. Use it next time you sign in.';
+          document.getElementById('adm-new-pw').value = '';
+          document.getElementById('adm-new-pw2').value = '';
+        } catch (err) {
+          st.textContent = (err && err.friendly) || 'Could not change it.';
+        } finally {
+          btn.disabled = false;
+        }
+      });
 
       root.querySelectorAll('.adm-range button').forEach(function (b) {
         b.addEventListener('click', function () {
@@ -321,11 +481,16 @@
 
     async function load() {
       try {
+        // The API calls are allowed to fail on their own without taking
+        // the page down: on a project where the API migration has not
+        // been run yet, the rest of the dashboard still works.
         var results = await Promise.all([
           rpc('admin_overview', { days: days }),
           rpc('admin_checkins_by_city', { days: days, max_rows: 50 }),
+          rpc('admin_api_overview', { days: 30 }).catch(function () { return []; }),
+          rpc('admin_api_keys', {}).catch(function () { return []; }),
         ]);
-        dashboard(results[0], results[1]);
+        dashboard(results[0], results[1], results[2], results[3]);
       } catch (err) {
         // The functions raise "not authorised" for a signed-in non-admin,
         // which PostgREST returns as a 4xx. Treat that as the answer
