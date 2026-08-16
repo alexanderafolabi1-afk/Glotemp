@@ -4,20 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#06060A" />
-  <meta name="description" content="Glotemp - the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
-  <meta name="keywords" content="city mood, travel intelligence, urban energy, real-time city data, location intelligence, collective mood" />
-  <meta property="og:title" content="Glotemp – Live City Pulse" />
-  <meta property="og:description" content="Glotemp - the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://glo-temp.com/" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Glotemp – Live City Pulse" />
-  <meta name="twitter:description" content="Glotemp - the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
-  <link rel="canonical" href="https://glo-temp.com/" />
+  <meta name="description" content="Glotemp — real-time collective mood infrastructure. Know how a city feels before you go." />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
   <title>Glotemp – Live City Pulse</title>
 
   <!-- Type system: Fraunces (display), Manrope (body), IBM Plex Mono (data) -->
@@ -26,18 +16,28 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=57" />
+  <link rel="stylesheet" href="/styles.css?v=58" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
 </head>
 <body>
   <div id="app">
-    <!-- Install Banner -->
-    <div id="install-banner" class="glass-card" style="display:none;">
-      <div class="flex-between">
-        <span data-i18n="install_title">Get the app</span>
-        <button id="install-btn" class="btn-neon" data-i18n="install_btn">Install</button>
-        <button id="dismiss-install" class="btn-text" data-i18n="dismiss" style="font-size:1.2rem;">×</button>
+    <!-- Install Banner — elevated, legacy-toned A2HS -->
+    <div id="install-banner" class="install-banner" style="display:none;" role="dialog" aria-labelledby="install-headline" aria-describedby="install-body">
+      <button id="dismiss-install" class="install-dismiss" aria-label="Dismiss" data-i18n="dismiss">×</button>
+      <div class="install-inner">
+        <div class="install-icon-wrap" aria-hidden="true">
+          <img src="/assets/icon-192.png" alt="" width="56" height="56" class="install-icon">
+        </div>
+        <div class="install-copy">
+          <p class="install-eyebrow" data-i18n="install_eyebrow">A private companion</p>
+          <h2 id="install-headline" class="install-headline" data-i18n="install_title">Keep the world’s pulse close.</h2>
+          <p id="install-body" class="install-body" data-i18n="install_body">Add Glotemp to your home screen. A quiet instrument that tells you how a city truly feels — before you arrive, while you are there, and long after you leave.</p>
+        </div>
+        <div class="install-actions">
+          <button id="install-btn" class="btn-neon install-cta" data-i18n="install_btn">Place among your essentials</button>
+          <button id="install-later" class="btn-text install-later" data-i18n="install_later">Not now</button>
+        </div>
       </div>
     </div>
 
@@ -98,270 +98,14 @@
             <div class="instrument-weather" aria-hidden="true"></div>
             <img class="instrument-image" src="/assets/barometer-equilibrium.png" alt="Barometer" width="300" height="537">
           </div>
-          <div class="instrument-label">
-            <span class="instrument-city-name">-</span>
-            <span class="instrument-band-name">-</span>
-          </div>
-        </div>
-        <div class="instrument-slot" data-slot="1">
-          <div class="instrument-visual">
-            <div class="instrument-weather" aria-hidden="true"></div>
-            <img class="instrument-image" src="/assets/barometer-warm.png" alt="Barometer" width="300" height="537">
-          </div>
-          <div class="instrument-label">
-            <span class="instrument-city-name">-</span>
-            <span class="instrument-band-name">-</span>
-          </div>
-        </div>
-        <div class="instrument-slot" data-slot="2">
-          <div class="instrument-visual">
-            <div class="instrument-weather" aria-hidden="true"></div>
-            <img class="instrument-image" src="/assets/barometer-equilibrium.png" alt="Barometer" width="300" height="537">
-          </div>
-          <div class="instrument-label">
-            <span class="instrument-city-name">-</span>
-            <span class="instrument-band-name">-</span>
-          </div>
-        </div>
-        <div class="instrument-slot" data-slot="3">
-          <div class="instrument-visual">
-            <div class="instrument-weather" aria-hidden="true"></div>
-            <img class="instrument-image" src="/assets/barometer-low.png" alt="Barometer" width="300" height="537">
-          </div>
-          <div class="instrument-label">
-            <span class="instrument-city-name">-</span>
-            <span class="instrument-band-name">-</span>
-          </div>
-        </div>
-        <div class="instrument-slot" data-slot="4">
-          <div class="instrument-visual">
-            <div class="instrument-weather" aria-hidden="true"></div>
-            <img class="instrument-image" src="/assets/barometer-charged.png" alt="Barometer" width="300" height="537">
-          </div>
-          <div class="instrument-label">
-            <span class="instrument-city-name">-</span>
-            <span class="instrument-band-name">-</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- City Selector Dropdown -->
-      <select id="city-select" style="display:none;"></select>
-
-      <!-- City Selector & Details (appears on selection) -->
-      <div class="city-selector glass-card" id="city-selector-panel" style="display:none;">
-        <h3 id="selected-city-name"></h3>
-        <div class="city-details" id="city-details">
-          <!-- Populated by app.js when city selected -->
-        </div>
-      </div>
-
-      <!-- Live Ticker -->
-      <div class="live-ticker glass-card">
-        <div class="ticker-content" id="ticker-content"></div>
-      </div>
-    </section>
-
-    <!-- How It Works -->
-    <section class="how-it-works">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">How it works</p>
-          <h2>Three steps. One reading.</h2>
-        </div>
-      </div>
-      <div class="hiw-steps">
-        <div class="hiw-step">
-          <div class="hiw-body">
-            <span class="hiw-numeral">📝</span>
-            <h3 class="hiw-title">Add a reading</h3>
-            <p class="hiw-copy">You tell us how your city feels right now.</p>
-          </div>
-        </div>
-        <div class="hiw-step">
-          <div class="hiw-body">
-            <span class="hiw-numeral">🔄</span>
-            <h3 class="hiw-title">We aggregate</h3>
-            <p class="hiw-copy">Every input becomes part of one reading.</p>
-          </div>
-        </div>
-        <div class="hiw-step">
-          <div class="hiw-body">
-            <span class="hiw-numeral">📊</span>
-            <h3 class="hiw-title">The instrument moves</h3>
-            <p class="hiw-copy">The city's mood becomes visible to all.</p>
-          </div>
         </div>
       </div>
     </section>
 
-    <!-- Trip Engine: verdict line plus the three real action links (room,
-         flight, table). -->
-    <section class="glass-card trip-slot">
-      <p class="eyebrow" data-i18n="trip_engine_title">Should you go</p>
-      <div class="trip-body">
-        <div class="trip-text">
-          <p class="trip-verdict-line" id="trip-verdict-line">Reading the city&hellip;</p>
-          <div class="trip-actions" id="trip-actions">
-            <a class="trip-action" id="book-hotel-btn" href="https://booking.com/searchresults?ss=New%20York" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18V7M3 12h13a4 4 0 014 4v2M3 18h18"/><circle cx="7.5" cy="9.5" r="1.6"/></svg><span data-i18n="book_hotel">Room</span></a>
-            <a class="trip-action" id="find-flights-btn" href="https://www.skyscanner.net/transport/flights/" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.2 3.3a1.6 1.6 0 013.1 0l1.5 5.4 6.1 1.8a1.2 1.2 0 010 2.3l-6.1 1.8-1.5 5.4a1.6 1.6 0 01-3.1 0l-1.5-5.4-6.1-1.8a1.2 1.2 0 010-2.3l6.1-1.8z"/></svg><span data-i18n="find_flights">Flight</span></a>
-            <a class="trip-action" id="book-table-btn" href="https://www.opentable.com/" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v8a2 2 0 002 2h0a2 2 0 002-2V3M7 13v8M17 3c-1.7 0-2.5 2-2.5 4.5S15.3 12 17 12v9"/></svg><span>Table</span></a>
-          </div>
-        </div>
-        <div class="trip-reading" id="trip-reading">
-          <span class="trip-reading-value">-</span>
-          <span class="trip-reading-band">-</span>
-          <span class="trip-reading-city">-</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Daily Pulse: city showcase rotator. Default city is Helsinki. -->
-    <section class="glass-card" id="daily-story">
-      <p class="eyebrow" data-i18n="daily_story">Daily pulse</p>
-      <div id="showcase" class="showcase">
-        <h2 class="showcase-city" id="showcase-city">Helsinki</h2>
-        <p class="showcase-line" id="showcase-line">&nbsp;</p>
-        <a class="showcase-open" id="showcase-open" href="/cities/helsinki.html">Open Helsinki &rarr;</a>
-      </div>
-    </section>
-
-    <!-- City reading -->
-    <section class="check-in glass-card checkin-hero-section">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow" data-i18n="checkin_eyebrow">City reading</p>
-          <h2 class="checkin-neon-title"><span data-i18n="checkin_title">How</span> <span class="checkin-glow" id="checkin-city-name">New York</span> feels right now</h2>
-        </div>
-        <p class="section-copy" data-i18n="checkin_intro">Pick a mood and add a note if you like.</p>
-      </div>
-
-      <!-- Live city browser. Purely additive: tiles set the existing hidden
-           #city-select and dispatch its change event, which is what app.js
-           already listens for. See city-tiles.js. -->
-      <div id="city-tiles" class="city-tiles" role="group" aria-label="Choose a city to read"></div>
-      <p class="city-tiles-hint">Live readings across 151 cities. Choose one, then add yours.</p>
-
-      <div class="mood-buttons" role="group" aria-label="How does your city feel right now?">
-        <button class="mood-btn" data-mood="🔥" data-band="charged"     data-label="Energized" title="Energized"><span class="mood-btn-icon" aria-hidden="true">🔥</span><span class="mood-btn-label">Energized</span></button>
-        <button class="mood-btn" data-mood="😊" data-band="warm"        data-label="Good"      title="Good"><span class="mood-btn-icon" aria-hidden="true">😊</span><span class="mood-btn-label">Good</span></button>
-        <button class="mood-btn" data-mood="😐" data-band="equilibrium" data-label="Neutral"   title="Neutral"><span class="mood-btn-icon" aria-hidden="true">😐</span><span class="mood-btn-label">Neutral</span></button>
-        <button class="mood-btn" data-mood="😞" data-band="restrained"  data-label="Low"       title="Low"><span class="mood-btn-icon" aria-hidden="true">😞</span><span class="mood-btn-label">Low</span></button>
-        <button class="mood-btn" data-mood="😟" data-band="low"         data-label="Cautious"  title="Cautious"><span class="mood-btn-icon" aria-hidden="true">😟</span><span class="mood-btn-label">Cautious</span></button>
-      </div>
-      <form id="observation-form" class="observation-form">
-        <div class="form-grid">
-          <label>
-            <span data-i18n="intensity_label">Intensity</span>
-            <input id="intensity-range" type="range" min="10" max="100" step="5" value="65" />
-            <strong id="intensity-value">65</strong>
-          </label>
-          <label>
-            <span data-i18n="scene_label">Where are you?</span>
-            <select id="scene-select">
-              <option value="street" data-i18n="scene_street">🚶 Out and about</option>
-              <option value="work" data-i18n="scene_work">💼 Work</option>
-              <option value="education" data-i18n="scene_school">🎓 School / campus</option>
-              <option value="food" data-i18n="scene_restaurant">🍽️ Restaurant / café</option>
-              <option value="entertainment" data-i18n="scene_concert">🎤 Concert / nightlife</option>
-              <option value="sport" data-i18n="scene_sport">🏋️ Gym / sport</option>
-              <option value="transport" data-i18n="scene_transit">🚇 Transit</option>
-              <option value="property" data-i18n="scene_home">🏠 Home</option>
-            </select>
-          </label>
-        </div>
-        <label class="full-width">
-          <span data-i18n="context_label">Optional local note</span>
-          <textarea id="context-note" rows="3" maxlength="240" data-i18n-placeholder="context_placeholder" placeholder="A small observation, event note, or mood context."></textarea>
-        </label>
-        <div class="form-actions">
-          <button id="record-observation" type="submit" class="btn-neon checkin-neon-btn" data-i18n="record_observation">Add reading</button>
-          <p id="observation-feedback" class="inline-feedback" aria-live="polite"></p>
-        </div>
-      </form>
-    </section>
-
-    <section id="fastest-moods" class="glass-card">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow" data-i18n="fastest_eyebrow">Trending now</p>
-          <h2 data-i18n="fastest_title">Cities with biggest mood shifts</h2>
-        </div>
-        <p class="section-copy" data-i18n="fastest_intro">Real-time shifts in city energy. These places are moving fast.</p>
-      </div>
-      <div id="fastest-cities-grid" class="fastest-grid">
-        <div class="fastest-placeholder" data-i18n="fastest_loading">Loading trending cities...</div>
-      </div>
-    </section>
-
-    <!-- Live observations: one rotating snippet, not a wall of cards. -->
-    <section id="observations-section" class="glass-card">
-      <p class="eyebrow" data-i18n="obs_eyebrow">Live observations</p>
-      <button type="button" class="obs-snippet" id="obs-snippet" aria-live="polite"></button>
-      <div class="add-voice-row">
-        <p class="add-voice-copy" data-i18n="add_voice_copy">Want to add your own read on a city?</p>
-        <button type="button" class="btn-neon" id="add-voice-btn" data-i18n="add_voice_btn">Add your voice ↑</button>
-      </div>
-    </section>
-
-    <footer class="footer glass">
-      <p>© 2026 RenviaIT Ltd. All rights reserved.</p>
-      <p class="small-print">
-        <a href="/privacy" data-i18n="privacy_policy">Privacy Policy</a> |
-        <a href="/terms" data-i18n="terms_of_service">Terms of Service</a> |
-        <a href="#" id="cookie-settings" data-i18n="cookie_settings">Cookie Settings</a>
-      </p>
-      <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
-      <p class="small-print"><a href="mailto:info@glo-temp.com" class="contact-link">info@glo-temp.com</a></p>
-      <p class="small-print footer-lang-row">
-      <button type="button" id="lang-switch" class="footer-lang">Language</button>
-    </p>
-  </footer>
+    <div id="main-content"></div>
   </div>
 
-  <script src="/cities-data.js" defer></script>
-  <script src="/seed-observations.js" defer></script>
-  <script src="/stories.js" defer></script>
-  <script src="/living-index.js" defer></script>
-  <script src="/glotemp-core.js" defer></script>
-  <script src="/city-landmarks.js" defer></script>
-  <script src="/city-landmark-photos.js" defer></script>
-  <script src="/glotemp-mood-imagery.js" defer></script>
-  <script src="/glotemp-tonight.js" defer></script>
-  <script src="/glotemp-showcase.js" defer></script>
-  <script src="/glotemp-spin.js" defer></script>
-  <script src="/glotemp-hero-instrument.js" defer></script>
-  <script src="/eclipse-2026.js" defer></script>
-  <script src="/city-tiles.js" defer></script>
-  <script src="/app.js" defer></script>
-  <script src="/tempo-economy.js" defer></script>
-  <script src="/cookie-consent.js" defer></script>
-  <script defer>
-    // Trip Engine slot: flight / room / table. The insurance link was
-    // replaced by Table, so every lookup is guarded -- an absent slot must
-    // never throw and take the rest of the page's init down with it.
-    function updateAffiliateLinks(cityName) {
-      const encodedCity = encodeURIComponent(cityName);
-      const set = (id, href) => { const el = document.getElementById(id); if (el) el.href = href; };
-      set('book-hotel-btn', `https://booking.com/searchresults?ss=${encodedCity}`);
-      const skyscannerCity = encodeURIComponent(cityName.replace(/\s+/g, ''));
-      set('find-flights-btn', `https://www.skyscanner.com/transport/flights/${skyscannerCity}/`);
-      set('book-table-btn', `https://www.opentable.com/s?term=${encodedCity}`);
-    }
-  </script>
-  <script>
-    /* 8s trending cities timeout */
-    (function () {
-      setTimeout(function () {
-        var grid = document.getElementById('fastest-cities-grid');
-        if (!grid) return;
-        var placeholder = grid.querySelector('.fastest-placeholder');
-        if (placeholder) {
-          placeholder.classList.add('timed-out');
-          placeholder.textContent = 'No trending data yet - check back soon as more observations arrive.';
-        }
-      }, 8000);
-    }());
-  </script>
+  <script src="/cities-data.js"></script>
+  <script src="/app.js?v=58"></script>
 </body>
 </html>

@@ -1,24 +1,42 @@
 {
-  "name": "Glotemp – City Pulse",
+  "id": "/",
+  "name": "Glotemp — The Living City Atlas",
   "short_name": "Glotemp",
-  "start_url": "/",
+  "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#06060A",
   "theme_color": "#06060A",
-  "description": "Real-time collective mood infrastructure for cities",
+  "description": "A private companion that reveals how a city truly feels — before you arrive, while you are there, and long after you leave. Real-time collective mood infrastructure for the discerning traveller.",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["travel", "lifestyle", "news", "social"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/assets/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/assets/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ],
-  "lang": "en",
-  "categories": ["travel", "social", "lifestyle"]
+  ]
 }
