@@ -105,6 +105,18 @@
     .adm-status { font-family: var(--font-mono); font-size: 0.78rem; color: var(--sand); margin: 0.75rem 0 0; }
     .adm-note { border-left: 2px solid var(--brass); padding-left: 0.9rem; max-width: 54ch; }
 
+    .adm-bar {
+      display: flex; align-items: center; min-height: 56px;
+      padding: 0 1.25rem; border-bottom: 1px solid var(--hairline);
+    }
+    .adm-back {
+      display: inline-flex; align-items: center; min-height: 44px;
+      font-family: var(--font-mono); font-variant-caps: small-caps;
+      font-size: 0.82rem; letter-spacing: 0.12em;
+      color: var(--sand); text-decoration: none;
+    }
+    .adm-back:hover { color: var(--ivory); }
+
     @media (max-width: 400px) {
       .adm-row { flex-wrap: wrap; gap: 0.4rem 1rem; }
       .adm-row-when { width: 100%; }
@@ -113,14 +125,17 @@
   <script src="/glotemp-analytics.js" defer></script>
 </head>
 <body>
-  <nav id="site-nav"></nav>
-<script src="/nav-component.js"></script>
+  <!-- No public site nav here. This is a private page, and the public nav
+       carries a SIGN IN button and visitor links that make no sense on it. -->
+  <header class="adm-bar">
+    <a class="adm-back" href="/">Glotemp</a>
+  </header>
 
   <main class="page-main">
     <section class="glass-card">
       <div class="adm" id="adm-root">
         <p class="adm-eyebrow">Admin</p>
-        <h1 class="adm-title">Checking your access.</h1>
+        <h1 class="adm-title">Loading.</h1>
       </div>
     </section>
   </main>
@@ -188,7 +203,7 @@
       render(
         '<p class="adm-eyebrow">Admin</p>' +
         '<h1 class="adm-title">Sign in to continue.</h1>' +
-        '<p class="adm-copy">Your own account and password. Signing in does not by itself grant access: admin is decided in the database.</p>' +
+        '<p class="adm-copy">Enter your email and password.</p>' +
         '<form id="adm-signin-form">' +
           '<label class="adm-label" for="adm-email">Email</label>' +
           '<input class="adm-input" type="email" id="adm-email" placeholder="you@example.com" required autocomplete="email">' +
@@ -222,12 +237,13 @@
       render(
         '<p class="adm-eyebrow">Admin</p>' +
         '<h1 class="adm-title">This account is not an admin.</h1>' +
-        '<div class="adm-note">' +
-          '<p class="adm-copy">Admin access is granted in the database, never from a page. ' +
-          'Nothing you can click here will grant it.</p>' +
-        '</div>' +
-        '<p style="margin-top:1.5rem"><a class="adm-action" href="/">Back to Glotemp</a></p>'
+        '<p style="margin-top:1.5rem"><a class="adm-action" href="/">Back to Glotemp</a>' +
+        '<a class="adm-secondary" href="#" id="adm-signout">Sign out</a></p>'
       );
+      var out = document.getElementById('adm-signout');
+      if (out) out.addEventListener('click', function (e) {
+        e.preventDefault(); GlotempAuth.signOut(); signedOut();
+      });
     }
 
     function stat(value, label) {
@@ -251,7 +267,7 @@
 
       render(
         '<p class="adm-eyebrow">Admin</p>' +
-        '<h1 class="adm-title">The instrument, from the inside.</h1>' +
+        '<h1 class="adm-title">Glotemp Admin</h1>' +
 
         '<div class="adm-range" role="group" aria-label="Range">' +
           [1, 7, 30].map(function (d) {
@@ -277,11 +293,7 @@
           stat(m.prompt_shown || 0, 'prompt shown') +
           stat(m.prompt_dismissed || 0, 'dismissed') +
         '</div>' +
-        '<div class="adm-note"><p class="adm-copy">Shown minus dismissed is not the same as installed. ' +
-        'Someone who was never asked and someone who declined are counted separately on purpose.</p></div>' +
-
         '<div class="adm-section-head"><h2 class="adm-h2">Visitors</h2></div>' +
-        '<p class="adm-copy">Visitor counts are kept by Cloudflare, which sets no cookies and so needs no consent banner.</p>' +
         '<p><a class="adm-action" href="https://dash.cloudflare.com/?to=/:account/web-analytics" target="_blank" rel="noopener noreferrer">Open Cloudflare Web Analytics</a>' +
         '<a class="adm-secondary" href="#" id="adm-signout">Sign out</a></p>'
       );
@@ -318,7 +330,7 @@
         // The functions raise "not authorised" for a signed-in non-admin,
         // which PostgREST returns as a 4xx. Treat that as the answer
         // rather than an error.
-        failed('The numbers could not be read. If you were just made an admin, sign out and back in so the change is picked up.');
+        failed('The numbers could not be read. Sign out and back in, then try again.');
       }
     }
 
