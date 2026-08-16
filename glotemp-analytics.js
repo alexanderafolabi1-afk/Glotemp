@@ -24,7 +24,7 @@
   // The one place to set this. Get it from Cloudflare dashboard >
   // Analytics & Logs > Web Analytics > the site > Manage site. Until it is
   // set, the beacon is not injected at all rather than injected broken.
-  var CF_BEACON_TOKEN = '';
+  var CF_BEACON_TOKEN = '51d8eb74ae9f487cba20cac9950fd5e7';
 
   var SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
   var SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
