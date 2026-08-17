@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#06060A" />
+  <meta name="description" content="💻 Tech in La Paz: Should I build or work here? Live readings, updated as new signal arrives.">
+  <meta property="og:title" content="💻 Tech in La Paz - Glotemp" />
+  <meta property="og:description" content="Should I build or work here?" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://glo-temp.com/cities/la-paz/tech/" />
+  <meta property="og:image" content="https://glo-temp.com/assets/city-la-paz.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://glo-temp.com/cities/la-paz/tech/" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <title>💻 Tech in La Paz - Glotemp</title>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "name": "💻 Tech in La Paz",
+    "description": "Should I build or work here?",
+    "url": "https://glo-temp.com/cities/la-paz/tech/",
+    "spatialCoverage": "La Paz, Bolivia"
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=57" />
+  <script src="/glotemp-analytics.js" defer></script>
+</head>
+<body>
+  <nav id="site-nav"></nav>
+  <script src="/nav-component.js"></script>
+
+  <main class="page-main">
+    <section class="glass-card page-header">
+      <p class="eyebrow"><a href="/cities/la-paz.html" data-city-link="la-paz" data-city-nav="false" style="color:var(--sand);">La Paz, Bolivia</a> · 💻 Tech</p>
+      <h1>💻 Tech in La Paz</h1>
+      <p class="section-copy" style="color:var(--sand); max-width:64ch;">Should I build or work here?</p>
+    </section>
+
+    <section id="tech" class="vertical-section glass-card">
+      <div id="tech-content" class="vertical-content"></div>
+      <div id="tech-context" class="vertical-context"></div>
+      
+      <div class="vertical-listings" data-city="la-paz" data-vertical="tech"></div>
+    </section>
+
+    <section class="glass-card" style="padding:2rem; text-align:center;">
+      <div class="secondary-links-row">
+        <a href="/cities/la-paz.html" class="secondary-link">🏙️ Full La Paz profile</a>
+        <a href="/rankings/tech/" class="secondary-link">🏆 💻 Tech rankings, all cities</a>
+      </div>
+    </section>
+
+    <div id="city-credit"></div>
+  </main>
+
+  <footer class="footer glass">
+    <p>© 2026 RenviaIT Ltd. All rights reserved.</p>
+    <p class="small-print">
+      <a href="/privacy">Privacy Policy</a> | <a href="/terms">Terms of Service</a> | <a href="#" id="cookie-settings">Cookie Settings</a>
+    </p>
+    <p class="small-print"><a href="mailto:info@glo-temp.com" class="contact-link">info@glo-temp.com</a></p>
+    <p class="small-print"><a href="mailto:marketing@glo-temp.com?subject=Sponsoring%20a%20city" class="contact-link">Sponsor a city's reading</a></p>
+    <p class="small-print footer-lang-row">
+      <button type="button" id="lang-switch" class="footer-lang">Language</button>
+    </p>
+  </footer>
+
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
+  <script src="/city-wiki.js" defer></script>
+  <script src="/city-food-signature.js" defer></script>
+  <script src="/city-worldbank.js" defer></script>
+  <script src="/verticals-engine.js" defer></script>
+  <script src="/glotemp-listings.js" defer></script>
+  <script src="/city-sports-data.js" defer></script>
+  <script src="/glotemp-sports.js" defer></script>
+  <script src="/glotemp-credits.js" defer></script>
+  <script>
+    // SUPABASE_URL / SUPABASE_ANON_KEY come from verticals-engine.js
+    // (deferred, but resolved by the time DOMContentLoaded fires below) --
+    // redeclaring them here would collide with that script's top-level
+    // const and throw, since classic <script> tags share one scope.
+
+    // Reasonable ceiling per metric, used only to normalise how much of
+    // the instrument's arc is filled -- purely presentation, never
+    // written back. Kept identical to generate-city-pages.js's copy.
+    const METRIC_MAX = {
+      mood_reading: 10, event_energy: 10,
+      developer_activity: 3000, job_openings: 500, startup_activity: 50,
+      cost_of_living: 200, currency_strength: 10, inflation_rate: 10,
+      remote_work_adoption: 80, salary_competitiveness: 100, work_culture_score: 10,
+      housing_availability: 80, median_rent: 3000, property_appreciation: 10,
+      education_quality_score: 10, international_students: 50, university_count: 50,
+      active_participation: 80, major_events: 12, sports_venues: 110,
+      event_frequency: 250, nightlife_score: 10, venue_count: 330,
+      designer_brands: 110, fashion_events: 10, style_influence: 10,
+      culinary_diversity: 10, michelin_stars: 50, restaurant_count: 2100,
+      air_quality_index: 200, hospital_quality: 10, wellness_index: 10,
+      bike_share_bikes: 4700, congestion_level: 10, transit_quality: 10,
+    };
+    const METRIC_MAX_FALLBACK = 10;
+
+    const VERTICAL_ACCENT = {
+      pulse: '198,140,150', tech: '110,140,180', finance: '120,160,130',
+      work: '150,130,180', property: '190,150,100', education: '120,130,180',
+      sport: '190,130,100', entertainment: '160,110,150', fashion: '190,140,150',
+      food: '190,140,90', health: '100,160,150', transport: '110,130,160',
+    };
+
+    // Same circular-instrument language as /explore's city dials and
+    // generate-city-pages.js's copy: ivory face, brass ring, coloured
+    // reading arc, rim ticks filled by confidence. No hour hand.
+    const INS_CX = 48, INS_CY = 48, INS_R_FACE = 32, INS_R_ARC = 37, INS_R_TICK_IN = 40, INS_R_TICK_OUT = 43;
+    const INS_ARC_CIRC = 2 * Math.PI * INS_R_ARC;
+
+    function instrumentTicksSVG(confidence) {
+      const filled = typeof confidence === 'number' ? Math.round(confidence * 12) : 0;
+      let out = '';
+      for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * 360 - 90;
+        const rad = (angle * Math.PI) / 180;
+        const x1 = INS_CX + INS_R_TICK_IN * Math.cos(rad);
+        const y1 = INS_CY + INS_R_TICK_IN * Math.sin(rad);
+        const x2 = INS_CX + INS_R_TICK_OUT * Math.cos(rad);
+        const y2 = INS_CY + INS_R_TICK_OUT * Math.sin(rad);
+        const on = i < filled;
+        out += `<line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" stroke="${on ? 'var(--sand)' : 'var(--brass-dim)'}" stroke-width="${on ? 1.4 : 0.9}" stroke-linecap="round" />`;
+      }
+      return out;
+    }
+
+    function instrumentSVG(value, max, accentRgb, confidence, ariaLabel) {
+      const frac = value === null ? 0 : Math.max(0, Math.min(1, value / max));
+      const arcLen = INS_ARC_CIRC * frac;
+      return `<svg viewBox="0 0 96 96" role="img" aria-label="${(ariaLabel || '').replace(/"/g, '&quot;')}">
+        <g>${instrumentTicksSVG(confidence)}</g>
+        <circle cx="${INS_CX}" cy="${INS_CY}" r="${INS_R_FACE}" fill="#F0E0C8" />
+        <circle cx="${INS_CX}" cy="${INS_CY}" r="${INS_R_FACE}" fill="none" stroke="var(--brass)" stroke-width="1" />
+        <circle cx="${INS_CX}" cy="${INS_CY}" r="${INS_R_ARC}" fill="none" stroke="rgb(${accentRgb})"
+          stroke-width="2.5" stroke-linecap="round"
+          stroke-dasharray="${arcLen.toFixed(2)} ${(INS_ARC_CIRC - arcLen).toFixed(2)}"
+          transform="rotate(-90 ${INS_CX} ${INS_CY})" />
+      </svg>`;
+    }
+
+    // Keeps the centred readout short enough to sit cleanly inside the dial:
+    // whole numbers (developer_activity, job_openings, etc.) drop the decimal
+    // entirely, small-scale metrics (scores out of 10, percentages) keep at
+    // most one.
+    function formatInstrumentValue(value) {
+      const num = Number(value);
+      const rounded = Math.abs(num) >= 100 ? Math.round(num) : Math.round(num * 10) / 10;
+      return rounded.toString();
+    }
+
+    // Override GlotempCore's pinned-city default with this page's own city.
+    (function () {
+      var rec = (window.CITIES_DATA || []).find(function (c) { return c.slug === 'la-paz'; });
+      if (rec && typeof GlotempCore !== 'undefined') GlotempCore.applyMoodBackground(rec.mood);
+    })();
+
+    // Real, sourced context for this one vertical -- a Wikipedia section
+    // excerpt where a genuine one exists, plus a World Bank country
+    // indicator where this vertical has a defensible one. Neither
+    // replaces the live reading above; both render nothing if there's no
+    // honest match, same rule as every empty state on the site.
+    document.addEventListener('DOMContentLoaded', async function () {
+      
+      const loaders = [];
+      if (typeof GlotempWiki !== 'undefined') loaders.push(GlotempWiki.loadVerticalContext('La Paz', 'Bolivia', 'tech'));
+      if (typeof GlotempWorldBank !== 'undefined') loaders.push(GlotempWorldBank.loadVerticalIndicator('BO', 'tech', 'Bolivia'));
+      await Promise.all(loaders);
+      // Fashion and Pulse (and any city whose article lacks this
+      // vertical's section) have no per-vertical source at all -- fall
+      // back to the general Wikipedia summary so this page is never left
+      // with nothing but an empty reading.
+      if (typeof GlotempWiki !== 'undefined') {
+        await GlotempWiki.fillEmptyVerticalContexts('La Paz', 'Bolivia', ['tech']);
+      }
+    });
+
+    async function loadVerticalContent() {
+      const contentEl = document.getElementById('tech-content');
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/readings?city_slug=eq.la-paz&vertical=eq.tech&order=fetched_at.desc&limit=50`,
+          { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
+        );
+        if (!response.ok) {
+          contentEl.innerHTML = '';
+          if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder('tech');
+          return;
+        }
+        const readings = await response.json();
+        if (!readings.length) {
+          contentEl.innerHTML = '';
+          if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder('tech');
+          return;
+        }
+        const accentRgb = VERTICAL_ACCENT['tech'] || '176,141,87';
+        contentEl.innerHTML = readings.slice(0, 15).map(reading => {
+          const max = METRIC_MAX[reading.metric] || METRIC_MAX_FALLBACK;
+          const shownValue = reading.value !== null && reading.value !== undefined ? formatInstrumentValue(reading.value) : null;
+          const confidenceNote = typeof reading.confidence === 'number' ? `${Math.round(reading.confidence * 100)}% confidence` : '';
+          const ariaLabel = `${reading.label || 'Reading'}: ${shownValue !== null ? shownValue : 'n/a'}`;
+          const valueClass = shownValue !== null && shownValue.length > 3 ? 'instrument-value instrument-value-compact' : 'instrument-value';
+          return `
+          <div class="instrument" ${confidenceNote ? `title="${confidenceNote}"` : ''}>
+            <div class="instrument-dial">
+              ${instrumentSVG(reading.value, max, accentRgb, reading.confidence, ariaLabel)}
+              ${shownValue !== null ? `<span class="${valueClass}">${shownValue}</span>` : ''}
+            </div>
+            <span class="instrument-label">${reading.label || ''}</span>
+            <time class="instrument-time" datetime="${reading.fetched_at}">${verticals.getTimeAgo(new Date(reading.fetched_at))}</time>
+          </div>
+        `;
+        }).join('');
+      } catch (error) {
+        console.error('Error loading tech data:', error);
+        contentEl.innerHTML = '<div class="empty-state">Error loading data. Try again shortly.</div>';
+      }
+    }
+
+    function mountCityCredit() {
+      if (typeof GlotempCredits !== 'undefined') GlotempCredits.mount('city-credit', 'la-paz', 'tech');
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadVerticalContent);
+      document.addEventListener('DOMContentLoaded', mountCityCredit);
+    } else {
+      loadVerticalContent();
+      mountCityCredit();
+    }
+    GlotempCore.wireCityLinks(document);
+    const lang = localStorage.getItem('glotemp-lang') || 'en';
+    document.documentElement.lang = lang;
+  </script>
+  <script src="/cookie-consent.js" defer></script>
+  <script src="/tempo-economy.js" defer></script>
+</body>
+</html>
