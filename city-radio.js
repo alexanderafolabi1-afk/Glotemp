@@ -7,11 +7,19 @@
 // same approach Radio Browser's own official apps use for "nearby
 // stations."
 (function () {
+  // More mirrors than one round trip strictly needs -- Radio Browser is
+  // community-run and any single mirror can be slow or briefly down, and
+  // fetchJSON already stops at the first one that answers, so extra
+  // entries only get used when they're needed.
   const SERVERS = [
     'https://de1.api.radio-browser.info',
+    'https://de2.api.radio-browser.info',
     'https://nl1.api.radio-browser.info',
     'https://at1.api.radio-browser.info',
+    'https://fr1.api.radio-browser.info',
   ];
+
+  const MIN_STATIONS = 3;
 
   function escapeHTML(s) {
     return String(s || '').replace(/[&<>"']/g, (c) => ({
@@ -70,9 +78,9 @@
 
   function stationRowHTML(station, i) {
     const name = (station.name || 'Unnamed station').trim();
-    const tag = (station.tags || '').split(',')[0].trim();
+    const tag = station.curated ? (station.tag || '') : (station.tags || '').split(',')[0].trim();
     return `
-      <button type="button" class="radio-station" data-idx="${i}" data-uuid="${escapeHTML(station.stationuuid)}">
+      <button type="button" class="radio-station${station.curated ? ' radio-station-curated' : ''}" data-idx="${i}" data-uuid="${escapeHTML(station.stationuuid || '')}">
         <span class="radio-station-play" aria-hidden="true">&#9654;</span>
         <span class="radio-station-name">${escapeHTML(name)}</span>
         ${tag ? `<span class="radio-station-tag">${escapeHTML(tag)}</span>` : ''}
@@ -83,6 +91,12 @@
     const audio = container.querySelector('#radio-audio');
     const nowPlaying = container.querySelector('#radio-now-playing');
     let activeUuid = null;
+    // Set on every play attempt so a failed stream can move to the next
+    // station automatically rather than just reporting the failure and
+    // stopping -- the whole point of having several stations listed is
+    // that one going down shouldn't be a dead end.
+    let activeIdx = -1;
+    let autoAdvancing = false;
 
     function resetButtons() {
       container.querySelectorAll('.radio-station').forEach((b) => {
@@ -91,21 +105,70 @@
       });
     }
 
+    async function play(idx, isRetry) {
+      const station = stations[idx];
+      if (!station) {
+        nowPlaying.textContent = 'Pick a station to listen';
+        return;
+      }
+      const btn = container.querySelector(`.radio-station[data-idx="${idx}"]`);
+      resetButtons();
+      nowPlaying.textContent = `${isRetry ? 'Trying' : 'Loading'} ${station.name}…`;
+      try {
+        let url;
+        if (station.curated) {
+          url = station.url;
+        } else {
+          const resolved = await fetchJSON(`/json/url/${encodeURIComponent(station.stationuuid)}`);
+          url = (resolved && resolved.url) || station.url_resolved || station.url;
+        }
+        if (!url) throw new Error('no stream url');
+        audio.src = url;
+        await audio.play();
+        activeUuid = station.stationuuid || station.url;
+        activeIdx = idx;
+        autoAdvancing = false;
+        if (btn) {
+          btn.classList.add('is-playing');
+          btn.querySelector('.radio-station-play').innerHTML = '&#10074;&#10074;';
+        }
+        nowPlaying.textContent = `Now playing - ${station.name}`;
+      } catch (e) {
+        if (!isRetry && idx + 1 < stations.length) {
+          // One dead stream shouldn't be where listening stops.
+          autoAdvancing = true;
+          play(idx + 1, true);
+        } else {
+          nowPlaying.textContent = `Couldn't play ${station.name} - try another station.`;
+          activeIdx = -1;
+        }
+      }
+    }
+
     audio.addEventListener('ended', () => {
       resetButtons();
       nowPlaying.textContent = 'Pick a station to listen';
+      activeIdx = -1;
     });
     audio.addEventListener('error', () => {
-      nowPlaying.textContent = "Couldn't play that station - try another.";
-      resetButtons();
-      activeUuid = null;
+      if (autoAdvancing) return; // play() itself is already handling this attempt
+      if (activeIdx >= 0 && activeIdx + 1 < stations.length) {
+        const failedIdx = activeIdx;
+        autoAdvancing = true;
+        play(failedIdx + 1, true);
+      } else {
+        nowPlaying.textContent = "Couldn't play that station - try another.";
+        resetButtons();
+        activeUuid = null;
+        activeIdx = -1;
+      }
     });
 
     container.querySelectorAll('.radio-station').forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        const uuid = btn.getAttribute('data-uuid');
+      btn.addEventListener('click', () => {
         const idx = Number(btn.getAttribute('data-idx'));
         const station = stations[idx];
+        const uuid = station.stationuuid || station.url;
 
         if (activeUuid === uuid && !audio.paused) {
           audio.pause();
@@ -113,27 +176,12 @@
           nowPlaying.textContent = `Paused - ${station.name}`;
           return;
         }
-
-        resetButtons();
-        nowPlaying.textContent = `Loading ${station.name}…`;
-        try {
-          const resolved = await fetchJSON(`/json/url/${encodeURIComponent(uuid)}`);
-          const url = (resolved && resolved.url) || station.url_resolved || station.url;
-          if (!url) throw new Error('no stream url');
-          audio.src = url;
-          await audio.play();
-          activeUuid = uuid;
-          btn.classList.add('is-playing');
-          btn.querySelector('.radio-station-play').innerHTML = '&#10074;&#10074;';
-          nowPlaying.textContent = `Now playing - ${station.name}`;
-        } catch (e) {
-          nowPlaying.textContent = `Couldn't play ${station.name} - try another station.`;
-        }
+        play(idx, false);
       });
     });
   }
 
-  async function loadRadio(cityName, lat, lon, country) {
+  async function loadRadio(cityName, lat, lon, country, citySlug) {
     const container = document.getElementById('radio-content');
     if (!container || lat == null || lon == null) return;
     container.innerHTML = '<p class="radio-status">Tuning in&hellip;</p>';
@@ -146,6 +194,23 @@
     } catch (e) {
       stations = [];
     }
+
+    // Curated, verified stream URLs top the live list up rather than
+    // replace it -- see city-radio-curated.js. Only engages when the
+    // live search came back thin, so a city Radio Browser already covers
+    // well is unaffected.
+    let curatedUsed = 0;
+    if (stations.length < MIN_STATIONS && typeof GlotempRadioCurated !== 'undefined') {
+      const existingNames = new Set(stations.map((s) => (s.name || '').trim().toLowerCase()));
+      const curated = GlotempRadioCurated.forCity(citySlug, country)
+        .filter((s) => s && s.name && s.url && !existingNames.has(s.name.trim().toLowerCase()))
+        .map((s) => Object.assign({}, s, { curated: true }));
+      if (curated.length) {
+        stations = stations.concat(curated).slice(0, 8);
+        curatedUsed = curated.length;
+      }
+    }
+
     if (!stations.length) {
       // Honest empty state instead of a silently vanished section: Radio
       // Browser genuinely has nothing streamable (https-capable) for this
@@ -153,18 +218,39 @@
       container.innerHTML = `<p class="radio-status">No streamable stations found for ${escapeHTML(cityName)} right now.</p>`;
       return;
     }
+    const attribution = near
+      ? 'Stations via Radio Browser, a free community directory. Streams play directly from each station.'
+      : `No station geotagged right at ${escapeHTML(cityName)} -- these are ${escapeHTML(country || 'the country')}-wide stations via Radio Browser, a free community directory.`;
     container.innerHTML = `
       <div class="radio-player">
         <audio id="radio-audio" preload="none"></audio>
         <span class="radio-now-playing" id="radio-now-playing">Pick a station to listen</span>
       </div>
       <div class="radio-stations">${stations.map(stationRowHTML).join('')}</div>
-      <p class="radio-attribution">${near
-        ? 'Stations via Radio Browser, a free community directory. Streams play directly from each station.'
-        : `No station geotagged right at ${escapeHTML(cityName)} -- these are ${escapeHTML(country || 'the country')}-wide stations via Radio Browser, a free community directory.`}</p>
+      <p class="radio-attribution">${attribution}${curatedUsed ? ' A marked station or two are curated picks, verified and pinned directly.' : ''}</p>
     `;
     wireStations(container, stations);
   }
 
-  window.GlotempRadio = { loadRadio };
+  // Single-station lookup for glotemp-home-frequency.js's quieter card --
+  // same search tiers as loadRadio, but the caller wants one station and
+  // its own compact markup rather than the full picker list.
+  async function fetchTopStation(lat, lon, country, citySlug) {
+    if (lat == null || lon == null) return null;
+    let stations = [];
+    let near = true;
+    try {
+      const result = await searchStations(lat, lon, country);
+      stations = result.stations;
+      near = result.near;
+    } catch (e) { stations = []; }
+    if (!stations.length && typeof GlotempRadioCurated !== 'undefined') {
+      const curated = GlotempRadioCurated.forCity(citySlug, country);
+      if (curated.length) return { station: Object.assign({}, curated[0], { curated: true }), near: true };
+      return null;
+    }
+    return stations.length ? { station: stations[0], near } : null;
+  }
+
+  window.GlotempRadio = { loadRadio, fetchTopStation };
 })();

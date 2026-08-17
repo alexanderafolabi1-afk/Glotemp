@@ -185,7 +185,7 @@
     if (!user || !user.id) return null;
     try {
       const resp = await fetch(
-        `${SUPABASE_URL}/rest/v1/profiles?user_id=eq.${user.id}&select=user_id,display_name,home_city,created_at,current_streak,longest_streak,total_daily_checkins,last_daily_checkin,total_contributions,reporter_tier`,
+        `${SUPABASE_URL}/rest/v1/profiles?user_id=eq.${user.id}&select=user_id,display_name,home_city,created_at,current_streak,longest_streak,total_daily_checkins,last_daily_checkin,total_contributions,reporter_tier,home_frequency_city,home_frequency_pref,home_frequency_streak,home_frequency_longest_streak,home_frequency_last_opened`,
         { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${session.access_token}`, Accept: 'application/json' } }
       );
       // A transient failure is NOT evidence that the user has no profile.

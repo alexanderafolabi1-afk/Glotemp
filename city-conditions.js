@@ -72,10 +72,12 @@
     return 'full daylight';
   }
 
-  async function loadConditions(cityName, lat, lon, timezone) {
-    const container = document.getElementById('conditions-line');
-    if (!container || lat == null || lon == null) return;
-
+  // Pure data: fetches and composes the same "temp, clarity, daylight"
+  // line loadConditions renders, without touching the DOM -- so a second
+  // caller (glotemp-home-frequency.js) can fold it into its own markup
+  // instead of fighting over the one #conditions-line id.
+  async function computeConditionsText(lat, lon, timezone) {
+    if (lat == null || lon == null) return null;
     const [weather, air] = await Promise.all([
       fetchJSON(`${WEATHER_BASE}?latitude=${lat}&longitude=${lon}` +
         `&current=temperature_2m,apparent_temperature,weather_code,is_day` +
@@ -83,7 +85,7 @@
       fetchJSON(`${AIR_BASE}?latitude=${lat}&longitude=${lon}&current=us_aqi`),
     ]);
 
-    if (!weather || !weather.current) { container.innerHTML = ''; return; }
+    if (!weather || !weather.current) return null;
 
     const cur = weather.current;
     const daily = weather.daily || {};
@@ -103,9 +105,17 @@
     if (clarity) parts.push(clarity);
     if (daylight) parts.push(daylight);
 
-    if (!parts.length) { container.innerHTML = ''; return; }
-    container.innerHTML = `<span class="conditions-eyebrow">Right now</span> ${escapeHTML(parts.join(' · '))}`;
+    return parts.length ? parts.join(' · ') : null;
   }
 
-  window.GlotempConditions = { loadConditions };
+  async function loadConditions(cityName, lat, lon, timezone) {
+    const container = document.getElementById('conditions-line');
+    if (!container || lat == null || lon == null) return;
+    const text = await computeConditionsText(lat, lon, timezone);
+    container.innerHTML = text
+      ? `<span class="conditions-eyebrow">Right now</span> ${escapeHTML(text)}`
+      : '';
+  }
+
+  window.GlotempConditions = { loadConditions, computeConditionsText };
 })();

@@ -167,5 +167,17 @@
     return items.length;
   }
 
-  window.GlotempNews = { loadNews: loadNews };
+  // Data only, no DOM -- glotemp-home-frequency.js wants a single headline
+  // folded into its own card rather than the full <ul> loadNews renders.
+  async function fetchHeadlines(cityName, limit) {
+    if (!cityName) return [];
+    try {
+      const articles = await fetchNews(cityName);
+      return oneEach(articles).slice(0, limit || 1);
+    } catch (e) {
+      return [];
+    }
+  }
+
+  window.GlotempNews = { loadNews: loadNews, fetchHeadlines: fetchHeadlines, itemHTML: itemHTML };
 })();

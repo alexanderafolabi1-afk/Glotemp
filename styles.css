@@ -4662,6 +4662,10 @@ a:hover .city-landmark-photo,
 .radio-station:hover,
 .radio-station:focus-visible { color: var(--brass); padding-left: 0.5rem; }
 .radio-station.is-playing { color: var(--band-warm); }
+/* Curated stream (city-radio-curated.js), not from the live Radio
+   Browser search -- dashed rather than solid, same distinguishing
+   language as .venue-editorial. */
+.radio-station-curated { border-bottom-style: dashed; }
 .radio-station-play {
   flex: none;
   width: 1.4rem;
@@ -5624,6 +5628,229 @@ a:hover .city-landmark-photo,
 }
 
 .checkin-list { display: flex; flex-direction: column; min-height: 96px; }
+
+/* ===== HOME FREQUENCY (glotemp-home-frequency.js) =====
+   A private, quiet letter, not a dashboard widget -- centred, narrow,
+   generous line-height, same hairline-underline language as the rest of
+   the site. No filled boxes, no border-radius beyond the true circles
+   already carved out sitewide. */
+.hf-section { padding: 2.5rem 0 2rem; }
+
+.hf-card {
+  max-width: 34rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.hf-eyebrow {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  color: var(--sand);
+  margin: 0 0 0.6rem;
+}
+
+.hf-title {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: clamp(1.4rem, 3.4vw, 1.9rem);
+  line-height: 1.25;
+  color: var(--ivory);
+  margin: 0 0 0.75rem;
+}
+.hf-glow {
+  color: var(--ivory);
+  text-shadow: 0 0 18px rgba(176, 141, 87, 0.5), 0 0 40px rgba(176, 141, 87, 0.2);
+}
+
+.hf-copy {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--sand);
+  margin: 0 0 1.25rem;
+}
+
+.hf-time {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  color: var(--sand);
+  margin: 0 0 1rem;
+}
+
+.hf-pulse {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ivory);
+  margin: 0 0 1.25rem;
+}
+
+.hf-signin,
+.hf-begin-btn { min-width: 10rem; }
+
+/* ---------- city picker ---------- */
+.hf-picker-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+}
+.hf-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: var(--sand);
+  align-self: flex-start;
+}
+.hf-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 0.2rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--brass-dim);
+  border-radius: 0;
+  color: var(--ivory);
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+.hf-input:focus { outline: none; border-color: var(--brass); }
+.hf-pref-row { display: flex; gap: 1.1rem; }
+.hf-pref-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--brass-dim);
+  color: var(--sand);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.1rem;
+  min-height: 36px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.hf-pref-btn:hover { color: var(--ivory); border-color: var(--brass); }
+.hf-pref-btn[aria-pressed="true"] { color: var(--ivory); border-color: var(--ivory); }
+.hf-status { font-family: var(--font-mono); font-size: 0.85rem; color: var(--sand); min-height: 1.2em; }
+
+/* ---------- radio strand ---------- */
+.hf-radio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  margin: 0 0 1rem;
+}
+.hf-radio-play {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--brass-dim);
+  border-radius: 50%;
+  color: var(--brass);
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+.hf-radio-play:hover { border-color: var(--brass); color: var(--ivory); }
+.hf-radio-name {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  color: var(--sand);
+}
+
+/* ---------- press / observation fragment ---------- */
+.hf-fragment {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ivory);
+  margin: 0 0 1.25rem;
+}
+.hf-fragment a { color: inherit; border-bottom: 1px solid var(--brass-dim); text-decoration: none; }
+.hf-fragment a:hover { color: var(--brass); border-color: var(--brass); }
+.hf-fragment-empty { font-style: normal; color: var(--sand); }
+.hf-fragment-tag {
+  display: block;
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sand);
+  opacity: 0.8;
+  margin-top: 0.35rem;
+}
+
+/* ---------- the personal note ---------- */
+.hf-note-form { text-align: left; margin: 0 0 1.25rem; }
+.hf-note-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.7rem 0.2rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(240, 224, 200, 0.2);
+  border-radius: 0;
+  color: var(--ivory);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  resize: vertical;
+  margin: 0.4rem 0 0.6rem;
+}
+.hf-note-input:focus { outline: none; border-color: var(--brass); }
+.hf-note-actions { display: flex; align-items: center; gap: 1rem; }
+.hf-note-save {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--brass);
+  color: var(--ivory);
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.82rem;
+  letter-spacing: 0.05em;
+  padding: 0.35rem 0;
+  min-height: 40px;
+  cursor: pointer;
+}
+.hf-note-save:hover { color: var(--brass); }
+.hf-note-status { font-family: var(--font-mono); font-size: 0.78rem; color: var(--sand); }
+
+.hf-streak {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--sand);
+  margin: 0 0 0.75rem;
+}
+.hf-change-city {
+  background: transparent;
+  border: none;
+  color: var(--sand);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  text-decoration: underline;
+  text-decoration-color: var(--brass-dim);
+  text-underline-offset: 3px;
+  cursor: pointer;
+  min-height: 32px;
+}
+.hf-change-city:hover { color: var(--brass); }
+
+@media (max-width: 480px) {
+  .hf-pref-row { flex-direction: column; gap: 0.6rem; align-items: flex-start; }
+}
 
 /* ===== INVESTOR PAGE: REVENUE PATHS ===== */
 .revenue-paths-list {
