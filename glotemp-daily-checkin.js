@@ -221,6 +221,13 @@
       }
       const stats = await resp.json();
       if (status) status.textContent = 'Recorded.';
+      // Announced rather than handled here, so the hero instrument (or
+      // anything else) can react without this file knowing who's
+      // listening -- same pattern as glotemp-checkin.js's own
+      // glotemp:checkin event.
+      window.dispatchEvent(new CustomEvent('glotemp:daily-checkin', {
+        detail: { mood: selectedMood, streak: stats.current_streak || 0 },
+      }));
       setTimeout(() => {
         renderAlreadyDone(
           { mood: selectedMood, note: text, checkin_date: stats.checkin_date },

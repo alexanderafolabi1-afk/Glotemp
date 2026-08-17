@@ -6235,9 +6235,14 @@ a:hover .city-landmark-photo,
   animation-duration: var(--hero-breathe-period, 6s);
   touch-action: none;
 }
+/* --hero-tilt-x/y are updated every frame by the pointer-parallax rAF
+   loop in glotemp-hero-instrument.js -- referencing them inside the
+   keyframe (rather than setting transform directly from JS) is what lets
+   the hover tilt and the constant idle breathing compose instead of one
+   silently overriding the other. At rest both default to 0px. */
 @keyframes hero-instrument-breathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.015); }
+  0%, 100% { transform: translate(var(--hero-tilt-x, 0px), var(--hero-tilt-y, 0px)) scale(1); }
+  50% { transform: translate(var(--hero-tilt-x, 0px), var(--hero-tilt-y, 0px)) scale(1.015); }
 }
 .hero-instrument-inner {
   position: relative;
@@ -6249,6 +6254,11 @@ a:hover .city-landmark-photo,
      behind everything, instead of blending only with the (black)
      aperture pixels directly beneath it. */
   isolation: isolate;
+  /* Mood coupling: --hero-saturate/--hero-hue are set per band by
+     applyMoodCoupling() in glotemp-hero-instrument.js. A few percent of
+     saturation and a handful of hue degrees -- felt, not noticed. */
+  filter: saturate(var(--hero-saturate, 1)) hue-rotate(var(--hero-hue, 0deg));
+  transition: filter 1.4s ease;
 }
 .hero-instrument-base {
   position: absolute;
@@ -6494,15 +6504,216 @@ a:hover .city-landmark-photo,
   50% { transform: translateY(-4%) scaleY(1.08); opacity: 1; }
 }
 
+/* Sleet: a lighter rain streak plus small bouncing ice-pellet dots,
+   distinct from plain rain. */
+.hero-instrument-weather.hero-weather-sleet::before {
+  content: '';
+  position: absolute;
+  inset: -20% -20%;
+  background-image: repeating-linear-gradient(
+    100deg,
+    transparent 0px, transparent 7px,
+    rgba(220, 235, 255, 0.28) 7px, rgba(220, 235, 255, 0.4) 7.5px,
+    transparent 8.2px, transparent 15px
+  );
+  animation: rain-fall 0.5s linear infinite;
+}
+.hero-instrument-weather.hero-weather-sleet .hero-sleet-pellet {
+  position: absolute;
+  top: -6%;
+  left: var(--flake-left, 50%);
+  width: 2px;
+  height: 2px;
+  background: #E6F0F5;
+  border-radius: 50%;
+  opacity: 0;
+  animation: sleet-bounce var(--flake-duration, 2.4s) ease-in infinite;
+  animation-delay: var(--flake-delay, 0s);
+}
+@keyframes sleet-bounce {
+  0%   { transform: translateY(0); opacity: 0; }
+  8%   { opacity: 1; }
+  78%  { transform: translateY(340%); opacity: 1; }
+  86%  { transform: translateY(320%) scale(1.4, 0.6); }
+  100% { transform: translateY(320%) scale(1, 1); opacity: 0; }
+}
+
+/* Heavier precipitation: denser rain streak and a faster fall, layered
+   on top of the base rain/snow rule rather than replacing it. */
+.hero-instrument-weather.hero-weather-rain.hero-weather-heavy::before {
+  background-image: repeating-linear-gradient(
+    100deg,
+    transparent 0px, transparent 3px,
+    rgba(220, 235, 255, 0.42) 3px, rgba(220, 235, 255, 0.6) 3.6px,
+    transparent 4.4px, transparent 9px
+  );
+  animation-duration: 0.22s;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-instrument-weather .hero-snowflake,
   .hero-instrument-weather.hero-weather-rain::before,
   .hero-instrument-weather.hero-weather-thunderstorm::before,
   .hero-instrument-weather.hero-weather-thunderstorm::after,
   .hero-instrument-weather.hero-is-frost::before,
+  .hero-instrument-weather.hero-weather-sleet::before,
+  .hero-instrument-weather .hero-sleet-pellet,
   .hero-instrument.hero-is-hot::after {
     animation: none !important;
   }
+}
+
+/* ----- Full-housing surface layer (rings + edges, not just the
+   aperture) -- glotemp-hero-instrument.js toggles these on
+   #hero-instrument-surface, masked to the same outer-rim geometry as the
+   base image so nothing bleeds past the real housing edge. ----- */
+.hero-instrument-surface {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle at 50.2% 49.9%, #000 36.5%, transparent 37.6%);
+  mask-image: radial-gradient(circle at 50.2% 49.9%, #000 36.5%, transparent 37.6%);
+  overflow: hidden;
+}
+
+/* Snow settling on the upper rings -- a soft crescent, not the falling
+   flakes (those stay in the aperture layer). */
+.hero-instrument-surface.hero-surface-snow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(ellipse 68% 38% at 50% 9%, rgba(240, 224, 200, 0.5), transparent 62%);
+  opacity: 0.6;
+  animation: hero-surface-settle 7s ease-in-out infinite alternate;
+}
+.hero-instrument-surface.hero-surface-snow.hero-surface-heavy::before {
+  opacity: 0.88;
+  background: radial-gradient(ellipse 78% 46% at 50% 10%, rgba(245, 234, 218, 0.62), transparent 66%),
+              radial-gradient(circle at 50% 50%, transparent 60%, rgba(230, 240, 245, 0.16) 100%);
+}
+@keyframes hero-surface-settle {
+  from { opacity: 0.5; }
+  to   { opacity: 0.75; }
+}
+
+/* Overcast: soft diffusion and a faint grey veil, applied as its own
+   layer rather than a filter on the base image so the housing's own
+   colour (used for mood coupling) stays independent of it. */
+.hero-instrument-surface.hero-surface-overcast::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(160, 165, 175, 0.14);
+  backdrop-filter: blur(0.5px) saturate(0.85);
+  -webkit-backdrop-filter: blur(0.5px) saturate(0.85);
+}
+
+/* Clear day: a slow diagonal glint sweeping across the polished metal,
+   screen-blended so it only ever brightens, never darkens. */
+.hero-instrument-surface.hero-surface-sun-glint::after {
+  content: '';
+  position: absolute;
+  inset: -25%;
+  background: linear-gradient(115deg,
+    transparent 42%,
+    rgba(255, 224, 170, 0.28) 48%,
+    rgba(255, 244, 220, 0.5) 50%,
+    rgba(255, 224, 170, 0.28) 52%,
+    transparent 58%);
+  mix-blend-mode: screen;
+  animation: hero-glint-sweep 9s linear infinite;
+}
+@keyframes hero-glint-sweep {
+  from { transform: translateX(-55%); }
+  to   { transform: translateX(55%); }
+}
+
+/* Clear night: a faint star field scattered near the outer rim, each
+   one twinkling on its own offset. */
+.hero-star {
+  position: absolute;
+  left: var(--star-left, 50%);
+  top: var(--star-top, 50%);
+  width: var(--star-size, 1.4px);
+  height: var(--star-size, 1.4px);
+  border-radius: 50%;
+  background: #DCE8F0;
+  opacity: 0;
+  animation: hero-star-twinkle 3.6s ease-in-out infinite;
+  animation-delay: var(--star-delay, 0s);
+}
+@keyframes hero-star-twinkle {
+  0%, 100% { opacity: 0; }
+  50%      { opacity: 0.85; }
+}
+
+/* Seasonal motifs -- blossom petals, drifting sand -- reuse the same
+   slow-drift mechanics as snowflakes but with their own shape/colour,
+   and only ever render alongside a clear-weather state. */
+.hero-motif {
+  position: absolute;
+  top: -8%;
+  left: var(--motif-left, 50%);
+  opacity: 0;
+  animation: hero-motif-drift var(--motif-duration, 8s) ease-in infinite;
+  animation-delay: var(--motif-delay, 0s);
+}
+.hero-motif-blossom {
+  width: 5px;
+  height: 4px;
+  background: radial-gradient(circle, #F7C9D6, #E9A8BE 70%);
+  border-radius: 60% 40% 55% 45% / 55% 45% 60% 40%;
+}
+.hero-motif-sand {
+  width: 2.5px;
+  height: 2.5px;
+  background: #D9B37A;
+  border-radius: 50%;
+}
+@keyframes hero-motif-drift {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.85; }
+  90%  { opacity: 0.7; }
+  100% { transform: translate(14%, 340%) rotate(140deg); opacity: 0; }
+}
+
+/* The twinkle eye: a small glowing highlight that appears only during
+   snow, blinking slowly as if the instrument has noticed it. Lives
+   inside the live SVG, so it's toggled directly (not via a CSS sibling
+   selector -- the weather div that carries the precip class sits after
+   this SVG in the DOM, not before it). */
+.hero-twinkle-eye {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.hero-twinkle-eye.is-active {
+  animation: hero-twinkle-blink 4.5s ease-in-out infinite;
+}
+.hero-twinkle-eye.is-bright {
+  animation-duration: 2.6s;
+}
+@keyframes hero-twinkle-blink {
+  0%, 82%, 100% { opacity: 0; }
+  88%           { opacity: 1; }
+  94%           { opacity: 0.25; }
+  97%           { opacity: 0.9; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-instrument-surface.hero-surface-snow::before,
+  .hero-instrument-surface.hero-surface-sun-glint::after,
+  .hero-star,
+  .hero-motif,
+  .hero-twinkle-eye {
+    animation: none !important;
+  }
+  .hero-twinkle-eye.is-active { opacity: 0.6; }
+  .hero-star { opacity: 0.5; }
 }
 
 /* Sits just above the instrument row: tells the visitor the barometers
@@ -7745,6 +7956,141 @@ summary:focus-visible,
 .hero-instrument:focus-visible .hero-instrument-base {
   filter: drop-shadow(0 30px 70px rgba(0, 0, 0, 0.55))
           drop-shadow(0 0 26px rgba(245, 162, 90, 0.30));
+}
+
+/* Mood coupling: an energised (charged-band) city gets a faster, warmer
+   idle pulse; a low/restrained one is slower and quieter. Layered on top
+   of the mood ring's own colour (already set per-band in JS) rather than
+   replacing it. */
+.hero-instrument.hero-mood-charged { animation-duration: calc(var(--hero-breathe-period, 6s) * 0.82); }
+.hero-instrument.hero-mood-low { animation-duration: calc(var(--hero-breathe-period, 6s) * 1.25); }
+
+/* Mood-ring settle flourish: a brief pulse on click, so switching cities
+   reads as the instrument noticing rather than a silent content swap. */
+#hero-mood-ring.hero-ring-settle {
+  animation: hero-ring-settle-pulse 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes hero-ring-settle-pulse {
+  0%   { stroke-width: 3; opacity: 0.85; }
+  35%  { stroke-width: 6.5; opacity: 1; }
+  100% { stroke-width: 3; opacity: 0.85; }
+}
+
+/* Daily check-in acknowledgment: the instrument's own glow blooms once,
+   tying the homepage's daily ritual to its centrepiece. */
+.hero-instrument.hero-checkin-ack .hero-instrument-glow {
+  animation: hero-checkin-bloom 1.7s ease-out;
+}
+@keyframes hero-checkin-bloom {
+  0%   { opacity: var(--hero-glow-opacity, 0.7); }
+  25%  { opacity: 1; }
+  100% { opacity: var(--hero-glow-opacity, 0.7); }
+}
+
+/* ----- Click-reward particle bursts (spawnBurst in the JS) ----- */
+.hero-burst-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+.hero-burst-particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  opacity: 0;
+  animation: hero-burst-fly 0.9s cubic-bezier(0.16, 0.84, 0.24, 1) forwards;
+  animation-delay: var(--burst-delay, 0s);
+}
+.hero-burst-flake { background: #F0E0C8; }
+.hero-burst-drop { width: 2.5px; height: 6px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: rgba(200, 222, 245, 0.85); }
+.hero-burst-spark { width: 2px; height: 2px; background: #F5D77A; box-shadow: 0 0 5px 1px rgba(245, 215, 122, 0.7); }
+.hero-burst-glint { background: radial-gradient(circle, #FFF4DC, #F5A25A 70%); }
+.hero-burst-star { background: #DCE8F0; box-shadow: 0 0 4px 1px rgba(220, 232, 240, 0.6); }
+@keyframes hero-burst-fly {
+  0%   { transform: translate(-50%, -50%) rotate(var(--burst-angle, 0deg)) translateY(0) rotate(calc(var(--burst-angle, 0deg) * -1)); opacity: 0; }
+  12%  { opacity: 1; }
+  100% { transform: translate(-50%, -50%) rotate(var(--burst-angle, 0deg)) translateY(calc(var(--burst-dist, 40%) * -1)) rotate(calc(var(--burst-angle, 0deg) * -1)); opacity: 0; }
+}
+
+/* ----- Founding mark (Chief Correspondent tier, see glotemp-reporter.js) -----
+   A single small brass diamond, engraved-quiet -- never a badge or a pill. */
+.hero-founding-mark {
+  position: absolute;
+  left: 6%;
+  bottom: 7%;
+  font-size: 0.85rem;
+  line-height: 1;
+  color: var(--brass);
+  opacity: 0.75;
+  text-shadow: 0 0 6px rgba(176, 141, 87, 0.5);
+  pointer-events: none;
+}
+.hero-founding-mark[hidden] { display: none; }
+
+/* ----- Sound toggle: muted by default, a small unobtrusive control near
+   the instrument rather than inside it (so it never intercepts the
+   instrument's own click). ----- */
+.hero-sound-toggle {
+  position: absolute;
+  right: 2%;
+  bottom: 4%;
+  width: 2.1rem;
+  height: 2.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 16, 11, 0.35);
+  border: 1px solid var(--brass-dim);
+  border-radius: 50%;
+  font-size: 0.9rem;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  z-index: 2;
+}
+.hero-sound-toggle:hover,
+.hero-sound-toggle:focus-visible { opacity: 1; border-color: var(--brass); }
+.hero-sound-toggle[aria-pressed="true"] { opacity: 0.9; border-color: var(--brass); }
+
+/* ----- Pulse spark: a rare one-line poetic read on the city just landed
+   on, shown beneath the instrument. Empty and invisible almost always. ----- */
+.hero-pulse-spark {
+  position: relative;
+  z-index: 1;
+  margin: 0.5rem 0 0;
+  text-align: right;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--sand);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  pointer-events: none;
+}
+.hero-pulse-spark.is-visible { opacity: 0.9; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-instrument.hero-mood-charged,
+  .hero-instrument.hero-mood-low { animation-duration: var(--hero-breathe-period, 6s); }
+  #hero-mood-ring.hero-ring-settle,
+  .hero-instrument.hero-checkin-ack .hero-instrument-glow,
+  .hero-burst-particle {
+    animation: none !important;
+  }
+  .hero-burst-particle { display: none; }
+  .hero-pulse-spark { transition: opacity 0.3s ease; transform: none; }
+}
+
+@media (max-width: 900px) {
+  .hero-sound-toggle { right: 4%; bottom: 3%; }
+  .hero-pulse-spark { text-align: center; }
 }
 
 /* Aesthetic enhancement - safe to remove
