@@ -2,7 +2,7 @@
 // Ranked by: Internet Penetration Rate × Metro Population
 // Source: ITU World Telecommunication Indicators, World Bank, UN Urbanization
 // Updated: 2026
-// Total: 250 cities across 100 countries
+// Total: 300 cities across 104 countries
 
 const CITIES_DATA = [
   { slug: 'tokyo', name: 'Tokyo', country: 'Japan', iso: 'JP', region: 'Asia-Pacific', timezone: 'Asia/Tokyo', lat: 35.6762, lon: 139.6503, metro_pop: 37400000, penetration: 0.94, rank: 1, mood: 8.4, available: true },
@@ -254,7 +254,57 @@ const CITIES_DATA = [
   { slug: 'nadi', name: 'Nadi', country: 'Fiji', iso: 'FJ', region: 'Asia-Pacific', timezone: 'Pacific/Fiji', lat: -17.8, lon: 177.4166, metro_pop: 55000, penetration: 0.62, rank: 247, mood: 8.2, available: true },
   { slug: 'bora-bora', name: 'Bora Bora', country: 'French Polynesia', iso: 'PF', region: 'Asia-Pacific', timezone: 'Pacific/Tahiti', lat: -16.5004, lon: -151.7415, metro_pop: 11000, penetration: 0.85, rank: 248, mood: 9, available: true },
   { slug: 'granada-nicaragua', name: 'Granada', country: 'Nicaragua', iso: 'NI', region: 'Latin America', timezone: 'America/Managua', lat: 11.9344, lon: -85.9561, metro_pop: 123000, penetration: 0.55, rank: 249, mood: 8, available: true },
-  { slug: 'san-pedro-la-laguna', name: 'San Pedro La Laguna', country: 'Guatemala', iso: 'GT', region: 'Latin America', timezone: 'America/Guatemala', lat: 14.6929, lon: -91.2704, metro_pop: 15000, penetration: 0.66, rank: 250, mood: 8.1, available: true }
+  { slug: 'san-pedro-la-laguna', name: 'San Pedro La Laguna', country: 'Guatemala', iso: 'GT', region: 'Latin America', timezone: 'America/Guatemala', lat: 14.6929, lon: -91.2704, metro_pop: 15000, penetration: 0.66, rank: 250, mood: 8.1, available: true },
+  { slug: 'las-vegas', name: 'Las Vegas', country: 'USA', iso: 'US', region: 'North America', timezone: 'America/Los_Angeles', lat: 36.1699, lon: -115.1398, metro_pop: 2300000, penetration: 0.95, rank: 251, mood: 8.6, available: true },
+  { slug: 'venice', name: 'Venice', country: 'Italy', iso: 'IT', region: 'Europe', timezone: 'Europe/Rome', lat: 45.4408, lon: 12.3155, metro_pop: 260000, penetration: 0.87, rank: 252, mood: 7.9, available: true },
+  { slug: 'florence', name: 'Florence', country: 'Italy', iso: 'IT', region: 'Europe', timezone: 'Europe/Rome', lat: 43.7696, lon: 11.2558, metro_pop: 380000, penetration: 0.87, rank: 253, mood: 7.8, available: true },
+  { slug: 'ibiza', name: 'Ibiza', country: 'Spain', iso: 'ES', region: 'Europe', timezone: 'Europe/Madrid', lat: 38.9067, lon: 1.4206, metro_pop: 150000, penetration: 0.95, rank: 254, mood: 9, available: true },
+  { slug: 'santorini', name: 'Santorini', country: 'Greece', iso: 'GR', region: 'Europe', timezone: 'Europe/Athens', lat: 36.3932, lon: 25.4615, metro_pop: 15500, penetration: 0.9, rank: 255, mood: 8.7, available: true },
+  { slug: 'new-orleans', name: 'New Orleans', country: 'USA', iso: 'US', region: 'North America', timezone: 'America/Chicago', lat: 29.9511, lon: -90.0715, metro_pop: 1270000, penetration: 0.93, rank: 256, mood: 8.2, available: true },
+  { slug: 'key-west', name: 'Key West', country: 'USA', iso: 'US', region: 'North America', timezone: 'America/New_York', lat: 24.5551, lon: -81.78, metro_pop: 25000, penetration: 0.95, rank: 257, mood: 8.5, available: true },
+  { slug: 'whistler', name: 'Whistler', country: 'Canada', iso: 'CA', region: 'North America', timezone: 'America/Vancouver', lat: 50.1163, lon: -122.9574, metro_pop: 13000, penetration: 0.95, rank: 258, mood: 8.4, available: true },
+  { slug: 'banff', name: 'Banff', country: 'Canada', iso: 'CA', region: 'North America', timezone: 'America/Edmonton', lat: 51.1784, lon: -115.5708, metro_pop: 8300, penetration: 0.95, rank: 259, mood: 8.5, available: true },
+  { slug: 'mykonos', name: 'Mykonos', country: 'Greece', iso: 'GR', region: 'Europe', timezone: 'Europe/Athens', lat: 37.4467, lon: 25.3289, metro_pop: 10000, penetration: 0.9, rank: 260, mood: 8.9, available: true },
+  { slug: 'capri', name: 'Capri', country: 'Italy', iso: 'IT', region: 'Europe', timezone: 'Europe/Rome', lat: 40.5527, lon: 14.2429, metro_pop: 13000, penetration: 0.87, rank: 261, mood: 8.7, available: true },
+  { slug: 'amalfi', name: 'Amalfi', country: 'Italy', iso: 'IT', region: 'Europe', timezone: 'Europe/Rome', lat: 40.634, lon: 14.6027, metro_pop: 5100, penetration: 0.87, rank: 262, mood: 8.6, available: true },
+  { slug: 'positano', name: 'Positano', country: 'Italy', iso: 'IT', region: 'Europe', timezone: 'Europe/Rome', lat: 40.628, lon: 14.4849, metro_pop: 3900, penetration: 0.87, rank: 263, mood: 8.8, available: true },
+  { slug: 'lake-como', name: 'Como', country: 'Italy', iso: 'IT', region: 'Europe', timezone: 'Europe/Rome', lat: 45.8081, lon: 9.0852, metro_pop: 85000, penetration: 0.87, rank: 264, mood: 8.3, available: true },
+  { slug: 'st-tropez', name: 'Saint-Tropez', country: 'France', iso: 'FR', region: 'Europe', timezone: 'Europe/Paris', lat: 43.2727, lon: 6.6407, metro_pop: 4300, penetration: 0.93, rank: 265, mood: 8.6, available: true },
+  { slug: 'bordeaux', name: 'Bordeaux', country: 'France', iso: 'FR', region: 'Europe', timezone: 'Europe/Paris', lat: 44.8378, lon: -0.5792, metro_pop: 950000, penetration: 0.93, rank: 266, mood: 7.7, available: true },
+  { slug: 'monaco', name: 'Monaco', country: 'Monaco', iso: 'MC', region: 'Europe', timezone: 'Europe/Monaco', lat: 43.7384, lon: 7.4246, metro_pop: 39000, penetration: 0.97, rank: 267, mood: 8.4, available: true },
+  { slug: 'zermatt', name: 'Zermatt', country: 'Switzerland', iso: 'CH', region: 'Europe', timezone: 'Europe/Zurich', lat: 46.0207, lon: 7.7491, metro_pop: 5800, penetration: 0.96, rank: 268, mood: 8.6, available: true },
+  { slug: 'innsbruck', name: 'Innsbruck', country: 'Austria', iso: 'AT', region: 'Europe', timezone: 'Europe/Vienna', lat: 47.2692, lon: 11.4041, metro_pop: 132000, penetration: 0.94, rank: 269, mood: 7.9, available: true },
+  { slug: 'san-sebastian', name: 'San Sebastián', country: 'Spain', iso: 'ES', region: 'Europe', timezone: 'Europe/Madrid', lat: 43.3183, lon: -1.9812, metro_pop: 189000, penetration: 0.95, rank: 270, mood: 8.2, available: true },
+  { slug: 'cordoba', name: 'Córdoba', country: 'Spain', iso: 'ES', region: 'Europe', timezone: 'Europe/Madrid', lat: 37.8882, lon: -4.7794, metro_pop: 325000, penetration: 0.95, rank: 271, mood: 7.9, available: true },
+  { slug: 'rhodes', name: 'Rhodes', country: 'Greece', iso: 'GR', region: 'Europe', timezone: 'Europe/Athens', lat: 36.4341, lon: 28.2176, metro_pop: 115000, penetration: 0.9, rank: 272, mood: 8.3, available: true },
+  { slug: 'heraklion', name: 'Heraklion', country: 'Greece', iso: 'GR', region: 'Europe', timezone: 'Europe/Athens', lat: 35.3387, lon: 25.1442, metro_pop: 211000, penetration: 0.9, rank: 273, mood: 8, available: true },
+  { slug: 'jerusalem', name: 'Jerusalem', country: 'Israel', iso: 'IL', region: 'Middle East', timezone: 'Asia/Jerusalem', lat: 31.7683, lon: 35.2137, metro_pop: 1253000, penetration: 0.91, rank: 274, mood: 7, available: true },
+  { slug: 'tangier', name: 'Tangier', country: 'Morocco', iso: 'MA', region: 'North Africa', timezone: 'Africa/Casablanca', lat: 35.7595, lon: -5.834, metro_pop: 1200000, penetration: 0.72, rank: 275, mood: 7.8, available: true },
+  { slug: 'sousse', name: 'Sousse', country: 'Tunisia', iso: 'TN', region: 'North Africa', timezone: 'Africa/Tunis', lat: 35.8256, lon: 10.6369, metro_pop: 675000, penetration: 0.67, rank: 276, mood: 7.7, available: true },
+  { slug: 'hurghada', name: 'Hurghada', country: 'Egypt', iso: 'EG', region: 'North Africa', timezone: 'Africa/Cairo', lat: 27.2579, lon: 33.8116, metro_pop: 250000, penetration: 0.61, rank: 277, mood: 8.1, available: true },
+  { slug: 'mombasa', name: 'Mombasa', country: 'Kenya', iso: 'KE', region: 'East Africa', timezone: 'Africa/Nairobi', lat: -4.0435, lon: 39.6682, metro_pop: 1200000, penetration: 0.5, rank: 278, mood: 7.8, available: true },
+  { slug: 'st-lucia', name: 'Castries', country: 'Saint Lucia', iso: 'LC', region: 'Latin America', timezone: 'America/St_Lucia', lat: 14.0101, lon: -60.9875, metro_pop: 70000, penetration: 0.62, rank: 279, mood: 8.3, available: true },
+  { slug: 'aruba', name: 'Oranjestad', country: 'Aruba', iso: 'AW', region: 'Latin America', timezone: 'America/Aruba', lat: 12.5246, lon: -70.027, metro_pop: 30000, penetration: 0.95, rank: 280, mood: 8.5, available: true },
+  { slug: 'curacao', name: 'Willemstad', country: 'Curaçao', iso: 'CW', region: 'Latin America', timezone: 'America/Curacao', lat: 12.1091, lon: -68.9316, metro_pop: 140000, penetration: 0.92, rank: 281, mood: 8.2, available: true },
+  { slug: 'puerto-vallarta', name: 'Puerto Vallarta', country: 'Mexico', iso: 'MX', region: 'Latin America', timezone: 'America/Mexico_City', lat: 20.6534, lon: -105.2253, metro_pop: 300000, penetration: 0.78, rank: 282, mood: 8.5, available: true },
+  { slug: 'playa-del-carmen', name: 'Playa del Carmen', country: 'Mexico', iso: 'MX', region: 'Latin America', timezone: 'America/Cancun', lat: 20.6296, lon: -87.0739, metro_pop: 300000, penetration: 0.78, rank: 283, mood: 8.5, available: true },
+  { slug: 'aguas-calientes', name: 'Aguas Calientes', country: 'Peru', iso: 'PE', region: 'South America', timezone: 'America/Lima', lat: -13.1547, lon: -72.5254, metro_pop: 5300, penetration: 0.72, rank: 284, mood: 8.4, available: true },
+  { slug: 'valparaiso', name: 'Valparaíso', country: 'Chile', iso: 'CL', region: 'South America', timezone: 'America/Santiago', lat: -33.0472, lon: -71.6127, metro_pop: 296000, penetration: 0.9, rank: 285, mood: 8.1, available: true },
+  { slug: 'mendoza', name: 'Mendoza', country: 'Argentina', iso: 'AR', region: 'South America', timezone: 'America/Argentina/Mendoza', lat: -32.8895, lon: -68.8458, metro_pop: 1150000, penetration: 0.88, rank: 286, mood: 7.9, available: true },
+  { slug: 'langkawi', name: 'Langkawi', country: 'Malaysia', iso: 'MY', region: 'Southeast Asia', timezone: 'Asia/Kuala_Lumpur', lat: 6.35, lon: 99.8, metro_pop: 100000, penetration: 0.9, rank: 287, mood: 8.4, available: true },
+  { slug: 'ha-long', name: 'Ha Long', country: 'Vietnam', iso: 'VN', region: 'Southeast Asia', timezone: 'Asia/Ho_Chi_Minh', lat: 20.9101, lon: 107.1839, metro_pop: 300000, penetration: 0.78, rank: 288, mood: 8.2, available: true },
+  { slug: 'sapa', name: 'Sapa', country: 'Vietnam', iso: 'VN', region: 'Southeast Asia', timezone: 'Asia/Ho_Chi_Minh', lat: 22.3364, lon: 103.8438, metro_pop: 61000, penetration: 0.78, rank: 289, mood: 8, available: true },
+  { slug: 'pai', name: 'Pai', country: 'Thailand', iso: 'TH', region: 'Southeast Asia', timezone: 'Asia/Bangkok', lat: 19.3583, lon: 98.4396, metro_pop: 20000, penetration: 0.8, rank: 290, mood: 8.3, available: true },
+  { slug: 'bagan', name: 'Bagan', country: 'Myanmar', iso: 'MM', region: 'Southeast Asia', timezone: 'Asia/Yangon', lat: 21.1717, lon: 94.8585, metro_pop: 30000, penetration: 0.5, rank: 291, mood: 8, available: true },
+  { slug: 'kandy', name: 'Kandy', country: 'Sri Lanka', iso: 'LK', region: 'South Asia', timezone: 'Asia/Colombo', lat: 7.2906, lon: 80.6337, metro_pop: 125000, penetration: 0.6, rank: 292, mood: 7.9, available: true },
+  { slug: 'shimla', name: 'Shimla', country: 'India', iso: 'IN', region: 'South Asia', timezone: 'Asia/Kolkata', lat: 31.1048, lon: 77.1734, metro_pop: 170000, penetration: 0.67, rank: 293, mood: 7.8, available: true },
+  { slug: 'rishikesh', name: 'Rishikesh', country: 'India', iso: 'IN', region: 'South Asia', timezone: 'Asia/Kolkata', lat: 30.0869, lon: 78.2676, metro_pop: 102000, penetration: 0.67, rank: 294, mood: 8.1, available: true },
+  { slug: 'amritsar', name: 'Amritsar', country: 'India', iso: 'IN', region: 'South Asia', timezone: 'Asia/Kolkata', lat: 31.634, lon: 74.8723, metro_pop: 1183000, penetration: 0.67, rank: 295, mood: 8, available: true },
+  { slug: 'gyeongju', name: 'Gyeongju', country: 'South Korea', iso: 'KR', region: 'East Asia', timezone: 'Asia/Seoul', lat: 35.8562, lon: 129.2247, metro_pop: 264000, penetration: 0.96, rank: 296, mood: 7.7, available: true },
+  { slug: 'jeju', name: 'Jeju City', country: 'South Korea', iso: 'KR', region: 'East Asia', timezone: 'Asia/Seoul', lat: 33.4996, lon: 126.5312, metro_pop: 490000, penetration: 0.96, rank: 297, mood: 8.2, available: true },
+  { slug: 'kota-kinabalu', name: 'Kota Kinabalu', country: 'Malaysia', iso: 'MY', region: 'Southeast Asia', timezone: 'Asia/Kuching', lat: 5.9804, lon: 116.0735, metro_pop: 500000, penetration: 0.9, rank: 298, mood: 8.1, available: true },
+  { slug: 'cairns', name: 'Cairns', country: 'Australia', iso: 'AU', region: 'Asia-Pacific', timezone: 'Australia/Brisbane', lat: -16.9186, lon: 145.7781, metro_pop: 160000, penetration: 0.95, rank: 299, mood: 8.2, available: true },
+  { slug: 'gold-coast', name: 'Gold Coast', country: 'Australia', iso: 'AU', region: 'Asia-Pacific', timezone: 'Australia/Brisbane', lat: -28.0167, lon: 153.4, metro_pop: 700000, penetration: 0.95, rank: 300, mood: 8.1, available: true }
 ];
 
 // Export for use in app.js

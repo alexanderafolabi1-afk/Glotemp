@@ -2192,7 +2192,7 @@ function tickStatUp(el, target, duration) {
 
 function loadCoverageStats() {
   // Cities tracked from dataset
-  const tracked = (window.CITIES_DATA || []).length || 250;
+  const tracked = (window.CITIES_DATA || []).length || 300;
   const trackedEl = document.getElementById('cities-tracked-count');
   if (trackedEl) tickStatUp(trackedEl, tracked, 800);
 
