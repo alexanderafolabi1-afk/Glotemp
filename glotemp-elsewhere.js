@@ -219,7 +219,7 @@
       GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country);
     }
     if (window.GlotempNews) {
-      GlotempNews.loadNews(city.name, city.country, 'elsewhere-news');
+      GlotempNews.loadNews(city.slug, 'elsewhere-news');
     }
 
     keep(city.slug);

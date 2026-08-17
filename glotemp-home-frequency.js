@@ -204,7 +204,7 @@
       }
     } catch (e) { /* fall through to news */ }
     if (window.GlotempNews) {
-      const headlines = await GlotempNews.fetchHeadlines(cityName, 1);
+      const headlines = await GlotempNews.fetchHeadlines(citySlug, 1);
       if (headlines[0]) return { kind: 'news', text: headlines[0].title, url: headlines[0].url, source: headlines[0].domain };
     }
     return null;

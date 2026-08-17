@@ -289,7 +289,7 @@ function generateCityPage(city) {
       // function server-side, since GDELT itself sends no CORS header),
       // same treatment as Radio and Venues above.
       if (typeof GlotempNews !== 'undefined' && city) {
-        GlotempNews.loadNews(city.name, city.country, 'news-content');
+        GlotempNews.loadNews(city.slug, 'news-content');
       }
 
       // Conditions line: same treatment as Radio -- a live free-API
