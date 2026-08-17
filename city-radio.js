@@ -240,8 +240,8 @@
       return;
     }
     const attribution = near
-      ? 'Stations via Radio Browser, a free community directory. Streams play directly from each station.'
-      : `No station geotagged right at ${escapeHTML(cityName)} -- these are ${escapeHTML(country || 'the country')}-wide stations via Radio Browser, a free community directory.`;
+      ? 'Streams play directly from each station.'
+      : `No station geotagged right at ${escapeHTML(cityName)} -- these are ${escapeHTML(country || 'the country')}-wide stations. Streams play directly from each station.`;
     container.innerHTML = `
       <div class="radio-player">
         <audio id="radio-audio" preload="none"></audio>
