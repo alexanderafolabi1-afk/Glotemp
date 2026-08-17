@@ -85,9 +85,19 @@
             <img class="hero-instrument-base" src="/assets/instrument-base.png" alt="" aria-hidden="true" width="1024" height="1024">
             <svg class="hero-instrument-live" id="hero-instrument-live" viewBox="0 0 1024 1024" aria-hidden="true"></svg>
             <div class="hero-instrument-weather" id="hero-instrument-weather" aria-hidden="true"></div>
+            <!-- Full-housing weather layer (rings + edges, not just the
+                 aperture) -- snow accumulation, frost sheen, sun glints,
+                 night stars. See glotemp-hero-instrument.js. -->
+            <div class="hero-instrument-surface" id="hero-instrument-surface" aria-hidden="true"></div>
+            <!-- Click-reward particle bursts and the daily check-in
+                 acknowledgment bloom render into this layer. -->
+            <div class="hero-burst-layer" id="hero-burst-layer" aria-hidden="true"></div>
+            <span class="hero-founding-mark" id="hero-founding-mark" aria-hidden="true" hidden>&#9670;</span>
           </div>
         </div>
       </div>
+      <p class="hero-pulse-spark" id="hero-pulse-spark" role="status" aria-live="polite"></p>
+      <button type="button" class="hero-sound-toggle" id="hero-sound-toggle" aria-pressed="false" aria-label="Turn on instrument sound" title="Instrument sound: off">&#128263;</button>
     </section>
 
     <!-- Spin: most prominent interactive element on the page -->
