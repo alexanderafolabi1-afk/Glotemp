@@ -102,8 +102,19 @@
     const btn = document.getElementById('daily-checkin-signin');
     if (btn) {
       btn.addEventListener('click', async () => {
-        const ok = await GlotempAuth.requireAuth('Sign in to begin your daily check-in ritual.');
-        if (ok) mount();
+        btn.disabled = true;
+        btn.setAttribute('aria-busy', 'true');
+        btn.classList.add('is-loading');
+        try {
+          const ok = await GlotempAuth.requireAuth('Sign in to begin your daily check-in ritual.');
+          if (ok) { await mount(); return; }
+        } finally {
+          if (btn.isConnected) {
+            btn.disabled = false;
+            btn.removeAttribute('aria-busy');
+            btn.classList.remove('is-loading');
+          }
+        }
       });
     }
   }
@@ -198,7 +209,11 @@
     const session = await GlotempAuth.getSession();
     if (!session) return;
 
-    if (submitBtn) submitBtn.disabled = true;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.setAttribute('aria-busy', 'true');
+      submitBtn.classList.add('is-loading');
+    }
     if (status) status.textContent = 'Recording…';
 
     try {

@@ -94,8 +94,19 @@
     const btn = document.getElementById('hf-signin');
     if (btn) {
       btn.addEventListener('click', async () => {
-        const ok = await GlotempAuth.requireAuth('Sign in to keep a Home Frequency.');
-        if (ok) mount();
+        btn.disabled = true;
+        btn.setAttribute('aria-busy', 'true');
+        btn.classList.add('is-loading');
+        try {
+          const ok = await GlotempAuth.requireAuth('Sign in to keep a Home Frequency.');
+          if (ok) { await mount(); return; }
+        } finally {
+          if (btn.isConnected) {
+            btn.disabled = false;
+            btn.removeAttribute('aria-busy');
+            btn.classList.remove('is-loading');
+          }
+        }
       });
     }
   }
@@ -273,6 +284,12 @@
         playing = false;
         return;
       }
+      // Loading state before the resolve-URL fetch starts -- without
+      // this the play glyph just sits there, unchanged, for however long
+      // the station lookup takes.
+      btn.disabled = true;
+      btn.setAttribute('aria-busy', 'true');
+      btn.classList.add('is-loading');
       try {
         let url = s.url || s.url_resolved;
         if (!s.curated && s.stationuuid) {
@@ -289,6 +306,10 @@
         playing = true;
       } catch (e) {
         btn.setAttribute('title', "Couldn't play this station right now.");
+      } finally {
+        btn.disabled = false;
+        btn.removeAttribute('aria-busy');
+        btn.classList.remove('is-loading');
       }
     });
   }
