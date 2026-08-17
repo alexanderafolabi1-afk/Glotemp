@@ -1619,6 +1619,13 @@ summary:focus:not(:focus-visible) {
 
 @media (min-width: 800px) {
   .elsewhere-strands { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+  /* A city with nothing filed in the last 48 hours hides its press
+     strand entirely (city-news.js) rather than showing an empty column
+     -- give the remaining strand the full row so that reads as a
+     deliberate one-column layout, not a broken two-column one. */
+  .elsewhere-strands:has(.news-hidden) .elsewhere-strand:not(.news-hidden) {
+    grid-column: 1 / -1;
+  }
 }
 
 /* ===== LIGHTWEIGHT VERIFICATION (glotemp-verify.js) =====
@@ -1727,7 +1734,10 @@ summary:focus:not(:focus-visible) {
   max-width: 52ch;
 }
 
-/* ===== WHAT IS BEING REPORTED (city-news.js) ===== */
+/* ===== WHAT IS BEING REPORTED (city-news.js) =====
+   Five headlines, source + relative time beneath each, one hairline
+   between consecutive items -- none before the first, none after the
+   last, so an empty or single-item list never shows a stray rule. */
 .news-heading {
   font-family: var(--font-display);
   font-weight: var(--fw-light);
@@ -1740,8 +1750,10 @@ summary:focus:not(:focus-visible) {
 
 .news-item {
   padding: 0.7rem 0;
-  border-bottom: 1px solid var(--hairline);
   min-width: 0;
+}
+.news-item + .news-item {
+  border-top: 1px solid var(--hairline);
 }
 
 .news-title {
@@ -1766,24 +1778,14 @@ summary:focus:not(:focus-visible) {
   opacity: 0.8;
 }
 
-.news-lang {
-  font-variant-caps: small-caps;
-  letter-spacing: 0.08em;
-  color: var(--brass);
-  opacity: 0.95;
-}
-
-.news-status,
-.news-attribution {
+.news-status {
   font-family: var(--font-mono);
   font-size: 0.7rem;
   color: var(--sand);
   opacity: 0.8;
   line-height: 1.6;
-  margin: 0.75rem 0 0;
+  margin: 0;
 }
-.news-attribution a { color: var(--sand); }
-.news-attribution a:hover { color: var(--brass); }
 
 /* ===== LOCAL BUSINESSES (city-venues.js) =====
    Real named places from OpenStreetMap. Rows on hairlines, matching the
