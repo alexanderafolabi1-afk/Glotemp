@@ -121,39 +121,50 @@
   // Postgres SQLSTATE in `code` (e.g. 23514 = check_violation, 42501 =
   // insufficient_privilege/RLS) plus a human `message`/`details` -- this
   // reads those rather than discarding the response body.
+  //
+  // The raw diagnostic (HTTP status + Postgres code, when present) is
+  // always appended after the human sentence, never swapped in instead of
+  // it -- so a report of "it's still broken" always comes with something
+  // exact to search logs against, instead of one more generic message.
   async function describePostError(resp) {
     let body = null;
     try { body = await resp.json(); } catch (e) { /* no JSON body */ }
 
+    const code = body && body.code;
+    const diag = `[HTTP ${resp.status}${code ? ' · ' + code : ''}]`;
+
     if (resp.status === 401) {
-      return "You've been signed out. Sign in again and re-post.";
+      return `You've been signed out. Sign in again and re-post. ${diag}`;
     }
-    if (resp.status === 403 || (body && body.code === '42501')) {
-      return "That wasn't allowed by the server -- try signing out and back in. (ref: 403)";
+    if (resp.status === 403 || code === '42501') {
+      return `That wasn't allowed by the server -- try signing out and back in. ${diag}`;
     }
-    if (body && body.code === '23514') {
+    if (code === '23514') {
       // constraint name is inside body.message, e.g.
       // "new row ... violates check constraint \"observations_mood_check\""
       const constraint = /"([a-z_]+_check)"/.exec(body.message || '')?.[1] || '';
       if (constraint.indexOf('mood') !== -1) {
-        return "That mood value wasn't recognized by the server. Pick a mood again and re-post.";
+        return `That mood value wasn't recognized by the server. Pick a mood again and re-post. ${diag}`;
       }
       if (constraint.indexOf('note') !== -1) {
-        return "That comment is too long for the server to accept. Shorten it and try again.";
+        return `That comment is too long for the server to accept. Shorten it and try again. ${diag}`;
       }
-      return `That check-in didn't pass a server-side rule (${constraint || 'unknown check'}). Try again with different text.`;
+      return `That check-in didn't pass a server-side rule (${constraint || 'unknown check'}). Try again with different text. ${diag}`;
     }
-    if (body && body.code === '23503') {
-      return "Your account record couldn't be found by the server. Try signing out and back in. (ref: 23503)";
+    if (code === '23503') {
+      return `Your account record couldn't be found by the server. Try signing out and back in. ${diag}`;
+    }
+    if (code === 'PGRST204' || code === 'PGRST202' || (body && /schema cache/i.test(body.message || ''))) {
+      return `The server rejected the request -- it references a field or function the database doesn't recognize. This is a deployment bug, not something a re-post fixes. ${diag} ${body && body.message ? '"' + body.message + '"' : ''}`;
     }
     if (resp.status === 429) {
-      return "Too many requests right now -- wait a moment and try again.";
+      return `Too many requests right now -- wait a moment and try again. ${diag}`;
     }
     if (resp.status >= 500) {
-      return `The server had a problem saving that (ref: ${resp.status}). Try again shortly.`;
+      return `The server had a problem saving that. Try again shortly. ${diag}`;
     }
-    const detail = (body && (body.message || body.details || body.hint)) || `HTTP ${resp.status}`;
-    return `Could not post that: ${detail}`;
+    const detail = (body && (body.message || body.details || body.hint)) || 'no further detail from the server';
+    return `Could not post that: ${detail} ${diag}`;
   }
 
   function moodGlyphSVG(key, extraClass) {

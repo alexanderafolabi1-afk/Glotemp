@@ -1,5 +1,8 @@
 -- Step 3: Positive-only filter + moderation queue
 -- Hard-block toxic language at write; soft-hide negative content for public reads.
+-- observation_id is bigint (observations.id is a bigint identity column, not uuid) --
+-- the original draft of this migration declared it uuid and could never be applied;
+-- this corrected version is what actually shipped to the live database.
 
 alter table observations
   add column if not exists moderation_status text not null default 'visible'
@@ -12,7 +15,7 @@ create index if not exists idx_observations_moderation_status
 
 create table if not exists moderation_queue (
   id uuid primary key default gen_random_uuid(),
-  observation_id uuid references observations(id) on delete cascade,
+  observation_id bigint references observations(id) on delete cascade,
   daily_checkin_id uuid references daily_checkins(id) on delete cascade,
   source text not null check (source in ('observation', 'daily_checkin', 'user_flag')),
   reason text not null,
@@ -79,7 +82,7 @@ $$;
 grant execute on function moderate_observation_text(text) to authenticated;
 grant execute on function moderate_observation_text(text) to anon;
 
-create or replace function flag_observation(p_observation_id uuid, p_reason text default 'user_flag')
+create or replace function flag_observation(p_observation_id bigint, p_reason text default 'user_flag')
 returns json
 language plpgsql
 security definer
@@ -114,7 +117,7 @@ begin
 end;
 $$;
 
-grant execute on function flag_observation(uuid, text) to authenticated;
+grant execute on function flag_observation(bigint, text) to authenticated;
 
 create or replace function resolve_moderation_item(
   p_queue_id uuid,
@@ -127,7 +130,7 @@ set search_path = public
 as $$
 declare
   v_uid uuid := auth.uid();
-  v_obs uuid;
+  v_obs bigint;
   v_status text;
 begin
   if v_uid is null then
