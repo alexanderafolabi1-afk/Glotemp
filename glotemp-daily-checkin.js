@@ -84,9 +84,10 @@
         longest_streak: profile.longest_streak || 0,
         total_daily_checkins: profile.total_daily_checkins || 0,
         last_daily_checkin: profile.last_daily_checkin || null,
+        reporter_tier: profile.reporter_tier || null,
       };
     } catch (_) {
-      return { current_streak: 0, longest_streak: 0, total_daily_checkins: 0 };
+      return { current_streak: 0, longest_streak: 0, total_daily_checkins: 0, reporter_tier: null };
     }
   }
 
@@ -111,6 +112,8 @@
     const moodLabel = (MOODS.find(m => m.key === checkin.mood) || {}).label || checkin.mood;
     const streak = stats.current_streak || 0;
     const streakLine = streak === 1 ? '1 day of noticing' : streak + ' days of noticing';
+    const reporterPanel = (window.GlotempReporter && stats.reporter_tier)
+      ? GlotempReporter.panelHTML(stats.reporter_tier) : '';
     root.innerHTML = `
       <div class="daily-checkin-card daily-checkin-done">
         <p class="daily-checkin-eyebrow">Today’s pulse</p>
@@ -118,6 +121,7 @@
         <p class="daily-checkin-mood-line"><span class="daily-checkin-mood-label">${esc(moodLabel)}</span></p>
         ${checkin.note ? `<p class="daily-checkin-note-echo">“${esc(checkin.note)}”</p>` : ''}
         <p class="daily-checkin-streak">${esc(streakLine)}</p>
+        ${reporterPanel}
         <p class="daily-checkin-copy subtle">Return tomorrow. The ritual is the point.</p>
       </div>`;
   }

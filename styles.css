@@ -35,6 +35,11 @@
   --brass: #B08D57;
   --brass-dim: rgba(176, 141, 87, 0.48);  /* raised from 0.35, same reason */
 
+  /* Temp-Reporter tiers: brass is the site's own metal (entry tier), these
+     two extend the family upward without introducing a foreign palette. */
+  --reporter-silver: #C6CBCE;
+  --reporter-platinum: #E9E6DC;
+
   /* Band colors (mood/reading state, used everywhere a band appears) */
   --band-low: #4FD8E8;
   --band-restrained: #6BA8F5;
@@ -1675,6 +1680,48 @@ summary:focus:not(:focus-visible) {
 .verify-badge-presence { color: var(--brass); border-color: var(--brass-dim); }
 .verify-badge-standing { color: var(--sand); }
 
+/* Temp-Reporter status: a permanent, quiet recognition tier, not a game.
+   Same hairline-underline language as .verify-badge -- no fill, ever. */
+.reporter-badge {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--hairline);
+  border-radius: 0;
+  white-space: nowrap;
+}
+.reporter-badge-brass { color: var(--brass); border-color: var(--brass-dim); }
+.reporter-badge-silver { color: var(--reporter-silver); border-color: rgba(198, 203, 206, 0.4); }
+.reporter-badge-platinum { color: var(--reporter-platinum); border-color: rgba(233, 230, 220, 0.45); }
+
+/* Fuller standalone panel -- the daily check-in "done" card today. */
+.reporter-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.6rem 0 0;
+  margin-top: 0.2rem;
+  border-top: 1px solid var(--hairline);
+}
+.reporter-panel-label {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+}
+.reporter-panel-brass .reporter-panel-label { color: var(--brass); }
+.reporter-panel-silver .reporter-panel-label { color: var(--reporter-silver); }
+.reporter-panel-platinum .reporter-panel-label { color: var(--reporter-platinum); }
+.reporter-panel-line {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--sand);
+  max-width: 52ch;
+}
+
 /* ===== WHAT IS BEING REPORTED (city-news.js) ===== */
 .news-heading {
   font-family: var(--font-display);
@@ -1788,6 +1835,12 @@ summary:focus:not(:focus-visible) {
   opacity: 0.72;
   flex-basis: 100%;
 }
+
+/* Editorial fallback entries (city-venues.js) -- visually distinct from a
+   mapped, verified OpenStreetMap place: dashed rather than solid rule,
+   name in the body face rather than the display face, name never a link. */
+.venue-editorial { border-bottom-style: dashed; }
+.venue-editorial .venue-name { font-family: var(--font-body); font-style: italic; }
 
 .venue-status,
 .venue-attribution {
@@ -4308,6 +4361,31 @@ a:hover .city-landmark-photo,
   line-height: 1.6;
 }
 .context-fact strong { color: var(--ivory); }
+
+/* Vertical starter content (city-vertical-signature.js): the fallback
+   shown in place of the instrument-dial grid when a vertical has no live
+   readings yet. Spans the grid rather than sitting centred in one narrow
+   column, and reads as plain editorial prose -- no card, no border. */
+.vertical-signature {
+  grid-column: 1 / -1;
+  justify-self: stretch;
+  text-align: left;
+  max-width: 62ch;
+}
+.vertical-signature-text {
+  color: var(--sand);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin: 0 0 0.5rem;
+}
+.vertical-signature-tag {
+  display: block;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--brass);
+}
 
 /* Verticals monetisation: curated listings + open slots. Reuses the
    site's hairline-border language (no boxes, no fills) so partner and

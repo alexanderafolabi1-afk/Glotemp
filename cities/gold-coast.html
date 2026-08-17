@@ -319,6 +319,7 @@
   <script src="/city-landmark-photos.js"></script>
   <script src="/glotemp-auth.js"></script>
   <script src="/glotemp-verify.js"></script>
+  <script src="/glotemp-reporter.js"></script>
   <script src="/glotemp-checkin.js"></script>
   <script src="/glotemp-tonight.js"></script>
   <script src="/glotemp-features.js"></script>
@@ -331,8 +332,10 @@
   <script src="/city-wiki.js" defer></script>
   <script src="/city-header-photo.js" defer></script>
   <script src="/city-food-signature.js" defer></script>
+  <script src="/city-vertical-signature.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
   <script src="/city-radio.js" defer></script>
+  <script src="/city-venues.js" defer></script>
   <script src="/city-conditions.js" defer></script>
   <script src="/verticals-accordion.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
@@ -484,7 +487,7 @@
       // Real named places from OpenStreetMap. Same treatment as Radio:
       // a live keyless source, not a Supabase reading.
       if (typeof GlotempVenues !== 'undefined' && city) {
-        GlotempVenues.loadVenues(city.slug, city.name, city.lat, city.lon);
+        GlotempVenues.loadVenues(city.slug, city.name, city.lat, city.lon, city.country);
       }
 
       // Conditions line: same treatment as Radio -- a live free-API
@@ -523,6 +526,7 @@
 
           if (!response.ok) {
             contentEl.innerHTML = '';
+            if (typeof GlotempVerticalSignature !== 'undefined' && city) GlotempVerticalSignature.renderFallback(vertical, city);
             if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
             continue;
           }
@@ -530,6 +534,7 @@
           const readings = await response.json();
           if (!readings.length) {
             contentEl.innerHTML = '';
+            if (typeof GlotempVerticalSignature !== 'undefined' && city) GlotempVerticalSignature.renderFallback(vertical, city);
             if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
             continue;
           }
@@ -556,7 +561,9 @@
           contentEl.innerHTML = content;
         } catch (error) {
           console.error(`Error loading ${vertical} data:`, error);
-          contentEl.innerHTML = '<div class="empty-state">Error loading data. Try again shortly.</div>';
+          contentEl.innerHTML = '';
+          if (typeof GlotempVerticalSignature !== 'undefined' && city) GlotempVerticalSignature.renderFallback(vertical, city);
+          if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
         }
       }
     }
