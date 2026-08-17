@@ -85,7 +85,12 @@
 
   /* Spacing & Effects */
   --radius: 24px;
-  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Was 0.3s: over the 150ms ceiling for anything an interactive control
+     uses to answer a press (this token drives 30+ button/chip/picker
+     states sitewide). --smooth-transition below is intentionally left
+     alone -- it's used for larger, non-press content transitions, not
+     tap feedback. */
+  --transition: 0.12s cubic-bezier(0.4, 0, 0.2, 1);
   --smooth-transition: 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
   /* Surface Properties */
@@ -5613,8 +5618,13 @@ a:hover .city-landmark-photo,
   letter-spacing: 0.03em;
   padding: 0.3rem 0.1rem;
   min-height: 36px;
+  display: inline-flex;
+  align-items: center;
   cursor: pointer;
   transition: all var(--transition);
+}
+@media (pointer: coarse) {
+  .checkin-visibility-btn { min-height: var(--touch-min); }
 }
 .checkin-visibility-btn:hover { color: var(--ivory); border-color: var(--brass); }
 .checkin-visibility-btn[aria-pressed="true"] { color: var(--ivory); border-color: var(--ivory); }
@@ -7785,10 +7795,24 @@ body > section {
   --radius-md: 10px;
   --radius-lg: 16px;
 
-  /* One easing for everything, so the whole page moves with one hand. */
+  /* One easing for everything, so the whole page moves with one hand.
+     --dur-fast dropped from 160ms to 100ms: it drives the transition on
+     every real interactive control (buttons, links, inputs, mood/emoji
+     pickers -- see the grep at the bottom of this file if that ever
+     drifts), and anything over 150ms there reads as the site being slow
+     to acknowledge a tap, not as polish. --dur-mid (320ms) is left alone
+     -- it only ever drives decorative, non-interactive hover ambience
+     (navbar blur on scroll, the compass's own glow sweep), not a
+     control's response to being pressed. */
   --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
-  --dur-fast: 160ms;
+  --dur-fast: 100ms;
   --dur-mid: 320ms;
+  /* The instant press acknowledgement itself: faster than --dur-fast on
+     purpose, so the visual response starts within a single frame or two
+     of the pointer going down, well under the 100ms floor a tap needs to
+     read as immediate -- and always before any network call the same
+     press might also trigger. */
+  --dur-press: 70ms;
 
   --touch-min: 44px;
 }
@@ -7808,6 +7832,127 @@ summary:focus-visible,
   outline: 2px solid var(--accent-cool);
   outline-offset: 3px;
   border-radius: var(--radius-sm);
+}
+
+/* ===== SITEWIDE INSTANT PRESS FEEDBACK =====
+   Every clickable control gets a felt response the instant a pointer or
+   finger presses it -- a brass hairline brightening and a subtle scale
+   -- before any network call the press might trigger has even started.
+   Deliberately element/role selectors rather than a class someone has to
+   remember to add to every new button: this reaches every control on
+   every page, including ones that don't exist yet. Component-specific
+   :active rules elsewhere in this file (higher specificity, a class
+   beats a bare tag) naturally take over where one already exists; this
+   is the floor everything else stands on.
+   -webkit-tap-highlight-color:transparent because the scale+hairline
+   below is the tap feedback now -- the browser's own grey flash would
+   just fight it. */
+button,
+a,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+[role="button"],
+[role="tab"],
+[role="switch"],
+summary {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+button:not(:disabled):not([aria-disabled="true"]),
+a,
+input[type="submit"]:not(:disabled),
+input[type="button"]:not(:disabled),
+input[type="reset"]:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+[role="tab"],
+[role="switch"],
+summary {
+  transition: transform var(--dur-press) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out),
+              background-color var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out),
+              opacity var(--dur-fast) var(--ease-out);
+}
+button:not(:disabled):not([aria-disabled="true"]):active,
+a:active,
+input[type="submit"]:not(:disabled):active,
+input[type="button"]:not(:disabled):active,
+input[type="reset"]:not(:disabled):active,
+[role="button"]:not([aria-disabled="true"]):active,
+[role="tab"]:active,
+[role="switch"]:active,
+summary:active {
+  transform: scale(0.96);
+  transition-duration: var(--dur-press);
+}
+/* The brass hairline itself: a currentColor underline/border most
+   controls in this system already carry (they're built border-bottom or
+   outline, not filled) simply brightens on press via border-color above;
+   controls with no border of their own (plain text links inside body
+   copy, for instance) get one drawn under them on press so the
+   acknowledgement is never purely a scale nobody's peripheral vision
+   catches. */
+a:active:not(.btn-neon):not(.nav-logo):not([class*="chip"]) {
+  box-shadow: 0 1px 0 0 var(--brass, currentColor);
+}
+
+/* Loading state for any control mid-network-call: glotemp-*.js sets this
+   class the instant a fetch is dispatched from a click, and the element
+   is always disabled/aria-disabled in the same breath, so a second tap
+   before the response lands cannot fire a second request. A quiet
+   opacity pulse -- not a spinner glyph -- keeps this consistent with the
+   rest of the site's understated register. */
+.is-loading,
+[aria-busy="true"] {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.7;
+  animation: gt-loading-pulse 1.1s ease-in-out infinite;
+}
+@keyframes gt-loading-pulse {
+  0%, 100% { opacity: 0.7; }
+  50%      { opacity: 0.45; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .is-loading,
+  [aria-busy="true"] { animation: none; opacity: 0.6; }
+  button:not(:disabled):not([aria-disabled="true"]):active,
+  a:active,
+  input[type="submit"]:not(:disabled):active,
+  input[type="button"]:not(:disabled):active,
+  input[type="reset"]:not(:disabled):active,
+  [role="button"]:not([aria-disabled="true"]):active,
+  [role="tab"]:active,
+  [role="switch"]:active,
+  summary:active {
+    transform: none;
+  }
+}
+
+/* Minimum 44x44px touch target on every real control on touch devices --
+   pointer:coarse targets touch specifically rather than guessing from
+   viewport width, so a touchscreen laptop at desktop width still gets
+   it. min-height/min-width only (never a fixed height/width), so a
+   control already sized larger is untouched, and -- because min-height
+   and min-width have no effect on plain `display: inline` boxes -- an
+   ordinary inline text link inside a sentence is untouched too; this
+   only actually grows block/inline-block/flex controls, which is what
+   "too small to tap" ever really means in practice. */
+@media (pointer: coarse) {
+  button,
+  a[href],
+  input[type="submit"],
+  input[type="button"],
+  input[type="checkbox"],
+  input[type="radio"],
+  [role="button"],
+  [role="tab"],
+  [role="switch"] {
+    min-height: var(--touch-min);
+    min-width: var(--touch-min);
+  }
 }
 
 /* Aesthetic enhancement - safe to remove

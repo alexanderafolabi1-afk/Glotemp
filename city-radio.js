@@ -97,11 +97,24 @@
     // that one going down shouldn't be a dead end.
     let activeIdx = -1;
     let autoAdvancing = false;
+    // Guards the resolve-URL fetch a tap kicks off: without it, a second
+    // tap (on the same or a different station) while the first is still
+    // resolving can race it -- two fetches landing out of order, or
+    // audio.src getting set twice before either has actually started.
+    let resolving = false;
 
     function resetButtons() {
       container.querySelectorAll('.radio-station').forEach((b) => {
         b.classList.remove('is-playing');
         b.querySelector('.radio-station-play').innerHTML = '&#9654;';
+      });
+    }
+
+    function setStationsDisabled(disabled) {
+      container.querySelectorAll('.radio-station').forEach((b) => {
+        b.disabled = disabled;
+        if (disabled) { b.setAttribute('aria-busy', 'true'); b.classList.add('is-loading'); }
+        else { b.removeAttribute('aria-busy'); b.classList.remove('is-loading'); }
       });
     }
 
@@ -114,6 +127,8 @@
       const btn = container.querySelector(`.radio-station[data-idx="${idx}"]`);
       resetButtons();
       nowPlaying.textContent = `${isRetry ? 'Trying' : 'Loading'} ${station.name}…`;
+      resolving = true;
+      setStationsDisabled(true);
       try {
         let url;
         if (station.curated) {
@@ -135,14 +150,20 @@
         nowPlaying.textContent = `Now playing - ${station.name}`;
       } catch (e) {
         if (!isRetry && idx + 1 < stations.length) {
-          // One dead stream shouldn't be where listening stops.
+          // One dead stream shouldn't be where listening stops. The
+          // recursive call re-arms resolving/disabled itself immediately
+          // (synchronously, before its own first await), so there's no
+          // gap where a tap could land in between.
           autoAdvancing = true;
           play(idx + 1, true);
+          return;
         } else {
           nowPlaying.textContent = `Couldn't play ${station.name} - try another station.`;
           activeIdx = -1;
         }
       }
+      resolving = false;
+      setStationsDisabled(false);
     }
 
     audio.addEventListener('ended', () => {
