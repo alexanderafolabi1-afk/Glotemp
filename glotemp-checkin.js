@@ -371,11 +371,16 @@
   function checkinHTML(row) {
     const name = row.is_anonymous ? 'Anonymous' : ((row.profiles && row.profiles.display_name) || 'Anonymous');
     const mood = MOOD_BY_KEY[row.mood];
+    // No reporter badge on an anonymous post -- the whole point of posting
+    // anonymously is that nothing here identifies the account, and a tier
+    // badge is exactly that kind of identifying signal.
+    const reporterTier = row.is_anonymous ? null : (row.profiles && row.profiles.reporter_tier);
     return `
       <article class="checkin-item">
         <div class="checkin-item-head">
           ${mood ? moodGlyphSVG(row.mood, 'checkin-item-glyph') : ''}
           <span class="checkin-item-name">${esc(name)}</span>
+          ${reporterTier && window.GlotempReporter ? GlotempReporter.badgeHTML(reporterTier) : ''}
           <span class="checkin-item-mood">${esc(mood ? mood.label : row.mood)}</span>
           ${window.GlotempVerify ? GlotempVerify.badgeHTML(row.verify_method) : ''}
           <time class="checkin-item-time" datetime="${esc(row.created_at)}">${esc(timeAgo(row.created_at))}</time>
@@ -392,7 +397,7 @@
     try {
       const resp = await fetch(
         `${SUPABASE_URL}/rest/v1/observations?city_slug=eq.${encodeURIComponent(citySlug)}` +
-        `&select=id,mood,is_anonymous,note,created_at,verify_method,profiles(display_name)` +
+        `&select=id,mood,is_anonymous,note,created_at,verify_method,profiles(display_name,reporter_tier)` +
         `&order=created_at.desc&offset=${offset}&limit=${PAGE_SIZE}`,
         { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
       );

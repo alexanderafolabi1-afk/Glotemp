@@ -265,7 +265,7 @@ function generateCityPage(city) {
       // Real named places from OpenStreetMap. Same treatment as Radio:
       // a live keyless source, not a Supabase reading.
       if (typeof GlotempVenues !== 'undefined' && city) {
-        GlotempVenues.loadVenues(city.slug, city.name, city.lat, city.lon);
+        GlotempVenues.loadVenues(city.slug, city.name, city.lat, city.lon, city.country);
       }
 
       // Conditions line: same treatment as Radio -- a live free-API
@@ -304,6 +304,7 @@ function generateCityPage(city) {
 
           if (!response.ok) {
             contentEl.innerHTML = '';
+            if (typeof GlotempVerticalSignature !== 'undefined' && city) GlotempVerticalSignature.renderFallback(vertical, city);
             if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
             continue;
           }
@@ -311,6 +312,7 @@ function generateCityPage(city) {
           const readings = await response.json();
           if (!readings.length) {
             contentEl.innerHTML = '';
+            if (typeof GlotempVerticalSignature !== 'undefined' && city) GlotempVerticalSignature.renderFallback(vertical, city);
             if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
             continue;
           }
@@ -337,7 +339,9 @@ function generateCityPage(city) {
           contentEl.innerHTML = content;
         } catch (error) {
           console.error(\`Error loading \${vertical} data:\`, error);
-          contentEl.innerHTML = '<div class="empty-state">Error loading data. Try again shortly.</div>';
+          contentEl.innerHTML = '';
+          if (typeof GlotempVerticalSignature !== 'undefined' && city) GlotempVerticalSignature.renderFallback(vertical, city);
+          if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
         }
       }
     }
