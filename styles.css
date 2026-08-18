@@ -1548,6 +1548,61 @@ summary:focus:not(:focus-visible) {
   background: linear-gradient(180deg, rgba(107, 168, 245, 0.09) 0%, transparent 60%);
 }
 
+/* City of the Day only (glotemp-elsewhere.js / city-of-day-photos.js).
+   Every other city never gets this modifier class, so .elsewhere-panel's
+   own rules above are the only ones that ever apply to it -- same
+   layout, same spacing, same everything. Named "-featured", not "-day",
+   so it can't collide with .elsewhere-panel-day above (unrelated
+   time-of-day styling). position:relative here does not affect flow; it
+   only gives the absolutely-positioned photo layer below something to
+   anchor to, clipped to this panel's own box. */
+.elsewhere-panel-featured {
+  position: relative;
+  overflow: hidden;
+}
+.elsewhere-panel-featured > .elsewhere-now,
+.elsewhere-panel-featured > .elsewhere-strands,
+.elsewhere-panel-featured > .elsewhere-more {
+  position: relative;
+  z-index: 1;
+}
+
+.elsewhere-photo-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.elsewhere-photo-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  /* The crossfade itself -- slow enough to read as ambient, never as a
+     slide changing. See city-of-day-photos.js for the interval this is
+     timed against (15-20s between swaps). */
+  transition: opacity 2s ease;
+}
+.elsewhere-photo-layer.is-active { opacity: 1; }
+
+/* A steady dark wash, not a directional scrim -- Commons photos vary far
+   more in exposure than the hand-picked hero-dusk.jpg does, so this
+   leans dark enough to keep --ivory/--sand text readable against
+   whatever brightness the photo underneath happens to be, top to
+   bottom, not just in one corner. Same ink tone as the hero's own scrim
+   (rgba(6, 5, 3, *)) for a consistent dark, atmospheric feel. */
+.elsewhere-photo-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg,
+    rgba(6, 5, 3, 0.6) 0%,
+    rgba(6, 5, 3, 0.66) 55%,
+    rgba(6, 5, 3, 0.74) 100%);
+}
+
 .elsewhere-now {
   display: flex;
   flex-direction: column;

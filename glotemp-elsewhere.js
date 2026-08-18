@@ -134,7 +134,24 @@
     // should see the world in the first row, not one region.
     var OPENERS = ['manila', 'warsaw', 'lima', 'accra', 'seoul', 'casablanca',
                    'ho-chi-minh', 'istanbul', 'nairobi', 'bogota', 'karachi', 'kyiv'];
+    // OPENERS[0] only: a first-time visitor's default city is City of the
+    // Day when one is configured (see city-of-the-day.js), falling back
+    // to plain 'manila' -- OPENERS[0]'s original value -- when it isn't.
+    // Every other opener stays exactly as it was.
+    if (window.GlotempCityOfDay) {
+      var cityOfDay = window.GlotempCityOfDay.get();
+      if (cityOfDay && bySlug(cityOfDay)) OPENERS[0] = cityOfDay;
+    }
     var suggested = OPENERS.filter(bySlug).slice(0, 6);
+    // Guard against City of the Day landing on the same slug as one of
+    // the other five openers (both pools draw from the same 300 cities)
+    // -- a duplicate chip would look like a mistake, not a feature.
+    var seen = {};
+    suggested = suggested.filter(function (slug) {
+      if (seen[slug]) return false;
+      seen[slug] = true;
+      return true;
+    });
     if (suggested.length < 6) {
       var fill = all.filter(function (c) { return suggested.indexOf(c.slug) === -1; });
       suggested = suggested.concat(fill.slice(0, 6 - suggested.length).map(function (c) { return c.slug; }));
@@ -177,8 +194,20 @@
 
     var h = hourIn(city.timezone);
 
+    // City of the Day gets one addition -- a slow photo rotation behind
+    // the panel (city-of-day-photos.js) -- and nothing else differs.
+    // Recomputed per paint rather than cached once, so switching to a
+    // different city (chip, search, kept-city reopen) is checked fresh
+    // every time. Named "-featured", not "-day", so it can't collide
+    // with the unrelated day/night time-of-day class right below it.
+    var cityOfDayNow = window.GlotempCityOfDay && window.GlotempCityOfDay.get();
+    var isCityOfDay = !!cityOfDayNow && cityOfDayNow === city.slug;
+    if (!isCityOfDay && window.GlotempCityOfDayPhotos) window.GlotempCityOfDayPhotos.stop();
+
     win.innerHTML = '' +
-      '<div class="elsewhere-panel elsewhere-panel-' + (h < 6 || h >= 20 ? 'night' : 'day') + '">' +
+      '<div class="elsewhere-panel elsewhere-panel-' + (h < 6 || h >= 20 ? 'night' : 'day') +
+        (isCityOfDay ? ' elsewhere-panel-featured' : '') + '">' +
+        (isCityOfDay ? '<div class="elsewhere-photo-bg" id="elsewhere-photo-bg"></div>' : '') +
         '<div class="elsewhere-now">' +
           '<span class="elsewhere-clock" id="elsewhere-clock">' + esc(timeIn(city.timezone)) + '</span>' +
           '<span class="elsewhere-place">' + esc(city.name) + '<span class="elsewhere-country">' +
@@ -214,6 +243,10 @@
       line.textContent = partOfDay(hourIn(city.timezone)) +
         ', ' + s.temp + ' degrees' + (s.text ? ', ' + s.text : '');
     });
+
+    if (isCityOfDay && window.GlotempCityOfDayPhotos) {
+      window.GlotempCityOfDayPhotos.attach(document.getElementById('elsewhere-photo-bg'), city);
+    }
 
     if (window.GlotempRadio) {
       GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country);
