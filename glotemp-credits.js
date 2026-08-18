@@ -21,7 +21,7 @@
   function render(container, row) {
     container.innerHTML = `
       <a class="city-credit-link" href="${esc(row.url)}" target="_blank" rel="noopener sponsored" aria-label="Supported by ${esc(row.name)}">
-        <span class="city-credit-kicker">Supported by</span>
+        <span class="city-credit-kicker">Partner</span>
         <img class="city-credit-logo" src="${esc(row.logo_path)}" alt="${esc(row.name)}" height="32" loading="lazy">
         <span class="city-credit-name">${esc(row.name)}</span>
         ${row.tagline ? `<span class="city-credit-tagline">${esc(row.tagline)}</span>` : ''}
