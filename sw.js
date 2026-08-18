@@ -6,7 +6,7 @@
 // whole fix: the previous worker used a hand-bumped constant that nobody
 // bumped, so every deploy reused the same cache name, activate's cleanup
 // matched nothing, and the old build survived.
-const BUILD_HASH = 'fdbace9bf2c2';
+const BUILD_HASH = '7418df5c21de';
 const CACHE_NAME = `glotemp-${BUILD_HASH}`;
 
 // Only genuinely immutable things are precached. HTML never is.
@@ -129,4 +129,38 @@ function putInCache(req, res) {
 
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
+});
+
+// Push payload is the plaintext JSON the server encrypted -- decrypted by
+// the browser itself before this handler ever runs, per the Push API.
+// Shape sent by push-send: { title, body, citySlug }.
+self.addEventListener('push', (event) => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch (e) { /* malformed payload, fall through to defaults */ }
+
+  const title = data.title || 'Glotemp';
+  const options = {
+    body: data.body || '',
+    icon: '/assets/icon-192.png',
+    badge: '/assets/icon-192.png',
+    data: { citySlug: data.citySlug || null },
+    tag: data.citySlug ? `city-${data.citySlug}` : undefined,
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const citySlug = event.notification.data && event.notification.data.citySlug;
+  const targetUrl = citySlug ? `/cities/${citySlug}.html` : '/';
+
+  event.waitUntil((async () => {
+    const clientsList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of clientsList) {
+      const clientUrl = new URL(client.url);
+      if (clientUrl.pathname === targetUrl && 'focus' in client) return client.focus();
+    }
+    return self.clients.openWindow(targetUrl);
+  })());
 });
