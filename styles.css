@@ -7110,6 +7110,31 @@ time, .instr-clock, .tonight-modelled {
 }
 .nav-panel-links .nav-gem-icon { height: 34px; }
 
+/* Quiet, monochrome -- line glyphs in the footer's own muted tone, no
+   brand colour, no filled badge. Sits above the language row in both
+   footer variants (see footer-social.js). */
+.footer-social {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.65rem;
+}
+.footer-social-link {
+  display: inline-flex;
+  color: var(--sand);
+  transition: color var(--transition);
+}
+.footer-social-link:hover,
+.footer-social-link:focus-visible {
+  color: var(--ivory);
+}
+.footer-social-link svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+
 .footer-lang-row { margin-top: 0.6rem; }
 .footer-lang {
   background: none;

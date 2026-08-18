@@ -75,6 +75,7 @@ function pageHTML(city, v) {
 <body>
   <nav id="site-nav"></nav>
   <script src="/nav-component.js"></script>
+  <script src="/footer-social.js" defer></script>
 
   <main class="page-main">
     <section class="glass-card page-header">
