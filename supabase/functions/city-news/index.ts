@@ -421,7 +421,12 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function fetchCityArticles(cityName: string): Promise<GdeltArticle[]> {
+// null means "GDELT did not actually answer this query" (rate-limited,
+// timed out, or sent something unparseable) -- distinct from [], which
+// means GDELT answered normally and there was nothing in the window.
+// refreshCity below depends on telling these apart: a failed call must
+// never be treated as "this city has no news right now."
+async function fetchCityArticles(cityName: string): Promise<GdeltArticle[] | null> {
   const params = new URLSearchParams({
     query: `"${cityName.replace(/["\\]/g, "")}"`,
     mode: "ArtList",
@@ -448,11 +453,11 @@ async function fetchCityArticles(cityName: string): Promise<GdeltArticle[]> {
           await sleep(RATE_LIMIT_BACKOFF_MS * (attempt + 1));
           continue;
         }
-        return [];
+        return null;
       }
       if (!resp.ok) {
         console.error(`GDELT ${cityName}: HTTP ${resp.status}`);
-        return [];
+        return null;
       }
       // GDELT answers a rate-limited or malformed query with a text body
       // and a 200, so this cannot assume JSON just because status is ok.
@@ -462,16 +467,16 @@ async function fetchCityArticles(cityName: string): Promise<GdeltArticle[]> {
         return Array.isArray(data?.articles) ? data.articles : [];
       } catch (e) {
         console.error(`GDELT ${cityName}: non-JSON response: ${text.slice(0, 200)}`);
-        return [];
+        return null;
       }
     } catch (e) {
       console.error(`GDELT ${cityName}: ${e instanceof Error ? e.message : String(e)}`);
-      return [];
+      return null;
     } finally {
       clearTimeout(timer);
     }
   }
-  return [];
+  return null;
 }
 
 // One item per outlet, no repeated headline -- breaking news gets
@@ -507,13 +512,28 @@ async function refreshCity(
 ): Promise<{ slug: string; count: number; error: string | null }> {
   try {
     const articles = await fetchCityArticles(city.name);
+
+    // null means GDELT did not actually answer (rate-limited, timed out,
+    // unparseable) -- this is the fix for the bug this comment used to
+    // describe incorrectly. The old code ran the delete unconditionally,
+    // so a rate-limited call reported success while silently erasing the
+    // city's last good headlines -- worse than doing nothing, and with
+    // GDELT rate-limiting this heavily, it was erasing far more cities
+    // than it was ever refreshing. A failed call must leave whatever is
+    // already stored untouched and try again next time this city's turn
+    // comes up in the rotation.
+    if (articles === null) {
+      return { slug: city.slug, count: 0, error: "gdelt_unavailable" };
+    }
+
     const items = distinct(city.slug, articles);
 
     // Replace strategy: a city that has dropped out of the 48-hour window
     // since the last run should end up with nothing stored, which is
     // exactly what makes the client hide the section rather than show a
-    // stale headline. Delete only runs after a successful GDELT call, so
-    // a transient fetch failure never wipes out the last good set.
+    // stale headline. Reaching here means GDELT did answer, so an empty
+    // items[] here is a genuine "nothing in the last 48 hours," not a
+    // failed call -- the one case this delete is actually meant for.
     const del = await supabase.from("city_news").delete().eq("city_slug", city.slug);
     if (del.error) throw new Error(`delete: ${del.error.message}`);
 
