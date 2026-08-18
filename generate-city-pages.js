@@ -285,6 +285,7 @@ function generateCityPage(city) {
       }
 
       if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('${city.name}', '${city.country}');
+      if (typeof GlotempAttention !== 'undefined') GlotempAttention.loadCityAttention('${city.slug}');
 
       // Synchronous and static, so it's always in the DOM before any of
       // the async context loaders below append their own findings --

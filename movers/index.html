@@ -26,6 +26,9 @@
     .mover-delta{ margin-left:auto; font-size:1rem; color:var(--mv-band,var(--ivory)); }
     .mover-spark{ width:120px; flex:0 0 auto; }
     .movers-list{ min-height:420px; }
+    .attn-board-list { min-height: 120px; }
+    .attn-spike-row .mover-city { color: var(--band-warm); }
+    .attn-spike-detail { font-family: var(--font-mono); font-size: 0.72rem; color: var(--sand); margin-left: 0.5rem; }
   </style>
   <script src="/glotemp-analytics.js" defer></script>
 </head>
@@ -44,6 +47,20 @@
       <div class="movers-list" id="movers-list" aria-live="polite">
         <p class="empty-recruit"><strong>Reading the week&hellip;</strong></p>
       </div>
+    </section>
+
+    <section class="glass-card">
+      <p class="eyebrow">Global attention</p>
+      <h2>Most watched</h2>
+      <p class="section-copy" style="color:var(--sand); max-width:62ch;">Real Wikipedia pageviews, summed over the last seven days &mdash; measured, not modelled. Cities without a full week of stored history are not listed.</p>
+      <div class="attn-board-list" id="most-watched-list" aria-live="polite"></div>
+    </section>
+
+    <section class="glass-card">
+      <p class="eyebrow">Right now</p>
+      <h2>Currently spiking</h2>
+      <p class="section-copy" style="color:var(--sand); max-width:62ch;">Cities whose Wikipedia edit rate is well above their own baseline this hour. Something is happening there.</p>
+      <div class="attn-board-list" id="spiking-list" aria-live="polite"></div>
     </section>
   </main>
 
@@ -64,6 +81,7 @@
   <script src="/glotemp-core.js"></script>
   <script src="/glotemp-features.js"></script>
   <script src="/glotemp-movers.js"></script>
+  <script src="/glotemp-attention-boards.js"></script>
   <script src="/cookie-consent.js" defer></script>
 </body>
 </html>

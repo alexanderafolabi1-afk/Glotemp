@@ -85,6 +85,15 @@
       <div id="city-wiki-panel" class="city-wiki-panel"></div>
     </section>
 
+    <!-- Attention layer: Wikipedia pageviews + edit-activity, fetched
+         client-side with a 5s timeout -- see city-attention.js. Hidden by
+         default; only shown once real data actually loads, so a failed
+         or slow fetch never leaves a stuck spinner or an empty box. -->
+    <section class="glass-card city-attention-section" id="city-attention-section" style="display:none;">
+      <p class="eyebrow">Attention</p>
+      <div id="city-attention-panel"></div>
+    </section>
+
     <!-- Vertical Navigation -->
     <div class="vertical-nav glass-card">
       <a href="#pulse" class="vertical-link" data-vertical="pulse">💓 Pulse</a>
@@ -333,6 +342,7 @@
   <script src="/glotemp-reporter.js"></script>
   <script src="/push-notifications.js"></script>
   <script src="/glotemp-checkin.js"></script>
+  <script src="/city-attention.js"></script>
   <script src="/glotemp-tonight.js"></script>
   <script src="/glotemp-features.js"></script>
   <script src="/glotemp-listings.js" defer></script>
@@ -468,6 +478,7 @@
       }
 
       if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('Bishkek', 'Kyrgyzstan');
+      if (typeof GlotempAttention !== 'undefined') GlotempAttention.loadCityAttention('bishkek');
 
       // Synchronous and static, so it's always in the DOM before any of
       // the async context loaders below append their own findings --

@@ -8750,3 +8750,59 @@ a:active:not(.btn-neon):not(.nav-logo):not([class*="chip"]) {
 .music-sponsor a { text-decoration: none; }
 .music-sponsor-name { display: block; font-family: var(--font-display); font-size: 1rem; color: var(--ivory); }
 .music-sponsor-line { display: block; font-size: 0.8rem; color: var(--sand); margin-top: 0.15rem; }
+
+/* ===== ATTENTION LAYER (city-attention.js) =====
+   Wikipedia pageviews + edit-activity. Restrained -- a figure, a
+   sparkline, a delta line -- and a spike marker that is a single dot and
+   a sentence, not a banner. */
+.attention-pageviews {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+}
+.attention-figure {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--ivory);
+  margin: 0;
+}
+.attention-unit {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sand);
+}
+.attention-spark { flex: 0 0 auto; line-height: 0; }
+.attention-spark .sparkline { width: 140px; height: 26px; display: block; }
+.attention-delta {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--sand);
+  margin-left: auto;
+}
+.attention-source {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--sand);
+  opacity: 0.65;
+  margin: 0.6rem 0 0;
+}
+.attention-spike {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--ivory);
+  margin: 0 0 0.9rem;
+}
+.attention-spike-dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--band-warm);
+  box-shadow: 0 0 6px var(--band-warm);
+}
