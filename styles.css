@@ -7572,3 +7572,117 @@ summary:focus-visible,
   .hero-search-input,
   .hero-search-go { border-color: var(--ivory); }
 }
+
+/* ===== MUSIC LAYER (glotemp-music.js) =====
+   Aesthetic enhancement - safe to remove
+   Hairline rows, same language as the check-ins and venue lists. No card,
+   no radius, nothing that competes with the instrument above it. */
+.music-panel { margin-top: 0.5rem; min-width: 0; }
+
+.music-block { margin: 0 0 1.75rem; min-width: 0; }
+
+.music-h {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.78rem;
+  letter-spacing: 0.11em;
+  font-weight: var(--fw-regular);
+  color: var(--brass);
+  margin: 0 0 0.6rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* The method is stated on the page, not buried in a tooltip. */
+.music-method {
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  line-height: 1.6;
+  color: var(--sand);
+  opacity: 0.85;
+  margin: 0 0 0.75rem;
+  max-width: 62ch;
+}
+
+.music-list, .music-chart { list-style: none; margin: 0; padding: 0; }
+.music-chart { counter-reset: gt-chart; }
+
+.music-row, .music-chart-row, .music-now-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.75rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--hairline);
+  min-width: 0;              /* flex children refuse to shrink without it */
+}
+
+.music-chart-row { counter-increment: gt-chart; }
+.music-chart-row::before {
+  content: counter(gt-chart);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--sand);
+  opacity: 0.6;
+  min-width: 1.4rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.music-name, .music-track {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--ivory);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;   /* track titles carry unbroken strings */
+}
+.music-name a, .music-track a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--brass-dim); }
+.music-name a:hover { color: var(--brass); }
+
+.music-artist {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--sand);
+  flex-basis: 100%;
+}
+
+.music-sub, .music-meta {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--sand);
+  opacity: 0.8;
+  white-space: nowrap;
+}
+.music-meta { flex-basis: 100%; white-space: normal; }
+.music-when { margin-left: 0.6rem; opacity: 0.75; }
+
+.music-mv {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-variant-caps: small-caps;
+  letter-spacing: 0.06em;
+  color: var(--sand);
+  white-space: nowrap;
+}
+.music-mv-up { color: var(--band-warm); }
+.music-mv-down { color: var(--band-restrained); }
+.music-mv-new { color: var(--brass); }
+
+/* Set apart so it can never be mistaken for a chart entry. */
+.music-sponsor {
+  margin-top: 1.5rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--brass-dim);
+}
+.music-sponsor-label {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: var(--sand);
+  opacity: 0.75;
+  margin: 0 0 0.3rem;
+}
+.music-sponsor a { text-decoration: none; }
+.music-sponsor-name { display: block; font-family: var(--font-display); font-size: 1rem; color: var(--ivory); }
+.music-sponsor-line { display: block; font-size: 0.8rem; color: var(--sand); margin-top: 0.15rem; }

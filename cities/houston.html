@@ -211,6 +211,7 @@
       <div class="vertical-body">
         <p class="vertical-description">Where should you experience culture and nightlife?</p>
         <div id="entertainment-content" class="vertical-content"></div>
+        <div id="entertainment-music"></div>
         <div id="entertainment-context" class="vertical-context"></div>
         
         <div class="vertical-listings" data-city="houston" data-vertical="entertainment"></div>
@@ -330,6 +331,7 @@
   <script src="/city-radio.js" defer></script>
   <script src="/city-venues.js" defer></script>
   <script src="/city-news.js" defer></script>
+  <script src="/glotemp-music.js" defer></script>
   <script src="/city-conditions.js" defer></script>
   <script src="/verticals-accordion.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
@@ -488,6 +490,12 @@
       // reported in. Live and keyless, like Radio and Venues above.
       if (typeof GlotempNews !== 'undefined' && city) {
         GlotempNews.loadNews(city.name, city.country, 'news-content');
+      }
+
+      // The music layer. Reads only stored data, so this makes no
+      // third-party call and cannot slow the page down.
+      if (typeof GlotempMusic !== 'undefined' && city) {
+        GlotempMusic.mount(city.slug, city.name);
       }
 
       // Conditions line: same treatment as Radio -- a live free-API
