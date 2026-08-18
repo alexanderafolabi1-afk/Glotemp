@@ -96,9 +96,12 @@ async function resolveTitle(citySlug: string, name: string, country: string | nu
 
 interface CityRow { city_slug: string; name: string; country: string | null; wikipedia_title: string | null; }
 
-async function loadCities(limit: number): Promise<CityRow[]> {
+async function loadCities(limit: number, slugs?: string[]): Promise<CityRow[]> {
+  const filter = slugs && slugs.length
+    ? `&city_slug=in.(${slugs.map(encodeURIComponent).join(",")})`
+    : "";
   const resp = await rest(
-    `city_points?select=city_slug,name,country,wikipedia_title&order=city_slug.asc&limit=${limit}`,
+    `city_points?select=city_slug,name,country,wikipedia_title&order=city_slug.asc&limit=${limit}${filter}`,
   );
   return await resp.json();
 }
@@ -134,8 +137,8 @@ async function fetchPageviews(article: string, start: string, end: string): Prom
   }
 }
 
-async function jobPageviews(limitCities: number) {
-  const cities = await loadCities(limitCities);
+async function jobPageviews(limitCities: number, slugs?: string[]) {
+  const cities = await loadCities(limitCities, slugs);
   const today = new Date();
   const cityErrors: { city_slug: string; stage: string; detail: string }[] = [];
   let citiesWritten = 0, rowsWritten = 0;
@@ -288,6 +291,37 @@ async function jobRevisions(limitCities: number) {
   return { cities: cities.length, checked, spikes, errors: cityErrors };
 }
 
+// ---------- job: resolve_check ----------
+// Diagnostic-only, no writes. Given explicit slug->candidate-title pairs
+// (for the handful of cities whose display name doesn't map cleanly to
+// a Wikipedia title -- parenthetical names, disambiguation collisions),
+// resolves each candidate through the same fetchCanonicalTitle path the
+// real jobs use, then test-fetches a week of real pageviews to confirm
+// the resolved title actually has data before anything gets written to
+// city_points.wikipedia_title.
+async function jobResolveCheck(candidates: Record<string, string>) {
+  const results: Record<string, unknown> = {};
+  for (const [slug, requested] of Object.entries(candidates)) {
+    const canonical = await fetchCanonicalTitle(requested);
+    let pageviewsOk = false;
+    let sample: { date: string; views: number }[] = [];
+    if (canonical) {
+      const end = new Date();
+      end.setUTCDate(end.getUTCDate() - 1);
+      const start = new Date(end);
+      start.setUTCDate(start.getUTCDate() - 6);
+      const rows = await fetchPageviews(canonical, yyyymmdd(start), yyyymmdd(end));
+      if (rows && rows.length > 0 && rows.some((r) => r.views > 0)) {
+        pageviewsOk = true;
+        sample = rows;
+      }
+    }
+    results[slug] = { requested, canonical, pageviewsOk, sample };
+    await new Promise((r) => setTimeout(r, REQUEST_GAP_MS));
+  }
+  return results;
+}
+
 const FULL_COVERAGE_LIMIT = 500;
 const DEFAULT_LIMIT: Record<string, number> = {
   pageviews: FULL_COVERAGE_LIMIT,
@@ -300,6 +334,8 @@ Deno.serve(async (req: Request) => {
   const rawLimit = url.searchParams.get("limit");
   const fallback = DEFAULT_LIMIT[job] ?? 25;
   const limit = Math.min(Math.max(Number(rawLimit ?? fallback) || fallback, 1), FULL_COVERAGE_LIMIT);
+  const rawSlugs = url.searchParams.get("slugs");
+  const slugs = rawSlugs ? rawSlugs.split(",").map((s) => s.trim()).filter(Boolean) : undefined;
 
   if (!SUPABASE_URL || !SERVICE_KEY) {
     console.error("[wiki-attention] missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
@@ -309,10 +345,17 @@ Deno.serve(async (req: Request) => {
   try {
     let result: Record<string, unknown>;
     switch (job) {
-      case "pageviews": result = await jobPageviews(limit); break;
+      case "pageviews": result = await jobPageviews(limit, slugs); break;
       case "revisions": result = await jobRevisions(limit); break;
+      case "resolve_check": {
+        const body = await req.json().catch(() => ({}));
+        const candidates = body && typeof body.candidates === "object" ? body.candidates : {};
+        result = await jobResolveCheck(candidates);
+        console.log(`[wiki-attention] resolve_check`, JSON.stringify(result));
+        return json({ job, result });
+      }
       default:
-        return json({ error: "unknown_job", jobs: ["pageviews", "revisions"] }, 400);
+        return json({ error: "unknown_job", jobs: ["pageviews", "revisions", "resolve_check"] }, 400);
     }
     console.log(`[wiki-attention] ${job}`, JSON.stringify(result));
 
