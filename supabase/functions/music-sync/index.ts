@@ -140,15 +140,24 @@ async function readIcyTitle(streamUrl: string): Promise<string | null> {
 // ---------- jobs ----------
 const RB = "https://de1.api.radio-browser.info";
 
+// Radio Browser is a small volunteer-run mirror set. A fixed pause between
+// requests, not just a per-request timeout, is what "does not throttle it"
+// actually requires -- 300 cities at ~200ms apart is roughly a minute of
+// wall time, comfortably inside the function's budget, and never bursts.
+const RB_REQUEST_GAP_MS = 200;
+
 async function jobStations(limitCities: number) {
-  // Cities with the fewest stations first, so a new city fills before an
-  // already-covered one is refreshed.
+  // No default that quietly caps coverage below the full city set: the
+  // caller may still narrow it (a smaller manual run), but the fallback is
+  // "every row in city_points", not 25.
   const resp = await rest(
     `city_points?select=city_slug,lat,lon&order=city_slug.asc&limit=${limitCities}`,
   );
   const cities: { city_slug: string; lat: number; lon: number }[] = await resp.json();
 
   let added = 0;
+  const cityErrors: { city_slug: string; stage: string; detail: string }[] = [];
+
   for (const c of cities) {
     const { signal, done } = withTimeout(TIMEOUT_MS);
     try {
@@ -157,8 +166,14 @@ async function jobStations(limitCities: number) {
         `&geo_distance=50000&hidebroken=true&order=clickcount&reverse=true&limit=12`,
         { headers: { "User-Agent": UA, Accept: "application/json" }, signal },
       );
-      if (!r.ok) continue;
+      if (!r.ok) {
+        const body = await r.text().catch(() => "");
+        console.error(`[music-sync] stations ${c.city_slug}: radio-browser HTTP ${r.status} ${body.slice(0, 300)}`);
+        cityErrors.push({ city_slug: c.city_slug, stage: "radio_browser_fetch", detail: `HTTP ${r.status}: ${body.slice(0, 300)}` });
+        continue;
+      }
       const list = await r.json();
+      const rawCount = Array.isArray(list) ? list.length : 0;
       const rows = (Array.isArray(list) ? list : [])
         // https only. A plain-http stream is unusable from an https page
         // and pointless to poll for a site that is https everywhere.
@@ -175,20 +190,35 @@ async function jobStations(limitCities: number) {
         .filter((s: Record<string, unknown>) => s.station_uuid && s.name && s.stream_url);
 
       if (rows.length) {
-        await rest("city_stations?on_conflict=station_uuid", {
-          method: "POST",
-          headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
-          body: JSON.stringify(rows),
-        });
-        added += rows.length;
+        try {
+          await rest("city_stations?on_conflict=station_uuid", {
+            method: "POST",
+            headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+            body: JSON.stringify(rows),
+          });
+          added += rows.length;
+        } catch (e) {
+          // The real Postgres error (rest() bundles status + body), not a
+          // swallowed exception -- this is the thing point 1 asked for.
+          console.error(`[music-sync] stations ${c.city_slug}: insert failed`, String(e));
+          cityErrors.push({ city_slug: c.city_slug, stage: "insert", detail: String(e) });
+        }
+      } else {
+        // Radio Browser answered but nothing survived the https filter --
+        // logged explicitly so "0 stored" is diagnosable rather than a
+        // mystery: was the raw response empty, or did everything get
+        // filtered?
+        console.log(`[music-sync] stations ${c.city_slug}: radio-browser returned ${rawCount} station(s), 0 after https filter`);
       }
     } catch (e) {
-      console.error(`[music-sync] stations ${c.city_slug}`, String(e));
+      console.error(`[music-sync] stations ${c.city_slug}: exception`, String(e));
+      cityErrors.push({ city_slug: c.city_slug, stage: "exception", detail: String(e) });
     } finally {
       done();
+      await new Promise((r) => setTimeout(r, RB_REQUEST_GAP_MS));
     }
   }
-  return { cities: cities.length, stations: added };
+  return { cities: cities.length, stations: added, errors: cityErrors };
 }
 
 async function jobNowPlaying(limitStations: number) {
@@ -203,6 +233,7 @@ async function jobNowPlaying(limitStations: number) {
   }[] = await resp.json();
 
   let recorded = 0, silent = 0;
+  const recordErrors: { station_uuid: string; detail: string }[] = [];
   for (const s of stations) {
     const title = await readIcyTitle(s.stream_url);
     if (title) {
@@ -215,7 +246,10 @@ async function jobNowPlaying(limitStations: number) {
         });
         recorded++;
       } catch (e) {
-        console.error(`[music-sync] record ${s.station_uuid}`, String(e));
+        // The real rpc failure (record_now_playing threw, or the HTTP call
+        // itself failed), not a swallowed exception.
+        console.error(`[music-sync] nowplaying record ${s.station_uuid} failed`, String(e));
+        recordErrors.push({ station_uuid: s.station_uuid, detail: String(e) });
       }
     } else {
       silent++;
@@ -226,9 +260,9 @@ async function jobNowPlaying(limitStations: number) {
       method: "PATCH",
       headers: { Prefer: "return=minimal" },
       body: JSON.stringify({ last_polled_at: new Date().toISOString() }),
-    }).catch(() => {});
+    }).catch((e) => console.error(`[music-sync] nowplaying stamp ${s.station_uuid} failed`, String(e)));
   }
-  return { polled: stations.length, recorded, silent };
+  return { polled: stations.length, recorded, silent, errors: recordErrors };
 }
 
 async function jobArtists(limitCities: number) {
@@ -333,10 +367,33 @@ async function jobEvents(limitCities: number) {
   return { cities: cities.length, events: added };
 }
 
+// Per job, which field of its result is the "did this actually write
+// anything" count. Anchors the health check below to a real number
+// instead of guessing at the shape of each job's return value.
+const WRITE_COUNT_FIELD: Record<string, string> = {
+  stations: "stations",
+  nowplaying: "recorded",
+  artists: "artists",
+  events: "events",
+};
+
+// city_points holds every city this site knows (300 as of writing). No
+// default may silently cap coverage below that -- 500 is a fixed ceiling
+// comfortably above the current set, not a per-run tuning knob.
+const FULL_COVERAGE_LIMIT = 500;
+const DEFAULT_LIMIT: Record<string, number> = {
+  stations: FULL_COVERAGE_LIMIT,
+  nowplaying: 40,
+  artists: 25,
+  events: 40,
+};
+
 Deno.serve(async (req: Request) => {
   const url = new URL(req.url);
   const job = url.searchParams.get("job") ?? "";
-  const limit = Math.min(Math.max(Number(url.searchParams.get("limit") ?? 25) || 25, 1), 200);
+  const rawLimit = url.searchParams.get("limit");
+  const fallback = DEFAULT_LIMIT[job] ?? 25;
+  const limit = Math.min(Math.max(Number(rawLimit ?? fallback) || fallback, 1), FULL_COVERAGE_LIMIT);
 
   if (!SUPABASE_URL || !SERVICE_KEY) {
     console.error("[music-sync] missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
@@ -344,7 +401,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    let result: unknown;
+    let result: Record<string, unknown>;
     switch (job) {
       case "stations":   result = await jobStations(limit); break;
       case "nowplaying": result = await jobNowPlaying(limit); break;
@@ -354,7 +411,20 @@ Deno.serve(async (req: Request) => {
         return json({ error: "unknown_job", jobs: ["stations", "nowplaying", "artists", "events"] }, 400);
     }
     console.log(`[music-sync] ${job}`, JSON.stringify(result));
-    return json({ job, ...(result as Record<string, unknown>) });
+
+    // Health check: a run that writes zero rows is not a green run. It is
+    // logged as an error here (visible in function logs even though
+    // pg_cron itself does not inspect the response body) and reported
+    // non-200, so a scheduler or a human watching either surface shows it
+    // rather than a quiet 200 that looks identical to a real success.
+    const countField = WRITE_COUNT_FIELD[job];
+    const writeCount = countField ? Number(result[countField]) : NaN;
+    if (Number.isFinite(writeCount) && writeCount === 0) {
+      console.error(`[music-sync] ${job} wrote zero rows this run`, JSON.stringify(result));
+      return json({ job, ...result, zero_rows: true }, 500);
+    }
+
+    return json({ job, ...result });
   } catch (e) {
     // Non-200 on every failure path, so a scheduler shows red rather than
     // a green run that quietly wrote nothing.
