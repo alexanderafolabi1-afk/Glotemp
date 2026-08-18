@@ -4497,6 +4497,21 @@ a:hover .city-landmark-photo,
   margin-top: 0.3rem;
   line-height: 1.5;
 }
+/* Discreet, not a badge: same small-caps mono register as
+   .city-credit-kicker, muted gold rather than an ad-network tag colour.
+   Never hidden -- always present when item.kind is 'partner' -- but
+   sized and weighted to sit quietly under the title, not compete with
+   it. */
+.listing-partner-tag {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  color: var(--brass);
+  opacity: 0.85;
+  margin-top: 0.3rem;
+}
 .listing-open-slot {
   display: flex;
   justify-content: space-between;

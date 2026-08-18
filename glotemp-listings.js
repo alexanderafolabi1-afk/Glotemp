@@ -118,8 +118,16 @@
     var titleInner = item.affiliate_url
       ? '<a href="' + esc(item.affiliate_url) + '" target="_blank" rel="noopener noreferrer sponsored">' + esc(item.title) + '</a>'
       : esc(item.title);
+    // "Partner" reads only where kind is actually 'partner' -- set at
+    // submission from the vertical's own config (property/work/tech/
+    // fashion/transport/finance/education/health). A food recommendation
+    // or an entertainment listing never carries this: those verticals'
+    // nomination copy tells submitters plainly that nothing here is paid,
+    // and the label should never say otherwise for content that isn't.
+    var partnerTag = item.kind === 'partner' ? '<p class="listing-partner-tag">Partner</p>' : '';
     return '<div class="listing-item">' +
       '<p class="listing-title"><span>' + titleInner + '</span>' + (dateStr ? '<span class="listing-date">' + dateStr + '</span>' : '') + '</p>' +
+      partnerTag +
       (item.description ? '<p class="listing-desc">' + esc(item.description) + '</p>' : '') +
       '</div>';
   }
