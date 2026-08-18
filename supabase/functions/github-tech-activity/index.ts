@@ -5,21 +5,36 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
 const supabase = createClient(SUPABASE_URL ?? "", SUPABASE_SERVICE_ROLE_KEY ?? "");
 
-// City-to-GitHub org mappings for activity collection
-const cityRepos: Record<string, { org: string; repos: string[] }> = {
-  "tokyo": { org: "japan", repos: ["cookpad", "mercari"] },
-  "nyc": { org: "us", repos: ["nodejs", "npm"] },
-  "london": { org: "uk", repos: ["guardian", "bbc"] },
-  "paris": { org: "france", repos: ["mozilla-france"] },
-  "berlin": { org: "germany", repos: ["fefe"] },
-  "singapore": { org: "sg", repos: ["grab", "gojek"] },
-  "toronto": { org: "ca", repos: ["mozilla-canada"] },
-  "sydney": { org: "au", repos: ["getup"] },
-  "bangalore": { org: "in", repos: ["zomato"] },
-  "hong-kong": { org: "hk", repos: ["alibaba", "tencent"] },
+// City-to-GitHub org mappings for activity collection.
+//
+// The previous version of this map used placeholder "org" values that were
+// never real GitHub accounts (org: "japan", "us", "uk", ...) with specific
+// hardcoded repo names under them. Every /repos/{org}/{repo} lookup 404'd
+// unconditionally, for every city, since neither the org nor the repo path
+// existed -- this function has never written real data. Fixed two ways:
+// 1. Each org below is the real GitHub handle of a company actually
+//    headquartered in that city (verified against public knowledge at
+//    write time, not fetched live -- this sandbox cannot reach
+//    api.github.com to re-verify at edit time).
+// 2. Instead of hardcoding specific repo names (which can be renamed or
+//    archived and would silently 404 again), this now lists each org's
+//    own repos via /orgs/{org}/repos and sums real, current issue counts
+//    across whatever repos actually exist -- no repo name is guessed.
+// hong-kong had no city-HQ'd org here we could verify with confidence, so
+// it's dropped rather than guessed; add it back with a confirmed org.
+const cityRepos: Record<string, { orgs: string[] }> = {
+  "tokyo": { orgs: ["cookpad", "mercari"] },
+  "nyc": { orgs: ["nytimes", "etsy"] },
+  "london": { orgs: ["guardian", "bbc"] },
+  "paris": { orgs: ["algolia"] },
+  "berlin": { orgs: ["soundcloud", "delivery-hero"] },
+  "singapore": { orgs: ["grab"] },
+  "toronto": { orgs: ["shopify"] },
+  "sydney": { orgs: ["atlassian", "canva"] },
+  "bangalore": { orgs: ["razorpay"] },
 };
 
-async function fetchGitHubActivity(city: string, repoInfo: { org: string; repos: string[] }) {
+async function fetchGitHubActivity(city: string, repoInfo: { orgs: string[] }) {
   try {
     const token = Deno.env.get("GITHUB_TOKEN");
     // IMPORTANT: only send an Authorization header when a real token exists.
@@ -35,19 +50,26 @@ async function fetchGitHubActivity(city: string, repoInfo: { org: string; repos:
     let totalPRs = 0;
     let repoCount = 0;
 
-    for (const repo of repoInfo.repos) {
-      const url = `https://api.github.com/repos/${repoInfo.org}/${repo}`;
+    for (const org of repoInfo.orgs) {
+      const url = `https://api.github.com/orgs/${org}/repos?sort=pushed&direction=desc&per_page=5`;
 
       const response = await fetch(url, { headers });
       if (!response.ok) {
         const body = await response.text().catch(() => "");
-        console.warn(`[github-tech-activity] ${city}/${repo}: HTTP ${response.status} - ${body.slice(0, 200)}`);
+        console.warn(`[github-tech-activity] ${city}/${org}: HTTP ${response.status} - ${body.slice(0, 200)}`);
         continue;
       }
 
       const data = await response.json();
-      totalPRs += data.open_issues_count || 0;
-      repoCount++;
+      if (!Array.isArray(data) || data.length === 0) {
+        console.warn(`[github-tech-activity] ${city}/${org}: org has no visible repos`);
+        continue;
+      }
+
+      for (const repo of data) {
+        totalPRs += repo.open_issues_count || 0;
+      }
+      repoCount += data.length;
     }
 
     if (repoCount === 0) {
