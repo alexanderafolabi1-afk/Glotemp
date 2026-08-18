@@ -1,0 +1,273 @@
+{
+  "name": "Glotemp - Instagram + Facebook daily post",
+  "flow": [
+    {
+      "id": 1,
+      "module": "http:MakeRequest",
+      "version": 4,
+      "parameters": {
+        "authenticationType": "noAuth"
+      },
+      "mapper": {
+        "url": "https://hnysztednzqfzbmiqqgl.supabase.co/functions/v1/social-next-post",
+        "method": "get",
+        "headers": [
+          {
+            "name": "apikey",
+            "value": "<YOUR_SUPABASE_ANON_OR_SERVICE_KEY>"
+          },
+          {
+            "name": "Authorization",
+            "value": "Bearer <YOUR_SUPABASE_ANON_OR_SERVICE_KEY>"
+          }
+        ],
+        "queryParameters": [],
+        "contentType": "",
+        "parseResponse": true,
+        "stopOnHttpError": false,
+        "allowRedirects": true,
+        "shareCookies": false,
+        "requestCompressedContent": true
+      },
+      "metadata": {
+        "designer": {
+          "x": 0,
+          "y": 0
+        },
+        "restore": {}
+      }
+    },
+    {
+      "id": 2,
+      "module": "builtin:BasicRouter",
+      "version": 1,
+      "mapper": {},
+      "metadata": {
+        "designer": {
+          "x": 300,
+          "y": 0
+        }
+      },
+      "routes": [
+        [
+          {
+            "id": 3,
+            "module": "instagram-business:CreatePostPhoto",
+            "version": 1,
+            "parameters": {},
+            "filter": {
+              "name": "Due, needs Instagram, has an image",
+              "conditions": [
+                [
+                  {
+                    "a": "{{1.data.due}}",
+                    "o": "text:equal",
+                    "b": "true"
+                  },
+                  {
+                    "a": "{{1.data.needs_instagram}}",
+                    "o": "text:equal",
+                    "b": "true"
+                  },
+                  {
+                    "a": "{{1.data.image_url}}",
+                    "o": "exist"
+                  }
+                ]
+              ]
+            },
+            "mapper": {
+              "accountId": "",
+              "image_url": "{{1.data.image_url}}",
+              "caption": "{{1.data.caption}}"
+            },
+            "metadata": {
+              "designer": {
+                "x": 300,
+                "y": -150
+              },
+              "restore": {
+                "expect": {
+                  "accountId": {
+                    "label": "Choose your Instagram Business account after connecting"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": 4,
+            "module": "http:MakeRequest",
+            "version": 4,
+            "parameters": {
+              "authenticationType": "noAuth"
+            },
+            "mapper": {
+              "url": "https://hnysztednzqfzbmiqqgl.supabase.co/functions/v1/social-mark-posted",
+              "method": "post",
+              "headers": [
+                {
+                  "name": "apikey",
+                  "value": "<YOUR_SUPABASE_ANON_OR_SERVICE_KEY>"
+                },
+                {
+                  "name": "Authorization",
+                  "value": "Bearer <YOUR_SUPABASE_ANON_OR_SERVICE_KEY>"
+                },
+                {
+                  "name": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "queryParameters": [],
+              "contentType": "json",
+              "inputMethod": "jsonString",
+              "jsonStringBodyContent": "{\"row_id\": \"{{1.data.row_id}}\", \"platform\": \"instagram\", \"post_id\": \"{{3.id}}\"}",
+              "parseResponse": true,
+              "stopOnHttpError": false,
+              "allowRedirects": true,
+              "shareCookies": false,
+              "requestCompressedContent": true
+            },
+            "metadata": {
+              "designer": {
+                "x": 600,
+                "y": -150
+              },
+              "restore": {}
+            }
+          }
+        ],
+        [
+          {
+            "id": 5,
+            "module": "http:DownloadFile",
+            "version": 4,
+            "parameters": {
+              "authenticationType": "noAuth"
+            },
+            "filter": {
+              "name": "Due, needs Facebook, has an image",
+              "conditions": [
+                [
+                  {
+                    "a": "{{1.data.due}}",
+                    "o": "text:equal",
+                    "b": "true"
+                  },
+                  {
+                    "a": "{{1.data.needs_facebook}}",
+                    "o": "text:equal",
+                    "b": "true"
+                  },
+                  {
+                    "a": "{{1.data.image_url}}",
+                    "o": "exist"
+                  }
+                ]
+              ]
+            },
+            "mapper": {
+              "url": "{{1.data.image_url}}",
+              "stopOnHttpError": true,
+              "shareCookies": false
+            },
+            "metadata": {
+              "designer": {
+                "x": 300,
+                "y": 150
+              },
+              "restore": {}
+            }
+          },
+          {
+            "id": 6,
+            "module": "facebook-pages:UploadPhoto",
+            "version": 6,
+            "parameters": {},
+            "mapper": {
+              "page_id": "",
+              "fileName": "{{5.fileName}}",
+              "data": "{{5.data}}",
+              "message": "{{1.data.caption}}"
+            },
+            "metadata": {
+              "designer": {
+                "x": 600,
+                "y": 150
+              },
+              "restore": {
+                "expect": {
+                  "page_id": {
+                    "label": "Choose your Facebook Page after connecting"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": 7,
+            "module": "http:MakeRequest",
+            "version": 4,
+            "parameters": {
+              "authenticationType": "noAuth"
+            },
+            "mapper": {
+              "url": "https://hnysztednzqfzbmiqqgl.supabase.co/functions/v1/social-mark-posted",
+              "method": "post",
+              "headers": [
+                {
+                  "name": "apikey",
+                  "value": "<YOUR_SUPABASE_ANON_OR_SERVICE_KEY>"
+                },
+                {
+                  "name": "Authorization",
+                  "value": "Bearer <YOUR_SUPABASE_ANON_OR_SERVICE_KEY>"
+                },
+                {
+                  "name": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "queryParameters": [],
+              "contentType": "json",
+              "inputMethod": "jsonString",
+              "jsonStringBodyContent": "{\"row_id\": \"{{1.data.row_id}}\", \"platform\": \"facebook\", \"post_id\": \"{{6.post_id}}\"}",
+              "parseResponse": true,
+              "stopOnHttpError": false,
+              "allowRedirects": true,
+              "shareCookies": false,
+              "requestCompressedContent": true
+            },
+            "metadata": {
+              "designer": {
+                "x": 900,
+                "y": 150
+              },
+              "restore": {}
+            }
+          }
+        ]
+      ]
+    }
+  ],
+  "metadata": {
+    "instant": false,
+    "version": 1,
+    "scenario": {
+      "roundtrips": 1,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "autoCommitTriggerLast": true,
+      "sequential": false,
+      "confidential": false,
+      "dataloss": false,
+      "dlq": false,
+      "freshVariables": false
+    },
+    "designer": {
+      "orphans": []
+    },
+    "zone": "eu1.make.com"
+  }
+}
