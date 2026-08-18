@@ -72,6 +72,14 @@ comparePairs(topCities).forEach(slug => {
   urls.push({ loc: `https://glo-temp.com/compare/${slug}/`, priority: '0.7', changefreq: 'weekly' });
 });
 
+// No per-page last-changed date is tracked anywhere in this stack --
+// pages are regenerated in bulk on each build regardless of whether that
+// specific city/vertical actually changed. This is honestly a build
+// timestamp, not per-page freshness data, and is applied identically to
+// every URL for that reason -- it tells a crawler "this sitemap was
+// produced at this time," nothing more specific than that.
+const BUILD_TIMESTAMP = new Date().toISOString();
+
 // Generate sitemap XML
 const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -79,6 +87,7 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${urls.map(url => `  <url>
     <loc>${url.loc}</loc>
+    <lastmod>${BUILD_TIMESTAMP}</lastmod>
     <changefreq>${url.changefreq}</changefreq>
     <priority>${url.priority}</priority>
   </url>`).join('\n')}

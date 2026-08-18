@@ -41,19 +41,38 @@ const VERTICALS = [
   { name: 'radio', label: '📻 Radio', desc: 'What is this city listening to right now?' }
 ];
 
-// Parse each city line
+// Parse each city line. lat/lon (skipping over region/timezone in between)
+// are captured for the JSON-LD geo block below -- real values already in
+// this file's own source of truth, not invented for SEO purposes.
 const cities = cityLines.map(line => {
-  const match = line.match(/\{ slug: '([^']+)', name: '([^']+)', country: '([^']+)', iso: '([^']+)'/);
+  const match = line.match(/\{ slug: '([^']+)', name: '([^']+)', country: '([^']+)', iso: '([^']+)'.*?lat: (-?[0-9.]+), lon: (-?[0-9.]+)/);
   if (!match) return null;
   return {
     slug: match[1],
     name: match[2],
     country: match[3],
-    iso: match[4]
+    iso: match[4],
+    lat: Number(match[5]),
+    lon: Number(match[6])
   };
 }).filter(Boolean);
 
 console.log(`Found ${cities.length} cities`);
+
+function escHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// JSON embedded inside a <script> tag needs its own escaping, separate
+// from escHtml: a literal "</script" substring anywhere in the JSON (a
+// city or country name could in principle contain it) would close the
+// tag early, so every "<" is escaped to its unicode form -- valid inside
+// a JSON string and never interpreted as markup.
+function escForScriptTag(jsonStr) {
+  return jsonStr.replace(/</g, '\\u003c');
+}
 
 // Generate HTML content for all verticals
 function generateVerticalNav() {
@@ -111,14 +130,34 @@ function generateVerticalSections(city) {
 }
 
 function generateCityPage(city) {
+  const title = `${city.name} | Glotemp`;
+  const desc = `Live profile of ${city.name} across all 12 dimensions. Real-time data on mood, opportunities, economy, and city vitality.`;
+  const ogDesc = `Explore what ${city.name} is like right now across all 12 dimensions.`;
+  const canonical = `https://glo-temp.com/cities/${city.slug}`;
+
+  // schema.org City, not TouristAttraction -- this page covers Tech,
+  // Finance, Work and nine other verticals, not just visiting. Only
+  // fields with a real, factual source: name/country/coordinates from
+  // this file's own cities-data.js parse above. No aggregateRating, no
+  // review count -- there is no rating data anywhere in this stack, and
+  // inventing one is exactly the kind of fabricated signal this project
+  // has consistently refused to ship.
+  const citySchema = {
+    '@context': 'https://schema.org',
+    '@type': 'City',
+    name: city.name,
+    url: canonical,
+    address: { '@type': 'PostalAddress', addressCountry: city.country },
+    geo: { '@type': 'GeoCoordinates', latitude: city.lat, longitude: city.lon },
+    description: desc,
+  };
+
   let html = template
-    .replace(/data-title-template="[^"]*"/g, `data-title-template="${city.name} | Glotemp"`)
-    .replace(/data-desc-template="[^"]*"/g, `data-desc-template="Live profile of ${city.name} across all 12 dimensions. Real-time data on mood, opportunities, economy, and city vitality."`)
-    .replace(/data-canonical-template="canonical" content="[^"]*"/g, `data-canonical-template="canonical" content="https://glo-temp.com/cities/${city.slug}"`)
-    .replace(/data-og-title-template="[^"]*"/g, `data-og-title-template="${city.name} | Glotemp"`)
-    .replace(/data-og-desc-template="[^"]*"/g, `data-og-desc-template="Explore what ${city.name} is like right now across all 12 dimensions."`)
-    .replace(/data-og-url-template="[^"]*"/g, `data-og-url-template="https://glo-temp.com/cities/${city.slug}"`)
-    .replace(/data-og-image-template="[^"]*"/g, `data-og-image-template="https://glo-temp.com/assets/city-${city.slug}.png"`);
+    .replace(/__CITY_TITLE__/g, escHtml(title))
+    .replace(/__CITY_DESC__/g, escHtml(desc))
+    .replace(/__CITY_OG_DESC__/g, escHtml(ogDesc))
+    .replace(/__CITY_CANONICAL__/g, escHtml(canonical))
+    .replace(/__CITY_SCHEMA_JSON__/g, escForScriptTag(JSON.stringify(citySchema)));
 
   // Update vertical navigation to include all 12 verticals
   html = html.replace(

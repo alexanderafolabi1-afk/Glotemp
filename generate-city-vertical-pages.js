@@ -45,7 +45,7 @@ function pageHTML(city, v) {
   <meta property="og:description" content="${v.desc}" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/cities/${city.slug}/${v.slug}/" />
-  <meta property="og:image" content="https://glo-temp.com/assets/city-${city.slug}.png" />
+  <meta property="og:image" content="https://glo-temp.com/assets/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="canonical" href="https://glo-temp.com/cities/${city.slug}/${v.slug}/" />
   <link rel="manifest" href="/manifest.json" />
