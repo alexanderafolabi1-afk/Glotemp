@@ -84,9 +84,10 @@
         longest_streak: profile.longest_streak || 0,
         total_daily_checkins: profile.total_daily_checkins || 0,
         last_daily_checkin: profile.last_daily_checkin || null,
+        reporter_tier: profile.reporter_tier || null,
       };
     } catch (_) {
-      return { current_streak: 0, longest_streak: 0, total_daily_checkins: 0 };
+      return { current_streak: 0, longest_streak: 0, total_daily_checkins: 0, reporter_tier: null };
     }
   }
 
@@ -101,8 +102,19 @@
     const btn = document.getElementById('daily-checkin-signin');
     if (btn) {
       btn.addEventListener('click', async () => {
-        const ok = await GlotempAuth.requireAuth('Sign in to begin your daily check-in ritual.');
-        if (ok) mount();
+        btn.disabled = true;
+        btn.setAttribute('aria-busy', 'true');
+        btn.classList.add('is-loading');
+        try {
+          const ok = await GlotempAuth.requireAuth('Sign in to begin your daily check-in ritual.');
+          if (ok) { await mount(); return; }
+        } finally {
+          if (btn.isConnected) {
+            btn.disabled = false;
+            btn.removeAttribute('aria-busy');
+            btn.classList.remove('is-loading');
+          }
+        }
       });
     }
   }
@@ -111,6 +123,8 @@
     const moodLabel = (MOODS.find(m => m.key === checkin.mood) || {}).label || checkin.mood;
     const streak = stats.current_streak || 0;
     const streakLine = streak === 1 ? '1 day of noticing' : streak + ' days of noticing';
+    const reporterPanel = (window.GlotempReporter && stats.reporter_tier)
+      ? GlotempReporter.panelHTML(stats.reporter_tier) : '';
     root.innerHTML = `
       <div class="daily-checkin-card daily-checkin-done">
         <p class="daily-checkin-eyebrow">Today’s pulse</p>
@@ -118,6 +132,7 @@
         <p class="daily-checkin-mood-line"><span class="daily-checkin-mood-label">${esc(moodLabel)}</span></p>
         ${checkin.note ? `<p class="daily-checkin-note-echo">“${esc(checkin.note)}”</p>` : ''}
         <p class="daily-checkin-streak">${esc(streakLine)}</p>
+        ${reporterPanel}
         <p class="daily-checkin-copy subtle">Return tomorrow. The ritual is the point.</p>
       </div>`;
   }
@@ -194,7 +209,11 @@
     const session = await GlotempAuth.getSession();
     if (!session) return;
 
-    if (submitBtn) submitBtn.disabled = true;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.setAttribute('aria-busy', 'true');
+      submitBtn.classList.add('is-loading');
+    }
     if (status) status.textContent = 'Recording…';
 
     try {
@@ -217,6 +236,13 @@
       }
       const stats = await resp.json();
       if (status) status.textContent = 'Recorded.';
+      // Announced rather than handled here, so the hero instrument (or
+      // anything else) can react without this file knowing who's
+      // listening -- same pattern as glotemp-checkin.js's own
+      // glotemp:checkin event.
+      window.dispatchEvent(new CustomEvent('glotemp:daily-checkin', {
+        detail: { mood: selectedMood, streak: stats.current_streak || 0 },
+      }));
       setTimeout(() => {
         renderAlreadyDone(
           { mood: selectedMood, note: text, checkin_date: stats.checkin_date },

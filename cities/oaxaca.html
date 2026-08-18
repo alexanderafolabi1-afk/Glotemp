@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-title-template="Oaxaca | Glotemp">City Profile | Glotemp</title>
+  <meta name="description" data-desc-template="Live profile of Oaxaca across all 12 dimensions. Real-time data on mood, opportunities, economy, and city vitality.">
+  <meta data-canonical-template="canonical" content="https://glo-temp.com/cities/oaxaca">
+  <meta property="og:title" data-og-title-template="Oaxaca | Glotemp">
+  <meta property="og:description" data-og-desc-template="Explore what Oaxaca is like right now across all 12 dimensions.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" data-og-url-template="https://glo-temp.com/cities/oaxaca">
+  <meta property="og:image" data-og-image-template="https://glo-temp.com/assets/city-oaxaca.png">
+  <meta name="theme-color" content="#06060A">
+
+  <!-- Structured data (rendered by app.js) -->
+  <script type="application/ld+json" id="city-schema"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&family=Fredoka:wght@400..600&family=Baloo+2:wght@400..600&family=Quicksand:wght@400..600&family=Comfortaa:wght@400..600&family=Varela+Round&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css?v=57">
+  <script src="/glotemp-analytics.js" defer></script>
+</head>
+<body>
+  <nav id="site-nav"></nav>
+<script src="/nav-component.js"></script>
+
+  <main class="page-content">
+    <section class="city-header glass-card">
+      <div class="city-header-photo" id="city-header-photo" aria-hidden="true">
+        <img id="city-header-photo-img" alt="" decoding="async">
+      </div>
+      <div class="city-header-content">
+        <p class="city-live-badge checkin-live-eyebrow live-mark">Live</p>
+        <h1 id="city-name"></h1>
+        <p id="city-country-region"></p>
+        <div class="city-meta">
+          <span id="city-timezone"></span>
+          <span id="city-penetration"></span>
+          <span id="city-metro-pop"></span>
+        </div>
+        <p class="conditions-line" id="conditions-line" aria-live="polite"></p>
+        <div class="city-action-row">
+          <button id="watch-city-btn" class="btn-neon" type="button">Follow this city</button>
+          <button id="share-city-btn" class="btn-neon" type="button" style="--btn-band: var(--band-restrained);">Share</button>
+        </div>
+        <div id="watch-email-panel" class="watch-email-panel" style="display:none;">
+          <label for="watch-email-input">Get notified when this city changes band or enters a top ten.</label>
+          <div class="watch-email-row">
+            <input type="email" id="watch-email-input" placeholder="you@example.com" required>
+            <button id="watch-email-submit" class="btn-neon" type="button">Notify me</button>
+          </div>
+          <p id="watch-email-status" class="inline-feedback"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- City reading: given the first, most prominent placement on the
+         page -- right after the hero, before anything else.
+         glotemp-checkin.js finds #city-observation-feed by id regardless
+         of where it sits in the DOM, so moving it here is safe; it
+         replaces this section's contents with the live composer (or,
+         signed out, a sign-in prompt) and the recent readings list. -->
+    <section class="glass-card city-feed-section checkin-hero-section">
+      <h2>City reading</h2>
+      <p class="vertical-description">How this city feels right now.</p>
+      <div id="city-observation-feed" class="vertical-content"></div>
+    </section>
+
+    <section class="glass-card city-affiliate-row">
+      <p class="eyebrow">Plan your visit</p>
+      <div class="affiliate-links" id="city-affiliate-links"></div>
+    </section>
+
+    <!-- Live from Wikipedia: fetched client-side on load, never stored --
+         see city-wiki.js. One general-knowledge summary per city; Wikipedia
+         has no per-vertical breakdown to source Tech/Finance/etc. from. -->
+    <section class="glass-card city-wiki-section">
+      <p class="eyebrow">About this city</p>
+      <div id="city-wiki-panel" class="city-wiki-panel"></div>
+    </section>
+
+    <!-- Vertical Navigation -->
+    <div class="vertical-nav glass-card">
+      <a href="#pulse" class="vertical-link" data-vertical="pulse">💓 Pulse</a>
+      <a href="#tech" class="vertical-link" data-vertical="tech">💻 Tech</a>
+      <a href="#finance" class="vertical-link" data-vertical="finance">💰 Finance</a>
+      <a href="#work" class="vertical-link" data-vertical="work">💼 Work</a>
+      <a href="#property" class="vertical-link" data-vertical="property">🏠 Property</a>
+      <a href="#education" class="vertical-link" data-vertical="education">🎓 Education</a>
+      <a href="#sport" class="vertical-link" data-vertical="sport">⚽ Sport</a>
+      <a href="#entertainment" class="vertical-link" data-vertical="entertainment">🎭 Entertainment</a>
+      <a href="#fashion" class="vertical-link" data-vertical="fashion">👗 Fashion</a>
+      <a href="#food" class="vertical-link" data-vertical="food">🍽️ Food</a>
+      <a href="#health" class="vertical-link" data-vertical="health">🩺 Health</a>
+      <a href="#transport" class="vertical-link" data-vertical="transport">🚇 Transport</a>
+      <a href="#radio" class="vertical-link" data-vertical="radio">📻 Radio</a>
+    </div>
+
+    
+    <section id="city-news" class="vertical-section glass-card">
+      <div class="vertical-body">
+        <h2 class="news-heading">In the papers today</h2>
+        <div id="news-content"></div>
+      </div>
+    </section>
+
+    <!-- 💓 Pulse Vertical -->
+    <details id="pulse" class="vertical-section glass-card" open>
+      <summary class="vertical-summary"><h2>💓 Pulse</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">How does this city feel right now?</p>
+        <div id="pulse-content" class="vertical-content"></div>
+        
+        <div id="pulse-context" class="vertical-context"></div>
+        
+        
+        <div id="city-credit-pulse"></div>
+      </div>
+    </details>
+  
+
+    <!-- 💻 Tech Vertical -->
+    <details id="tech" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>💻 Tech</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Should I build or work here?</p>
+        <div id="tech-content" class="vertical-content"></div>
+        
+        <div id="tech-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="oaxaca" data-vertical="tech"></div>
+        <div id="city-credit-tech"></div>
+      </div>
+    </details>
+  
+
+    <!-- 💰 Finance Vertical -->
+    <details id="finance" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>💰 Finance</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Should I invest or trade here?</p>
+        <div id="finance-content" class="vertical-content"></div>
+        
+        <div id="finance-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="oaxaca" data-vertical="finance"></div>
+        <div id="city-credit-finance"></div>
+      </div>
+    </details>
+  
+
+    <!-- 💼 Work Vertical -->
+    <details id="work" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>💼 Work</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Where should you work and live?</p>
+        <div id="work-content" class="vertical-content"></div>
+        
+        <div id="work-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="oaxaca" data-vertical="work"></div>
+        <div id="city-credit-work"></div>
+      </div>
+    </details>
+  
+
+    <!-- 🏠 Property Vertical -->
+    <details id="property" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>🏠 Property</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Where should you invest in real estate?</p>
+        <div id="property-content" class="vertical-content"></div>
+        
+        <div id="property-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="oaxaca" data-vertical="property"></div>
+        <div id="city-credit-property"></div>
+      </div>
+    </details>
+  
+
+    <!-- 🎓 Education Vertical -->
+    <details id="education" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>🎓 Education</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Where should you study?</p>
+        <div id="education-content" class="vertical-content"></div>
+        
+        <div id="education-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="oaxaca" data-vertical="education"></div>
+        <div id="city-credit-education"></div>
+      </div>
+    </details>
+  
+
+    <!-- ⚽ Sport Vertical -->
+    <details id="sport" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>⚽ Sport</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Where should you play and watch sports?</p>
+        <div id="sport-content" class="vertical-content"></div>
+        
+        <div id="sport-context" class="vertical-context"></div>
+        <div id="sport-live" class="sport-live" data-city="oaxaca" data-city-name="Oaxaca" data-country="Mexico"></div>
+        
+        <div id="city-credit-sport"></div>
+      </div>
+    </details>
+  
+
+    <!-- 🎭 Entertainment Vertical -->
+    <details id="entertainment" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>🎭 Entertainment</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Where should you experience culture and nightlife?</p>
+        <div id="entertainment-content" class="vertical-content"></div>
+        <div id="entertainment-music"></div>
+        
+        <div id="entertainment-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="oaxaca" data-vertical="entertainment"></div>
+        <div id="city-credit-entertainment"></div>
+      </div>
+    </details>
+  
+
+    <!-- 👗 Fashion Vertical -->
+    <details id="fashion" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>👗 Fashion</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Where is the center of global style?</p>
+        <div id="fashion-content" class="vertical-content"></div>
+        
+        <div id="fashion-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="oaxaca" data-vertical="fashion"></div>
+        <div id="city-credit-fashion"></div>
+      </div>
+    </details>
+  
+
+    <!-- 🍽️ Food Vertical -->
+    <details id="food" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>🍽️ Food</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Where should you eat and explore cuisine?</p>
+        <div id="food-content" class="vertical-content"></div>
+        <div id="food-venues" class="vertical-venues"></div>
+        <div id="food-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="oaxaca" data-vertical="food"></div>
+        <div id="city-credit-food"></div>
+      </div>
+    </details>
+  
+
+    <!-- 🩺 Health Vertical -->
+    <details id="health" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>🩺 Health</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Where is it healthiest to live?</p>
+        <div id="health-content" class="vertical-content"></div>
+        
+        <div id="health-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="oaxaca" data-vertical="health"></div>
+        <div id="city-credit-health"></div>
+      </div>
+    </details>
+  
+
+    <!-- 🚇 Transport Vertical -->
+    <details id="transport" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>🚇 Transport</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">Which cities have the best mobility?</p>
+        <div id="transport-content" class="vertical-content"></div>
+        
+        <div id="transport-context" class="vertical-context"></div>
+        
+        <div class="vertical-listings" data-city="oaxaca" data-vertical="transport"></div>
+        <div id="city-credit-transport"></div>
+      </div>
+    </details>
+  
+
+    <!-- 📻 Radio Vertical -->
+    <details id="radio" class="vertical-section glass-card">
+      <summary class="vertical-summary"><h2>📻 Radio</h2></summary>
+      <div class="vertical-body">
+        <p class="vertical-description">What is this city listening to right now?</p>
+        <div id="radio-content" class="vertical-content"></div>
+        
+        <div id="radio-context" class="vertical-context"></div>
+        
+        
+        <div id="city-credit-radio"></div>
+      </div>
+    </details>
+  
+    <!-- Compare Section -->
+    <section class="compare-section glass-card">
+      <h2 data-i18n="compare_title">Compare with Another City</h2>
+      <select id="compare-city-select" class="filter-select"></select>
+    </section>
+
+  </main>
+
+  <footer class="footer glass-card">
+    <div class="footer-content">
+      <p class="small-print" data-i18n="footer_copyright">&copy; 2026 Glotemp. Live city intelligence.</p>
+      <p class="small-print"><a href="mailto:info@glo-temp.com" class="contact-link">info@glo-temp.com</a></p>
+      <p class="small-print"><a href="mailto:marketing@glo-temp.com?subject=Sponsoring%20a%20city" class="contact-link">Sponsor a city's reading</a></p>
+    </div>
+    <p class="small-print footer-lang-row">
+      <button type="button" id="lang-switch" class="footer-lang">Language</button>
+    </p>
+  </footer>
+
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
+  <script src="/city-landmarks.js"></script>
+  <script src="/city-landmark-photos.js"></script>
+  <script src="/glotemp-auth.js"></script>
+  <script src="/glotemp-verify.js"></script>
+  <script src="/glotemp-reporter.js"></script>
+  <script src="/glotemp-checkin.js"></script>
+  <script src="/glotemp-tonight.js"></script>
+  <script src="/glotemp-features.js"></script>
+  <script src="/glotemp-listings.js" defer></script>
+  <script src="/glotemp-credits.js" defer></script>
+  <script src="/city-sports-data.js" defer></script>
+  <script src="/glotemp-sports.js" defer></script>
+  <script src="/city-trivia-data.js" defer></script>
+  <script src="/glotemp-personality.js" defer></script>
+  <script src="/city-wiki.js" defer></script>
+  <script src="/city-header-photo.js" defer></script>
+  <script src="/city-food-signature.js" defer></script>
+  <script src="/city-vertical-signature.js" defer></script>
+  <script src="/city-worldbank.js" defer></script>
+  <script src="/city-radio-curated.js" defer></script>
+  <script src="/city-radio.js" defer></script>
+  <script src="/city-venues.js" defer></script>
+  <script src="/city-news.js" defer></script>
+  <script src="/glotemp-music.js" defer></script>
+  <script src="/city-conditions.js" defer></script>
+  <script src="/verticals-accordion.js" defer></script>
+  <script src="/verticals-engine.js" defer></script>
+  
+  <script>
+    // Reasonable ceiling per metric, used only to normalise how much of
+    // the instrument's arc is filled -- purely a presentation choice,
+    // never written back and never changes the stored reading. Derived
+    // from the real observed range of each metric in production.
+    const METRIC_MAX = {
+      mood_reading: 10, event_energy: 10,
+      developer_activity: 3000, job_openings: 500, startup_activity: 50,
+      cost_of_living: 200, currency_strength: 10, inflation_rate: 10,
+      remote_work_adoption: 80, salary_competitiveness: 100, work_culture_score: 10,
+      housing_availability: 80, median_rent: 3000, property_appreciation: 10,
+      education_quality_score: 10, international_students: 50, university_count: 50,
+      active_participation: 80, major_events: 12, sports_venues: 110,
+      event_frequency: 250, nightlife_score: 10, venue_count: 330,
+      designer_brands: 110, fashion_events: 10, style_influence: 10,
+      culinary_diversity: 10, michelin_stars: 50, restaurant_count: 2100,
+      air_quality_index: 200, hospital_quality: 10, wellness_index: 10,
+      bike_share_bikes: 4700, congestion_level: 10, transit_quality: 10,
+    };
+    const METRIC_MAX_FALLBACK = 10;
+
+    // One quiet accent per vertical (not per metric) -- desaturated,
+    // brass-family tones so every instrument still reads as one
+    // consistent set of dials, not a rainbow of dashboard widgets.
+    const VERTICAL_ACCENT = {
+      pulse: '198,140,150', tech: '110,140,180', finance: '120,160,130',
+      work: '150,130,180', property: '190,150,100', education: '120,130,180',
+      sport: '190,130,100', entertainment: '160,110,150', fashion: '190,140,150',
+      food: '190,140,90', health: '100,160,150', transport: '110,130,160',
+    };
+
+    // Same circular-instrument language as /explore's city dials: an
+    // ivory face, a brass hairline ring, a coloured reading arc, and rim
+    // ticks -- filled here by confidence rather than coverage. No hour
+    // hand (there's no time to tell); the rounded value sits as HTML text
+    // over the centre instead, so it shares the page's own font stack
+    // rather than being drawn as SVG text.
+    const INS_CX = 48, INS_CY = 48, INS_R_FACE = 32, INS_R_ARC = 37, INS_R_TICK_IN = 40, INS_R_TICK_OUT = 43;
+    const INS_ARC_CIRC = 2 * Math.PI * INS_R_ARC;
+
+    function instrumentTicksSVG(confidence) {
+      const filled = typeof confidence === 'number' ? Math.round(confidence * 12) : 0;
+      let out = '';
+      for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * 360 - 90;
+        const rad = (angle * Math.PI) / 180;
+        const x1 = INS_CX + INS_R_TICK_IN * Math.cos(rad);
+        const y1 = INS_CY + INS_R_TICK_IN * Math.sin(rad);
+        const x2 = INS_CX + INS_R_TICK_OUT * Math.cos(rad);
+        const y2 = INS_CY + INS_R_TICK_OUT * Math.sin(rad);
+        const on = i < filled;
+        out += `<line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" stroke="${on ? 'var(--sand)' : 'var(--brass-dim)'}" stroke-width="${on ? 1.4 : 0.9}" stroke-linecap="round" />`;
+      }
+      return out;
+    }
+
+    function instrumentSVG(value, max, accentRgb, confidence, ariaLabel) {
+      const frac = value === null ? 0 : Math.max(0, Math.min(1, value / max));
+      const arcLen = INS_ARC_CIRC * frac;
+      return `<svg viewBox="0 0 96 96" role="img" aria-label="${(ariaLabel || '').replace(/"/g, '&quot;')}">
+        <g>${instrumentTicksSVG(confidence)}</g>
+        <circle cx="${INS_CX}" cy="${INS_CY}" r="${INS_R_FACE}" fill="#F0E0C8" />
+        <circle cx="${INS_CX}" cy="${INS_CY}" r="${INS_R_FACE}" fill="none" stroke="var(--brass)" stroke-width="1" />
+        <circle cx="${INS_CX}" cy="${INS_CY}" r="${INS_R_ARC}" fill="none" stroke="rgb(${accentRgb})"
+          stroke-width="2.5" stroke-linecap="round"
+          stroke-dasharray="${arcLen.toFixed(2)} ${(INS_ARC_CIRC - arcLen).toFixed(2)}"
+          transform="rotate(-90 ${INS_CX} ${INS_CY})" />
+      </svg>`;
+    }
+
+    // Keeps the centred readout short enough to sit cleanly inside the dial:
+    // whole numbers (developer_activity, job_openings, etc.) drop the decimal
+    // entirely, small-scale metrics (scores out of 10, percentages) keep at
+    // most one.
+    function formatInstrumentValue(value) {
+      const num = Number(value);
+      const rounded = Math.abs(num) >= 100 ? Math.round(num) : Math.round(num * 10) / 10;
+      return rounded.toString();
+    }
+
+    // Load city data and populate verticals
+    async function loadCityData() {
+      const citySlug = 'oaxaca';
+      const city = window.CITIES_DATA.find(c => c.slug === citySlug);
+
+      if (city) {
+        const nameEl = document.getElementById('city-name');
+        if (typeof GlotempLandmarks !== 'undefined') {
+          nameEl.innerHTML = GlotempLandmarks.cityIconHTML(city.slug, { size: 34, className: 'city-landmark-icon' }) + `<span>${city.name}</span>`;
+          if (typeof GlotempLandmarkPhotos !== 'undefined') GlotempLandmarkPhotos.upgrade(nameEl, city.slug, 34);
+        } else {
+          nameEl.textContent = city.name;
+        }
+        document.getElementById('city-country-region').textContent = `${city.country} • ${city.region}`;
+        document.getElementById('city-timezone').textContent = `📍 ${city.timezone}`;
+        document.getElementById('city-penetration').textContent = `📡 ${(city.penetration * 100).toFixed(0)}% online`;
+        document.getElementById('city-metro-pop').textContent = `👥 ${city.metro_pop.toLocaleString()} metro`;
+        if (typeof GlotempCore !== 'undefined') GlotempCore.applyMoodBackground(city.mood);
+      }
+
+      const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
+
+      // Header photo: kicked off first so it's the earliest possible
+      // trigger of the shared Wikipedia summary fetch (see city-wiki.js
+      // getCityImageUrl / city-header-photo.js) -- whichever of this or
+      // loadCityWiki below actually wins the race is the only network
+      // call; the other reuses its cached promise.
+      if (typeof GlotempHeaderPhoto !== 'undefined' && city) {
+        GlotempHeaderPhoto.loadHeaderPhoto(city.name, city.country);
+      }
+
+      if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('Oaxaca', 'Mexico');
+
+      // Synchronous and static, so it's always in the DOM before any of
+      // the async context loaders below append their own findings --
+      // reads as the headline fact for Food, with Wikipedia's Cuisine
+      // excerpt (if this city's article has one) as supplementary depth
+      // underneath it.
+      if (typeof GlotempFoodSignature !== 'undefined') GlotempFoodSignature.render('oaxaca');
+
+      // Wikipedia section-matching and World Bank indicators both get a
+      // turn per vertical; whatever's still empty afterward -- Fashion
+      // and Pulse always are, since neither has a real per-vertical
+      // source -- falls back to the general Wikipedia summary so no
+      // vertical ever renders completely empty.
+      const contextLoaders = [];
+      if (typeof GlotempWiki !== 'undefined') {
+        contextLoaders.push(GlotempWiki.loadAllVerticalContexts('Oaxaca', 'Mexico', verticalSlugs));
+      }
+      if (typeof GlotempWorldBank !== 'undefined') {
+        contextLoaders.push(...verticalSlugs.map(v => GlotempWorldBank.loadVerticalIndicator('MX', v, 'Mexico')));
+      }
+      await Promise.all(contextLoaders);
+      if (typeof GlotempWiki !== 'undefined') {
+        await GlotempWiki.fillEmptyVerticalContexts('Oaxaca', 'Mexico', verticalSlugs);
+      }
+
+      // Radio is its own live source (Radio Browser, searched by this
+      // city's real coordinates) -- not a Supabase reading, so it's kept
+      // out of verticalSlugs above and loaded separately here.
+      if (typeof GlotempRadio !== 'undefined' && city) {
+        GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country, city.slug);
+      }
+
+      // Real named places from OpenStreetMap. Same treatment as Radio:
+      // a live keyless source, not a Supabase reading.
+      if (typeof GlotempVenues !== 'undefined' && city) {
+        GlotempVenues.loadVenues(city.slug, city.name, city.lat, city.lon, city.country);
+      }
+
+      // What the local press is reporting, in the languages it is
+      // reported in. Live and keyless (routed through the city-news edge
+      // function server-side, since GDELT itself sends no CORS header),
+      // same treatment as Radio and Venues above.
+      if (typeof GlotempNews !== 'undefined' && city) {
+        GlotempNews.loadNews(city.slug, 'news-content');
+      }
+
+      // The music layer. Reads only stored data, so this makes no
+      // third-party call and cannot slow the page down.
+      if (typeof GlotempMusic !== 'undefined' && city) {
+        GlotempMusic.mount(city.slug, city.name);
+      }
+
+      // Conditions line: same treatment as Radio -- a live free-API
+      // source, not a Supabase reading.
+      if (typeof GlotempConditions !== 'undefined' && city) {
+        GlotempConditions.loadConditions(city.name, city.lat, city.lon, city.timezone);
+      }
+
+      // Sponsor credit per vertical section -- "Supported by X", a paid,
+      // curated slot sold directly (partners table, RLS already limits
+      // the anon read to active rows in their flight window). This is a
+      // different thing from the public "suggest a place" pathway above:
+      // a passive credit line, not an open call for submissions, which is
+      // exactly why it's fine on every vertical including Sport (a real
+      // brand can sponsor the Sport section; the public can't usefully
+      // "suggest a sports company" the way they can suggest a restaurant).
+      // Previously wired into the standalone per-vertical pages only --
+      // never the main city page, its highest-traffic page type.
+      if (typeof GlotempCredits !== 'undefined' && city) {
+        [...verticalSlugs, 'radio'].forEach(v => GlotempCredits.mount('city-credit-' + v, city.slug, v));
+      }
+
+      for (const vertical of verticalSlugs) {
+        const contentEl = document.getElementById(`${vertical}-content`);
+        try {
+          const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/readings?city_slug=eq.${citySlug}&vertical=eq.${vertical}&order=fetched_at.desc&limit=50`,
+            {
+              headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Accept': 'application/json'
+              }
+            }
+          );
+
+          if (!response.ok) {
+            contentEl.innerHTML = '';
+            if (typeof GlotempVerticalSignature !== 'undefined' && city) GlotempVerticalSignature.renderFallback(vertical, city);
+            if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
+            continue;
+          }
+
+          const readings = await response.json();
+          if (!readings.length) {
+            contentEl.innerHTML = '';
+            if (typeof GlotempVerticalSignature !== 'undefined' && city) GlotempVerticalSignature.renderFallback(vertical, city);
+            if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
+            continue;
+          }
+
+          const accentRgb = VERTICAL_ACCENT[vertical] || '176,141,87';
+          const content = readings.slice(0, 10).map(reading => {
+            const max = METRIC_MAX[reading.metric] || METRIC_MAX_FALLBACK;
+            const shownValue = reading.value !== null && reading.value !== undefined ? formatInstrumentValue(reading.value) : null;
+            const confidenceNote = typeof reading.confidence === 'number' ? `${Math.round(reading.confidence * 100)}% confidence` : '';
+            const ariaLabel = `${reading.label || 'Reading'}: ${shownValue !== null ? shownValue : 'n/a'}`;
+            const valueClass = shownValue !== null && shownValue.length > 3 ? 'instrument-value instrument-value-compact' : 'instrument-value';
+            return `
+            <div class="instrument" ${confidenceNote ? `title="${confidenceNote}"` : ''}>
+              <div class="instrument-dial">
+                ${instrumentSVG(reading.value, max, accentRgb, reading.confidence, ariaLabel)}
+                ${shownValue !== null ? `<span class="${valueClass}">${shownValue}</span>` : ''}
+              </div>
+              <span class="instrument-label">${reading.label || ''}</span>
+              <time class="instrument-time" datetime="${reading.fetched_at}">${verticals.getTimeAgo(new Date(reading.fetched_at))}</time>
+            </div>
+          `;
+          }).join('');
+
+          contentEl.innerHTML = content;
+        } catch (error) {
+          console.error(`Error loading ${vertical} data:`, error);
+          contentEl.innerHTML = '';
+          if (typeof GlotempVerticalSignature !== 'undefined' && city) GlotempVerticalSignature.renderFallback(vertical, city);
+          if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
+        }
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadCityData);
+    } else {
+      loadCityData();
+    }
+
+    // ---- Affiliate row ----
+    (function renderAffiliateLinks() {
+      const container = document.getElementById('city-affiliate-links');
+      if (!container) return;
+      const cityName = encodeURIComponent('Oaxaca');
+      container.innerHTML = `
+        <a href="https://www.booking.com/searchresults.html?ss=${cityName}" target="_blank" rel="noopener noreferrer" class="affiliate-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18V7M3 12h13a4 4 0 014 4v2M3 18h18"/><circle cx="7.5" cy="9.5" r="1.6"/></svg>
+          <span>Stay in Oaxaca</span>
+        </a>
+        <a href="https://www.kayak.com/cars/${cityName}" target="_blank" rel="noopener noreferrer" class="affiliate-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11l1.4-4.2A2 2 0 018.3 5.5h7.4a2 2 0 011.9 1.3L19 11M4 11h16v4.5a1 1 0 01-1 1h-1a1 1 0 01-1-1V15H7v.5a1 1 0 01-1 1H5a1 1 0 01-1-1V11z"/><circle cx="7.5" cy="15.5" r="1.2"/><circle cx="16.5" cy="15.5" r="1.2"/></svg>
+          <span>Rent a Car in Oaxaca</span>
+        </a>
+        <a href="https://www.getyourguide.com/s/?q=${cityName}" target="_blank" rel="noopener noreferrer" class="affiliate-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M14.8 9.2L10.3 14l1-4.8 4.5-1z"/></svg>
+          <span>Things to Do in Oaxaca</span>
+        </a>
+        <a href="https://www.opentable.com/" target="_blank" rel="noopener noreferrer" class="affiliate-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v8a2 2 0 002 2h0a2 2 0 002-2V3M7 13v8M17 3c-1.7 0-2.5 2-2.5 4.5S15.3 12 17 12v9"/></svg>
+          <span>Reserve a Table</span>
+        </a>
+        <a href="https://www.skyscanner.net/transport/flights/anywhere/${cityName}/" target="_blank" rel="noopener noreferrer" class="affiliate-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.2 3.3a1.6 1.6 0 013.1 0l1.5 5.4 6.1 1.8a1.2 1.2 0 010 2.3l-6.1 1.8-1.5 5.4a1.6 1.6 0 01-3.1 0l-1.5-5.4-6.1-1.8a1.2 1.2 0 010-2.3l6.1-1.8z"/></svg>
+          <span>Flights to Oaxaca</span>
+        </a>
+        <a href="https://www.insuremytrip.com/" target="_blank" rel="noopener noreferrer" class="affiliate-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+          <span>Travel Insurance</span>
+        </a>
+      `;
+    })();
+
+    // ---- Follow this city ----
+    (function wireWatch() {
+      const btn = document.getElementById('watch-city-btn');
+      const panel = document.getElementById('watch-email-panel');
+      const emailInput = document.getElementById('watch-email-input');
+      const submitBtn = document.getElementById('watch-email-submit');
+      const statusEl = document.getElementById('watch-email-status');
+      if (!btn || typeof GlotempCore === 'undefined') return;
+      const citySlug = 'oaxaca';
+
+      function refreshLabel() {
+        btn.textContent = GlotempCore.isWatched(citySlug) ? 'Following this city ✓' : 'Follow this city';
+      }
+      refreshLabel();
+
+      btn.addEventListener('click', () => {
+        const nowWatching = GlotempCore.toggleWatch(citySlug);
+        refreshLabel();
+        if (panel) panel.style.display = nowWatching ? 'block' : 'none';
+      });
+
+      if (submitBtn && emailInput) {
+        submitBtn.addEventListener('click', async () => {
+          const email = emailInput.value.trim();
+          if (!email || !email.includes('@')) {
+            statusEl.textContent = 'Enter a valid email.';
+            return;
+          }
+          submitBtn.disabled = true;
+          try {
+            await fetch(`${SUPABASE_URL}/rest/v1/city_watchers`, {
+              method: 'POST',
+              headers: {
+                apikey: SUPABASE_ANON_KEY,
+                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                Prefer: 'return=minimal',
+              },
+              body: JSON.stringify({ city_slug: citySlug, email }),
+            });
+            statusEl.textContent = "You're on the list -- we'll notify " + email + '.';
+            emailInput.value = '';
+          } catch (e) {
+            statusEl.textContent = "Saved locally -- we'll sync this once you're back online.";
+          }
+          submitBtn.disabled = false;
+        });
+      }
+    })();
+
+    // ---- Share ----
+    (function wireShare() {
+      const btn = document.getElementById('share-city-btn');
+      if (!btn) return;
+      btn.addEventListener('click', async () => {
+        const cityRec = window.CITIES_DATA.find(c => c.slug === 'oaxaca');
+        const band = cityRec ? GlotempCore.moodToBand(cityRec.mood) : null;
+        const text = cityRec && band
+          ? `${cityRec.name} is reading ${band.band} right now (${cityRec.mood.toFixed(1)}/10) on Glotemp.`
+          : 'Check out this city on Glotemp.';
+        const url = window.location.href;
+        if (navigator.share) {
+          try { await navigator.share({ title: 'Glotemp', text, url }); } catch (e) { /* user cancelled */ }
+        } else if (navigator.clipboard) {
+          await navigator.clipboard.writeText(`${text} ${url}`);
+          const original = btn.textContent;
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.textContent = original; }, 2000);
+        }
+      });
+    })();
+
+    // The static seed-data flash into #city-observation-feed and the
+    // separate, entirely broken #city-comment-section widget (its INSERT
+    // payload named columns -- city_slug, text, mood_emoji, user_id,
+    // stars_awarded -- that don't exist on any live table, so every "Post
+    // Comment" click 400'd silently) both used to live here.
+    // glotemp-checkin.js now owns the whole check-in + comment experience
+    // for #city-observation-feed; #city-comment-section and its markup are
+    // removed from the template.
+  </script>
+  
+  <script src="/app.js" defer></script>
+  <script src="/cookie-consent.js" defer></script>
+</body>
+</html>

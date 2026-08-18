@@ -69,7 +69,7 @@
         <div class="hero-copy">
           <div class="eclipse-note" id="eclipse-note" hidden></div>
           <h1 class="hero-headline">Know how a city feels before you go.</h1>
-          <p class="hero-subhead">Live readings across 151 cities.</p>
+          <p class="hero-subhead">Live readings across 300 cities.</p>
           <form class="hero-search" id="hero-city-search" role="search">
             <input type="text" id="hero-city-input" class="hero-search-input" list="hero-city-list"
                    placeholder="Search a city" autocomplete="off" aria-label="Search a city">
@@ -85,9 +85,19 @@
             <img class="hero-instrument-base" src="/assets/instrument-base.png" alt="" aria-hidden="true" width="1024" height="1024">
             <svg class="hero-instrument-live" id="hero-instrument-live" viewBox="0 0 1024 1024" aria-hidden="true"></svg>
             <div class="hero-instrument-weather" id="hero-instrument-weather" aria-hidden="true"></div>
+            <!-- Full-housing weather layer (rings + edges, not just the
+                 aperture) -- snow accumulation, frost sheen, sun glints,
+                 night stars. See glotemp-hero-instrument.js. -->
+            <div class="hero-instrument-surface" id="hero-instrument-surface" aria-hidden="true"></div>
+            <!-- Click-reward particle bursts and the daily check-in
+                 acknowledgment bloom render into this layer. -->
+            <div class="hero-burst-layer" id="hero-burst-layer" aria-hidden="true"></div>
+            <span class="hero-founding-mark" id="hero-founding-mark" aria-hidden="true" hidden>&#9670;</span>
           </div>
         </div>
       </div>
+      <p class="hero-pulse-spark" id="hero-pulse-spark" role="status" aria-live="polite"></p>
+      <button type="button" class="hero-sound-toggle" id="hero-sound-toggle" aria-pressed="false" aria-label="Turn on instrument sound" title="Instrument sound: off">&#128263;</button>
     </section>
 
     <!-- Spin: most prominent interactive element on the page -->
@@ -100,6 +110,12 @@
     <!-- Daily check-in ritual. Populated by glotemp-daily-checkin.js. -->
     <section class="daily-checkin-section" aria-label="Daily check-in">
       <div id="daily-checkin-root"></div>
+    </section>
+
+    <!-- Home Frequency: a private daily letter from one kept city.
+         Populated by glotemp-home-frequency.js. -->
+    <section class="hf-section" aria-label="Home Frequency">
+      <div id="home-frequency-root"></div>
     </section>
 
     <!-- Hero City Pulse -->
@@ -228,7 +244,7 @@
            #city-select and dispatch its change event, which is what app.js
            already listens for. See city-tiles.js. -->
       <div id="city-tiles" class="city-tiles" role="group" aria-label="Choose a city to read"></div>
-      <p class="city-tiles-hint">Live readings across 151 cities. Choose one, then add yours.</p>
+      <p class="city-tiles-hint">Live readings across 300 cities. Choose one, then add yours.</p>
 
       <div class="mood-buttons" role="group" aria-label="How does your city feel right now?">
         <button class="mood-btn" data-mood="🔥" data-band="charged"     data-label="Energized" title="Energized"><span class="mood-btn-icon" aria-hidden="true">🔥</span><span class="mood-btn-label">Energized</span></button>
@@ -321,12 +337,17 @@
   <script src="/glotemp-hero-instrument.js" defer></script>
   <script src="/eclipse-2026.js" defer></script>
   <script src="/city-tiles.js" defer></script>
+  <script src="/city-radio-curated.js" defer></script>
   <script src="/city-radio.js" defer></script>
   <script src="/city-news.js" defer></script>
+  <script src="/city-of-the-day.js" defer></script>
+  <script src="/city-of-day-photos.js" defer></script>
   <script src="/glotemp-elsewhere.js" defer></script>
   <script src="/app.js?v=58" defer></script>
   <script src="/glotemp-auth.js" defer></script>
+  <script src="/glotemp-reporter.js" defer></script>
   <script src="/glotemp-daily-checkin.js" defer></script>
+  <script src="/glotemp-home-frequency.js" defer></script>
   <script src="/tempo-economy.js" defer></script>
   <script src="/cookie-consent.js" defer></script>
   <script defer>

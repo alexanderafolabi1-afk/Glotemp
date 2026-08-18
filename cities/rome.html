@@ -100,7 +100,6 @@
     </div>
 
     
-    <!-- 💓 Pulse Vertical -->
     <section id="city-news" class="vertical-section glass-card">
       <div class="vertical-body">
         <h2 class="news-heading">In the papers today</h2>
@@ -108,11 +107,13 @@
       </div>
     </section>
 
+    <!-- 💓 Pulse Vertical -->
     <details id="pulse" class="vertical-section glass-card" open>
       <summary class="vertical-summary"><h2>💓 Pulse</h2></summary>
       <div class="vertical-body">
         <p class="vertical-description">How does this city feel right now?</p>
         <div id="pulse-content" class="vertical-content"></div>
+        
         <div id="pulse-context" class="vertical-context"></div>
         
         
@@ -127,6 +128,7 @@
       <div class="vertical-body">
         <p class="vertical-description">Should I build or work here?</p>
         <div id="tech-content" class="vertical-content"></div>
+        
         <div id="tech-context" class="vertical-context"></div>
         
         <div class="vertical-listings" data-city="rome" data-vertical="tech"></div>
@@ -141,6 +143,7 @@
       <div class="vertical-body">
         <p class="vertical-description">Should I invest or trade here?</p>
         <div id="finance-content" class="vertical-content"></div>
+        
         <div id="finance-context" class="vertical-context"></div>
         
         <div class="vertical-listings" data-city="rome" data-vertical="finance"></div>
@@ -155,6 +158,7 @@
       <div class="vertical-body">
         <p class="vertical-description">Where should you work and live?</p>
         <div id="work-content" class="vertical-content"></div>
+        
         <div id="work-context" class="vertical-context"></div>
         
         <div class="vertical-listings" data-city="rome" data-vertical="work"></div>
@@ -169,6 +173,7 @@
       <div class="vertical-body">
         <p class="vertical-description">Where should you invest in real estate?</p>
         <div id="property-content" class="vertical-content"></div>
+        
         <div id="property-context" class="vertical-context"></div>
         
         <div class="vertical-listings" data-city="rome" data-vertical="property"></div>
@@ -183,6 +188,7 @@
       <div class="vertical-body">
         <p class="vertical-description">Where should you study?</p>
         <div id="education-content" class="vertical-content"></div>
+        
         <div id="education-context" class="vertical-context"></div>
         
         <div class="vertical-listings" data-city="rome" data-vertical="education"></div>
@@ -197,6 +203,7 @@
       <div class="vertical-body">
         <p class="vertical-description">Where should you play and watch sports?</p>
         <div id="sport-content" class="vertical-content"></div>
+        
         <div id="sport-context" class="vertical-context"></div>
         <div id="sport-live" class="sport-live" data-city="rome" data-city-name="Rome" data-country="Italy"></div>
         
@@ -212,6 +219,7 @@
         <p class="vertical-description">Where should you experience culture and nightlife?</p>
         <div id="entertainment-content" class="vertical-content"></div>
         <div id="entertainment-music"></div>
+        
         <div id="entertainment-context" class="vertical-context"></div>
         
         <div class="vertical-listings" data-city="rome" data-vertical="entertainment"></div>
@@ -226,6 +234,7 @@
       <div class="vertical-body">
         <p class="vertical-description">Where is the center of global style?</p>
         <div id="fashion-content" class="vertical-content"></div>
+        
         <div id="fashion-context" class="vertical-context"></div>
         
         <div class="vertical-listings" data-city="rome" data-vertical="fashion"></div>
@@ -255,6 +264,7 @@
       <div class="vertical-body">
         <p class="vertical-description">Where is it healthiest to live?</p>
         <div id="health-content" class="vertical-content"></div>
+        
         <div id="health-context" class="vertical-context"></div>
         
         <div class="vertical-listings" data-city="rome" data-vertical="health"></div>
@@ -269,6 +279,7 @@
       <div class="vertical-body">
         <p class="vertical-description">Which cities have the best mobility?</p>
         <div id="transport-content" class="vertical-content"></div>
+        
         <div id="transport-context" class="vertical-context"></div>
         
         <div class="vertical-listings" data-city="rome" data-vertical="transport"></div>
@@ -283,6 +294,7 @@
       <div class="vertical-body">
         <p class="vertical-description">What is this city listening to right now?</p>
         <div id="radio-content" class="vertical-content"></div>
+        
         <div id="radio-context" class="vertical-context"></div>
         
         
@@ -315,6 +327,7 @@
   <script src="/city-landmark-photos.js"></script>
   <script src="/glotemp-auth.js"></script>
   <script src="/glotemp-verify.js"></script>
+  <script src="/glotemp-reporter.js"></script>
   <script src="/glotemp-checkin.js"></script>
   <script src="/glotemp-tonight.js"></script>
   <script src="/glotemp-features.js"></script>
@@ -327,7 +340,9 @@
   <script src="/city-wiki.js" defer></script>
   <script src="/city-header-photo.js" defer></script>
   <script src="/city-food-signature.js" defer></script>
+  <script src="/city-vertical-signature.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
+  <script src="/city-radio-curated.js" defer></script>
   <script src="/city-radio.js" defer></script>
   <script src="/city-venues.js" defer></script>
   <script src="/city-news.js" defer></script>
@@ -477,19 +492,21 @@
       // city's real coordinates) -- not a Supabase reading, so it's kept
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
-        GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country);
+        GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country, city.slug);
       }
 
       // Real named places from OpenStreetMap. Same treatment as Radio:
       // a live keyless source, not a Supabase reading.
       if (typeof GlotempVenues !== 'undefined' && city) {
-        GlotempVenues.loadVenues(city.slug, city.name, city.lat, city.lon);
+        GlotempVenues.loadVenues(city.slug, city.name, city.lat, city.lon, city.country);
       }
 
       // What the local press is reporting, in the languages it is
-      // reported in. Live and keyless, like Radio and Venues above.
+      // reported in. Live and keyless (routed through the city-news edge
+      // function server-side, since GDELT itself sends no CORS header),
+      // same treatment as Radio and Venues above.
       if (typeof GlotempNews !== 'undefined' && city) {
-        GlotempNews.loadNews(city.name, city.country, 'news-content');
+        GlotempNews.loadNews(city.slug, 'news-content');
       }
 
       // The music layer. Reads only stored data, so this makes no
@@ -534,6 +551,7 @@
 
           if (!response.ok) {
             contentEl.innerHTML = '';
+            if (typeof GlotempVerticalSignature !== 'undefined' && city) GlotempVerticalSignature.renderFallback(vertical, city);
             if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
             continue;
           }
@@ -541,6 +559,7 @@
           const readings = await response.json();
           if (!readings.length) {
             contentEl.innerHTML = '';
+            if (typeof GlotempVerticalSignature !== 'undefined' && city) GlotempVerticalSignature.renderFallback(vertical, city);
             if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
             continue;
           }
@@ -567,7 +586,9 @@
           contentEl.innerHTML = content;
         } catch (error) {
           console.error(`Error loading ${vertical} data:`, error);
-          contentEl.innerHTML = '<div class="empty-state">Error loading data. Try again shortly.</div>';
+          contentEl.innerHTML = '';
+          if (typeof GlotempVerticalSignature !== 'undefined' && city) GlotempVerticalSignature.renderFallback(vertical, city);
+          if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
         }
       }
     }

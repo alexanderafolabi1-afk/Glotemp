@@ -76,8 +76,24 @@ const LISTINGS_VERTICALS = new Set(['entertainment', 'fashion', 'food', 'propert
 // Modern browsers additionally auto-expand whichever <details> a URL
 // fragment targets; verticals-accordion.js is the click-time fallback for
 // browsers that don't.
+// Live local press, GDELT-sourced via the city-news edge function (real
+// headlines, real outlets, no summarisation). Sits above the first
+// vertical and open by default -- unlike the accordion below it, this is
+// the freshest thing on the page and the reason to come back, so it
+// should never start collapsed.
+function generateNewsSection() {
+  return `
+    <section id="city-news" class="vertical-section glass-card">
+      <div class="vertical-body">
+        <h2 class="news-heading">In the papers today</h2>
+        <div id="news-content"></div>
+      </div>
+    </section>
+`;
+}
+
 function generateVerticalSections(city) {
-  return VERTICALS.map((v, i) => `
+  return generateNewsSection() + VERTICALS.map((v, i) => `
     <!-- ${v.label} Vertical -->
     <details id="${v.name}" class="vertical-section glass-card"${i === 0 ? ' open' : ''}>
       <summary class="vertical-summary"><h2>${v.label}</h2></summary>
@@ -259,13 +275,21 @@ function generateCityPage(city) {
       // city's real coordinates) -- not a Supabase reading, so it's kept
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
-        GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country);
+        GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country, city.slug);
       }
 
       // Real named places from OpenStreetMap. Same treatment as Radio:
       // a live keyless source, not a Supabase reading.
       if (typeof GlotempVenues !== 'undefined' && city) {
-        GlotempVenues.loadVenues(city.slug, city.name, city.lat, city.lon);
+        GlotempVenues.loadVenues(city.slug, city.name, city.lat, city.lon, city.country);
+      }
+
+      // What the local press is reporting, in the languages it is
+      // reported in. Live and keyless (routed through the city-news edge
+      // function server-side, since GDELT itself sends no CORS header),
+      // same treatment as Radio and Venues above.
+      if (typeof GlotempNews !== 'undefined' && city) {
+        GlotempNews.loadNews(city.slug, 'news-content');
       }
 
       // Conditions line: same treatment as Radio -- a live free-API
@@ -304,6 +328,7 @@ function generateCityPage(city) {
 
           if (!response.ok) {
             contentEl.innerHTML = '';
+            if (typeof GlotempVerticalSignature !== 'undefined' && city) GlotempVerticalSignature.renderFallback(vertical, city);
             if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
             continue;
           }
@@ -311,6 +336,7 @@ function generateCityPage(city) {
           const readings = await response.json();
           if (!readings.length) {
             contentEl.innerHTML = '';
+            if (typeof GlotempVerticalSignature !== 'undefined' && city) GlotempVerticalSignature.renderFallback(vertical, city);
             if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
             continue;
           }
@@ -337,7 +363,9 @@ function generateCityPage(city) {
           contentEl.innerHTML = content;
         } catch (error) {
           console.error(\`Error loading \${vertical} data:\`, error);
-          contentEl.innerHTML = '<div class="empty-state">Error loading data. Try again shortly.</div>';
+          contentEl.innerHTML = '';
+          if (typeof GlotempVerticalSignature !== 'undefined' && city) GlotempVerticalSignature.renderFallback(vertical, city);
+          if (typeof GlotempCore !== 'undefined') GlotempCore.reconcileVerticalOrder(vertical);
         }
       }
     }

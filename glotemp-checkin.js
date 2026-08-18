@@ -115,6 +115,58 @@
     };
   }
 
+  // Turns a failed PostgREST response into a message that actually says
+  // what went wrong, instead of one generic "try again" that fits every
+  // possible failure equally badly. PostgREST error bodies carry a
+  // Postgres SQLSTATE in `code` (e.g. 23514 = check_violation, 42501 =
+  // insufficient_privilege/RLS) plus a human `message`/`details` -- this
+  // reads those rather than discarding the response body.
+  //
+  // The raw diagnostic (HTTP status + Postgres code, when present) is
+  // always appended after the human sentence, never swapped in instead of
+  // it -- so a report of "it's still broken" always comes with something
+  // exact to search logs against, instead of one more generic message.
+  async function describePostError(resp) {
+    let body = null;
+    try { body = await resp.json(); } catch (e) { /* no JSON body */ }
+
+    const code = body && body.code;
+    const diag = `[HTTP ${resp.status}${code ? ' · ' + code : ''}]`;
+
+    if (resp.status === 401) {
+      return `You've been signed out. Sign in again and re-post. ${diag}`;
+    }
+    if (resp.status === 403 || code === '42501') {
+      return `That wasn't allowed by the server -- try signing out and back in. ${diag}`;
+    }
+    if (code === '23514') {
+      // constraint name is inside body.message, e.g.
+      // "new row ... violates check constraint \"observations_mood_check\""
+      const constraint = /"([a-z_]+_check)"/.exec(body.message || '')?.[1] || '';
+      if (constraint.indexOf('mood') !== -1) {
+        return `That mood value wasn't recognized by the server. Pick a mood again and re-post. ${diag}`;
+      }
+      if (constraint.indexOf('note') !== -1) {
+        return `That comment is too long for the server to accept. Shorten it and try again. ${diag}`;
+      }
+      return `That check-in didn't pass a server-side rule (${constraint || 'unknown check'}). Try again with different text. ${diag}`;
+    }
+    if (code === '23503') {
+      return `Your account record couldn't be found by the server. Try signing out and back in. ${diag}`;
+    }
+    if (code === 'PGRST204' || code === 'PGRST202' || (body && /schema cache/i.test(body.message || ''))) {
+      return `The server rejected the request -- it references a field or function the database doesn't recognize. This is a deployment bug, not something a re-post fixes. ${diag} ${body && body.message ? '"' + body.message + '"' : ''}`;
+    }
+    if (resp.status === 429) {
+      return `Too many requests right now -- wait a moment and try again. ${diag}`;
+    }
+    if (resp.status >= 500) {
+      return `The server had a problem saving that. Try again shortly. ${diag}`;
+    }
+    const detail = (body && (body.message || body.details || body.hint)) || 'no further detail from the server';
+    return `Could not post that: ${detail} ${diag}`;
+  }
+
   function moodGlyphSVG(key, extraClass) {
     const m = MOOD_BY_KEY[key] || MOOD_BY_KEY[DEFAULT_MOOD];
     return `<svg class="checkin-mood-glyph${extraClass ? ' ' + extraClass : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${m.glyph}</svg>`;
@@ -266,8 +318,17 @@
 
     if (signInBtn) {
       signInBtn.addEventListener('click', async () => {
-        const ok = await GlotempAuth.requireAuth('Sign in to add a check-in for this city.');
-        if (ok) refreshAuthState();
+        signInBtn.disabled = true;
+        signInBtn.setAttribute('aria-busy', 'true');
+        signInBtn.classList.add('is-loading');
+        try {
+          const ok = await GlotempAuth.requireAuth('Sign in to add a check-in for this city.');
+          if (ok) refreshAuthState();
+        } finally {
+          signInBtn.disabled = false;
+          signInBtn.removeAttribute('aria-busy');
+          signInBtn.classList.remove('is-loading');
+        }
       });
     }
 
@@ -303,9 +364,32 @@
           return;
         }
 
+        // Defense in depth: the server enforces this exact set too
+        // (observations_mood_check), but failing fast here with a
+        // specific reason beats sending a value that can only come back
+        // as an opaque 400 from the network.
+        if (!MOOD_BY_KEY[selectedMood]) {
+          status.textContent = "That mood selection didn't register properly. Pick a mood again and re-post.";
+          return;
+        }
+        if (!citySlug) {
+          status.textContent = "Couldn't tell which city this is for. Reload the page and try again.";
+          return;
+        }
+
         const submitBtn = document.getElementById('checkin-submit');
+        // aria-busy + .is-loading fire in the same tick as disabled, well
+        // under the 100ms floor for a felt response -- the network call
+        // on the next line hasn't even been dispatched yet.
         submitBtn.disabled = true;
+        submitBtn.setAttribute('aria-busy', 'true');
+        submitBtn.classList.add('is-loading');
         status.textContent = 'Posting…';
+        function endLoading() {
+          submitBtn.disabled = false;
+          submitBtn.removeAttribute('aria-busy');
+          submitBtn.classList.remove('is-loading');
+        }
         try {
           // representation rather than minimal: the new row's id is what
           // the optional verification step needs, and asking for it here
@@ -321,7 +405,11 @@
               is_anonymous: postAnonymously,
             }),
           });
-          if (!resp.ok) throw new Error('post failed ' + resp.status);
+          if (!resp.ok) {
+            status.textContent = await describePostError(resp);
+            endLoading();
+            return;
+          }
 
           // The offer is made only after a successful post. Asking for a
           // position before someone has written anything is a toll gate.
@@ -330,24 +418,41 @@
             const rows = await resp.json();
             newId = Array.isArray(rows) && rows[0] ? rows[0].id : null;
           } catch (e) { /* older PostgREST, or no body: verification is optional anyway */ }
-          const verifySlot = document.getElementById('checkin-verify');
-          if (newId && verifySlot && window.GlotempVerify) {
-            GlotempVerify.mountOffer(verifySlot, newId);
-          }
-          // Per city, because growth has to be readable one city at a time.
-          // Announced rather than measured here, so glotemp-analytics.js
-          // owns every event and this file keeps owning the composer.
-          window.dispatchEvent(new CustomEvent('glotemp:checkin', { detail: { city: citySlug } }));
+
+          // The row is safely in the database at this point -- everything
+          // from here on is presentation, and a failure in it must never
+          // be reported back to the poster as "could not post that".
           status.textContent = 'Posted.';
           note.value = '';
           count.textContent = `0/${NOTE_MAX}`;
           offset = 0;
-          await loadCheckins({ replace: true });
+          endLoading();
+          try {
+            const verifySlot = document.getElementById('checkin-verify');
+            if (newId && verifySlot && window.GlotempVerify) {
+              GlotempVerify.mountOffer(verifySlot, newId);
+            }
+            // Per city, because growth has to be readable one city at a
+            // time. Announced rather than measured here, so
+            // glotemp-analytics.js owns every event and this file keeps
+            // owning the composer.
+            window.dispatchEvent(new CustomEvent('glotemp:checkin', { detail: { city: citySlug } }));
+            await loadCheckins({ replace: true });
+          } catch (postErr) {
+            // The post succeeded; only the refresh afterward failed. Say
+            // so rather than implying the check-in itself is in doubt.
+            console.error('Post succeeded but the feed refresh failed:', postErr);
+          }
           setTimeout(() => { status.textContent = ''; }, 3000);
         } catch (err) {
-          status.textContent = 'Could not post that. Try again shortly.';
+          // fetch() itself threw: offline, DNS failure, CORS, timeout --
+          // genuinely a network-layer failure, distinct from a server
+          // response the code above already handles.
+          status.textContent = err instanceof TypeError
+            ? 'Network problem -- check your connection and try again.'
+            : `Unexpected error posting that (ref: ${err && err.message ? err.message.slice(0, 60) : 'unknown'}). Try again.`;
+          endLoading();
         }
-        submitBtn.disabled = false;
       });
     }
   }
@@ -371,11 +476,16 @@
   function checkinHTML(row) {
     const name = row.is_anonymous ? 'Anonymous' : ((row.profiles && row.profiles.display_name) || 'Anonymous');
     const mood = MOOD_BY_KEY[row.mood];
+    // No reporter badge on an anonymous post -- the whole point of posting
+    // anonymously is that nothing here identifies the account, and a tier
+    // badge is exactly that kind of identifying signal.
+    const reporterTier = row.is_anonymous ? null : (row.profiles && row.profiles.reporter_tier);
     return `
       <article class="checkin-item">
         <div class="checkin-item-head">
           ${mood ? moodGlyphSVG(row.mood, 'checkin-item-glyph') : ''}
           <span class="checkin-item-name">${esc(name)}</span>
+          ${reporterTier && window.GlotempReporter ? GlotempReporter.badgeHTML(reporterTier) : ''}
           <span class="checkin-item-mood">${esc(mood ? mood.label : row.mood)}</span>
           ${window.GlotempVerify ? GlotempVerify.badgeHTML(row.verify_method) : ''}
           <time class="checkin-item-time" datetime="${esc(row.created_at)}">${esc(timeAgo(row.created_at))}</time>
@@ -392,7 +502,7 @@
     try {
       const resp = await fetch(
         `${SUPABASE_URL}/rest/v1/observations?city_slug=eq.${encodeURIComponent(citySlug)}` +
-        `&select=id,mood,is_anonymous,note,created_at,verify_method,profiles(display_name)` +
+        `&select=id,mood,is_anonymous,note,created_at,verify_method,profiles(display_name,reporter_tier)` +
         `&order=created_at.desc&offset=${offset}&limit=${PAGE_SIZE}`,
         { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
       );
@@ -500,7 +610,12 @@
       const session = await GlotempAuth.getSession();
       const user = GlotempAuth.getUser();
       if (!session || !user) return;
+      // disabled + aria-busy immediately, before the network call --
+      // .is-loading (styles.css) is what actually paints the busy state;
+      // disabled alone is what stops a second tap firing a second request.
       fresh.disabled = true;
+      fresh.setAttribute('aria-busy', 'true');
+      fresh.classList.add('is-loading');
       const watching = await isWatching();
       try {
         if (watching) {
@@ -518,6 +633,8 @@
       } catch (e) { /* surfaced by the label refresh below */ }
       await refreshLabel();
       fresh.disabled = false;
+      fresh.removeAttribute('aria-busy');
+      fresh.classList.remove('is-loading');
     });
   }
 
@@ -556,7 +673,22 @@
     loadCheckins();
 
     const moreBtn = document.getElementById('checkin-more');
-    if (moreBtn) moreBtn.addEventListener('click', () => loadCheckins());
+    if (moreBtn) moreBtn.addEventListener('click', async () => {
+      moreBtn.disabled = true;
+      moreBtn.setAttribute('aria-busy', 'true');
+      moreBtn.classList.add('is-loading');
+      try {
+        await loadCheckins();
+      } finally {
+        // loadCheckins() itself may hide moreBtn (no more rows); guard
+        // against touching a button loadCheckins already tore down.
+        if (moreBtn.isConnected) {
+          moreBtn.disabled = false;
+          moreBtn.removeAttribute('aria-busy');
+          moreBtn.classList.remove('is-loading');
+        }
+      }
+    });
 
     document.addEventListener('glotemp:auth-changed', () => {
       refreshAuthState();
