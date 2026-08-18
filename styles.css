@@ -7778,6 +7778,69 @@ body > section {
   }
 }
 
+/* ===== EVENT OVERLAY =====
+   A temporary banner shown only when a city has an active event-window
+   row in `partners` (format='event'). Same no-box, hairline-and-band
+   language as .tonight-mode -- a left-edge band accent is the only new
+   shape introduced. Absent by default: event-overlay.js only inserts
+   this section when a matching row exists, so a city with none renders
+   identically to today. */
+.event-overlay {
+  border-left: 2px solid var(--band-charged);
+  padding-left: 1.15rem;
+}
+.event-overlay-eyebrow {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  color: var(--band-charged);
+  margin-bottom: 0.5rem;
+}
+.event-overlay-name {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: 1.6rem;
+  color: var(--ivory);
+  margin-bottom: 0.3rem;
+}
+.event-overlay-dates {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--sand);
+  margin-bottom: 0.5rem;
+}
+.event-overlay-tagline {
+  font-family: var(--font-body);
+  color: var(--sand);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+  max-width: 46ch;
+}
+.event-overlay-link {
+  position: relative;
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  color: var(--brass);
+  padding-bottom: 4px;
+  margin-bottom: 0.75rem;
+  text-decoration: none;
+  border-bottom: 1px solid var(--brass-dim);
+}
+.event-overlay-link:hover { border-color: var(--brass); }
+.event-overlay-prov {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--sand);
+  opacity: 0.85;
+}
+
 /* ==========================================================================
    MOBILE STANDING RULES
    The site is a PWA judged on the phone first, so these are floors rather
