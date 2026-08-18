@@ -2057,6 +2057,85 @@ summary:focus:not(:focus-visible) {
   .install-later { width: auto; }
 }
 
+/* ===== PUSH NOTIFICATION PROMPT =====
+   The on-brand confirmation shown right after following a city, before
+   the native browser permission dialog. Same fixed-sheet idiom as
+   #install-banner, deliberately smaller -- one line of copy, two
+   buttons, nothing that reads as an interruption. */
+.push-prompt {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg, var(--basalt-raised) 0%, var(--basalt) 100%);
+  border-top: 1px solid var(--brass-dim);
+  box-shadow: 0 -18px 44px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.push-prompt-text {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ivory);
+  margin: 0;
+}
+
+.push-prompt-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.push-prompt-yes {
+  flex: 1;
+  min-height: 44px;
+  font-family: var(--font-body);
+  font-weight: var(--fw-semibold);
+  font-size: 14px;
+  color: var(--obsidian);
+  background: var(--brass);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.push-prompt-no {
+  min-height: 44px;
+  padding: 0 1rem;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--sand);
+  background: none;
+  border: 1px solid var(--brass-dim);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+@media (min-width: 640px) {
+  .push-prompt {
+    left: 50%;
+    right: auto;
+    bottom: 20px;
+    transform: translateX(-50%);
+    width: min(480px, calc(100vw - 2rem));
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--brass-dim);
+    border-radius: 14px;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .push-prompt-text { flex: 1; }
+  .push-prompt-actions { flex: none; }
+  .push-prompt-yes, .push-prompt-no { width: auto; }
+}
+
 .flex-between {
   display: flex;
   align-items: center;

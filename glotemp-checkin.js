@@ -629,6 +629,11 @@
             headers: Object.assign(authHeaders(session), { Prefer: 'resolution=ignore-duplicates,return=minimal' }),
             body: JSON.stringify({ user_id: user.id, city_slug: citySlug }),
           });
+          // Explicit action just taken (following this city) -- the one
+          // moment this prompt is allowed to appear. Never on page load.
+          if (window.GlotempPush) {
+            GlotempPush.promptAfterFollow(citySlug, cityDisplayName(), session, user);
+          }
         }
       } catch (e) { /* surfaced by the label refresh below */ }
       await refreshLabel();
