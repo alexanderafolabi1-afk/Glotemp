@@ -6966,6 +6966,35 @@ a:hover .city-landmark-photo,
 }
 .spin-sentence.is-settling { opacity: 0.35; }
 
+/* Surprise-only: one real photo, revealed alongside the sentence (see
+   revealSurprisePhoto() in glotemp-spin.js). Empty and [hidden] for
+   anywhere/feed/moving and for every spin before a photo actually
+   resolves -- [hidden] is display:none, so it contributes nothing to
+   layout for any of those. Deliberately modest: a single framed photo,
+   not a carousel, sized well under the sentence's own 30ch column so it
+   reads as part of the reveal rather than a second, competing section. */
+.spin-photo {
+  width: 100%;
+  max-width: 22rem;
+  margin: 1.1rem auto 0;
+}
+.spin-photo-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border: 1px solid var(--hairline);
+  opacity: 0;
+  animation: spin-photo-in 500ms ease forwards;
+}
+@keyframes spin-photo-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spin-photo-img { animation: none; opacity: 1; }
+}
+
 /* Flight/Room/Table: inline brass line icons with the label beneath,
    no boxes -- three columns on the ground, not three buttons. */
 .spin-affiliates {

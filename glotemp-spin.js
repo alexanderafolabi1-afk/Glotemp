@@ -41,6 +41,7 @@
   let spinning = false;
   let rotation = 0;       // accumulated degrees, never reset (keeps motion one-way)
   let variant = VARIANTS[0];
+  let revealToken = 0;    // see finish(): discards a photo fetch that resolves after a newer spin has landed
 
   function esc(s) {
     return String(s == null ? '' : s)
@@ -107,6 +108,7 @@
           <button type="button" class="spin-go" id="spin-go">Spin</button>
         </div>
         <p class="spin-sentence" id="spin-sentence" role="status" aria-live="polite">Give it a turn.</p>
+        <div class="spin-photo" id="spin-photo" hidden></div>
         <div class="spin-affiliates" id="spin-affiliates" hidden>
           <a class="spin-aff" id="spin-aff-flight" target="_blank" rel="noopener noreferrer">${AFF_ICONS.flight}<span class="spin-aff-kind">Flight</span><span class="spin-aff-label"></span></a>
           <a class="spin-aff" id="spin-aff-room" target="_blank" rel="noopener noreferrer">${AFF_ICONS.room}<span class="spin-aff-kind">Room</span><span class="spin-aff-label"></span></a>
@@ -163,6 +165,85 @@
     return scored[scored.length - 1].c;
   }
 
+  // ---------- surprise-only: one real photo of the landing city ----------
+  // Nothing here runs for anywhere/feed/moving -- see finish() below,
+  // where this is only ever called inside the variant.id === 'surprise'
+  // branch. The dial, the sentence, and the other three variants have no
+  // dependency on any of this.
+  //
+  // Same free, keyless Wikimedia family as city-landmark-photos.js's
+  // Wikipedia REST calls, one step further into Commons' own action API
+  // (as city-of-day-photos.js already does for its background rotation).
+  // This asks for something more specific than "a photo of the city",
+  // though: search text biased toward the quieter corners -- gardens,
+  // historic districts, temples and shrines, old town streets,
+  // sanctuaries, courtyards -- rather than the tallest building or the
+  // widest avenue, since a generic skyline shot is the opposite of what
+  // "Surprise me" is for. Falls back to the plain Wikipedia thumbnail
+  // (GlotempLandmarkPhotos) if nothing themed turns up, and to nothing
+  // at all -- the sentence alone, exactly as it renders for the other
+  // three variants -- if that fails too. Never a broken image, never a
+  // placeholder: every URL returned here is a real Commons or Wikipedia
+  // file, or there is no photo this time.
+  const COMMONS_API = 'https://commons.wikimedia.org/w/api.php';
+  const SURPRISE_MIN_DIMENSION = 400;
+  const SURPRISE_THUMB_WIDTH = 900;
+  const SURPRISE_THEMES = ['garden', '"historic district"', 'temple', 'shrine', '"old town"', 'sanctuary', 'courtyard'];
+  const SURPRISE_BAD_TITLE = /logo|coat[\s_]of[\s_]arms|seal[\s_]of|flag[\s_]of|\bmap\b|diagram|chart|icon|emblem|locator/i;
+  const surprisePhotoCache = new Map();
+
+  function looksLikeThemedPhoto(page) {
+    const info = page && page.imageinfo && page.imageinfo[0];
+    if (!info) return false;
+    const mime = String(info.mime || '').toLowerCase();
+    if (mime !== 'image/jpeg' && mime !== 'image/png') return false;
+    if ((info.width || 0) < SURPRISE_MIN_DIMENSION && (info.height || 0) < SURPRISE_MIN_DIMENSION) return false;
+    if (SURPRISE_BAD_TITLE.test(String(page.title || '').replace(/^File:/i, ''))) return false;
+    return !!(info.thumburl || info.url);
+  }
+
+  async function fetchThemedCommonsPhoto(cityName) {
+    try {
+      const params = new URLSearchParams({
+        action: 'query',
+        generator: 'search',
+        gsrsearch: `"${cityName}" (${SURPRISE_THEMES.join(' OR ')})`,
+        gsrnamespace: '6',
+        gsrlimit: '20',
+        prop: 'imageinfo',
+        iiprop: 'url|size|mime',
+        iiurlwidth: String(SURPRISE_THUMB_WIDTH),
+        format: 'json',
+        origin: '*',
+      });
+      const resp = await fetch(`${COMMONS_API}?${params}`);
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      const pages = (data && data.query && data.query.pages) || {};
+      for (const key of Object.keys(pages)) {
+        const page = pages[key];
+        if (!looksLikeThemedPhoto(page)) continue;
+        const info = page.imageinfo[0];
+        return info.thumburl || info.url;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function fetchSurprisePhoto(city) {
+    if (surprisePhotoCache.has(city.slug)) return surprisePhotoCache.get(city.slug);
+    const promise = (async () => {
+      const themed = await fetchThemedCommonsPhoto(city.name);
+      if (themed) return themed;
+      if (window.GlotempLandmarkPhotos) return (await window.GlotempLandmarkPhotos.getPhotoUrl(city.slug)) || null;
+      return null;
+    })();
+    surprisePhotoCache.set(city.slug, promise);
+    return promise;
+  }
+
   // ---------- the sentence ----------
   function buildSentence(choice) {
     const { city, mode } = choice;
@@ -212,6 +293,12 @@
     const choice = pick(candidates);
     if (!choice) return;
 
+    // Captured now, not re-read in finish(): variant buttons aren't
+    // disabled during the ~3s animation, so a click on another one
+    // mid-spin must not change whether the photo appears for a spin
+    // that was already committed as 'surprise' (or wasn't).
+    const isSurprise = variant.id === 'surprise';
+
     const rotor = document.getElementById('spin-rotor');
     const go = document.getElementById('spin-go');
     spinning = true;
@@ -219,7 +306,7 @@
     sentenceEl.classList.add('is-settling');
 
     if (reduceMotion()) {
-      finish(choice);
+      finish(choice, isSurprise);
       return;
     }
 
@@ -235,12 +322,40 @@
       rotor.style.transition = 'transform 420ms cubic-bezier(0.34, 1.4, 0.64, 1)';
       rotor.style.transform = `rotate(${rotation - 3.2}deg)`;
     }, 2600);
-    setTimeout(() => finish(choice), 3040);
+    setTimeout(() => finish(choice, isSurprise), 3040);
   }
 
-  function finish(choice) {
+  // Surprise-only, and fire-and-forget: the network round trip never
+  // holds up re-enabling the Spin button or anything else in finish()
+  // below. revealToken guards against a slow fetch from an earlier spin
+  // landing after a newer one has already replaced the sentence on
+  // screen -- without it, a stale photo could briefly overwrite the
+  // current result.
+  async function revealSurprisePhoto(city, token) {
+    const photoEl = document.getElementById('spin-photo');
+    const url = await fetchSurprisePhoto(city);
+    if (!url || token !== revealToken || !photoEl) return;
+    const img = new Image();
+    img.onload = () => {
+      if (token !== revealToken || !photoEl.isConnected) return;
+      photoEl.innerHTML = `<img class="spin-photo-img" src="${esc(url)}" alt="">`;
+      photoEl.hidden = false;
+    };
+    img.onerror = () => {}; // broken URL: photoEl stays hidden, sentence stands alone
+    img.src = url;
+  }
+
+  function finish(choice, isSurprise) {
     const sentenceEl = document.getElementById('spin-sentence');
     const provEl = document.getElementById('spin-prov');
+    const photoEl = document.getElementById('spin-photo');
+    revealToken++;
+    const token = revealToken;
+    // Reset every reveal, not just surprise ones -- otherwise a photo
+    // from a previous "Surprise me" spin would still be showing after
+    // switching to anywhere/feed/moving and spinning again.
+    photoEl.hidden = true;
+    photoEl.innerHTML = '';
     sentenceEl.textContent = buildSentence(choice);
     sentenceEl.classList.remove('is-settling');
     setAffiliates(choice.city);
@@ -249,6 +364,7 @@
     provEl.innerHTML = esc(bits.join(' · ')) + (choice.modelled ? ' · <span class="tonight-modelled">modelled</span>' : '');
     document.getElementById('spin-go').disabled = false;
     spinning = false;
+    if (isSurprise) revealSurprisePhoto(choice.city, token);
   }
 
   async function mount() {
