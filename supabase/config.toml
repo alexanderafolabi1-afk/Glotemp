@@ -42,6 +42,12 @@ verify_jwt = false
 [functions.city-news]
 verify_jwt = false
 
+# The music collector. Unlike city-news this is NOT public: it writes the
+# archive the charts are built from. pg_cron calls it with the service
+# role key from Vault, which satisfies the JWT check, so verify_jwt stays
+# at its default true and a stranger cannot poke the writer.
+# Deliberately absent from this file's false-list for that reason.
+
 [functions.hipolabs-education]
 verify_jwt = false
 
