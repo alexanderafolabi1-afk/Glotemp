@@ -1,0 +1,25 @@
+-- Closes a real race condition, confirmed live by a duplicate post: two
+-- concurrent calls to social-next-post (the scheduled poller overlapping
+-- a manual/replay call) could both SELECT the same row as "not yet
+-- posted" before either call's social-mark-posted write landed, so both
+-- posted to the same platform. The per-platform posted_instagram_at/
+-- posted_facebook_at gating (see 20260818200000) stops a SINGLE
+-- execution from reposting to a platform it already succeeded on, but
+-- does nothing against two executions racing each other on the same
+-- row -- that needs an atomic claim, which is what this column is for.
+--
+-- claimed_at is set by an UPDATE ... WHERE claimed_at IS NULL (or
+-- stale) ... RETURNING inside social-next-post -- see that function.
+-- Postgres serializes concurrent UPDATEs against the same row: only one
+-- of two simultaneous claim attempts can have its WHERE clause still
+-- match once the row lock is acquired, so only one caller ever gets the
+-- row back as due. The other sees claimed_at already set and moves on.
+--
+-- claimed_at is released (set back to null) by social-mark-posted the
+-- moment a platform is genuinely marked posted, so a row still needing
+-- its other platform isn't blocked from being reclaimed until expiry.
+-- If an execution crashes before ever calling social-mark-posted, the
+-- claim isn't permanent -- social-next-post treats a claimed_at older
+-- than CLAIM_EXPIRY_MINUTES as claimable again, so a genuinely stuck
+-- row self-heals on the next poll rather than being locked forever.
+alter table social_content_queue add column if not exists claimed_at timestamptz;

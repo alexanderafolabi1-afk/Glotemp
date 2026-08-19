@@ -12,6 +12,43 @@
 // currently every 15 min), and THIS function is the source of truth
 // for "is anything actually due right now, and for which platform(s)".
 //
+// ATOMIC CLAIM (fixes a real, confirmed-live race condition)
+// Two concurrent calls to this function -- the scheduled poller
+// overlapping a manual/replay call, or two overlapping poller runs --
+// could both SELECT the same row as due before either call's
+// social-mark-posted write landed, so both would post to the same
+// platform. The per-platform posted_instagram_at/posted_facebook_at
+// gating stops a SINGLE execution from reposting to a platform it
+// already succeeded on, but does nothing against two executions
+// racing each other on a row neither has touched yet -- that needs an
+// atomic claim, not just a re-check.
+//
+// The claim is a conditional UPDATE: SET claimed_at = now() WHERE
+// id = <candidate> AND (claimed_at IS NULL OR claimed_at < <expiry
+// cutoff>) AND (posted_instagram_at IS NULL OR posted_facebook_at IS
+// NULL), via PostgREST with Prefer: return=representation. Postgres
+// serializes concurrent UPDATEs against the same row: whichever
+// request's UPDATE acquires the row lock first commits and the row's
+// claimed_at is no longer null: the second request's WHERE clause is
+// then re-evaluated against that committed state and matches zero
+// rows, so PostgREST returns an empty array to it. Only one caller can
+// ever receive that row as due from a single claim attempt -- this is
+// not "should be fine", it is Postgres's own row-level locking making
+// concurrent claims on the same row mutually exclusive by
+// construction. A lost claim returns due:false with an explicit
+// reason (claim_lost_to_concurrent_call) rather than silently trying
+// another row, so a real race is visible in the response, not masked.
+//
+// The claim is released (claimed_at reset to null) by social-mark-posted
+// the moment a platform is genuinely marked posted -- so a row still
+// needing its other platform isn't blocked from being reclaimed until
+// expiry. CLAIM_EXPIRY_MINUTES exists only for the crash case: an
+// execution that claims a row and then dies before ever calling
+// social-mark-posted (Make itself crashing, a network partition, etc).
+// Without an expiry that row would be locked forever; with it, the row
+// becomes claimable again once the claim is older than
+// CLAIM_EXPIRY_MINUTES, comfortably inside the next poll cycle.
+//
 // CAMPAIGN_START_DATE (env var, with a real default below)
 // social_content_queue rows are keyed by day_number (1-30), not a
 // calendar date -- the calendar itself doesn't fix one. This function
@@ -51,6 +88,13 @@ const IMAGE_FETCH_URL = Deno.env.get("SOCIAL_IMAGE_FETCH_URL")
 
 const TIMEZONE = "Europe/London";
 const TIMEOUT_MS = 5000;
+// Comfortably longer than this function's real worst-case runtime (one
+// REST select, one REST claim, one image-fetch bounded by its own 5s
+// timeout -- realistically under 10s total) and comfortably shorter
+// than the 15-minute poll interval, so a genuinely crashed claim is
+// always reclaimable by the very next scheduled poll, never stuck for
+// a whole extra cycle.
+const CLAIM_EXPIRY_MINUTES = 10;
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -86,6 +130,7 @@ interface QueueRow {
   image_search_term: string | null;
   posted_instagram_at: string | null;
   posted_facebook_at: string | null;
+  claimed_at: string | null;
 }
 
 // Europe/London's current wall-clock date (YYYY-MM-DD) and
@@ -123,6 +168,27 @@ async function fetchImage(term: string): Promise<{ image_url: string | null; err
   }
 }
 
+// Attempts to atomically claim `id`: succeeds only if, at the moment
+// Postgres evaluates the WHERE clause under the row lock, the row is
+// still unclaimed-or-stale AND still has an unposted platform. Returns
+// the freshly-claimed row (server-authoritative posted_*/claimed_at,
+// not whatever the earlier SELECT saw) on success, or null if another
+// call won the race -- see the header comment for why this is atomic.
+async function tryClaim(id: string): Promise<QueueRow | null> {
+  const cutoffIso = new Date(Date.now() - CLAIM_EXPIRY_MINUTES * 60_000).toISOString();
+  const resp = await rest(
+    `social_content_queue?id=eq.${encodeURIComponent(id)}` +
+    `&and=(or(claimed_at.is.null,claimed_at.lt.${cutoffIso}),or(posted_instagram_at.is.null,posted_facebook_at.is.null))`,
+    {
+      method: "PATCH",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({ claimed_at: new Date().toISOString() }),
+    },
+  );
+  const updated: QueueRow[] = await resp.json();
+  return updated[0] ?? null;
+}
+
 Deno.serve(async (req: Request) => {
   if (!SUPABASE_URL || !SERVICE_KEY) {
     console.error("[social-next-post] missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
@@ -143,35 +209,50 @@ Deno.serve(async (req: Request) => {
       return json({ due: false, reason: "outside_campaign_window", day_number: dayNumber });
     }
 
+    const cutoffIso = new Date(Date.now() - CLAIM_EXPIRY_MINUTES * 60_000).toISOString();
     const rows: QueueRow[] = await rest(
-      `social_content_queue?select=id,scheduled_time,caption,image_search_term,posted_instagram_at,posted_facebook_at` +
-      `&day_number=eq.${dayNumber}&or=(posted_instagram_at.is.null,posted_facebook_at.is.null)&order=scheduled_time.asc`,
+      `social_content_queue?select=id,scheduled_time,caption,image_search_term,posted_instagram_at,posted_facebook_at,claimed_at` +
+      `&day_number=eq.${dayNumber}` +
+      `&and=(or(posted_instagram_at.is.null,posted_facebook_at.is.null),or(claimed_at.is.null,claimed_at.lt.${cutoffIso}))` +
+      `&order=scheduled_time.asc`,
     ).then((r) => r.json());
 
     // Due once its slot's time has arrived (Europe/London), for the
     // rest of that campaign day -- see the disclosed limitation above
     // for why this doesn't extend past day_number's own day.
-    const due = rows.find((r) => nowMin >= minutesFromTimeString(r.scheduled_time));
+    const candidate = rows.find((r) => nowMin >= minutesFromTimeString(r.scheduled_time));
 
-    if (!due) {
+    if (!candidate) {
       return json({ due: false, day_number: dayNumber, unposted_today: rows.length });
     }
 
-    const needs_instagram = !due.posted_instagram_at;
-    const needs_facebook = !due.posted_facebook_at;
-
-    if (!due.image_search_term) {
+    // Atomic claim -- the actual fix. A candidate found claimable a
+    // moment ago in the SELECT above can still lose the claim here if
+    // another call's UPDATE won the row lock first; that is exactly
+    // the race this function now closes.
+    const claimed = await tryClaim(candidate.id);
+    if (!claimed) {
       return json({
-        due: true, row_id: due.id, caption: due.caption, image_url: null,
+        due: false, day_number: dayNumber,
+        reason: "claim_lost_to_concurrent_call", row_id: candidate.id,
+      });
+    }
+
+    const needs_instagram = !claimed.posted_instagram_at;
+    const needs_facebook = !claimed.posted_facebook_at;
+
+    if (!claimed.image_search_term) {
+      return json({
+        due: true, row_id: claimed.id, caption: claimed.caption, image_url: null,
         image_error: "no_search_term", needs_instagram, needs_facebook,
       });
     }
 
-    const { image_url, error: imageError } = await fetchImage(due.image_search_term);
+    const { image_url, error: imageError } = await fetchImage(claimed.image_search_term);
     return json({
       due: true,
-      row_id: due.id,
-      caption: due.caption,
+      row_id: claimed.id,
+      caption: claimed.caption,
       image_url,
       needs_instagram,
       needs_facebook,
