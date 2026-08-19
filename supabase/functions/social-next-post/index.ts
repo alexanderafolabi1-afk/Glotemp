@@ -12,13 +12,17 @@
 // currently every 15 min), and THIS function is the source of truth
 // for "is anything actually due right now, and for which platform(s)".
 //
-// CAMPAIGN_START_DATE (env var, required)
+// CAMPAIGN_START_DATE (env var, with a real default below)
 // social_content_queue rows are keyed by day_number (1-30), not a
 // calendar date -- the calendar itself doesn't fix one. This function
-// needs one real date to anchor day_number=1 to. Set the
-// CAMPAIGN_START_DATE env var (YYYY-MM-DD) once, when the campaign
-// actually goes live. Unset or unparsable -> this function refuses to
-// guess and returns a real 500, not a wrong post.
+// needs one real date to anchor day_number=1 to. DEFAULT_CAMPAIGN_START_DATE
+// is that anchor (2026-08-19, the day the campaign actually went live)
+// -- this environment has no way to set an actual Supabase Function
+// secret (no CLI, no MCP secrets tool), so the anchor lives here as a
+// source default instead. The CAMPAIGN_START_DATE env var, if ever
+// set, still overrides it. An explicitly-set-but-unparsable env var is
+// the one case this function still refuses to guess on, returning a
+// real 500 rather than silently falling back.
 //
 // TIMEZONE: Europe/London, DST-aware
 // scheduled_time (09:00/14:00/19:00) is interpreted in Europe/London
@@ -40,7 +44,8 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-const CAMPAIGN_START_DATE = Deno.env.get("CAMPAIGN_START_DATE") ?? "";
+const DEFAULT_CAMPAIGN_START_DATE = "2026-08-19";
+const CAMPAIGN_START_DATE = Deno.env.get("CAMPAIGN_START_DATE") ?? DEFAULT_CAMPAIGN_START_DATE;
 const IMAGE_FETCH_URL = Deno.env.get("SOCIAL_IMAGE_FETCH_URL")
   ?? `${SUPABASE_URL}/functions/v1/social-image-fetch`;
 
