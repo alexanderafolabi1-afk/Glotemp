@@ -72,6 +72,26 @@ verify_jwt = false
 [functions.tonight-layer]
 verify_jwt = false
 
+# The social-automation backend. Called externally by Make (not
+# pg_cron), which sends whatever key a human pasted into the HTTP
+# module's headers -- that's very likely to be the sb_publishable_...
+# key shown by default in the Supabase dashboard, which is not
+# JWT-shaped and never will parse as one, same class of rejection
+# music-sync and push-send hit before their own verify_jwt fix. Both
+# functions do their own config checks (SUPABASE_URL/SERVICE_KEY,
+# CAMPAIGN_START_DATE) and write only to social_content_queue, so
+# there is nothing here that depends on Supabase's own JWT gate.
+[functions.social-next-post]
+verify_jwt = false
+
+[functions.social-mark-posted]
+verify_jwt = false
+
+# Called only server-side by social-next-post, never directly by Make
+# or a browser -- consistent with the rest of this file's collectors.
+[functions.social-image-fetch]
+verify_jwt = false
+
 # ===== AUTH =====
 # These settings are the fix for confirmation links pointing at
 # http://localhost:3000. GoTrue falls back to site_url whenever the caller
