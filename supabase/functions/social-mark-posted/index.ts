@@ -5,6 +5,14 @@
 // re-attempt whichever platform actually failed. Marking both from one
 // call (or gating on "both succeeded") would either re-post to the
 // network that already worked, or silently skip the one that failed.
+//
+// Also releases social-next-post's claim (claimed_at -> null) the
+// moment real progress lands here. A row still needing its other
+// platform stays claimable immediately rather than waiting out
+// CLAIM_EXPIRY_MINUTES -- that expiry exists only for the crash case
+// (an execution that dies before ever reaching this function), not for
+// the normal case of a partially-completed row moving on to its next
+// poll. See social-next-post's header comment for the full claim design.
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
@@ -59,7 +67,11 @@ Deno.serve(async (req: Request) => {
           "Content-Type": "application/json",
           Prefer: "return=representation",
         },
-        body: JSON.stringify({ [columns.at]: new Date().toISOString(), [columns.id]: post_id ?? null }),
+        body: JSON.stringify({
+          [columns.at]: new Date().toISOString(),
+          [columns.id]: post_id ?? null,
+          claimed_at: null,
+        }),
       },
     );
     if (!resp.ok) {
