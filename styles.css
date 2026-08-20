@@ -7412,6 +7412,33 @@ a:hover .city-landmark-photo,
   .spin-photo-img { animation: none; opacity: 1; }
 }
 
+/* One real fact about the landing city, every variant -- see
+   getCityFact()/revealExtras() in glotemp-spin.js. Empty and [hidden]
+   until a spin actually resolves one, same as .spin-photo above: hidden
+   is display:none, so it contributes nothing to layout before that, and
+   nothing at all if neither CITY_TRIVIA nor Wikipedia has anything for
+   that city. Body-text size and the sentence's own 30ch measure, since
+   this reads as supporting text under the headline sentence, not a
+   second sentence of the same weight. */
+.spin-facts {
+  width: 100%;
+  max-width: 30ch;
+  margin: 0.85rem auto 0;
+  text-align: left;
+}
+.spin-facts-text {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--sand);
+  margin: 0;
+  opacity: 0;
+  animation: spin-photo-in 500ms ease forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .spin-facts-text { animation: none; opacity: 1; }
+}
+
 /* Flight/Room/Table: inline brass line icons with the label beneath,
    no boxes -- three columns on the ground, not three buttons. */
 .spin-affiliates {
