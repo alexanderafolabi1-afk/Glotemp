@@ -173,7 +173,19 @@
         '<a href="/" class="nav-brand" aria-label="Glotemp home">' +
           '<img src="/assets/logo.png" alt="Glotemp" class="nav-logo">' +
         '</a>' +
-        '<span class="nav-tagline">Your city temperature in real time</span>' +
+        // The mantra. One line, every page, at every width -- it sits
+        // between the mark and the hamburger on a phone, and between the
+        // mark and the links on a desktop. It replaces the old
+        // desktop-only tagline rather than joining it: two lines of
+        // positioning copy in one bar is one too many.
+        //
+        // The dot beats on the same period as the logo and the compass
+        // (--hero-breathe-period), so the three read as one instrument
+        // rather than three unrelated animations.
+        '<span class="nav-mantra">' +
+          '<span class="nav-mantra-pulse" aria-hidden="true"></span>' +
+          '<span class="nav-mantra-line">Control the pulse of your city&hellip;</span>' +
+        '</span>' +
       '</div>' +
       '<div class="nav-links" id="nav-links-desktop">\n        ' +
         linksHTML(active) +
