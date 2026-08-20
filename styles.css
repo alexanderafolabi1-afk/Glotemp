@@ -301,14 +301,28 @@ body.ambient-night::before   { filter: hue-rotate(calc(var(--wash-hue) + var(--w
    prose and grids already define their own track/measure sizing (see
    the 68ch caps and grid minmax() tracks throughout this file), so
    nothing here needs the outer wrapper to also cap width. */
+/* THE GUTTER IS IN TWO PARTS, ON PURPOSE.
+   Every top-level section reads as a panel -- it carries a hairline and a
+   raised shadow (see the .glass-card rules below), so it has a visible
+   edge. All the horizontal room used to live on the wrapper, which moved
+   that edge and the text inside it together: whatever the page margin
+   was, the text still began exactly ON the panel's edge and looked
+   cramped no matter how large the margin got.
+
+   So the room is split. --page-gutter holds the panel off the screen
+   edge; --panel-gutter holds the text off the panel's own edge. Text ends
+   up further in than before (about 44px on a phone, was 36px) AND now has
+   a real band of quiet between it and the edge it sits against, which is
+   what actually reads as space. */
+:root {
+  --page-gutter: clamp(1.25rem, 3.5vw, 3.5rem);
+  --panel-gutter: clamp(1.5rem, 3.5vw, 2.75rem);
+}
+
 #app {
   width: 100%;
   margin: 0 auto;
-  /* Floor raised to 2.25rem (36px) so content never sits closer than
-     that to the screen edge on any phone; scales faster with viewport
-     width and caps at 6rem (96px) so large screens get noticeably more
-     breathing room instead of flattening out at a modest 64px. */
-  padding: 1rem clamp(2.25rem, 6vw, 6rem);
+  padding: 1rem var(--page-gutter);
   position: relative;
   z-index: 1;
 }
@@ -317,9 +331,24 @@ body.ambient-night::before   { filter: hue-rotate(calc(var(--wash-hue) + var(--w
 .page-content {
   width: 100%;
   margin: 0 auto;
-  padding: 1rem clamp(2.25rem, 6vw, 6rem) 3rem;
+  padding: 1rem var(--page-gutter) 3rem;
   position: relative;
   z-index: 1;
+}
+
+/* The inner half. Longhand, and specific enough to beat .glass-card's own
+   `padding: 3.25rem 0 2.75rem` shorthand without disturbing its vertical
+   rhythm. Sections only -- the out-of-flow overlays (#nav-panel,
+   #install-banner, the auth sheet) are divs and must keep their own
+   geometry. */
+#app > section,
+#app > footer,
+.page-main > section,
+.page-main > footer,
+.page-content > section,
+.page-content > footer {
+  padding-left: var(--panel-gutter);
+  padding-right: var(--panel-gutter);
 }
 
 /* Guarantee vertical clearance between stacked top-level sections so

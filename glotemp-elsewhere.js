@@ -285,7 +285,8 @@
         '<div class="elsewhere-photo-bg" id="elsewhere-photo-bg"></div>' +
         '<div class="elsewhere-now">' +
           '<span class="elsewhere-clock" id="elsewhere-clock">' + esc(timeIn(city.timezone)) + '</span>' +
-          '<span class="elsewhere-place">' + esc(city.name) + '<span class="elsewhere-country">' +
+          '<span class="elsewhere-place" data-slug="' + esc(city.slug) + '">' + esc(city.name) +
+            '<span class="elsewhere-country">' +
             esc(city.country) + '</span></span>' +
           '<span class="elsewhere-line" id="elsewhere-line">' + esc(partOfDay(h)) + '</span>' +
         '</div>' +
@@ -333,14 +334,64 @@
       GlotempNews.loadNews(city.slug, 'elsewhere-news');
     }
 
-    keep(city.slug);
+    // Only a city someone actually chose becomes a city they keep. An
+    // auto-advance must never rewrite their own list out from under them.
+    if (!autoAdvancing) keep(city.slug);
   }
 
   function open(city) {
     if (!city) return;
+    stopPanel();            // a deliberate choice ends the drift for good
     paint(city);
     var win = document.getElementById('elsewhere-window');
     if (win && win.scrollIntoView) win.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // ---------- the window itself keeps moving ----------
+  // This is one of the first things anyone sees, and a panel parked on one
+  // city forever reads as a dead page. It now travels: a new city every
+  // PANEL_ADVANCE_MS, drawn from the same deck as the chips, each one
+  // arriving with its own clock, sky, photograph, stations and press.
+  //
+  // It is a lot of live fetching, so it is bounded on every side. It only
+  // runs while the section is actually on screen and the tab is visible,
+  // it is off under prefers-reduced-motion, and the first sign that
+  // someone is using the section -- a chip, a search, a tap on a station,
+  // any keypress or focus -- stops it permanently and leaves them on the
+  // city they landed on. It never writes to the kept-cities list.
+  var PANEL_ADVANCE_MS = 22000;
+  var panelTimer = null;
+  var panelStopped = false;
+  var autoAdvancing = false;
+  var panelOnScreen = true;
+
+  function stopPanel() {
+    panelStopped = true;
+    if (panelTimer) { clearInterval(panelTimer); panelTimer = null; }
+  }
+
+  function advancePanel() {
+    if (panelStopped || document.hidden || !panelOnScreen) return;
+    var current = document.querySelector('#elsewhere-window .elsewhere-place');
+    var showing = current ? current.getAttribute('data-slug') : null;
+    var next = bySlug(drawSlug(showing ? [showing] : []));
+    if (!next) return;
+    autoAdvancing = true;
+    try { paint(next); } finally { autoAdvancing = false; }
+  }
+
+  function startPanel(root) {
+    if (panelStopped || panelTimer) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // Only travel while someone could actually be looking at it.
+    if (typeof IntersectionObserver === 'function') {
+      panelOnScreen = false;
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { panelOnScreen = e.isIntersecting; });
+      }, { threshold: 0.2 }).observe(root);
+    }
+    panelTimer = setInterval(advancePanel, PANEL_ADVANCE_MS);
   }
 
   // ---------- the suggested chips turn over ----------
@@ -406,11 +457,14 @@
       open(bySlug(chip.getAttribute('data-slug')));
     });
 
-    // Any sign of intent settles the row permanently.
+    // Any sign of intent settles the section permanently -- the chips stop
+    // turning over and the window stops travelling, leaving whoever is
+    // reading it exactly where they are.
+    function settle() { stopChips(); stopPanel(); }
     ['pointerdown', 'touchstart', 'keydown'].forEach(function (evt) {
-      root.addEventListener(evt, stopChips, { passive: true });
+      root.addEventListener(evt, settle, { passive: true });
     });
-    root.addEventListener('focusin', stopChips);
+    root.addEventListener('focusin', settle);
 
     var form = root.querySelector('#elsewhere-pick');
     if (form) form.addEventListener('submit', function (e) {
@@ -435,12 +489,15 @@
     var root = document.getElementById('elsewhere-root');
     if (!root || !cities().length) return;
     stopChips();
+    stopPanel();
     chipsStopped = false;
+    panelStopped = false;
     root.innerHTML = shell();
     wire(root);
     rotateChips(root);
-    // Open on the most recently kept city, or on one of the openers, so
-    // the section is never an empty form asking to be filled in.
+    // Open on the most recently kept city, or on the first chip, so the
+    // section is never an empty form asking to be filled in. From there it
+    // travels on its own until someone takes hold of it.
     var kept = readKept();
     var first = kept.length ? bySlug(kept[0]) : null;
     if (!first) {
@@ -448,6 +505,7 @@
       first = chip ? bySlug(chip.getAttribute('data-slug')) : null;
     }
     if (first) paint(first);
+    startPanel(root);
   }
 
   // CITIES_DATA is a plain script tag above this one, but this file is
