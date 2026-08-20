@@ -27,6 +27,7 @@ const SOURCES = [
   'living-index.js', 'cities-data.js', 'tempo-economy.js',
   'glotemp-analytics.js',
   'city-tiles.js', 'city-landmark-photos.js', 'city-photos.js',
+  'glotemp-elsewhere.js', 'city-of-the-day.js', 'city-of-day-photos.js',
   'verticals-engine.js', 'stories.js', 'cookie-consent.js',
   'about/index.html', 'explore/index.html', 'feed/index.html',
   'gem/index.html', 'methodology/index.html', 'movers/index.html',

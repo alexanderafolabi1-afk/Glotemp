@@ -1533,6 +1533,15 @@ summary:focus:not(:focus-visible) {
 }
 .elsewhere-chip:hover { color: var(--ivory); border-bottom-color: var(--brass); }
 
+/* The drawn chips turn over one at a time (glotemp-elsewhere.js). A fade
+   through, not a slide -- the row must not move or reflow while someone
+   is aiming at it. */
+.elsewhere-chip-drawn { transition: opacity 300ms ease; }
+.elsewhere-chip-drawn.is-turning { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .elsewhere-chip-drawn { transition: none; }
+}
+
 /* The window itself. The tint is the only thing that changes between a
    city that is awake and one that is asleep, and it carries most of the
    feeling. */
@@ -1548,21 +1557,22 @@ summary:focus:not(:focus-visible) {
   background: linear-gradient(180deg, rgba(107, 168, 245, 0.09) 0%, transparent 60%);
 }
 
-/* City of the Day only (glotemp-elsewhere.js / city-of-day-photos.js).
-   Every other city never gets this modifier class, so .elsewhere-panel's
-   own rules above are the only ones that ever apply to it -- same
-   layout, same spacing, same everything. Named "-featured", not "-day",
-   so it can't collide with .elsewhere-panel-day above (unrelated
-   time-of-day styling). position:relative here does not affect flow; it
-   only gives the absolutely-positioned photo layer below something to
-   anchor to, clipped to this panel's own box. */
-.elsewhere-panel-featured {
+/* Every city is photographed (glotemp-elsewhere.js), so every panel
+   carries this modifier -- the City of the Day differs only in getting a
+   slow rotation through several Commons photos rather than one still
+   frame. Named "-photo", not "-day", so it can't collide with
+   .elsewhere-panel-day above (unrelated time-of-day styling).
+   position:relative here does not affect flow; it only gives the
+   absolutely-positioned photo layer below something to anchor to, clipped
+   to this panel's own box. A city with no photo simply leaves the layer
+   empty and looks exactly as it did before. */
+.elsewhere-panel-photo {
   position: relative;
   overflow: hidden;
 }
-.elsewhere-panel-featured > .elsewhere-now,
-.elsewhere-panel-featured > .elsewhere-strands,
-.elsewhere-panel-featured > .elsewhere-more {
+.elsewhere-panel-photo > .elsewhere-now,
+.elsewhere-panel-photo > .elsewhere-strands,
+.elsewhere-panel-photo > .elsewhere-more {
   position: relative;
   z-index: 1;
 }
