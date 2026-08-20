@@ -493,4 +493,13 @@
   } else {
     mount();
   }
+
+  // Public, minimal: the exact two fetchers used for a spin's own
+  // photo/fact reveal, for spin-backdrop.js's ambient rotation to call
+  // directly rather than re-implementing the same two-tier fact fallback
+  // and themed Commons search a second time. Both already cache
+  // per-city internally, so calling them again here for a city already
+  // fetched (e.g. a spin landing on a city the backdrop just showed) is
+  // free.
+  window.GlotempSpin = { fetchSurprisePhoto, getCityFact };
 })();

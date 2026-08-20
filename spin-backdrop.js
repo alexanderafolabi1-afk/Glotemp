@@ -3,38 +3,55 @@
  * WHAT THIS IS FOR
  * The section was bare next to the rest of the page -- thin rules, small
  * type, flat ground, a lot of empty room. It now carries a photograph of
- * a real city behind it, that city's name, and one thing worth knowing
- * about it, and it carries all three from the moment the page loads. A
- * visitor who never touches the dial still sees a finished section.
+ * a real city behind it, that city's name, and one real thing worth
+ * knowing about it, and it carries all three from the moment the page
+ * loads. A visitor who never touches the dial still sees a finished,
+ * living section.
  *
  * Spinning does not switch the section on; it only changes which city is
  * showing. See GlotempSpinBackdrop.showCity(), which glotemp-spin.js
- * calls when a spin lands.
+ * calls when a spin lands -- the ambient rotation and a spin's own
+ * result never fight, because the moment anyone touches the instrument
+ * (hover, click, keyboard, touch) the rotation stops for good. See
+ * wire() below.
  *
  * WHERE THE MEDIA COMES FROM
- * /city-media/manifest.json, written by scripts/fetch-city-media.js on a
- * schedule. Nothing here talks to Openverse or Commons -- by the time the
- * page loads, the photographs are already files on this origin, each one
- * carrying the creator, the licence and the page it came from.
+ * The exact same fetchers a spin's own result uses -- window.GlotempSpin
+ * (fetchSurprisePhoto, getCityFact), exported by glotemp-spin.js
+ * specifically so this file never re-implements the same themed Commons
+ * search or the same two-tier CITY_TRIVIA -> Wikipedia-extract fallback
+ * a second time. Nothing here talks to Commons or Wikipedia directly.
  *
- * A city is only in the rotation if it has BOTH a licensed photograph and
- * at least one fact. A city missing either is skipped entirely: there is
- * no blank frame and no placeholder, and nothing is invented to fill a
- * gap.
- *
- * SCOPE
- * This file writes into #spin-backdrop and #spin-caption and nothing
- * else. Remove it and the section renders exactly as it did before.
+ * ROTATION IS A SMALL, CURATED LIST, NOT ALL 300 CITIES
+ * ROTATION_CITIES below (16 cities) are chosen specifically because they
+ * are BOTH in city-trivia-data.js (a real fact resolves instantly, no
+ * network) AND in city-landmark-photos.js's LANDMARK_TITLES (a
+ * hand-verified Wikipedia landmark photo exists as fetchSurprisePhoto's
+ * own fallback if its themed Commons search comes up empty) -- so this
+ * ambient layer is built to rarely, if ever, hit the "nothing to show"
+ * case, without needing to cover the whole roster the way the per-spin
+ * result does. A city is only ever shown once its own photo AND fact
+ * have actually resolved; nothing is painted from a partial or invented
+ * result, and a draw whose photo fails simply waits for the next timer
+ * tick rather than showing a gap.
  */
 (function () {
   'use strict';
 
-  var MANIFEST_URL = '/city-media/manifest.json';
-  var CROSSFADE_MS = 9000;      // as specified: a new face every nine seconds
-  var FADE_MS = 1400;           // the fade itself -- never a hard swap
-  var FETCH_TIMEOUT_MS = 5000;
+  // Same 16 cities described above. Order here is irrelevant -- draw()
+  // shuffles.
+  var ROTATION_CITIES = [
+    'tokyo', 'paris', 'london', 'nyc', 'rome', 'sydney', 'dubai', 'singapore',
+    'hong-kong', 'istanbul', 'barcelona', 'amsterdam', 'cairo', 'mumbai', 'seoul', 'berlin',
+  ];
 
-  var frames = [];              // [{ slug, name, image, fact }]
+  // Matches city-of-day-photos.js's own "roughly every 15-20 seconds"
+  // pacing convention elsewhere in this project -- one ambient rotation
+  // reads as one system, not two different rhythms.
+  var CROSSFADE_MS = 18000;
+  var FADE_MS = 1400; // the fade itself -- never a hard swap
+
+  var cities = [];              // [{ slug, name }] resolved from CITIES_DATA, once
   var deck = [];
   var current = null;
   var timer = null;
@@ -58,47 +75,25 @@
     return a;
   }
 
-  function factsFor(slug) {
-    var all = window.CITY_TRIVIA;
-    var list = all && all[slug];
-    return Array.isArray(list) ? list.filter(function (f) { return typeof f === 'string' && f.trim(); }) : [];
-  }
-
-  // Every (image, fact) pairing a city can offer, so the same city shows a
-  // different face each time it comes round rather than repeating one
-  // photograph with one line.
-  function buildFrames(manifest) {
-    var out = [];
-    Object.keys(manifest.cities || {}).forEach(function (slug) {
-      var entry = manifest.cities[slug];
-      var images = (entry && entry.images) || [];
-      var facts = factsFor(slug);
-      if (!images.length || !facts.length) return;   // skipped, not faked
-      var n = Math.max(images.length, facts.length);
-      for (var i = 0; i < n; i++) {
-        out.push({
-          slug: slug,
-          name: entry.name || slug,
-          image: images[i % images.length],
-          fact: facts[i % facts.length],
-        });
-      }
-    });
-    return out;
+  function resolveCities() {
+    var all = (typeof window !== 'undefined' && window.CITIES_DATA) || [];
+    var bySlug = {};
+    all.forEach(function (c) { bySlug[c.slug] = c; });
+    return ROTATION_CITIES.map(function (slug) { return bySlug[slug]; }).filter(Boolean);
   }
 
   // A deck, so every city is offered before any is offered twice -- and
   // never the same city twice consecutively.
   function draw() {
-    if (!deck.length) deck = shuffle(frames);
+    if (!deck.length) deck = shuffle(cities);
     for (var i = 0; i < deck.length; i++) {
       if (!current || deck[i].slug !== current.slug) return deck.splice(i, 1)[0];
     }
-    deck = shuffle(frames);
+    deck = shuffle(cities);
     for (var j = 0; j < deck.length; j++) {
       if (!current || deck[j].slug !== current.slug) return deck.splice(j, 1)[0];
     }
-    return null;   // only reachable if every frame is the same city
+    return null; // only reachable if the rotation list has a single city
   }
 
   function preload(src) {
@@ -110,6 +105,26 @@
     });
   }
 
+  // Resolves a real (photo, fact) pair for one city, or null if either
+  // side genuinely has nothing this time -- see window.GlotempSpin's own
+  // header comments for what "nothing" means for each (a failed/blocked
+  // fetch for the photo; both CITY_TRIVIA and Wikipedia's extract coming
+  // up empty for the fact, which should not happen for these 16 curated
+  // cities, but is still handled rather than assumed).
+  async function resolveFrame(city) {
+    if (!window.GlotempSpin) return null;
+    var results = await Promise.all([
+      window.GlotempSpin.fetchSurprisePhoto(city),
+      window.GlotempSpin.getCityFact(city),
+    ]);
+    var photoUrl = results[0];
+    var fact = results[1];
+    if (!photoUrl || !fact) return null;
+    var ok = await preload(photoUrl);
+    if (!ok) return null;
+    return { slug: city.slug, name: city.name, photoUrl: photoUrl, fact: fact };
+  }
+
   function paint(frame) {
     var backdrop = document.getElementById('spin-backdrop');
     var caption = document.getElementById('spin-caption');
@@ -119,7 +134,7 @@
     if (layers.length !== 2) return;
     var incoming = layers[layerFlip % 2];
     var outgoing = layers[(layerFlip + 1) % 2];
-    incoming.style.backgroundImage = 'url("' + frame.image.src + '")';
+    incoming.style.backgroundImage = 'url("' + frame.photoUrl + '")';
     incoming.classList.add('is-on');
     outgoing.classList.remove('is-on');
     layerFlip++;
@@ -128,27 +143,29 @@
       '<p class="spin-city">' + esc(frame.name) + '</p>' +
       '<p class="spin-fact">' + esc(frame.fact) + '</p>';
 
-    var credit = document.getElementById('spin-credit');
-    if (credit) {
-      credit.innerHTML =
-        '<a class="spin-credit-link" href="' + esc(frame.image.sourceUrl) + '" target="_blank" rel="noopener noreferrer nofollow">' +
-          esc(frame.image.creator) + '</a>' +
-        '<span class="spin-credit-sep" aria-hidden="true">·</span>' +
-        '<span class="spin-credit-lic">' + esc(frame.image.licence) + '</span>';
-      credit.hidden = false;
-    }
+    // No attribution line: unlike a pre-fetched manifest entry, a
+    // live-fetched Commons/Wikipedia URL here carries no creator/licence
+    // metadata to show -- exactly like a spin's own per-result photo,
+    // which renders the same way. #spin-credit simply stays hidden.
 
     document.getElementById('spin-section').classList.add('has-backdrop');
     current = frame;
   }
 
+  // Tries drawn cities in turn (bounded) until one resolves a real frame,
+  // rather than giving up on a single city's transient fetch hiccup --
+  // but never invents one: if nothing in the rotation resolves this
+  // tick, the current frame simply stands until the next timer tick.
   async function advance() {
-    if (stopped || paused || document.hidden || !onScreen) return;
-    var next = draw();
-    if (!next) return;
-    var ok = await preload(next.image.src);
-    if (!ok || stopped) return;      // a dead file is skipped, never shown as a gap
-    paint(next);
+    if (stopped || paused || document.hidden || !onScreen || !cities.length) return;
+    var attempts = Math.min(cities.length, 4);
+    for (var i = 0; i < attempts; i++) {
+      var candidate = draw();
+      if (!candidate) return;
+      var frame = await resolveFrame(candidate);
+      if (stopped) return; // interaction happened mid-fetch
+      if (frame) { paint(frame); return; }
+    }
   }
 
   function start() {
@@ -168,25 +185,18 @@
 
   // Called by glotemp-spin.js when a spin lands. Spinning changes which
   // city shows; it never turns the section on, and it never resurrects a
-  // rotation the visitor has already stopped.
+  // rotation the visitor has already stopped. Uses the exact same
+  // fetchers as the ambient rotation and the spin's own result panel --
+  // one mechanism, three call sites.
   async function showCity(slug) {
     stop();
-    var matches = frames.filter(function (f) { return f.slug === slug; });
-    if (!matches.length) return false;
-    var frame = matches[Math.floor(Math.random() * matches.length)];
-    var ok = await preload(frame.image.src);
-    if (!ok) return false;
+    var all = (typeof window !== 'undefined' && window.CITIES_DATA) || [];
+    var city = all.filter(function (c) { return c.slug === slug; })[0];
+    if (!city || !window.GlotempSpin) return false;
+    var frame = await resolveFrame(city);
+    if (!frame) return false;
     paint(frame);
     return true;
-  }
-
-  function getJSON(url) {
-    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
-    var t = setTimeout(function () { if (ctrl) ctrl.abort(); }, FETCH_TIMEOUT_MS);
-    return fetch(url, ctrl ? { signal: ctrl.signal } : undefined)
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .catch(function () { return null; })
-      .then(function (d) { clearTimeout(t); return d; });
   }
 
   function wire(section) {
@@ -197,9 +207,6 @@
       section.addEventListener(evt, stop, { passive: true });
     });
     section.addEventListener('focusin', stop);
-    document.addEventListener('visibilitychange', function () {
-      if (!document.hidden && !stopped) { /* interval keeps its own guard */ }
-    });
     if (typeof IntersectionObserver === 'function') {
       onScreen = false;
       new IntersectionObserver(function (entries) {
@@ -212,20 +219,20 @@
     var section = document.getElementById('spin-section');
     if (!section || !document.getElementById('spin-backdrop')) return;
 
-    var manifest = await getJSON(MANIFEST_URL);
-    if (!manifest || !manifest.cities) return;   // section stays exactly as it was
-    frames = buildFrames(manifest);
-    if (!frames.length) return;
+    cities = resolveCities();
+    if (!cities.length) return; // CITIES_DATA not ready/available -- section stays exactly as it was
 
-    deck = shuffle(frames);
-    // Furnished on load: paint before the first interval ever fires.
-    var first = deck.shift();
-    if (first) {
-      var ok = await preload(first.image.src);
-      if (ok) paint(first);
-      else { var second = draw(); if (second && await preload(second.image.src)) paint(second); }
+    deck = shuffle(cities);
+    // Furnished on load: try to paint before the first interval ever
+    // fires, same bounded-attempts approach as advance().
+    var attempts = Math.min(cities.length, 4);
+    for (var i = 0; i < attempts && !current; i++) {
+      var candidate = draw();
+      if (!candidate) break;
+      var frame = await resolveFrame(candidate);
+      if (frame) paint(frame);
     }
-    if (!current) return;
+    if (!current) return; // nothing resolved -- section stays exactly as it was, no gap shown
 
     wire(section);
     if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) start();
@@ -240,11 +247,12 @@
   };
 
   // glotemp-spin.js writes the section's markup on DOMContentLoaded, so
-  // this must run after it rather than racing it for #spin-backdrop.
+  // this must run after it rather than racing it for #spin-backdrop --
+  // and after glotemp-spin.js has attached window.GlotempSpin.
   function boot() {
     var tries = 0;
     (function wait() {
-      if (document.getElementById('spin-backdrop')) { mount(); return; }
+      if (document.getElementById('spin-backdrop') && window.GlotempSpin) { mount(); return; }
       if (tries++ > 60) return;
       setTimeout(wait, 100);
     })();
