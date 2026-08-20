@@ -6,7 +6,7 @@
 // whole fix: the previous worker used a hand-bumped constant that nobody
 // bumped, so every deploy reused the same cache name, activate's cleanup
 // matched nothing, and the old build survived.
-const BUILD_HASH = '7e7a5244ea4b';
+const BUILD_HASH = '7f9f5128e12c';
 const CACHE_NAME = `glotemp-${BUILD_HASH}`;
 
 // Only genuinely immutable things are precached. HTML never is.
