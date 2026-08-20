@@ -92,10 +92,61 @@
       '<div class="nav-account" id="nav-account' + idSuffix + '">' +
         '<button type="button" class="nav-account-btn" id="nav-account-btn' + idSuffix + '" aria-haspopup="true" aria-expanded="false">' + escapeHTML(label) + '</button>' +
         '<div class="nav-account-menu" id="nav-account-menu' + idSuffix + '" hidden>' +
+          // Private, self-only: filled in by loadAccountStars() the
+          // moment the menu opens, never rendered with real numbers up
+          // front (there is nothing to fetch yet at initial page render,
+          // and this must never show anyone else's numbers -- it only
+          // ever exists inside the signed-in owner's own dropdown).
+          '<div class="nav-account-stars" id="nav-account-stars' + idSuffix + '"></div>' +
           '<button type="button" class="nav-account-signout" id="nav-account-signout' + idSuffix + '">Sign out</button>' +
         '</div>' +
       '</div>'
     );
+  }
+
+  // Fetches and renders this signed-in visitor's own star total and
+  // invite link into their account dropdown -- see glotemp-auth.js's
+  // get_my_stars()/ensureReferralCode(). Fired on menu open rather than
+  // on every render, since it is two network round trips and the menu
+  // usually stays closed.
+  var starsLoadedFor = {};
+  function loadAccountStars(idSuffix) {
+    var box = document.getElementById('nav-account-stars' + idSuffix);
+    if (!box || !window.GlotempAuth || !window.GlotempAuth.isSignedIn()) return;
+    if (starsLoadedFor[idSuffix]) return;
+    starsLoadedFor[idSuffix] = true;
+    box.innerHTML = '<p class="nav-account-stars-loading">Loading&hellip;</p>';
+    Promise.all([window.GlotempAuth.getMyStars(), window.GlotempAuth.ensureReferralCode()])
+      .then(function (results) {
+        var stars = results[0];
+        var code = results[1] || stars.referral_code;
+        var link = code ? (window.location.origin + '/?ref=' + encodeURIComponent(code)) : null;
+        box.innerHTML =
+          '<p class="nav-account-stars-count">' + escapeHTML(stars.total_stars) + ' star' + (stars.total_stars === 1 ? '' : 's') + '</p>' +
+          (link
+            ? '<p class="nav-account-invite-label">Your invite link</p>' +
+              '<div class="nav-account-invite-row">' +
+                '<input class="nav-account-invite-link" id="nav-account-invite-link' + idSuffix + '" type="text" readonly value="' + escapeAttr(link) + '">' +
+                '<button type="button" class="nav-account-invite-copy" id="nav-account-invite-copy' + idSuffix + '">Copy</button>' +
+              '</div>'
+            : '');
+        var copyBtn = document.getElementById('nav-account-invite-copy' + idSuffix);
+        var linkInput = document.getElementById('nav-account-invite-link' + idSuffix);
+        if (copyBtn && linkInput) {
+          copyBtn.addEventListener('click', function () {
+            var done = function () { copyBtn.textContent = 'Copied'; setTimeout(function () { copyBtn.textContent = 'Copy'; }, 2000); };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(linkInput.value).then(done, function () { linkInput.select(); });
+            } else {
+              linkInput.select();
+            }
+          });
+        }
+      })
+      .catch(function () {
+        starsLoadedFor[idSuffix] = false;
+        box.innerHTML = '';
+      });
   }
 
   function refreshAccountControls() {
@@ -125,11 +176,17 @@
       var open = !menu.hidden;
       menu.hidden = open;
       btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if (!open) loadAccountStars(idSuffix);
     });
     signoutBtn.addEventListener('click', function () {
       if (window.GlotempAuth) window.GlotempAuth.signOut();
       menu.hidden = true;
       btn.setAttribute('aria-expanded', 'false');
+      // A different account may sign in next -- never carry over a
+      // stale star count/invite link into their dropdown.
+      starsLoadedFor[idSuffix] = false;
+      var starsBox = document.getElementById('nav-account-stars' + idSuffix);
+      if (starsBox) starsBox.innerHTML = '';
       refreshAccountControls();
     });
     document.addEventListener('click', function (e) {
