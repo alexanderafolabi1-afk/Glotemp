@@ -30,8 +30,21 @@
  * and then, if Wikipedia has nothing, Wikimedia Commons' own category for
  * the city. Both are free, keyless, and already used elsewhere on the site
  * (city-wiki.js, city-landmark-photos.js, city-of-day-photos.js), so this
- * adds no new dependency and no licence question -- the page's existing
- * CC BY-SA attribution line covers imagery pulled from Wikipedia.
+ * adds no new dependency.
+ *
+ * EVERY MATCH IS CHECKED AGAINST THE MAP
+ * A title that resolves is not necessarily the place. Hue shipped with a
+ * picture of a colour wheel, because en.wikipedia's "Hue" is the article
+ * about colour and it has a perfectly good page image. Guessing harder at
+ * titles cannot fix that class of error, so the article is verified
+ * instead: every candidate must carry primary coordinates within
+ * MAX_KM of the city's own lat/lon from cities-data.js. The colour wheel
+ * has no coordinates at all and is rejected; the search then finds Hue in
+ * Vietnam, which is 0km from where we already know Hue to be.
+ *
+ * This makes the title list above a shortcut rather than a load-bearing
+ * guess -- a wrong entry in it now fails the map check and falls through
+ * to the next candidate instead of shipping the wrong photo.
  *
  * BATCHED, NOT 300 REQUESTS
  * Steps 2 and 3 go through action=query, which accepts up to 50 titles at
@@ -53,9 +66,19 @@
   var BATCH_SIZE = 40;        // action=query accepts 50; leave headroom
   var BATCH_DELAY_MS = 30;    // collect callers within one paint, then fire
 
-  var STORE_KEY = 'glotemp:city-photos:v1';
+  // v2: v1 shipped before candidates were checked against the map, so a
+  // few cities cached a confidently wrong picture (Hue got the colour
+  // wheel) with a thirty-day life. Changing the key retires those.
+  var STORE_KEY = 'glotemp:city-photos:v2';
   var HIT_TTL_MS = 30 * 24 * 60 * 60 * 1000;  // a photo URL is stable
   var MISS_TTL_MS = 3 * 24 * 60 * 60 * 1000;  // retry a miss sooner
+
+  // How far an article's own coordinates may sit from the city's before we
+  // conclude it is about somewhere else. Generous on purpose: island and
+  // metro articles legitimately centre tens of kilometres from the city
+  // point (Rhodes ~40km, Como ~25km), while a wrong subject is either
+  // hundreds of kilometres away or, like the colour hue, nowhere at all.
+  var MAX_KM = 150;
 
   var MIN_COMMONS_DIMENSION = 400;
   var BAD_COMMONS_TITLE = /logo|coat[\s_]of[\s_]arms|seal[\s_]of|flag[\s_]of|\bmap\b|diagram|chart|icon|emblem|locator/i;
@@ -182,24 +205,52 @@
     };
   }
 
-  function usableThumb(page) {
+  // Great-circle distance in kilometres.
+  function kmApart(lat1, lon1, lat2, lon2) {
+    var R = 6371;
+    var toRad = function (d) { return d * Math.PI / 180; };
+    var dLat = toRad(lat2 - lat1);
+    var dLon = toRad(lon2 - lon1);
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  // A candidate is only usable if it has a picture AND the article is
+  // demonstrably about this city. `city` may be null only where the caller
+  // has already established the subject some other way (the Commons
+  // category path), never for an article lookup.
+  function usableThumb(page, city) {
     if (!page || page.missing || page.invalid) return null;
     // A disambiguation page can carry a thumbnail (one of the candidates'
     // images); it is never a photo *of* the place we asked about.
     if (page.pageprops && typeof page.pageprops.disambiguation !== 'undefined') return null;
-    return (page.thumbnail && page.thumbnail.source) || null;
+    var src = (page.thumbnail && page.thumbnail.source) || null;
+    if (!src) return null;
+    if (!city) return src;
+    // No coordinates means this is not an article about a place at all --
+    // "Hue" the colour, "Phoenix" the bird. A real settlement article
+    // always carries them.
+    var coord = page.coordinates && page.coordinates[0];
+    if (!coord || typeof coord.lat !== 'number' || typeof coord.lon !== 'number') return null;
+    if (typeof city.lat !== 'number' || typeof city.lon !== 'number') return src;
+    return kmApart(city.lat, city.lon, coord.lat, coord.lon) <= MAX_KM ? src : null;
   }
 
-  // One request, up to BATCH_SIZE titles. Resolves to { <requested title>: url|null }.
-  function fetchTitles(titles) {
+  // One request, up to BATCH_SIZE titles. `wanted` maps each requested
+  // title to the city it was requested for, so each answer can be checked
+  // against that city's own position. Resolves to { <title>: url|null }.
+  function fetchTitles(titles, wanted) {
     if (!titles.length) return Promise.resolve({});
     var url = apiURL(WIKI_API, {
       action: 'query',
       redirects: '1',
-      prop: 'pageimages|pageprops',
+      prop: 'pageimages|pageprops|coordinates',
       ppprop: 'disambiguation',
       piprop: 'thumbnail',
       pithumbsize: String(THUMB_PX),
+      colimit: 'max',
       titles: titles.join('|'),
     });
     return getJSON(url).then(function (data) {
@@ -212,7 +263,9 @@
         byTitle[String(page.title || '').replace(/_/g, ' ').trim().toLowerCase()] = page;
       });
       var resolve = titleResolver(query);
-      titles.forEach(function (t) { out[t] = usableThumb(byTitle[resolve(t)]); });
+      titles.forEach(function (t) {
+        out[t] = usableThumb(byTitle[resolve(t)], (wanted && wanted[t]) || null);
+      });
       return out;
     });
   }
@@ -220,25 +273,29 @@
   // Last Wikipedia resort: let the search index find the article, whatever
   // it happens to be called. One request per city, so this only ever runs
   // for the handful the batched title lookups could not place.
-  function fetchBySearch(name, country) {
+  function fetchBySearch(city) {
     var url = apiURL(WIKI_API, {
       action: 'query',
       generator: 'search',
-      gsrsearch: name + (country ? ' ' + country : ''),
+      gsrsearch: city.name + (city.country ? ' ' + city.country : ''),
       gsrnamespace: '0',
-      gsrlimit: '3',
-      prop: 'pageimages|pageprops',
+      gsrlimit: '5',
+      prop: 'pageimages|pageprops|coordinates',
       ppprop: 'disambiguation',
       piprop: 'thumbnail',
       pithumbsize: String(THUMB_PX),
+      colimit: 'max',
     });
     return getJSON(url).then(function (data) {
       var raw = (data && data.query && data.query.pages) || [];
       // generator=search returns pages in an arbitrary order; index carries
       // the actual ranking, so sort by it rather than trusting array order.
       var pages = raw.slice().sort(function (a, b) { return (a.index || 0) - (b.index || 0); });
+      // Take the best-ranked hit that is both illustrated and in the right
+      // place. Searching "Hue Vietnam" surfaces the colour article too;
+      // it has no coordinates, so it loses to the city.
       for (var i = 0; i < pages.length; i++) {
-        var src = usableThumb(pages[i]);
+        var src = usableThumb(pages[i], city);
         if (src) return src;
       }
       return null;
@@ -248,11 +305,11 @@
   // Wikimedia Commons' own category for the city -- a second free source,
   // filtered the same way city-of-day-photos.js filters it (real raster
   // photographs only, no flags, seals, maps or diagrams).
-  function fetchFromCommons(name) {
+  function fetchOneCommonsCategory(category) {
     var url = apiURL(COMMONS_API, {
       action: 'query',
       generator: 'categorymembers',
-      gcmtitle: 'Category:' + name,
+      gcmtitle: 'Category:' + category,
       gcmtype: 'file',
       gcmnamespace: '6',
       gcmlimit: '25',
@@ -274,6 +331,23 @@
       }
       return null;
     });
+  }
+
+  // Commons categories are named after the place, so the same candidates
+  // that identify the article identify the category -- and the verified
+  // title is the best of them ("Huế", not "Hue", which on Commons is the
+  // colour again). Tried in order, first hit wins.
+  function fetchFromCommons(entry) {
+    var candidates = uniq([
+      TITLE_OVERRIDES[entry.slug],
+      entry.name,
+      entry.name && entry.country ? entry.name + ', ' + entry.country : null,
+    ]);
+    return candidates.reduce(function (chain, category) {
+      return chain.then(function (found) {
+        return found || fetchOneCommonsCategory(category);
+      });
+    }, Promise.resolve(null));
   }
 
   // ---------- the per-city pipeline ----------
@@ -312,16 +386,27 @@
       return {
         slug: item.slug,
         resolve: item.resolve,
+        city: city,
         name: city ? city.name : null,
         country: city ? city.country : null,
         primary: TITLE_OVERRIDES[item.slug] || (city ? city.name : null),
       };
     });
 
-    var round1 = entries.filter(function (e) { return e.primary; });
-    var titles1 = uniq(round1.map(function (e) { return e.primary; }));
+    // Each requested title is checked against the position of the city it
+    // was requested for; two cities can't sensibly claim the same title,
+    // so a title-to-city map is enough.
+    function titleMap(list, titleOf) {
+      var map = {};
+      list.forEach(function (e) { map[titleOf(e)] = e.city; });
+      return map;
+    }
 
-    fetchTitles(titles1).then(function (found1) {
+    var round1 = entries.filter(function (e) { return e.primary; });
+    var first = function (e) { return e.primary; };
+    var titles1 = uniq(round1.map(first));
+
+    fetchTitles(titles1, titleMap(round1, first)).then(function (found1) {
       var unresolved = [];
       round1.forEach(function (e) {
         var url = found1[e.primary];
@@ -331,21 +416,22 @@
              .forEach(function (e) { unresolved.push(e); });
 
       var round2 = unresolved.filter(function (e) { return e.name && e.country; });
-      var titles2 = uniq(round2.map(function (e) { return e.name + ', ' + e.country; }));
+      var second = function (e) { return e.name + ', ' + e.country; };
+      var titles2 = uniq(round2.map(second));
 
-      return fetchTitles(titles2).then(function (found2) {
+      return fetchTitles(titles2, titleMap(round2, second)).then(function (found2) {
         var stillOpen = [];
         unresolved.forEach(function (e) {
-          var url = (e.name && e.country) ? found2[e.name + ', ' + e.country] : null;
+          var url = (e.name && e.country) ? found2[second(e)] : null;
           if (url) finish(e, url); else stillOpen.push(e);
         });
         // Serially, not in parallel: these are one request per city and
         // there is no hurry -- the card already shows its band swatch.
         return stillOpen.reduce(function (chain, e) {
           return chain.then(function () {
-            if (!e.name) { finish(e, null); return; }
-            return fetchBySearch(e.name, e.country)
-              .then(function (url) { return url || fetchFromCommons(e.name); })
+            if (!e.city) { finish(e, null); return; }
+            return fetchBySearch(e.city)
+              .then(function (url) { return url || fetchFromCommons(e); })
               .then(function (url) { finish(e, url || null); });
           });
         }, Promise.resolve());
