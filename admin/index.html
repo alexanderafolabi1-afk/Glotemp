@@ -144,6 +144,10 @@
   </style>
   <script src="/glotemp-analytics.js" defer></script>
   <script src="/admin-i18n.js"></script>
+  <!-- Personality layer. Purely additive: remove these two and the
+       admin is exactly the panel it was. -->
+  <link rel="stylesheet" href="/admin/admin-space.css" />
+  <script src="/admin/admin-space.js" defer></script>
 </head>
 <body>
   <!-- No public site nav here. This is a private page, and the public nav
@@ -466,6 +470,17 @@
         '<p class="adm-status" id="adm-pw-status" role="status" aria-live="polite"></p>'
       );
 
+      // Tell the space layer what was just drawn, so it can compare the
+      // real numbers against what this browser last saw and react to
+      // anything that has actually gone up. It listens or it doesn't;
+      // nothing here depends on it.
+      document.dispatchEvent(new CustomEvent('admin:ready', { detail: { metrics: {
+        checkins: Number(m.checkins) || 0,
+        signed_up: Number(m.signed_up) || 0,
+        keys_active: Number(a.keys_active) || 0,
+        founders: Number(tc.founder) || 0,
+      } } }));
+
       // Limits live here rather than in the database default so the plan
       // named on screen and the ceiling actually applied are one thing.
       var PLAN_LIMITS = { free: 1000, starter: 50000, growth: 500000, scale: null };
@@ -479,6 +494,7 @@
         var btn = document.getElementById('adm-key-submit');
         if (!label || btn.disabled) return;
         st.textContent = 'Issuing...';
+        if (window.GlotempAdminSpace) GlotempAdminSpace.commit(btn);
         btn.disabled = true;
         try {
           var res = await rpc('admin_issue_api_key', {
@@ -498,6 +514,7 @@
               '<p><button type="button" class="adm-action" id="adm-key-copy">Copy</button></p>' +
             '</div>';
           document.getElementById('adm-key-copy').addEventListener('click', function () {
+            if (window.GlotempAdminSpace) GlotempAdminSpace.commit(this);
             navigator.clipboard.writeText(row.api_key).then(function () {
               document.getElementById('adm-key-copy').textContent = 'Copied';
             }, function () {
@@ -506,6 +523,10 @@
           });
           document.getElementById('adm-key-label').value = '';
           document.getElementById('adm-key-email').value = '';
+          // A key issued is the admin's real revenue moment.
+          var reveal = document.querySelector('#adm-key-reveal .adm-reveal');
+          if (reveal) reveal.classList.add('is-fresh');
+          document.dispatchEvent(new CustomEvent('admin:key-issued'));
         } catch (err) {
           st.textContent = 'Could not issue that key.';
         } finally {
@@ -519,6 +540,7 @@
           b.disabled = true;
           try {
             await rpc('admin_revoke_api_key', { p_id: b.getAttribute('data-key-id') });
+            if (window.GlotempAdminSpace) GlotempAdminSpace.pulseRow(b.closest('.adm-row'), 'gold');
             await load();
           } catch (err) {
             b.disabled = false;
@@ -539,6 +561,7 @@
         if (a.length < 8) { st.textContent = 'Use at least 8 characters.'; return; }
         if (a !== bb) { st.textContent = 'Those two do not match.'; return; }
         st.textContent = 'Saving...';
+        if (window.GlotempAdminSpace) GlotempAdminSpace.commit(btn);
         btn.disabled = true;
         try {
           await GlotempAuth.updatePassword(a);
@@ -590,6 +613,16 @@
           try {
             await restTable('PATCH', 'outreach_leads?id=eq.' + encodeURIComponent(id), { status: sel.value });
             sel.setAttribute('data-prev', sel.value);
+            // Real action, real reaction: the row acknowledges the save,
+            // and a reply is a milestone the astronaut celebrates.
+            if (window.GlotempAdminSpace) {
+              var tone = sel.value === 'replied' ? 'violet'
+                       : sel.value === 'closed' ? 'gold' : 'teal';
+              GlotempAdminSpace.pulseRow(sel.closest('.adm-row'), tone);
+            }
+            document.dispatchEvent(new CustomEvent('admin:lead-status', {
+              detail: { status: sel.value },
+            }));
           } catch (err) {
             sel.value = prev;
           } finally {
