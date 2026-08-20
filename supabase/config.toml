@@ -147,3 +147,10 @@ user = "env(SMTP_USER)"
 pass = "env(SMTP_PASS)"
 admin_email = "info@glo-temp.com"
 sender_name = "Glotemp"
+
+# The page-view collector is called from every visitor's browser, which has
+# no end-user JWT, so the platform's default JWT check would reject every
+# call. It is safe to leave open: it accepts nothing but a path, a referrer
+# and a display mode, writes a single row, and returns no data at all.
+[functions.collect]
+verify_jwt = false
