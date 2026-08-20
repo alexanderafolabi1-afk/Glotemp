@@ -56,6 +56,19 @@
   margin-top: 1rem;
 }
 
+/* One quiet line, not a badge or a counter -- see glotemp-daily-checkin.js.
+   Deliberately the same muted register as .daily-checkin-copy.subtle, not
+   the neon/brass treatment used for actionable state, so it reads as an
+   aside rather than a call to gamify. */
+.daily-checkin-founding-note {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: rgba(244,241,234,0.58);
+  border-top: 1px solid rgba(244,241,234,0.12);
+  margin: 1.5rem 0 0;
+  padding-top: 1rem;
+}
+
 .daily-moods {
   display: flex;
   flex-wrap: wrap;

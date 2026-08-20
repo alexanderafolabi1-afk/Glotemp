@@ -143,6 +143,7 @@
     }
   </style>
   <script src="/glotemp-analytics.js" defer></script>
+  <script src="/admin-i18n.js"></script>
 </head>
 <body>
   <!-- No public site nav here. This is a private page, and the public nav
@@ -202,6 +203,30 @@
         body: JSON.stringify(args || {}),
       });
       if (!resp.ok) throw new Error(fn + ' ' + resp.status);
+      return resp.json();
+    }
+
+    // Plain PostgREST table access for outreach_leads -- RLS-gated to
+    // is_admin() (see 20260820150500_admin_outreach_leads.sql), not an
+    // RPC. There is no raw-row-exposure concern here the way there is for
+    // profiles/analytics_events: this table holds no user data, only
+    // organisation names and notes the admin types in themselves, so a
+    // policy is the right amount of machinery rather than four functions.
+    async function restTable(method, path, body) {
+      var session = await GlotempAuth.getSession();
+      if (!session) throw new Error('no session');
+      var headers = {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: 'Bearer ' + session.access_token,
+        'Content-Type': 'application/json',
+      };
+      if (method !== 'GET') headers.Prefer = 'return=representation';
+      var resp = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+        method: method,
+        headers: headers,
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      if (!resp.ok) throw new Error(path + ' ' + resp.status);
       return resp.json();
     }
 
@@ -271,11 +296,27 @@
              '<span class="adm-stat-label">' + esc(label) + '</span></div>';
     }
 
-    function dashboard(overview, byCity, apiOverview, apiKeys) {
+    var t = window.AdminI18n ? window.AdminI18n.t : function (k, f) { return f || k; };
+
+    function tierLabel(tier) {
+      if (tier === 'voice') return t('adm_tier_voice', 'Voice');
+      if (tier === 'keeper') return t('adm_tier_keeper', 'Keeper');
+      if (tier === 'founder') return t('adm_tier_founder', 'Founder');
+      return tier || '';
+    }
+
+    var LEAD_STATUSES = ['not_contacted', 'contacted', 'replied', 'closed'];
+    function leadStatusLabel(status) {
+      return t('adm_outreach_status_' + status, status);
+    }
+
+    function dashboard(overview, byCity, apiOverview, apiKeys, tierCounts, topContributors, leads) {
       var m = {};
       (overview || []).forEach(function (r) { m[r.metric] = r.value; });
       var a = {};
       (apiOverview || []).forEach(function (r) { a[r.metric] = r.value; });
+      var tc = {};
+      (tierCounts || []).forEach(function (r) { tc[r.tier] = r.members; });
 
       var keyRows = (apiKeys || []).length
         ? (apiKeys || []).map(function (k) {
@@ -359,6 +400,59 @@
         '</form>' +
         '<p class="adm-status" id="adm-key-status" role="status" aria-live="polite"></p>' +
         '<div id="adm-key-reveal"></div>' +
+
+        '<div class="adm-section-head"><h2 class="adm-h2">' + esc(t('adm_contributors_title', 'Contributor tiers')) + '</h2></div>' +
+        '<p class="adm-eyebrow">' + esc(t('adm_contributors_eyebrow', 'Private, admin-only')) + '</p>' +
+        '<p class="adm-copy">' + esc(t('adm_contributors_copy', 'Voice / Keeper / Founder, computed from check-in count and streak. Never shown publicly.')) + '</p>' +
+        '<div class="adm-grid">' +
+          stat(tc.voice || 0, t('adm_tier_voice', 'Voice')) +
+          stat(tc.keeper || 0, t('adm_tier_keeper', 'Keeper')) +
+          stat(tc.founder || 0, t('adm_tier_founder', 'Founder')) +
+        '</div>' +
+        '<div class="adm-section-head"><h2 class="adm-h2">' + esc(t('adm_contributors_top_heading', 'Top contributors')) + '</h2></div>' +
+        ((topContributors || []).length
+          ? topContributors.map(function (c) {
+              return '<div class="adm-row">' +
+                '<span class="adm-row-city">' + esc(c.display_name) +
+                  '<span class="adm-key-prefix">' + esc(tierLabel(c.tier)) + '</span></span>' +
+                '<span class="adm-row-count">' + esc(c.total_checkins) + '</span>' +
+                '<span class="adm-row-when">' + esc(c.distinct_days) + ' days, ' + esc(c.distinct_weeks) + ' weeks</span>' +
+              '</div>';
+            }).join('')
+          : '<p class="adm-copy">' + esc(t('adm_contributors_empty', 'Nobody has reached a tier yet.')) + '</p>') +
+
+        '<div class="adm-section-head"><h2 class="adm-h2">' + esc(t('adm_outreach_title', 'Outreach')) + '</h2></div>' +
+        '<p class="adm-eyebrow">' + esc(t('adm_outreach_eyebrow', 'Private, admin-only')) + '</p>' +
+        '<p class="adm-copy">' + esc(t('adm_outreach_copy', 'Sponsor and partner leads. A place to track status, not a CRM.')) + '</p>' +
+        ((leads || []).length
+          ? leads.map(function (lead) {
+              return '<div class="adm-row adm-lead-row">' +
+                '<span class="adm-row-city">' + esc(lead.org_name) +
+                  (lead.category ? '<span class="adm-key-prefix">' + esc(lead.category) + '</span>' : '') +
+                '</span>' +
+                '<select class="adm-input adm-lead-status" data-lead-id="' + esc(lead.id) + '" data-prev="' + esc(lead.status) + '" style="width:auto;max-width:11rem;flex:0 0 auto">' +
+                  LEAD_STATUSES.map(function (s) {
+                    return '<option value="' + esc(s) + '"' + (s === lead.status ? ' selected' : '') + '>' + esc(leadStatusLabel(s)) + '</option>';
+                  }).join('') +
+                '</select>' +
+              '</div>' +
+              (lead.notes ? '<p class="adm-copy" style="margin:-0.5rem 0 0.8rem">' + esc(lead.notes) + '</p>' : '');
+            }).join('')
+          : '<p class="adm-copy">No leads yet.</p>') +
+        '<form id="adm-lead-form">' +
+          '<label class="adm-label" for="adm-lead-org">' + esc(t('adm_outreach_org', 'Organisation')) + '</label>' +
+          '<input class="adm-input" type="text" id="adm-lead-org" maxlength="120" required>' +
+          '<label class="adm-label" for="adm-lead-category">' + esc(t('adm_outreach_category', 'Category')) + '</label>' +
+          '<input class="adm-input" type="text" id="adm-lead-category" maxlength="60" placeholder="Tourism board">' +
+          '<label class="adm-label" for="adm-lead-contact-name">' + esc(t('adm_outreach_contact_name', 'Contact name')) + '</label>' +
+          '<input class="adm-input" type="text" id="adm-lead-contact-name" maxlength="120">' +
+          '<label class="adm-label" for="adm-lead-contact-email">' + esc(t('adm_outreach_contact_email', 'Contact email')) + '</label>' +
+          '<input class="adm-input" type="email" id="adm-lead-contact-email">' +
+          '<label class="adm-label" for="adm-lead-notes">' + esc(t('adm_outreach_notes', 'Notes')) + '</label>' +
+          '<input class="adm-input" type="text" id="adm-lead-notes" maxlength="500">' +
+          '<p><button class="adm-action" type="submit" id="adm-lead-submit">' + esc(t('adm_outreach_add', 'Add lead')) + '</button></p>' +
+        '</form>' +
+        '<p class="adm-status" id="adm-lead-status-msg" role="status" aria-live="polite"></p>' +
 
         '<div class="adm-section-head"><h2 class="adm-h2">Your account</h2></div>' +
         '<form id="adm-pw-form">' +
@@ -458,6 +552,52 @@
         }
       });
 
+      var leadForm = document.getElementById('adm-lead-form');
+      if (leadForm) leadForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var org = document.getElementById('adm-lead-org').value.trim();
+        var category = document.getElementById('adm-lead-category').value.trim();
+        var contactName = document.getElementById('adm-lead-contact-name').value.trim();
+        var contactEmail = document.getElementById('adm-lead-contact-email').value.trim();
+        var notes = document.getElementById('adm-lead-notes').value.trim();
+        var st = document.getElementById('adm-lead-status-msg');
+        var btn = document.getElementById('adm-lead-submit');
+        if (!org || btn.disabled) return;
+        st.textContent = 'Saving...';
+        btn.disabled = true;
+        try {
+          await restTable('POST', 'outreach_leads', {
+            org_name: org,
+            category: category || null,
+            contact_name: contactName || null,
+            contact_email: contactEmail || null,
+            notes: notes || null,
+          });
+          st.textContent = '';
+          await load();
+        } catch (err) {
+          st.textContent = 'Could not save that lead.';
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      root.querySelectorAll('.adm-lead-status').forEach(function (sel) {
+        sel.addEventListener('change', async function () {
+          var id = sel.getAttribute('data-lead-id');
+          var prev = sel.getAttribute('data-prev') || sel.value;
+          sel.disabled = true;
+          try {
+            await restTable('PATCH', 'outreach_leads?id=eq.' + encodeURIComponent(id), { status: sel.value });
+            sel.setAttribute('data-prev', sel.value);
+          } catch (err) {
+            sel.value = prev;
+          } finally {
+            sel.disabled = false;
+          }
+        });
+      });
+
       root.querySelectorAll('.adm-range button').forEach(function (b) {
         b.addEventListener('click', function () {
           days = Number(b.getAttribute('data-days')) || 7;
@@ -489,8 +629,11 @@
           rpc('admin_checkins_by_city', { days: days, max_rows: 50 }),
           rpc('admin_api_overview', { days: 30 }).catch(function () { return []; }),
           rpc('admin_api_keys', {}).catch(function () { return []; }),
+          rpc('admin_contributor_tier_counts', {}).catch(function () { return []; }),
+          rpc('admin_top_contributors', { p_tier: null, max_rows: 20 }).catch(function () { return []; }),
+          restTable('GET', 'outreach_leads?select=id,org_name,category,status,notes&order=created_at.desc').catch(function () { return []; }),
         ]);
-        dashboard(results[0], results[1], results[2], results[3]);
+        dashboard(results[0], results[1], results[2], results[3], results[4], results[5], results[6]);
       } catch (err) {
         // The functions raise "not authorised" for a signed-in non-admin,
         // which PostgREST returns as a 4xx. Treat that as the answer

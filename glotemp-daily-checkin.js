@@ -98,6 +98,7 @@
         <h2 class="daily-checkin-title">How does the world feel to you today?</h2>
         <p class="daily-checkin-copy">One quiet check-in a day. Build a streak of noticing. Sign in to begin.</p>
         <button type="button" class="btn-neon daily-checkin-signin" id="daily-checkin-signin">Begin the ritual</button>
+        <p class="daily-checkin-founding-note">Founding Voices — the earliest contributors to your city's pulse get first access as our sponsor rewards roll out: hotel stays, vouchers, partner perks. Check in today, be first in line.</p>
       </div>`;
     const btn = document.getElementById('daily-checkin-signin');
     if (btn) {
@@ -169,6 +170,7 @@
             <span class="daily-checkin-status" id="daily-checkin-status" role="status" aria-live="polite"></span>
           </div>
         </form>
+        <p class="daily-checkin-founding-note">Founding Voices — the earliest contributors to your city's pulse get first access as our sponsor rewards roll out: hotel stays, vouchers, partner perks. Check in today, be first in line.</p>
       </div>`;
 
     document.querySelectorAll('.daily-mood-btn').forEach(btn => {
