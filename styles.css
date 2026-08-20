@@ -7147,6 +7147,98 @@ a:hover .city-landmark-photo,
    heading, so "share the pulse" is never an abstract or random act. */
 .checkin-city { color: var(--brass); font-weight: var(--fw-regular); }
 
+/* ===== HOMEPAGE DUO: spin instrument beside City Spotlight =====
+   Two separate panels, two separate concerns -- the dial reads its own
+   state, City Spotlight reads none of it. Same two-column pattern as
+   .elsewhere-strands (glotemp-elsewhere.js's radio/news strands): one
+   column until there is room for two, not a bespoke proportion. */
+.homepage-duo {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+@media (min-width: 800px) {
+  .homepage-duo { grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: stretch; }
+}
+
+/* ===== CITY SPOTLIGHT (standalone; see city-spotlight.js) =====
+   A real city photo, full-bleed to the card's own edges, with 2-4 real
+   trivia facts overlaid on a dark scrim, rotating on a timer from the
+   moment the page loads. At desktop width, CSS Grid's default
+   align-items: stretch on .homepage-duo makes this match
+   .spin-section's own height exactly, row for row -- no separate
+   min-height needs tuning to keep the two panels the same "standard,
+   fixed size". Below 800px the two stack into separate rows, so this
+   carries its own explicit height there instead.
+
+   THE SCRIM IS A CONTRACT, NOT A MOOD -- same recipe, same measured
+   numbers, as the spin backdrop this replaces: body text here is
+   --ivory (relative luminance 0.760); for 4.5:1 the background beneath
+   it must stay at or below 0.130, which over a pure white photograph
+   pixel means the two scrim layers together have to hold the composite
+   at or below sRGB 101. They land it at ~90, measured: 5.36:1 against
+   the worst pixel a photograph could contain. */
+.city-spotlight-section {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  margin-bottom: 2rem; /* matches .spin-section's own margin-bottom, so the row sits level */
+  border: none;
+  border-top: 1px solid var(--hairline);
+  min-height: 420px;
+}
+@media (max-width: 600px) { .city-spotlight-section { min-height: 380px; } }
+
+.spotlight-layer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1400ms ease; /* the cross-fade; never a hard swap */
+}
+.spotlight-layer.is-on { opacity: 1; }
+
+.spotlight-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.32) 55%, rgba(0, 0, 0, 0.62) 100%),
+    rgba(24, 14, 6, 0.42);
+}
+
+.spotlight-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  padding: 1.75rem 1.75rem 2rem;
+}
+.spotlight-city {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: clamp(24px, 3.6vw, 38px);
+  line-height: 1.1;
+  color: var(--ivory);
+  margin: 0 0 0.65rem;
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.55);
+}
+.spotlight-fact {
+  font-family: var(--font-body);
+  font-size: 0.94rem;
+  line-height: 1.5;
+  color: var(--ivory);
+  margin: 0 0 0.4rem;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.6);
+  max-width: 42ch;
+}
+.spotlight-fact:last-child { margin-bottom: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-layer { transition: none; }
+}
+
 /* ===== SPIN DIAL (homepage centrepiece) ===== */
 .spin-section {
   padding: 2rem 1.5rem 2.25rem;
@@ -7162,129 +7254,6 @@ a:hover .city-landmark-photo,
 }
 @media (max-width: 900px) { .spin-section { min-height: 766px; } }
 @media (max-width: 600px) { .spin-section { min-height: 851px; } }
-/* ===== THE SPIN BACKDROP =====
-   A photograph of a real city behind this section, full-bleed to the
-   section's own edges, present from the moment the page loads. Written by
-   spin-backdrop.js from /city-media/, which is filled on a schedule by
-   scripts/fetch-city-media.js. A city with no licensed photograph never
-   reaches this stylesheet at all -- it is dropped from the rotation, so
-   there is no empty state to style.
-
-   THE SCRIM IS A CONTRACT, NOT A MOOD
-   Body text here is --ivory (relative luminance 0.760). For 4.5:1 the
-   background beneath it must stay at or below 0.130, which over a pure
-   white photograph pixel means the two scrim layers together have to hold
-   the composite at or below sRGB 101. They land it at ~90, measured:
-   5.36:1 against the worst pixel a photograph could contain. The credit
-   line is --ivory for the same reason -- in --sand it would have needed a
-   scrim at 0.74 alpha, which is no longer a photograph.
-   tests/spin-contrast.js measures the real composited pixels. */
-.spin-section.has-backdrop { position: relative; overflow: hidden; }
-
-.spin-backdrop {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-.spin-bd-layer {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  opacity: 0;
-  transition: opacity 1400ms ease;   /* the cross-fade; never a hard swap */
-}
-.spin-bd-layer.is-on { opacity: 1; }
-
-/* Warm first, then neutral: the brown knocks the daylight out of a photo
-   and the black takes it the rest of the way down to the contrast floor. */
-.spin-bd-scrim {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(180deg, rgba(0, 0, 0, 0.34) 0%, rgba(0, 0, 0, 0.26) 45%, rgba(0, 0, 0, 0.38) 100%),
-    rgba(24, 14, 6, 0.55);
-}
-
-/* Fine grain, so it reads as film rather than as a stock photograph.
-   Kept faint deliberately: it sits above the scrim, so anything heavier
-   would start lifting pixels back over the contrast floor. */
-.spin-bd-grain {
-  position: absolute;
-  inset: 0;
-  opacity: 0.05;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 160px 160px;
-}
-
-.spin-bd-vignette {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 50% 45%, transparent 42%, rgba(0, 0, 0, 0.28) 74%, rgba(0, 0, 0, 0.52) 100%);
-}
-
-/* Everything the visitor reads sits above the photograph. */
-.spin-inner { position: relative; z-index: 1; }
-
-/* The city and its one line. Display type, because this is the section's
-   subject now -- not a caption on someone else's picture. */
-.spin-caption {
-  width: 100%;
-  max-width: 30ch;
-  margin: 1.75rem auto 2.25rem;
-}
-/* A wider measure once there is room: at 30ch a desktop was breaking a
-   one-line fact across three, which is the opposite of "readable at a
-   glance". */
-@media (min-width: 900px) { .spin-caption { max-width: 46ch; } }
-.spin-city {
-  font-family: var(--font-display);
-  font-weight: var(--fw-light);
-  font-size: clamp(30px, 5.2vw, 56px);
-  line-height: 1.05;
-  color: var(--ivory);
-  margin: 0 0 0.85rem;
-  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.55);
-}
-.spin-fact {
-  font-family: var(--font-display);
-  font-weight: var(--fw-light);
-  font-size: clamp(17px, 2.5vw, 24px);
-  line-height: 1.45;
-  color: var(--ivory);
-  margin: 0;
-  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.55);
-}
-
-/* Attribution. Mono and small, as the small labels are -- but ivory, not
-   sand, because it has to clear the same 4.5:1 bar as everything else.
-   The creator and the licence, and nothing about which platform they came
-   through. */
-.spin-credit {
-  margin: 2rem 0 0;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.66rem;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--ivory);
-}
-.spin-credit-link { color: inherit; text-decoration: none; border-bottom: 1px solid rgba(240, 224, 200, 0.32); }
-.spin-credit-link:hover { border-bottom-color: var(--ivory); }
-.spin-credit-sep { margin: 0 0.5rem; opacity: 0.6; }
-
-/* Composed, not cramped. */
-.spin-section.has-backdrop { padding-top: 4.5rem; padding-bottom: 4.5rem; }
-@media (max-width: 600px) {
-  .spin-section.has-backdrop { padding-top: 3.25rem; padding-bottom: 3.25rem; }
-  .spin-caption { margin: 1.4rem auto 1.9rem; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .spin-bd-layer { transition: none; }
-}
-
 .spin-inner { display: flex; flex-direction: column; align-items: center; text-align: center; }
 .spin-title {
   font-family: var(--font-display);
@@ -7382,62 +7351,6 @@ a:hover .city-landmark-photo,
   text-align: left;
 }
 .spin-sentence.is-settling { opacity: 0.35; }
-
-/* Surprise-only: one real photo, revealed alongside the sentence (see
-   revealSurprisePhoto() in glotemp-spin.js). Empty and [hidden] for
-   anywhere/feed/moving and for every spin before a photo actually
-   resolves -- [hidden] is display:none, so it contributes nothing to
-   layout for any of those. Deliberately modest: a single framed photo,
-   not a carousel, sized well under the sentence's own 30ch column so it
-   reads as part of the reveal rather than a second, competing section. */
-.spin-photo {
-  width: 100%;
-  max-width: 22rem;
-  margin: 1.1rem auto 0;
-}
-.spin-photo-img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  border: 1px solid var(--hairline);
-  opacity: 0;
-  animation: spin-photo-in 500ms ease forwards;
-}
-@keyframes spin-photo-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .spin-photo-img { animation: none; opacity: 1; }
-}
-
-/* One real fact about the landing city, every variant -- see
-   getCityFact()/revealExtras() in glotemp-spin.js. Empty and [hidden]
-   until a spin actually resolves one, same as .spin-photo above: hidden
-   is display:none, so it contributes nothing to layout before that, and
-   nothing at all if neither CITY_TRIVIA nor Wikipedia has anything for
-   that city. Body-text size and the sentence's own 30ch measure, since
-   this reads as supporting text under the headline sentence, not a
-   second sentence of the same weight. */
-.spin-facts {
-  width: 100%;
-  max-width: 30ch;
-  margin: 0.85rem auto 0;
-  text-align: left;
-}
-.spin-facts-text {
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  line-height: 1.55;
-  color: var(--sand);
-  margin: 0;
-  opacity: 0;
-  animation: spin-photo-in 500ms ease forwards;
-}
-@media (prefers-reduced-motion: reduce) {
-  .spin-facts-text { animation: none; opacity: 1; }
-}
 
 /* Flight/Room/Table: inline brass line icons with the label beneath,
    no boxes -- three columns on the ground, not three buttons. */
