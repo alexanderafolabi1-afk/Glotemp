@@ -117,6 +117,7 @@
         </div>
         <p class="spin-sentence" id="spin-sentence" role="status" aria-live="polite">Give it a turn.</p>
         <div class="spin-photo" id="spin-photo" hidden></div>
+        <div class="spin-facts" id="spin-facts" hidden></div>
         <div class="spin-affiliates" id="spin-affiliates" hidden>
           <a class="spin-aff" id="spin-aff-flight" target="_blank" rel="noopener noreferrer">${AFF_ICONS.flight}<span class="spin-aff-kind">Flight</span><span class="spin-aff-label"></span></a>
           <a class="spin-aff" id="spin-aff-room" target="_blank" rel="noopener noreferrer">${AFF_ICONS.room}<span class="spin-aff-kind">Room</span><span class="spin-aff-label"></span></a>
@@ -174,11 +175,12 @@
     return scored[scored.length - 1].c;
   }
 
-  // ---------- surprise-only: one real photo of the landing city ----------
-  // Nothing here runs for anywhere/feed/moving -- see finish() below,
-  // where this is only ever called inside the variant.id === 'surprise'
-  // branch. The dial, the sentence, and the other three variants have no
-  // dependency on any of this.
+  // ---------- one real photo of the landing city, every variant ----------
+  // Runs for all four variants -- see revealExtras() below. The dial, the
+  // rotation, the tab switching and the sentence itself have no
+  // dependency on any of this: it is fetched and revealed strictly after
+  // the dial has already settled and the sentence is already on screen,
+  // so a slow or failed fetch here can never affect the spin mechanic.
   //
   // Same free, keyless Wikimedia family as city-landmark-photos.js's
   // Wikipedia REST calls, one step further into Commons' own action API
@@ -188,12 +190,12 @@
   // historic districts, temples and shrines, old town streets,
   // sanctuaries, courtyards -- rather than the tallest building or the
   // widest avenue, since a generic skyline shot is the opposite of what
-  // "Surprise me" is for. Falls back to the plain Wikipedia thumbnail
-  // (GlotempLandmarkPhotos) if nothing themed turns up, and to nothing
-  // at all -- the sentence alone, exactly as it renders for the other
-  // three variants -- if that fails too. Never a broken image, never a
-  // placeholder: every URL returned here is a real Commons or Wikipedia
-  // file, or there is no photo this time.
+  // any of these variants is for, not only "Surprise me". Falls back to
+  // the plain Wikipedia thumbnail (GlotempLandmarkPhotos) if nothing
+  // themed turns up, and to nothing at all -- the sentence alone, exactly
+  // as it renders before any photo resolves -- if that fails too. Never a
+  // broken image, never a placeholder: every URL returned here is a real
+  // Commons or Wikipedia file, or there is no photo this time.
   const COMMONS_API = 'https://commons.wikimedia.org/w/api.php';
   const SURPRISE_MIN_DIMENSION = 400;
   const SURPRISE_THUMB_WIDTH = 900;
@@ -253,6 +255,74 @@
     return promise;
   }
 
+  // ---------- one real fact about the landing city, every variant ----------
+  // Two tiers, tried in order, never a third:
+  //   1. CITY_TRIVIA (city-trivia-data.js) -- hand-curated for ~half the
+  //      roster. Used exactly as written; nothing here rewrites or
+  //      trims it.
+  //   2. Wikipedia's REST summary API -- same endpoint and pattern as
+  //      city-landmark-photos.js and city-wiki.js, one step further:
+  //      the response's real "extract" field, trimmed to its own first
+  //      1-2 sentences (never the whole paragraph, never a paraphrase).
+  //      Tried as the city's bare name first, then "name, country" --
+  //      Wikipedia disambiguates a lot of small-city names by country
+  //      (Cartagena, Cordoba, Faro, Banff...) and the bare name alone
+  //      resolves to a disambiguation page, or a same-named place
+  //      somewhere else, for those.
+  // Neither tier finds anything -> null, and the facts panel simply does
+  // not render for that spin -- the same honesty rule as every other
+  // "nothing to show" state in this project. No fact is ever invented to
+  // fill the gap.
+  const WIKI_SUMMARY_API = 'https://en.wikipedia.org/api/rest_v1/page/summary/';
+  const cityFactCache = new Map();
+
+  function curatedFact(city) {
+    const list = window.CITY_TRIVIA && window.CITY_TRIVIA[city.slug];
+    if (!Array.isArray(list) || !list.length) return null;
+    const clean = list.filter((f) => typeof f === 'string' && f.trim());
+    return clean.length ? clean.join(' ') : null;
+  }
+
+  // The extract's own first 1-2 sentences, split on real sentence-ending
+  // punctuation followed by whitespace -- not a hard character truncation,
+  // which would cut a real sentence off mid-word.
+  function firstSentences(text, max) {
+    const parts = String(text || '').trim().split(/(?<=[.!?])\s+/).filter(Boolean);
+    return parts.length ? parts.slice(0, max).join(' ') : '';
+  }
+
+  async function fetchWikiExtract(title) {
+    try {
+      const resp = await fetch(WIKI_SUMMARY_API + encodeURIComponent(title), {
+        headers: { Accept: 'application/json' },
+      });
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      if (!data || data.type === 'disambiguation' || !data.extract) return null;
+      const sentences = firstSentences(data.extract, 2);
+      return sentences || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function fetchWikiFact(city) {
+    if (cityFactCache.has(city.slug)) return cityFactCache.get(city.slug);
+    const promise = (async () => {
+      let fact = await fetchWikiExtract(city.name);
+      if (!fact && city.country) fact = await fetchWikiExtract(`${city.name}, ${city.country}`);
+      return fact;
+    })();
+    cityFactCache.set(city.slug, promise);
+    return promise;
+  }
+
+  function getCityFact(city) {
+    const curated = curatedFact(city);
+    if (curated) return Promise.resolve(curated);
+    return fetchWikiFact(city);
+  }
+
   // ---------- the sentence ----------
   function buildSentence(choice) {
     const { city, mode } = choice;
@@ -302,12 +372,6 @@
     const choice = pick(candidates);
     if (!choice) return;
 
-    // Captured now, not re-read in finish(): variant buttons aren't
-    // disabled during the ~3s animation, so a click on another one
-    // mid-spin must not change whether the photo appears for a spin
-    // that was already committed as 'surprise' (or wasn't).
-    const isSurprise = variant.id === 'surprise';
-
     const rotor = document.getElementById('spin-rotor');
     const go = document.getElementById('spin-go');
     spinning = true;
@@ -315,7 +379,7 @@
     sentenceEl.classList.add('is-settling');
 
     if (reduceMotion()) {
-      finish(choice, isSurprise);
+      finish(choice);
       return;
     }
 
@@ -331,40 +395,56 @@
       rotor.style.transition = 'transform 420ms cubic-bezier(0.34, 1.4, 0.64, 1)';
       rotor.style.transform = `rotate(${rotation - 3.2}deg)`;
     }, 2600);
-    setTimeout(() => finish(choice, isSurprise), 3040);
+    setTimeout(() => finish(choice), 3040);
   }
 
-  // Surprise-only, and fire-and-forget: the network round trip never
-  // holds up re-enabling the Spin button or anything else in finish()
-  // below. revealToken guards against a slow fetch from an earlier spin
-  // landing after a newer one has already replaced the sentence on
-  // screen -- without it, a stale photo could briefly overwrite the
-  // current result.
-  async function revealSurprisePhoto(city, token) {
+  // Fire-and-forget, for every variant: the network round trips here
+  // never hold up re-enabling the Spin button or anything else in
+  // finish() above this call -- both the dial and the sentence are
+  // already fully settled by the time this ever runs. revealToken
+  // guards against a slow fetch from an earlier spin landing after a
+  // newer one has already replaced the sentence on screen -- without it,
+  // a stale photo or fact could briefly overwrite the current result.
+  // Photo and fact are fetched in parallel and rendered independently:
+  // one failing (or simply taking longer) never holds up or hides the
+  // other.
+  async function revealExtras(city, token) {
     const photoEl = document.getElementById('spin-photo');
-    const url = await fetchSurprisePhoto(city);
-    if (!url || token !== revealToken || !photoEl) return;
-    const img = new Image();
-    img.onload = () => {
-      if (token !== revealToken || !photoEl.isConnected) return;
-      photoEl.innerHTML = `<img class="spin-photo-img" src="${esc(url)}" alt="">`;
-      photoEl.hidden = false;
-    };
-    img.onerror = () => {}; // broken URL: photoEl stays hidden, sentence stands alone
-    img.src = url;
+    const factsEl = document.getElementById('spin-facts');
+    const [photoUrl, fact] = await Promise.all([fetchSurprisePhoto(city), getCityFact(city)]);
+    if (token !== revealToken) return;
+
+    if (photoUrl && photoEl) {
+      const img = new Image();
+      img.onload = () => {
+        if (token !== revealToken || !photoEl.isConnected) return;
+        photoEl.innerHTML = `<img class="spin-photo-img" src="${esc(photoUrl)}" alt="">`;
+        photoEl.hidden = false;
+      };
+      img.onerror = () => {}; // broken URL: photoEl stays hidden, sentence stands alone
+      img.src = photoUrl;
+    }
+
+    if (fact && factsEl && factsEl.isConnected) {
+      factsEl.innerHTML = `<p class="spin-facts-text">${esc(fact)}</p>`;
+      factsEl.hidden = false;
+    }
   }
 
-  function finish(choice, isSurprise) {
+  function finish(choice) {
     const sentenceEl = document.getElementById('spin-sentence');
     const provEl = document.getElementById('spin-prov');
     const photoEl = document.getElementById('spin-photo');
+    const factsEl = document.getElementById('spin-facts');
     revealToken++;
     const token = revealToken;
-    // Reset every reveal, not just surprise ones -- otherwise a photo
-    // from a previous "Surprise me" spin would still be showing after
-    // switching to anywhere/feed/moving and spinning again.
+    // Reset every reveal -- otherwise a photo or fact from a previous
+    // spin would still be showing after switching variants and spinning
+    // again.
     photoEl.hidden = true;
     photoEl.innerHTML = '';
+    factsEl.hidden = true;
+    factsEl.innerHTML = '';
     sentenceEl.textContent = buildSentence(choice);
     sentenceEl.classList.remove('is-settling');
     setAffiliates(choice.city);
@@ -377,7 +457,7 @@
     // this only changes which city it is showing, and does nothing at all
     // if that city has no licensed photograph (spin-backdrop.js).
     if (window.GlotempSpinBackdrop) GlotempSpinBackdrop.showCity(choice.city.slug);
-    if (isSurprise) revealSurprisePhoto(choice.city, token);
+    revealExtras(choice.city, token);
   }
 
   async function mount() {
