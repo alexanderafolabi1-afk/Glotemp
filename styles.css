@@ -1378,9 +1378,69 @@ body.scroll-reveals-enabled section.revealed {
   border: 1px solid var(--brass-dim);
   border-radius: 10px;
   padding: 0.4rem;
-  min-width: 9rem;
+  min-width: 15rem;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
 }
+
+/* Private star total + invite link -- visible only inside the signed-in
+   owner's own dropdown, never anyone else's. See nav-component.js's
+   loadAccountStars(); numbers come from get_my_stars(), self-scoped by
+   auth.uid() server-side, not merely hidden client-side. */
+.nav-account-stars {
+  padding: 0.5rem 0.7rem 0.75rem;
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: 0.3rem;
+}
+.nav-account-stars-loading {
+  color: var(--sand);
+  font-size: 0.8rem;
+  margin: 0;
+}
+.nav-account-stars-count {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--ivory);
+  font-variant-numeric: tabular-nums;
+  margin: 0 0 0.6rem;
+}
+.nav-account-invite-label {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.68rem;
+  letter-spacing: 0.07em;
+  color: var(--sand);
+  margin: 0 0 0.3rem;
+}
+.nav-account-invite-row {
+  display: flex;
+  gap: 0.4rem;
+}
+.nav-account-invite-link {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.72rem;
+  padding: 0.3rem 0.4rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--hairline);
+  border-radius: 5px;
+  color: var(--sand);
+  font-family: var(--font-mono);
+}
+.nav-account-invite-copy {
+  flex: 0 0 auto;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--brass-dim);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--sand);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+.nav-account-invite-copy:hover {
+  color: var(--ivory);
+  border-color: var(--brass);
+}
+
 .nav-account-signout {
   display: block;
   width: 100%;

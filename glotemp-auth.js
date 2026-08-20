@@ -18,10 +18,25 @@
   const SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
   const SESSION_KEY = 'glotemp-auth-session';
   const PROFILE_KEY = 'glotemp-auth-profile';
+  const REFERRAL_KEY = 'glotemp-pending-referral';
 
   let cachedProfile = null;
   let modalEl = null;
   let pendingResolve = null;
+
+  // ---------- referral capture ----------
+  // Runs on every page this script loads on (not just the homepage), so
+  // a shared link to any page still gets remembered. Only ever WRITES
+  // when ?ref= is actually present -- an ordinary visit must never clear
+  // a code someone picked up on an earlier visit and hasn't signed up
+  // yet to redeem.
+  (function captureReferralCode() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get('ref');
+      if (ref) localStorage.setItem(REFERRAL_KEY, ref);
+    } catch (e) { /* private mode -- the invite silently isn't remembered */ }
+  })();
 
   // ---------- session storage ----------
   function readSession() {
@@ -239,8 +254,86 @@
     const rows = await resp.json();
     cachedProfile = rows && rows.length ? rows[0] : { user_id: user.id, display_name: displayName, home_city: homeCity };
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(cachedProfile)); } catch (e) { /* non-fatal */ }
+    // The profile row this function just created/updated is exactly what
+    // claim_referral()'s foreign key needs -- this is the first moment a
+    // brand-new, referred sign-up can be credited.
+    claimPendingReferral();
     return cachedProfile;
   }
+
+  // ---------- referral stars ----------
+  // Real Voice/Keeper/Founder foundation (daily_checkins, auth.uid()),
+  // never tempo-economy.js's dead reporters/total_stars system -- see
+  // 20260821090000_referral_stars.sql for why. rpc() mirrors the same
+  // small helper every other page in this project already hand-rolls for
+  // Postgres RPCs (admin/index.html, social-next-post, ...); kept local
+  // here rather than shared, matching that existing convention.
+  async function rpc(fn, args) {
+    const session = await getSession();
+    if (!session) throw new Error('not signed in');
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(args || {}),
+    });
+    if (!resp.ok) throw new Error(fn + ' ' + resp.status);
+    return resp.json();
+  }
+
+  async function ensureReferralCode() {
+    return rpc('ensure_referral_code', {});
+  }
+
+  async function getMyStars() {
+    const rows = await rpc('get_my_stars', {});
+    return (rows && rows[0]) || { checkin_stars: 0, referral_stars: 0, total_stars: 0, referral_code: null };
+  }
+
+  async function markInstalled() {
+    return rpc('mark_installed', {});
+  }
+
+  // Attempts to redeem a referral code picked up on an earlier visit.
+  // Safe to call whenever -- a no-op if there is no stored code, if this
+  // account isn't signed in yet, or if claim_referral() itself declines
+  // (self-referral, already claimed, bad code -- see that function's own
+  // comment for why none of those are errors). The stored code is
+  // cleared after any real attempt, successful or not, so an invalid or
+  // already-used code does not get retried on every future page load.
+  let referralClaimInFlight = false;
+  async function claimPendingReferral() {
+    if (referralClaimInFlight) return;
+    let code = null;
+    try { code = localStorage.getItem(REFERRAL_KEY); } catch (e) { return; }
+    if (!code || !isSignedIn()) return;
+    referralClaimInFlight = true;
+    try {
+      await rpc('claim_referral', { p_code: code });
+    } catch (e) {
+      // A missing profile row (brand-new sign-in, "Tell us who you are"
+      // not submitted yet) is expected and not a failure -- saveProfile()
+      // retries this the moment that row exists. Anything else is quiet
+      // by design too: a stray/expired invite link is not worth surfacing.
+    } finally {
+      try { localStorage.removeItem(REFERRAL_KEY); } catch (e) { /* non-fatal */ }
+      referralClaimInFlight = false;
+    }
+  }
+
+  // The real, per-user install signal for the referral bonus -- distinct
+  // from glotemp-analytics.js's own appinstalled listener, which is
+  // deliberately anonymous (see that file's header comment: "NOTHING
+  // HERE IDENTIFIES ANYONE"). That boundary is intentional and this does
+  // not cross it -- this is a second, separate listener, authenticated,
+  // existing only to gate the referral bonus, never sent anywhere
+  // analytics does.
+  window.addEventListener('appinstalled', function () {
+    if (isSignedIn()) markInstalled().catch(function () { /* try again next appinstalled-adjacent moment; not worth surfacing */ });
+  });
 
   // ---------- sign in / out ----------
   function signInWithOAuth(provider) {
@@ -579,6 +672,10 @@
         // stuck rendering their signed-out state for an already
         // signed-in user.
         document.dispatchEvent(new CustomEvent('glotemp:auth-changed', { detail: { signedIn: true } }));
+        // Covers a signed-in returning visitor with an existing profile
+        // who has a pending referral code stored from this visit --
+        // saveProfile() covers the brand-new sign-up case above it.
+        claimPendingReferral();
       }
     }
   }
@@ -614,5 +711,8 @@
     requireAuth,
     openModal,
     closeModal,
+    ensureReferralCode,
+    getMyStars,
+    markInstalled,
   };
 })();
