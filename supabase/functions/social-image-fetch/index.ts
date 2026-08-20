@@ -24,6 +24,24 @@
 // clear "no image found" response, not a fabricated or generic URL --
 // the caller (social-next-post) decides what to do with that, but it
 // will never be silently handed a fake image.
+//
+// RELEVANCE CHECK (fixes a real bug, confirmed live): a search for
+// "London skyline" once returned a real, well-formed, correctly-typed
+// photo of San Diego ("Sandiego skyline at night.JPG"). Commons'
+// generator=search is full-text relevance search, not a strict place
+// match -- a generic word like "skyline" can rank an unrelated city's
+// photo highly, and looksLikeRealPhoto only ever checked mime type,
+// dimensions and a bad-title blocklist, never whether the result was
+// actually of the requested place. locationHint extracts the leading
+// run of capitalized words from `term` (image_search_term is always
+// "<City name> skyline", so this reliably yields the city -- "Tokyo",
+// "New York City", "Hong Kong", "Sao Paulo") and a candidate is only
+// accepted if that hint appears, case-insensitively, in its title or
+// Commons description. No hint extracted -> no location check applied
+// (nothing reliable to check against, so this falls back to the prior
+// quality-only behavior rather than rejecting everything). A qualifying
+// but irrelevant photo is treated exactly like no photo at all: honest
+// no_image_found, never a fallback to something merely well-formed.
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const UA = "glo-temp.com/1.0 (+https://glo-temp.com; info@glo-temp.com)";
@@ -60,7 +78,10 @@ interface CommonsPage {
     height?: number;
     url?: string;
     thumburl?: string;
-    extmetadata?: { LicenseShortName?: { value?: string } };
+    extmetadata?: {
+      LicenseShortName?: { value?: string };
+      ImageDescription?: { value?: string };
+    };
   }>;
 }
 
@@ -72,6 +93,35 @@ function looksLikeRealPhoto(page: CommonsPage): boolean {
   if ((info.width || 0) < MIN_DIMENSION && (info.height || 0) < MIN_DIMENSION) return false;
   if (BAD_TITLE.test(stripFilePrefix(page.title || ""))) return false;
   return !!(info.thumburl || info.url);
+}
+
+// The leading run of capitalized words in `term` -- image_search_term is
+// always "<City name> skyline", so this reliably yields just the city:
+// "Tokyo", "New York City", "Hong Kong", "Sao Paulo". Returns "" if the
+// term doesn't start with a capitalized word (nothing reliable to check).
+function extractLocationHint(term: string): string {
+  const m = /^([A-Z][\p{L}'-]*(?:\s+[A-Z][\p{L}'-]*)*)/u.exec(term.trim());
+  return m ? m[1].trim() : "";
+}
+
+// Lowercases, strips diacritics, and turns underscores (Commons titles use
+// them as spaces) into spaces, so "São_Paulo" and "Sao Paulo" compare equal.
+function normalizeForMatch(s: string): string {
+  return String(s || "")
+    .replace(/_/g, " ")
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function matchesLocation(page: CommonsPage, hint: string): boolean {
+  if (!hint) return true; // no reliable hint to check against -- don't reject on it
+  const needle = normalizeForMatch(hint);
+  if (!needle) return true;
+  const title = normalizeForMatch(stripFilePrefix(page.title || ""));
+  const description = normalizeForMatch(page?.imageinfo?.[0]?.extmetadata?.ImageDescription?.value || "");
+  return title.includes(needle) || description.includes(needle);
 }
 
 async function searchCommons(term: string): Promise<CommonsPage[] | null> {
@@ -119,10 +169,12 @@ Deno.serve(async (req: Request) => {
     return json({ term, image_url: null, error: "commons_fetch_failed" }, 502);
   }
 
-  const match = pages.find(looksLikeRealPhoto);
+  const hint = extractLocationHint(term);
+  const match = pages.find((p) => looksLikeRealPhoto(p) && matchesLocation(p, hint));
   if (!match) {
     // A real, honest outcome -- not every search term resolves to a
-    // qualifying photo. Never fabricate a fallback URL here.
+    // qualifying, relevant photo. Never fabricate a fallback URL, and
+    // never fall back to a well-formed but unrelated-place photo.
     return json({ term, image_url: null, reason: "no_image_found" }, 200);
   }
 
