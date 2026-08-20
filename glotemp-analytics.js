@@ -1,45 +1,63 @@
 /* Glotemp measurement.
  *
- * Two halves, because one tool cannot do both:
+ * SELF-HOSTED, COOKIELESS, AGGREGATE ONLY
+ * Page views and events both go to Glotemp's own infrastructure. There is
+ * no third-party tracker on this site: the Cloudflare Web Analytics beacon
+ * this file used to inject has been removed, so no request leaves for
+ * anyone else's servers and no other company sees this traffic.
  *
- * VISITORS -- Cloudflare Web Analytics. Chosen over Google Analytics
- * because it sets no cookies (so it sits outside the consent banner
- * entirely), weighs a few KB, and the domain is already on Cloudflare.
+ * VISITORS -- a page_view goes to the `collect` edge function, which reads
+ * the request IP, turns it into a two-letter country, and throws the
+ * address away. The address is never sent to the database, never logged,
+ * and there is no column that could hold one. The referrer is reduced to a
+ * bare host there too, so a referring page's own query string cannot
+ * follow it in.
  *
- * EVENTS -- Cloudflare Web Analytics has no custom-event API, so installs,
- * standalone launches, prompt outcomes and check-ins cannot be sent to it.
- * They go to a Supabase table instead, which is where per-city check-in
- * counts belong anyway: that number is business data to be queried, not a
- * traffic metric. No separate dashboard is built for it.
+ * EVENTS -- installs, standalone launches, prompt outcomes and check-ins
+ * go to a Supabase table, which is where per-city check-in counts belong
+ * anyway: that number is business data to be queried, not a traffic
+ * metric.
  *
  * NOTHING HERE IDENTIFIES ANYONE. No cookie, no localStorage id, no
- * fingerprint, no IP recorded beyond what the request itself carries. That
- * is deliberate: it keeps the whole of this outside the scope of the
- * consent banner, so cookie-consent behaviour is unaffected.
+ * session id, no fingerprint, and no IP retained. Because nothing is
+ * written to or read from the visitor's device, PECR's consent rule for
+ * terminal-equipment storage is not engaged and this stays outside the
+ * consent banner, exactly as before.
+ *
+ * Two page views cannot be linked to each other. That is a deliberate
+ * limit: it is what keeps this aggregate-only, and it is why the dashboard
+ * reports views rather than pretending to count unique people.
  */
 (function () {
   'use strict';
 
   // ---- config ----------------------------------------------------------
-  // The one place to set this. Get it from Cloudflare dashboard >
-  // Analytics & Logs > Web Analytics > the site > Manage site. Until it is
-  // set, the beacon is not injected at all rather than injected broken.
-  var CF_BEACON_TOKEN = '51d8eb74ae9f487cba20cac9950fd5e7';
-
   var SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
   var SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
   var EVENTS_TABLE = 'analytics_events';
 
   // ---- visitors --------------------------------------------------------
-  function loadBeacon() {
-    if (!CF_BEACON_TOKEN) return false;
-    if (document.querySelector('script[data-cf-beacon]')) return true;
-    var s = document.createElement('script');
-    s.defer = true;
-    s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
-    s.setAttribute('data-cf-beacon', JSON.stringify({ token: CF_BEACON_TOKEN }));
-    document.head.appendChild(s);
-    return true;
+  // One page view, to our own collector. The full referrer is sent because
+  // the collector is what reduces it to a bare host and drops self-
+  // referrals; doing that here would still leave the full URL in the
+  // request. The path is sent without its query string regardless, so
+  // nothing identifying can ride along even if the collector changed.
+  var COLLECT_URL = SUPABASE_URL + '/functions/v1/collect';
+
+  function sendPageView() {
+    var body = {
+      path: String(window.location.pathname || '/').split('?')[0],
+      referrer: document.referrer || null,
+      display_mode: displayMode(),
+    };
+    try {
+      fetch(COLLECT_URL, {
+        method: 'POST',
+        keepalive: true,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }).catch(function () { /* measurement must never break a page */ });
+    } catch (e) { /* same */ }
   }
 
   // ---- events ----------------------------------------------------------
@@ -117,7 +135,7 @@
   }
 
   function init() {
-    loadBeacon();
+    sendPageView();
     // One session-open event carries the display mode, which is what
     // separates home-screen launches from browser tabs.
     send('session', { props: { referrer: document.referrer ? 'external' : 'direct' } });
