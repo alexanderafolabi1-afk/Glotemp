@@ -1219,7 +1219,6 @@ body.scroll-reveals-enabled section.revealed {
 .nav-mantra {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
   min-width: 0;
   padding-left: 1rem;
   /* Never let the line finish flush against the hamburger -- measured at
@@ -1249,28 +1248,6 @@ body.scroll-reveals-enabled section.revealed {
   .nav-mantra-line { -webkit-text-fill-color: transparent; }
 }
 
-/* The beat. Same period as the logo and the compass, so the three read as
-   one instrument: a steady mark with a ring going out from under it. */
-.nav-mantra-pulse {
-  position: relative;
-  flex: none;
-  width: 6px;
-  height: 6px;
-  background: var(--brass);
-  box-shadow: 0 0 6px var(--accent-warm-soft, rgba(245, 162, 90, 0.5));
-}
-.nav-mantra-pulse::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border: 1px solid var(--brass);
-  animation: gt-mantra-beat var(--hero-breathe-period, 6s) ease-out infinite;
-}
-@keyframes gt-mantra-beat {
-  0%       { transform: scale(1);   opacity: 0.7; }
-  55%, 100% { transform: scale(3.2); opacity: 0; }
-}
-
 /* Small phones: the box the line has to wrap inside is only ~130px, and
    at the base size the longest run ("CONTROL THE PULSE") did not fit, so
    it broke to three rows. Tighter type, two rows. */
@@ -1279,7 +1256,7 @@ body.scroll-reveals-enabled section.revealed {
      "CONTROL THE PULSE" broke and it ran to three rows. Reclaiming the
      gap and the padding gives it ~100px, which is what two rows need. */
   .nav-left { gap: 0.7rem; }
-  .nav-mantra { padding-left: 0.6rem; gap: 0.4rem; margin-right: 0.75rem; }
+  .nav-mantra { padding-left: 0.6rem; margin-right: 0.75rem; }
   .nav-mantra-line { font-size: 0.55rem; letter-spacing: 0.04em; max-width: 40vw; }
 }
 
@@ -1305,13 +1282,8 @@ body.scroll-reveals-enabled section.revealed {
 }
 
 @media (min-width: 1100px) {
-  .nav-mantra { padding-left: 1.25rem; gap: 0.7rem; margin-right: 1.25rem; }
+  .nav-mantra { padding-left: 1.25rem; margin-right: 1.25rem; }
   .nav-mantra-line { font-size: 0.78rem; letter-spacing: 0.17em; }
-  .nav-mantra-pulse { width: 7px; height: 7px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .nav-mantra-pulse::after { animation: none; opacity: 0.35; }
 }
 
 /* No gradient text under forced colours -- the system palette must win,
@@ -7130,6 +7102,125 @@ a:hover .city-landmark-photo,
 }
 @media (max-width: 900px) { .spin-section { min-height: 766px; } }
 @media (max-width: 600px) { .spin-section { min-height: 851px; } }
+/* ===== THE SPIN BACKDROP =====
+   A photograph of a real city behind this section, full-bleed to the
+   section's own edges, present from the moment the page loads. Written by
+   spin-backdrop.js from /city-media/, which is filled on a schedule by
+   scripts/fetch-city-media.js. A city with no licensed photograph never
+   reaches this stylesheet at all -- it is dropped from the rotation, so
+   there is no empty state to style.
+
+   THE SCRIM IS A CONTRACT, NOT A MOOD
+   Body text here is --ivory (relative luminance 0.760). For 4.5:1 the
+   background beneath it must stay at or below 0.130, which over a pure
+   white photograph pixel means the two scrim layers together have to hold
+   the composite at or below sRGB 101. They land it at ~90, measured:
+   5.36:1 against the worst pixel a photograph could contain. The credit
+   line is --ivory for the same reason -- in --sand it would have needed a
+   scrim at 0.74 alpha, which is no longer a photograph.
+   tests/spin-contrast.js measures the real composited pixels. */
+.spin-section.has-backdrop { position: relative; overflow: hidden; }
+
+.spin-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.spin-bd-layer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1400ms ease;   /* the cross-fade; never a hard swap */
+}
+.spin-bd-layer.is-on { opacity: 1; }
+
+/* Warm first, then neutral: the brown knocks the daylight out of a photo
+   and the black takes it the rest of the way down to the contrast floor. */
+.spin-bd-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.34) 0%, rgba(0, 0, 0, 0.26) 45%, rgba(0, 0, 0, 0.38) 100%),
+    rgba(24, 14, 6, 0.55);
+}
+
+/* Fine grain, so it reads as film rather than as a stock photograph.
+   Kept faint deliberately: it sits above the scrim, so anything heavier
+   would start lifting pixels back over the contrast floor. */
+.spin-bd-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+.spin-bd-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 45%, transparent 42%, rgba(0, 0, 0, 0.28) 74%, rgba(0, 0, 0, 0.52) 100%);
+}
+
+/* Everything the visitor reads sits above the photograph. */
+.spin-inner { position: relative; z-index: 1; }
+
+/* The city and its one line. Display type, because this is the section's
+   subject now -- not a caption on someone else's picture. */
+.spin-caption {
+  width: 100%;
+  max-width: 34ch;
+  margin: 1.75rem auto 2.25rem;
+}
+.spin-city {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: clamp(30px, 5.2vw, 56px);
+  line-height: 1.05;
+  color: var(--ivory);
+  margin: 0 0 0.85rem;
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.55);
+}
+.spin-fact {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: clamp(17px, 2.5vw, 24px);
+  line-height: 1.45;
+  color: var(--ivory);
+  margin: 0;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.55);
+}
+
+/* Attribution. Mono and small, as the small labels are -- but ivory, not
+   sand, because it has to clear the same 4.5:1 bar as everything else.
+   The creator and the licence, and nothing about which platform they came
+   through. */
+.spin-credit {
+  margin: 2rem 0 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ivory);
+}
+.spin-credit-link { color: inherit; text-decoration: none; border-bottom: 1px solid rgba(240, 224, 200, 0.32); }
+.spin-credit-link:hover { border-bottom-color: var(--ivory); }
+.spin-credit-sep { margin: 0 0.5rem; opacity: 0.6; }
+
+/* Composed, not cramped. */
+.spin-section.has-backdrop { padding-top: 4.5rem; padding-bottom: 4.5rem; }
+@media (max-width: 600px) {
+  .spin-section.has-backdrop { padding-top: 3.25rem; padding-bottom: 3.25rem; }
+  .spin-caption { margin: 1.4rem auto 1.9rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin-bd-layer { transition: none; }
+}
+
 .spin-inner { display: flex; flex-direction: column; align-items: center; text-align: center; }
 .spin-title {
   font-family: var(--font-display);
@@ -7709,9 +7800,7 @@ main > *,
 .nav-panel-close,
 .gt-auth-close,
 .mood-btn-photo,
-.fastest-mood,
-.nav-mantra-pulse,
-.nav-mantra-pulse::after {
+.fastest-mood {
   border-radius: 50% !important;
 }
 

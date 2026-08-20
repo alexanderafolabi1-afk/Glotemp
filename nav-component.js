@@ -179,11 +179,8 @@
         // desktop-only tagline rather than joining it: two lines of
         // positioning copy in one bar is one too many.
         //
-        // The dot beats on the same period as the logo and the compass
-        // (--hero-breathe-period), so the three read as one instrument
-        // rather than three unrelated animations.
+        // The line stands alone. Nothing precedes it.
         '<span class="nav-mantra">' +
-          '<span class="nav-mantra-pulse" aria-hidden="true"></span>' +
           '<span class="nav-mantra-line">Control the pulse of your city&hellip;</span>' +
         '</span>' +
       '</div>' +
