@@ -2616,16 +2616,45 @@ function setupTrendingRotation() {
   const allCities = (window.CITIES_DATA || []).filter(c => c.available !== false);
   if (allCities.length < 6) return;
 
-  // Shuffle once per session
-  const shuffled = allCities.slice().sort(() => Math.random() - 0.5);
-  let cursor = 0;
+  // ---- the deck: every city exactly once per pass ----
+  // The previous cursor consumed a city even when it was skipped for being
+  // on screen already, so roughly six cities were silently dropped from
+  // every pass and only turned up on some later, differently-aligned one.
+  // A real deck is drawn from and refilled, so a visitor who watches long
+  // enough sees all 300 -- and sees each of them once before any repeats.
+  const deck = { cards: [], pass: 0 };
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function refillDeck() {
+    deck.cards = shuffle(allCities);
+    deck.pass++;
+  }
+  refillDeck();
 
   function nextUniqueCity(excluding) {
-    for (let tries = 0; tries < shuffled.length * 2; tries++) {
-      const c = shuffled[cursor++ % shuffled.length];
-      if (!excluding.includes(c.slug)) return c;
+    // Take the first card not currently on screen. Anything passed over
+    // stays in the deck -- it is simply not this draw's card.
+    for (let i = 0; i < deck.cards.length; i++) {
+      if (!excluding.includes(deck.cards[i].slug)) return deck.cards.splice(i, 1)[0];
     }
-    return shuffled[cursor++ % shuffled.length];
+    refillDeck();
+    return deck.cards.splice(0, 1)[0];
+  }
+
+  // Warm the photo cache for what is coming up, so a card swap lands with
+  // its picture already resolved rather than popping in a beat later.
+  const PREFETCH_AHEAD = 12;
+  function prefetchAhead() {
+    if (!window.GlotempCityPhotos) return;
+    GlotempCityPhotos.prime(deck.cards.slice(0, PREFETCH_AHEAD).map(c => c.slug));
   }
 
   // Populate initial 6 cards
@@ -2647,24 +2676,33 @@ function setupTrendingRotation() {
       </div>
       <div class="fastest-mood" style="--mood-color:${color}"></div>
     `;
-    // A real photo of the city where one exists (curated set in
-    // city-landmark-photos.js); the band-colour swatch above is the
-    // complete, honest state if it doesn't -- never an emoji standing in.
-    if (window.GlotempLandmarkPhotos) {
-      GlotempLandmarkPhotos.getPhotoUrl(cityData.slug).then(src => {
-        if (!src || !card.isConnected) return;
-        const swatch = card.querySelector('.fastest-mood');
-        if (!swatch) return;
-        const img = document.createElement('img');
-        img.src = src;
-        img.alt = '';
-        img.loading = 'lazy';
-        img.decoding = 'async';
-        img.referrerPolicy = 'no-referrer';
-        img.className = 'fastest-mood-photo';
-        swatch.appendChild(img);
-      });
-    }
+    // A real photograph of the city, from Wikipedia or Wikimedia Commons
+    // (city-photos.js resolves both). Until it arrives -- and on the rare
+    // city where neither source has one -- the frame holds the city's own
+    // band colour, so every card is the same shape either way. Never an
+    // emoji, never a generated stand-in.
+    const photos = window.GlotempCityPhotos;
+    if (!photos) return;
+    const slug = cityData.slug;
+    photos.get(slug).then(src => {
+      // The card may have swapped to another city while this was in
+      // flight; painting then would put the wrong city's photo on it.
+      if (!src || !card.isConnected || card.dataset.slug !== slug) return;
+      const frame = card.querySelector('.fastest-mood');
+      if (!frame || frame.querySelector('.fastest-mood-photo')) return;
+      const img = document.createElement('img');
+      img.alt = '';
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.referrerPolicy = 'no-referrer';
+      img.className = 'fastest-mood-photo';
+      // Reveal only once it has actually decoded, so a broken or slow URL
+      // leaves the band colour standing instead of flashing an empty box.
+      img.addEventListener('load', () => img.classList.add('is-loaded'));
+      img.addEventListener('error', () => img.remove());
+      img.src = src;
+      frame.appendChild(img);
+    });
   }
 
   grid.innerHTML = '';
@@ -2681,19 +2719,32 @@ function setupTrendingRotation() {
     cards.push(card);
   });
 
-  // Static under prefers-reduced-motion
+  prefetchAhead();
+
+  // Static under prefers-reduced-motion -- but still photographed, which
+  // is the part that has to be the same for every card either way.
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const SWAP_INTERVAL_MS = 2000;
+  // One card turns over every SWAP_INTERVAL_MS, so each individual card
+  // holds for six times that. At 1500ms a card is readable for nine
+  // seconds and a full pass over all 300 cities takes about 7.5 minutes,
+  // rather than the 10 it took at 2000ms.
+  const SWAP_INTERVAL_MS = 1500;
   let paused = false;
   const intervalIds = [];
 
   document.addEventListener('visibilitychange', () => { paused = document.hidden; });
 
+  // Only a real pointer can hold a card still. `:hover` sticks after a tap
+  // on touch browsers, which used to freeze whichever card was last
+  // tapped for the rest of the visit.
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+
   cards.forEach((card, i) => {
     const tid = setTimeout(() => {
       const iid = setInterval(() => {
-        if (paused || card.matches(':hover')) return;
+        if (paused) return;
+        if (finePointer.matches && card.matches(':hover')) return;
         const next = nextUniqueCity(assigned.map(c => c.slug));
         assigned[i] = next;
         card.classList.add('swapping');
@@ -2701,6 +2752,7 @@ function setupTrendingRotation() {
           renderCard(card, next);
           card.classList.remove('swapping');
         }, 400);
+        prefetchAhead();
       }, SWAP_INTERVAL_MS * cards.length);
       intervalIds.push(iid);
     }, i * SWAP_INTERVAL_MS);

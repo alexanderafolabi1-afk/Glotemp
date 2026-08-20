@@ -11,8 +11,10 @@
 // SHOW, DO NOT TELL
 // The section explains nothing. It picks a city and becomes it: the clock
 // there, the sky there, a station playing there, what the local press is
-// reporting there in its own language. Nobody is told that Glotemp covers
-// 151 cities in 81 countries. They watch one of them being alive.
+// reporting there in its own language, and a photograph of the place
+// itself behind all of it. Nobody is told that Glotemp covers 300 cities
+// in 104 countries. They watch one of them being alive, and the row above
+// keeps turning over so the other 299 go past.
 //
 // Specificity is the whole mechanism. "Manila" is a word. "It is 11:42pm
 // in Manila and still 29 degrees" is a memory of what that heat felt like
@@ -28,14 +30,20 @@
 //   sky      Open-Meteo
 //   radio    Radio Browser, via city-radio.js
 //   press    GDELT, via city-news.js
+//   photo    Wikipedia and Wikimedia Commons, via city-photos.js
 //
 // The clock and the sky always resolve, so the panel is never empty even
-// when radio or press have nothing for a given city.
+// when radio, press or photo have nothing for a given city.
 (function () {
   'use strict';
 
   var STORE_KEY = 'glotemp-cities-kept';
   var MAX_KEPT = 4;
+  var CHIP_SLOTS = 6;        // how many chips the row holds in total
+  // One drawn chip turns over this often, so with five drawn slots each
+  // individual chip holds still for about twelve seconds -- long enough to
+  // read and aim at -- while the row as a whole works through all 300.
+  var CHIP_ROTATE_MS = 2500;
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -67,6 +75,41 @@
     var list = readKept().filter(function (s) { return s !== slug; });
     list.unshift(slug);
     try { localStorage.setItem(STORE_KEY, JSON.stringify(list.slice(0, MAX_KEPT))); } catch (e) { /* private mode */ }
+  }
+
+  // ---------- the deck of suggestions ----------
+  // The suggested chips used to be a hardcoded list of twelve slugs, cut
+  // to six -- so a first-time visitor saw the same six cities forever, and
+  // a returning visitor with one kept city saw exactly one chip and no way
+  // to stumble onto anything else. The row draws from all 300 now, as a
+  // deck: every city is offered once before any is offered twice.
+  var deck = [];
+
+  function shuffled(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function refillDeck() {
+    deck = shuffled(cities()).map(function (c) { return c.slug; });
+  }
+
+  // Takes the first slug not currently spoken for. Anything passed over
+  // stays in the deck -- it is simply not this draw's card, so no city is
+  // ever quietly consumed without being shown.
+  function drawSlug(taken) {
+    if (!deck.length) refillDeck();
+    for (var pass = 0; pass < 2; pass++) {
+      for (var i = 0; i < deck.length; i++) {
+        if (taken.indexOf(deck[i]) === -1) return deck.splice(i, 1)[0];
+      }
+      refillDeck();
+    }
+    return deck.length ? deck.splice(0, 1)[0] : null;
   }
 
   // ---------- clock ----------
@@ -128,35 +171,29 @@
   // ---------- render ----------
   function shell() {
     var all = cities().slice().sort(function (a, b) { return a.name.localeCompare(b.name); });
-    var kept = readKept();
+    var kept = readKept().slice(0, MAX_KEPT);
 
-    // The opening set is deliberately spread across continents. Someone
-    // should see the world in the first row, not one region.
-    var OPENERS = ['manila', 'warsaw', 'lima', 'accra', 'seoul', 'casablanca',
-                   'ho-chi-minh', 'istanbul', 'nairobi', 'bogota', 'karachi', 'kyiv'];
-    // OPENERS[0] only: a first-time visitor's default city is City of the
-    // Day when one is configured (see city-of-the-day.js), falling back
-    // to plain 'manila' -- OPENERS[0]'s original value -- when it isn't.
-    // Every other opener stays exactly as it was.
-    if (window.GlotempCityOfDay) {
-      var cityOfDay = window.GlotempCityOfDay.get();
-      if (cityOfDay && bySlug(cityOfDay)) OPENERS[0] = cityOfDay;
+    // Cities someone has kept are theirs and never rotate. Whatever slots
+    // are left over are filled from the deck and do rotate, so the row is
+    // always six wide -- a returning visitor with one kept city used to
+    // get a row of exactly one chip.
+    var taken = kept.slice();
+    // The City of the Day opens the suggested run when one is configured
+    // (see city-of-the-day.js), which is how it earns its photo rotation
+    // below; the rest are drawn.
+    var cityOfDay = window.GlotempCityOfDay && window.GlotempCityOfDay.get();
+    var suggested = [];
+    if (cityOfDay && bySlug(cityOfDay) && taken.indexOf(cityOfDay) === -1) {
+      suggested.push(cityOfDay);
+      taken.push(cityOfDay);
     }
-    var suggested = OPENERS.filter(bySlug).slice(0, 6);
-    // Guard against City of the Day landing on the same slug as one of
-    // the other five openers (both pools draw from the same 300 cities)
-    // -- a duplicate chip would look like a mistake, not a feature.
-    var seen = {};
-    suggested = suggested.filter(function (slug) {
-      if (seen[slug]) return false;
-      seen[slug] = true;
-      return true;
-    });
-    if (suggested.length < 6) {
-      var fill = all.filter(function (c) { return suggested.indexOf(c.slug) === -1; });
-      suggested = suggested.concat(fill.slice(0, 6 - suggested.length).map(function (c) { return c.slug; }));
+    refillDeck();
+    while (kept.length + suggested.length < CHIP_SLOTS) {
+      var drawn = drawSlug(taken);
+      if (!drawn) break;
+      suggested.push(drawn);
+      taken.push(drawn);
     }
-    var chips = (kept.length ? kept : suggested).slice(0, 6);
 
     return '' +
       '<div class="elsewhere-head">' +
@@ -175,12 +212,19 @@
         '</datalist>' +
         '<button class="elsewhere-go" type="submit">Open</button>' +
       '</form>' +
-      '<div class="elsewhere-chips">' +
+      '<div class="elsewhere-chips" id="elsewhere-chips">' +
         (kept.length ? '<span class="elsewhere-chips-label">Yours</span>' : '') +
-        chips.map(function (slug) {
+        kept.map(function (slug) {
           var c = bySlug(slug);
           return c ? '<button type="button" class="elsewhere-chip" data-slug="' + esc(c.slug) + '">' +
             esc(c.name) + '</button>' : '';
+        }).join('') +
+        // Labelled only when there are kept chips to tell them apart from.
+        (kept.length && suggested.length ? '<span class="elsewhere-chips-label">Elsewhere</span>' : '') +
+        suggested.map(function (slug, i) {
+          var c = bySlug(slug);
+          return c ? '<button type="button" class="elsewhere-chip elsewhere-chip-drawn" data-slot="' + i +
+            '" data-slug="' + esc(c.slug) + '">' + esc(c.name) + '</button>' : '';
         }).join('') +
       '</div>' +
       '<div class="elsewhere-window" id="elsewhere-window" aria-live="polite"></div>';
@@ -188,26 +232,57 @@
 
   var clockTimer = null;
 
+  // One still photograph of the city behind the panel, from Wikipedia or
+  // Wikimedia Commons (city-photos.js resolves both, and caches, so
+  // reopening a city costs nothing). Uses the same layer-plus-scrim markup
+  // city-of-day-photos.js builds, so the wash over the photo -- and
+  // therefore the text contrast on top of it -- is identical either way.
+  //
+  // A city neither source has a photo for keeps the panel exactly as it is
+  // today: empty host, no image element, nothing substituted in.
+  function stillPhoto(host, city) {
+    if (!host || !city || !window.GlotempCityPhotos) return;
+    var slug = city.slug;
+    host.innerHTML = '';
+    host.setAttribute('data-slug', slug);
+    window.GlotempCityPhotos.get(slug).then(function (src) {
+      // The panel may have been repainted for another city while this was
+      // in flight; painting then would put the wrong city behind it.
+      if (!src || !host.isConnected || host.getAttribute('data-slug') !== slug) return;
+      host.innerHTML = '<div class="elsewhere-photo-scrim"></div>' +
+                       '<img class="elsewhere-photo-layer" alt="">';
+      var img = host.querySelector('.elsewhere-photo-layer');
+      img.decoding = 'async';
+      img.referrerPolicy = 'no-referrer';
+      // Fade in only once it has actually decoded, so a slow or dead URL
+      // leaves the panel looking untouched rather than flashing a scrim
+      // over nothing.
+      img.addEventListener('load', function () { img.classList.add('is-active'); });
+      img.addEventListener('error', function () { host.innerHTML = ''; });
+      img.src = src;
+    });
+  }
+
   function paint(city) {
     var win = document.getElementById('elsewhere-window');
     if (!win || !city) return;
 
     var h = hourIn(city.timezone);
 
-    // City of the Day gets one addition -- a slow photo rotation behind
-    // the panel (city-of-day-photos.js) -- and nothing else differs.
-    // Recomputed per paint rather than cached once, so switching to a
-    // different city (chip, search, kept-city reopen) is checked fresh
-    // every time. Named "-featured", not "-day", so it can't collide
-    // with the unrelated day/night time-of-day class right below it.
+    // Every city is photographed now, not only the City of the Day. What
+    // still differs is how: the City of the Day gets a slow rotation
+    // through several Commons photos (city-of-day-photos.js), every other
+    // city gets one still frame resolved by city-photos.js. Recomputed per
+    // paint rather than cached once, so switching city (chip, search,
+    // kept-city reopen) is checked fresh every time.
     var cityOfDayNow = window.GlotempCityOfDay && window.GlotempCityOfDay.get();
     var isCityOfDay = !!cityOfDayNow && cityOfDayNow === city.slug;
     if (!isCityOfDay && window.GlotempCityOfDayPhotos) window.GlotempCityOfDayPhotos.stop();
 
     win.innerHTML = '' +
       '<div class="elsewhere-panel elsewhere-panel-' + (h < 6 || h >= 20 ? 'night' : 'day') +
-        (isCityOfDay ? ' elsewhere-panel-featured' : '') + '">' +
-        (isCityOfDay ? '<div class="elsewhere-photo-bg" id="elsewhere-photo-bg"></div>' : '') +
+        ' elsewhere-panel-photo">' +
+        '<div class="elsewhere-photo-bg" id="elsewhere-photo-bg"></div>' +
         '<div class="elsewhere-now">' +
           '<span class="elsewhere-clock" id="elsewhere-clock">' + esc(timeIn(city.timezone)) + '</span>' +
           '<span class="elsewhere-place">' + esc(city.name) + '<span class="elsewhere-country">' +
@@ -244,8 +319,11 @@
         ', ' + s.temp + ' degrees' + (s.text ? ', ' + s.text : '');
     });
 
+    var photoHost = document.getElementById('elsewhere-photo-bg');
     if (isCityOfDay && window.GlotempCityOfDayPhotos) {
-      window.GlotempCityOfDayPhotos.attach(document.getElementById('elsewhere-photo-bg'), city);
+      window.GlotempCityOfDayPhotos.attach(photoHost, city);
+    } else {
+      stillPhoto(photoHost, city);
     }
 
     if (window.GlotempRadio) {
@@ -265,12 +343,74 @@
     if (win && win.scrollIntoView) win.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
+  // ---------- the suggested chips turn over ----------
+  // A chip is a tap target, so this is deliberately unhurried and gives up
+  // easily: one chip every five seconds, staggered so the row never
+  // reshuffles at once, held still under a real pointer, and stopped for
+  // good the moment someone shows any intent to use the row. A chip that
+  // changes identity under a finger mid-tap would be worse than a row that
+  // never moves at all.
+  var chipTimers = [];
+  var chipsStopped = false;
+
+  function stopChips() {
+    chipsStopped = true;
+    chipTimers.forEach(function (id) { clearTimeout(id); clearInterval(id); });
+    chipTimers = [];
+  }
+
+  function rotateChips(root) {
+    var slots = Array.prototype.slice.call(root.querySelectorAll('.elsewhere-chip-drawn'));
+    if (slots.length < 2) return;   // nothing to rotate through meaningfully
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var finePointer = window.matchMedia &&
+      window.matchMedia('(hover: hover) and (pointer: fine)');
+    var paused = false;
+    document.addEventListener('visibilitychange', function () { paused = document.hidden; });
+
+    function spoken() {
+      // Never draw a city that is already on the row, kept or drawn, nor
+      // the one the panel is currently showing.
+      var out = readKept().slice(0, MAX_KEPT);
+      root.querySelectorAll('.elsewhere-chip').forEach(function (el) {
+        out.push(el.getAttribute('data-slug'));
+      });
+      return out;
+    }
+
+    slots.forEach(function (chip, i) {
+      var tid = setTimeout(function () {
+        var iid = setInterval(function () {
+          if (chipsStopped || paused) return;
+          if (finePointer && finePointer.matches && chip.matches(':hover')) return;
+          var next = bySlug(drawSlug(spoken()));
+          if (!next) return;
+          chip.classList.add('is-turning');
+          setTimeout(function () {
+            chip.setAttribute('data-slug', next.slug);
+            chip.textContent = next.name;
+            chip.classList.remove('is-turning');
+          }, 300);
+        }, CHIP_ROTATE_MS * slots.length);
+        chipTimers.push(iid);
+      }, i * CHIP_ROTATE_MS);
+      chipTimers.push(tid);
+    });
+  }
+
   function wire(root) {
     root.addEventListener('click', function (e) {
       var chip = e.target.closest && e.target.closest('.elsewhere-chip');
       if (!chip) return;
       open(bySlug(chip.getAttribute('data-slug')));
     });
+
+    // Any sign of intent settles the row permanently.
+    ['pointerdown', 'touchstart', 'keydown'].forEach(function (evt) {
+      root.addEventListener(evt, stopChips, { passive: true });
+    });
+    root.addEventListener('focusin', stopChips);
 
     var form = root.querySelector('#elsewhere-pick');
     if (form) form.addEventListener('submit', function (e) {
@@ -294,8 +434,11 @@
   function mount() {
     var root = document.getElementById('elsewhere-root');
     if (!root || !cities().length) return;
+    stopChips();
+    chipsStopped = false;
     root.innerHTML = shell();
     wire(root);
+    rotateChips(root);
     // Open on the most recently kept city, or on one of the openers, so
     // the section is never an empty form asking to be filled in.
     var kept = readKept();
