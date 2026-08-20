@@ -1,0 +1,77 @@
+name: City media
+
+# Fetches licensed photographs for the top cities and commits them to
+# /city-media/. This is the "server-side, on a schedule" half of the spin
+# section's backdrop -- the site never calls Openverse or Commons from a
+# visitor's browser.
+#
+# Only CC0, public domain and CC BY are stored; the licence of every single
+# image is re-checked in scripts/fetch-city-media.js after the APIs' own
+# filters, and anything unrecognised is dropped rather than guessed at.
+
+on:
+  workflow_dispatch:
+    inputs:
+      cities:
+        description: 'How many cities, by attention index'
+        required: false
+        default: '100'
+      per_city:
+        description: 'Images per city'
+        required: false
+        default: '4'
+      width:
+        description: 'Stored image width in pixels'
+        required: false
+        default: '1000'
+  schedule:
+    # Monthly. The photographs are of landmarks; they do not go stale fast,
+    # and a gentler cadence is kinder to two free APIs.
+    - cron: '0 4 1 * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: city-media-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch licensed city photographs
+        run: |
+          node scripts/fetch-city-media.js \
+            --cities "${{ github.event.inputs.cities || '100' }}" \
+            --per-city "${{ github.event.inputs.per_city || '4' }}" \
+            --width "${{ github.event.inputs.width || '1000' }}"
+
+      - name: Report what landed
+        run: |
+          echo "### City media" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "cities in manifest: $(node -e "console.log(Object.keys(require('./city-media/manifest.json').cities).length)")" >> "$GITHUB_STEP_SUMMARY"
+          echo "images on disk    : $(find city-media -type f \( -name '*.jpg' -o -name '*.png' \) | wc -l)" >> "$GITHUB_STEP_SUMMARY"
+          echo "size on disk      : $(du -sh city-media | cut -f1)" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          du -sh city-media
+
+      - name: Commit
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add city-media
+          if git diff --cached --quiet; then
+            echo "No change to city media."
+            exit 0
+          fi
+          git commit -m "City media: refresh licensed photographs for the spin section"
+          git push origin HEAD:${{ github.ref_name }}
