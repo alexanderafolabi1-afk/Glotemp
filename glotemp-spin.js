@@ -97,9 +97,17 @@
 
   function shellHTML() {
     return `
+      <div class="spin-backdrop" id="spin-backdrop" aria-hidden="true">
+        <div class="spin-bd-layer"></div>
+        <div class="spin-bd-layer"></div>
+        <div class="spin-bd-scrim"></div>
+        <div class="spin-bd-grain"></div>
+        <div class="spin-bd-vignette"></div>
+      </div>
       <div class="spin-inner">
         <p class="eyebrow">One turn, one answer</p>
         <h2 class="spin-title">Spin the instrument</h2>
+        <div class="spin-caption" id="spin-caption"></div>
         <div class="spin-variants" role="group" aria-label="Spin variant">
           ${VARIANTS.map((v, i) => `<button type="button" class="spin-variant" data-variant="${v.id}" aria-pressed="${i === 0}">${esc(v.label)}</button>`).join('')}
         </div>
@@ -115,6 +123,7 @@
           <a class="spin-aff" id="spin-aff-table" target="_blank" rel="noopener noreferrer">${AFF_ICONS.table}<span class="spin-aff-kind">Table</span><span class="spin-aff-label"></span></a>
         </div>
         <p class="spin-prov" id="spin-prov"></p>
+        <p class="spin-credit" id="spin-credit" hidden></p>
       </div>`;
   }
 
@@ -364,6 +373,10 @@
     provEl.innerHTML = esc(bits.join(' · ')) + (choice.modelled ? ' · <span class="tonight-modelled">modelled</span>' : '');
     document.getElementById('spin-go').disabled = false;
     spinning = false;
+    // The backdrop follows the landing city. It is already furnished --
+    // this only changes which city it is showing, and does nothing at all
+    // if that city has no licensed photograph (spin-backdrop.js).
+    if (window.GlotempSpinBackdrop) GlotempSpinBackdrop.showCity(choice.city.slug);
     if (isSurprise) revealSurprisePhoto(choice.city, token);
   }
 
