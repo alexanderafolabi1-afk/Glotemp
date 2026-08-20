@@ -1,0 +1,33 @@
+name: Site build checks
+
+# check-nav.js and check-no-admin-leak.js existed as scripts before this
+# workflow did, but nothing ever ran them automatically -- they only ever
+# ran if whoever was pushing remembered to run them by hand first. That is
+# exactly how an admin link could reach the public nav undetected: the
+# check that would have caught it existed, but nothing was gating merges
+# on it. This runs both on every push and pull request against main so a
+# regression fails the build instead of reaching glo-temp.com.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Nav single-source check
+        run: node check-nav.js
+
+      - name: Admin-leak check
+        run: node check-no-admin-leak.js
