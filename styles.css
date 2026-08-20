@@ -7172,9 +7172,13 @@ a:hover .city-landmark-photo,
    subject now -- not a caption on someone else's picture. */
 .spin-caption {
   width: 100%;
-  max-width: 34ch;
+  max-width: 30ch;
   margin: 1.75rem auto 2.25rem;
 }
+/* A wider measure once there is room: at 30ch a desktop was breaking a
+   one-line fact across three, which is the opposite of "readable at a
+   glance". */
+@media (min-width: 900px) { .spin-caption { max-width: 46ch; } }
 .spin-city {
   font-family: var(--font-display);
   font-weight: var(--fw-light);
