@@ -85,6 +85,14 @@ const DEFAULT_CAMPAIGN_START_DATE = "2026-08-19";
 const CAMPAIGN_START_DATE = Deno.env.get("CAMPAIGN_START_DATE") ?? DEFAULT_CAMPAIGN_START_DATE;
 const IMAGE_FETCH_URL = Deno.env.get("SOCIAL_IMAGE_FETCH_URL")
   ?? `${SUPABASE_URL}/functions/v1/social-image-fetch`;
+// The image_url handed to Make points HERE, not at Commons. A Commons
+// thumbnail keeps its source photograph's aspect ratio -- a skyline
+// arrives around 1600x450 -- and Instagram rejected every one of those
+// with error 36003, unsupported aspect ratio, then deactivated the
+// automation. social-card composes the photograph onto a 1080x1080
+// canvas and refuses to serve anything that is not exactly that.
+const CARD_URL = Deno.env.get("SOCIAL_CARD_URL")
+  ?? `${SUPABASE_URL}/functions/v1/social-card`;
 
 const TIMEZONE = "Europe/London";
 const TIMEOUT_MS = 5000;
@@ -154,15 +162,31 @@ function minutesFromTimeString(t: string): number {
   return h * 60 + m;
 }
 
-async function fetchImage(term: string): Promise<{ image_url: string | null; error?: string }> {
+// Returns the CARD url, which is what Make posts. social-image-fetch is
+// still called first, purely to find out whether a qualifying, licensed
+// photograph exists for this term -- so `photo_found: false` still
+// surfaces in the response the way it always did, instead of being
+// hidden behind a card URL that would render plain brand ground with no
+// explanation. Either way the URL returned is a 1080x1080 card.
+async function fetchImage(
+  term: string,
+): Promise<{ image_url: string | null; photo_found: boolean; error?: string }> {
+  const cardUrl = `${CARD_URL}?term=${encodeURIComponent(term)}`;
   const { signal, done } = withTimeout(TIMEOUT_MS);
   try {
     const resp = await fetch(`${IMAGE_FETCH_URL}?term=${encodeURIComponent(term)}`, { signal });
-    if (!resp.ok) return { image_url: null, error: `image_fetch_http_${resp.status}` };
+    if (!resp.ok) {
+      return { image_url: cardUrl, photo_found: false, error: `image_fetch_http_${resp.status}` };
+    }
     const data = await resp.json();
-    return { image_url: data.image_url ?? null, error: data.image_url ? undefined : (data.reason || "no_image_found") };
+    const found = !!data.image_url;
+    return {
+      image_url: cardUrl,
+      photo_found: found,
+      error: found ? undefined : (data.reason || "no_image_found"),
+    };
   } catch {
-    return { image_url: null, error: "image_fetch_exception" };
+    return { image_url: cardUrl, photo_found: false, error: "image_fetch_exception" };
   } finally {
     done();
   }
@@ -242,18 +266,27 @@ Deno.serve(async (req: Request) => {
     const needs_facebook = !claimed.posted_facebook_at;
 
     if (!claimed.image_search_term) {
+      // Still a card, still square. An Instagram feed post requires an
+      // image, so a row with no search term gets plain brand ground
+      // rather than nothing -- the reason is reported either way.
       return json({
-        due: true, row_id: claimed.id, caption: claimed.caption, image_url: null,
+        due: true, row_id: claimed.id, caption: claimed.caption,
+        image_url: CARD_URL, image_size: "1080x1080", photo_found: false,
         image_error: "no_search_term", needs_instagram, needs_facebook,
       });
     }
 
-    const { image_url, error: imageError } = await fetchImage(claimed.image_search_term);
+    const { image_url, photo_found, error: imageError } = await fetchImage(claimed.image_search_term);
     return json({
       due: true,
       row_id: claimed.id,
       caption: claimed.caption,
       image_url,
+      // Stated so a reader of this response never has to infer it, and
+      // so a future change cannot quietly go back to serving something
+      // of an arbitrary shape without this line becoming a lie.
+      image_size: "1080x1080",
+      photo_found,
       needs_instagram,
       needs_facebook,
       ...(imageError ? { image_error: imageError } : {}),
