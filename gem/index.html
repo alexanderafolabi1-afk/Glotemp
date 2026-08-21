@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#14100B" />
-  <meta name="description" content="Roll a die, land on a city, and open its long read: history, politics, life expectancy, and where to go." />
+  <meta name="description" content="Roll a die and land on a lost city: the real ones dug back out of the ground, and the ones that were only ever a story." />
   <link rel="canonical" href="https://glo-temp.com/gem" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
@@ -29,10 +29,67 @@
     .gem-go:disabled{ opacity:0.5; cursor:wait; }
     .gem-week { font-family:var(--font-mono); font-variant-caps:small-caps; font-size:0.78rem;
       color:var(--brass); min-height:1.3em; margin-top:1rem; }
-    .gem-open { display:inline-block; margin-top:1.2rem; min-height:44px; color:var(--ivory);
-      text-decoration:none; border-bottom:1px solid var(--brass-dim); padding-bottom:3px; }
-    .gem-open:hover{ border-color:var(--brass); color:var(--brass); }
     @media (prefers-reduced-motion: reduce){ .gem-cube{ transition:none !important; } }
+
+    /* ---- the reveal ----
+       These entries are not tracked cities and have no /cities/ page, so
+       what used to be a link out is now the result itself, rendered here
+       under the die in the same language as the rest of the page. */
+    .gem-reveal { margin-top:2.4rem; padding-top:2rem; border-top:1px solid var(--hairline); text-align:left; }
+    .gem-loading { font-family:var(--font-mono); font-size:0.8rem; color:var(--sand); opacity:0.7; }
+    .gem-card { max-width:62ch; margin:0 auto; }
+    .gem-card-head { margin-bottom:1.2rem; }
+
+    /* The category label. Two visibly different things, never the same
+       chip in two colours by accident: an ancient site gets a solid
+       brass rule, a legend gets a dashed one, so the distinction still
+       reads if colour is lost or the page is printed. */
+    .gem-tag { display:inline-block; font-family:var(--font-mono); font-variant-caps:small-caps;
+      font-size:0.7rem; letter-spacing:0.12em; padding:0.28rem 0.6rem; margin-bottom:0.7rem; }
+    .gem-tag.is-ancient { color:var(--brass); border:1px solid var(--brass); }
+    .gem-tag.is-legend { color:var(--sand); border:1px dashed var(--sand); }
+
+    .gem-name { font-family:var(--font-display); font-weight:var(--fw-light);
+      font-size:clamp(26px,4vw,40px); line-height:1.15; margin:0; color:var(--ivory); }
+    .gem-meta { font-family:var(--font-mono); font-size:0.76rem; font-variant-caps:small-caps;
+      letter-spacing:0.06em; color:var(--sand); opacity:0.8; margin:0.4rem 0 0; }
+
+    .gem-figure { margin:0 0 1.4rem; }
+    /* Capped rather than left to the image's own aspect ratio: a tall
+       portrait map would otherwise push the story beats off the fold,
+       and the beats are the point. object-fit crops instead of
+       squashing, and the full image is one tap away on Commons. */
+    .gem-photo { display:block; width:100%; height:auto; max-height:min(46vh, 420px);
+      object-fit:cover; border:1px solid var(--hairline); }
+    .gem-caption { font-family:var(--font-mono); font-size:0.7rem; line-height:1.5;
+      color:var(--sand); opacity:0.72; margin:0.5rem 0 0; }
+
+    /* The sentence that stops a legend reading as geography. It is
+       printed above the story beats, not below them, so it cannot be
+       missed by someone who stops reading halfway. */
+    .gem-status { border-left:2px solid var(--sand); padding:0.1rem 0 0.1rem 0.9rem;
+      margin:0 0 0.8rem; color:var(--ivory); font-size:0.95rem; line-height:1.6; }
+    .gem-status-mark { font-family:var(--font-mono); font-variant-caps:small-caps;
+      letter-spacing:0.06em; color:var(--sand); }
+    .gem-origin { font-family:var(--font-mono); font-size:0.72rem; color:var(--sand);
+      opacity:0.75; margin:0 0 1.2rem; }
+
+    .gem-beats { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0.9rem; }
+    .gem-beats li { color:var(--ivory); font-size:1rem; line-height:1.65; padding-left:1.1rem;
+      position:relative; }
+    .gem-beats li::before { content:''; position:absolute; left:0; top:0.72em;
+      width:6px; height:1px; background:var(--brass); }
+    .gem-card.is-legend .gem-beats li::before { background:var(--sand); opacity:0.7; }
+
+    .gem-source { margin:1.4rem 0 0; }
+    .gem-source a { display:inline-block; min-height:44px; color:var(--sand); font-size:0.86rem;
+      text-decoration:none; border-bottom:1px solid var(--brass-dim); padding-bottom:3px; }
+    .gem-source a:hover { color:var(--brass); border-color:var(--brass); }
+
+    @media (max-width: 640px){
+      .gem-reveal { margin-top:1.8rem; padding-top:1.5rem; }
+      .gem-photo { max-height:40vh; }
+    }
   </style>
   <script src="/glotemp-analytics.js" defer></script>
 </head>
@@ -43,9 +100,9 @@
 
   <main class="page-main">
     <section class="glass-card page-header">
-      <p class="eyebrow">One roll, one city</p>
+      <p class="eyebrow">One roll, one lost city</p>
       <h1>Hidden gem</h1>
-      <p class="section-copy" style="color:var(--sand); max-width:60ch;">Roll the die. It lands on a city and opens its long-form page &mdash; history, politics, life expectancy, and where to actually go. One city carries City of the Week, but the die always works.</p>
+      <p class="section-copy" style="color:var(--sand); max-width:60ch;">Roll the die. It lands on a city that was lost &mdash; either a real one that was buried, abandoned or forgotten and then dug back out of the ground, or one that was only ever a story. Every result says which of the two you got. No readings here, no live data: this is history and legend, kept apart.</p>
     </section>
     <section class="glass-card">
       <div class="gem-stage">
@@ -53,8 +110,10 @@
         <button type="button" class="gem-go" id="gem-go">Roll</button>
         <p class="gem-week" id="gem-week">&nbsp;</p>
         <p class="gem-roll" id="gem-roll">The die is cold. Give it a throw.</p>
-        <a class="gem-open" id="gem-open" href="#" hidden>Open the long read &rarr;</a>
       </div>
+      <!-- Filled by glotemp-gem.js after a roll. These entries have no
+           /cities/ page to link out to, so the result lands here. -->
+      <div class="gem-reveal" id="gem-reveal" hidden></div>
     </section>
   </main>
 
@@ -74,6 +133,7 @@
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
   <script src="/glotemp-features.js"></script>
+  <script src="/lost-cities-data.js"></script>
   <script src="/glotemp-gem.js"></script>
   <script src="/cookie-consent.js" defer></script>
 </body>
