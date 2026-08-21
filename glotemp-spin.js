@@ -194,13 +194,16 @@
   }
 
   // ---------- the spin ----------
+  function candidatesForVariant() {
+    return variant.modes ? pool.filter(c => variant.modes.indexOf(c.mode) !== -1) : pool;
+  }
+
   function spin() {
     if (spinning || poolLoading) return;
     const sentenceEl = document.getElementById('spin-sentence');
     const provEl = document.getElementById('spin-prov');
 
-    let candidates = pool;
-    if (variant.modes) candidates = pool.filter(c => variant.modes.indexOf(c.mode) !== -1);
+    const candidates = candidatesForVariant();
     if (!candidates.length) {
       // No invented destination -- and no announcement of absence either.
       sentenceEl.textContent = pool.length ? 'Try another variant.' : '';
@@ -277,6 +280,14 @@
     poolLoading = false;
     goBtn.disabled = false;
     goBtn.textContent = 'Spin';
+
+    // Show a real result immediately, before any click -- same picker and
+    // sentence builder a real spin uses, just without the dial animation,
+    // so the panel never sits on the inert "Give it a turn." placeholder
+    // next to the always-populated City Spotlight beside it. An actual
+    // spin still fully replaces this via finish(), same as always.
+    const initial = pick(candidatesForVariant());
+    if (initial) finish(initial);
   }
 
   if (document.readyState === 'loading') {
