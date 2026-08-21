@@ -304,6 +304,11 @@
     <section id="observations-section" class="glass-card">
       <p class="eyebrow" data-i18n="obs_eyebrow">Live observations</p>
       <button type="button" class="obs-snippet" id="obs-snippet" aria-live="polite"></button>
+      <!-- Reactions sit outside the snippet button: a button cannot
+           contain buttons, and #obs-snippet is one (tapping it pins the
+           city). Filled by app.js only when the snippet on screen is a
+           real comment row; empty and hidden for the seed set. -->
+      <div id="obs-snippet-reactions" hidden></div>
       <div class="add-voice-row">
         <p class="add-voice-copy" data-i18n="add_voice_copy">Want to add your own read on a city?</p>
         <button type="button" class="btn-neon" id="add-voice-btn" data-i18n="add_voice_btn">Add your voice ↑</button>
@@ -350,6 +355,7 @@
   <script src="/glotemp-elsewhere.js" defer></script>
   <script src="/app.js?v=58" defer></script>
   <script src="/glotemp-auth.js" defer></script>
+  <script src="/glotemp-reactions.js" defer></script>
   <script src="/glotemp-reporter.js" defer></script>
   <script src="/glotemp-daily-checkin.js" defer></script>
   <script src="/glotemp-home-frequency.js" defer></script>

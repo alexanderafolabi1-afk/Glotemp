@@ -1663,6 +1663,44 @@ const OBS_PIN_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"
 let obsSnippetPool = [];
 let obsSnippetIndex = 0;
 let obsSnippetTimer = null;
+// Real rows from the observations table -- the same comments the city
+// pages and /feed show. These are what can carry reactions: they have a
+// database id behind them. The seed set below cannot, and is never given
+// a reaction bar rather than one wired to an id that does not exist.
+let obsSnippetLive = [];
+// Set while a visitor is reading or reacting to the current snippet, so
+// the 5s rotation cannot swap the comment out from under a tap.
+let obsSnippetHold = false;
+
+const OBS_SNIPPET_SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
+const OBS_SNIPPET_SUPABASE_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
+
+// One recent comment per city, newest first. Failure is silent and the
+// pool falls back to the seed set, exactly as it did before -- the
+// homepage has never depended on this table being reachable.
+function fetchLiveObsSnippets() {
+  return fetch(
+    `${OBS_SNIPPET_SUPABASE_URL}/rest/v1/observations` +
+      `?select=id,city_slug,note,intensity,created_at&note=not.is.null` +
+      `&order=created_at.desc&limit=120`,
+    { headers: {
+        apikey: OBS_SNIPPET_SUPABASE_KEY,
+        Authorization: `Bearer ${OBS_SNIPPET_SUPABASE_KEY}`,
+        Accept: 'application/json',
+      } }
+  )
+    .then(resp => (resp.ok ? resp.json() : []))
+    .then(rows => {
+      obsSnippetLive = (rows || []).map(r => ({
+        id: r.id,
+        city: r.city_slug,
+        sentiment: Number.isFinite(Number(r.intensity)) ? Number(r.intensity) / 10 : 0.5,
+        context: r.note,
+        created_at: r.created_at,
+      }));
+    })
+    .catch(() => { obsSnippetLive = []; });
+}
 
 function buildObsSnippetPool() {
   const bySlug = new Map();
@@ -1679,6 +1717,11 @@ function buildObsSnippetPool() {
     if (!slugEntry || bySlug.has(slugEntry[0])) return;
     const sentiment = o.mood === 'Energized' ? 0.9 : o.mood === 'Good' ? 0.7 : o.mood === 'Neutral' ? 0.5 : o.mood === 'Low' ? 0.3 : 0.2;
     bySlug.set(slugEntry[0], { city: slugEntry[0], sentiment, text: o.note || `${o.mood}, ${o.scene}`, created_at: 'just now' });
+  });
+  // Real rows next: a live comment for a city always outranks the seed
+  // sample for that same city, same rule the feed already follows.
+  obsSnippetLive.forEach(o => {
+    if (o.city && !bySlug.has(o.city)) bySlug.set(o.city, o);
   });
   (window.SEED_OBSERVATIONS || []).forEach(o => {
     if (o.city && !bySlug.has(o.city)) bySlug.set(o.city, o);
@@ -1697,6 +1740,18 @@ function renderObsSnippet() {
   el.style.setProperty('--obs-band', bandInfo.color);
   el.innerHTML = `<span class="obs-snippet-pin" aria-hidden="true">${OBS_PIN_SVG}</span><span class="obs-snippet-body"><span class="obs-snippet-city">${cityName}</span><span class="obs-snippet-text">&ldquo;${text}&rdquo;</span></span>`;
   el.dataset.citySlug = obs.city;
+
+  // The reaction bar is a sibling, not a child: #obs-snippet is itself a
+  // button (tapping it pins the city) and a button cannot contain
+  // buttons. Seed snippets have no row behind them, so barHTML() returns
+  // '' for them and the host simply empties.
+  const host = document.getElementById('obs-snippet-reactions');
+  if (host && window.GlotempReactions) {
+    const bar = GlotempReactions.barHTML(obs.id);
+    host.innerHTML = bar;
+    host.hidden = !bar;
+    if (bar) GlotempReactions.mount(host);
+  }
 }
 
 // (Re)starts the rotation timer from now -- called on init and again
@@ -1707,6 +1762,10 @@ function startObsSnippetTimer() {
   if (obsSnippetTimer) clearInterval(obsSnippetTimer);
   if (!el || window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   obsSnippetTimer = setInterval(() => {
+    // Held while someone is reading or reacting to this one. Rotating a
+    // comment out from under a half-made tap is worse than a snippet
+    // that lingers.
+    if (obsSnippetHold) return;
     obsSnippetIndex++;
     el.classList.add('is-fading');
     setTimeout(() => { renderObsSnippet(); el.classList.remove('is-fading'); }, 300);
@@ -1724,7 +1783,27 @@ function initObsSnippetRotator() {
     const slug = el.dataset.citySlug;
     if (slug && typeof loadCityBySlug === 'function') loadCityBySlug(slug);
   });
+
+  const section = document.getElementById('observations-section');
+  if (section) {
+    const hold = () => { obsSnippetHold = true; };
+    const release = () => { obsSnippetHold = false; };
+    section.addEventListener('pointerenter', hold);
+    section.addEventListener('pointerleave', release);
+    section.addEventListener('focusin', hold);
+    section.addEventListener('focusout', release);
+  }
+
   startObsSnippetTimer();
+
+  // Live rows arrive after the first paint. Rebuild the pool once they
+  // land so the rotation moves onto real comments -- which is also what
+  // gives the section its reaction bars.
+  fetchLiveObsSnippets().then(() => {
+    if (!obsSnippetLive.length) return;
+    buildObsSnippetPool();
+    renderObsSnippet();
+  });
 }
 
 // Called right after a check-in is recorded: fold the new note into the

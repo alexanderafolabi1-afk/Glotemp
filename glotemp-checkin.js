@@ -491,6 +491,7 @@
           <time class="checkin-item-time" datetime="${esc(row.created_at)}">${esc(timeAgo(row.created_at))}</time>
         </div>
         ${row.note ? `<p class="checkin-item-note">${esc(row.note)}</p>` : ''}
+        ${window.GlotempReactions ? GlotempReactions.barHTML(row.id) : ''}
       </article>`;
   }
 
@@ -526,6 +527,10 @@
       }
       offset += rows.length;
       if (moreBtn) moreBtn.hidden = rows.length < PAGE_SIZE;
+      // Counts for whatever is now on screen. mount() only queries ids
+      // it has not seen, so paging in more rows costs one request for
+      // the new page rather than a re-fetch of the whole list.
+      if (window.GlotempReactions) GlotempReactions.mount(list);
     } catch (e) {
       if (offset === 0) {
         list.innerHTML = '';
@@ -643,6 +648,33 @@
     });
   }
 
+  // ---------- intent board ----------
+  // "Where people want to go" for this city. The section starts hidden
+  // and stays hidden unless GlotempReactions.intentBoard() finds enough
+  // to rank: an empty board is not shown as an empty board, it is not
+  // shown at all, and the element is removed so it cannot leave a gap
+  // between the sections either side of it.
+  function mountIntentBoard() {
+    if (!window.GlotempReactions) return;
+    var host = document.getElementById('city-intent-board');
+    if (!host) {
+      var anchor = document.getElementById('city-observation-feed');
+      var after = anchor ? (anchor.closest('section') || anchor) : null;
+      host = document.createElement('section');
+      host.id = 'city-intent-board';
+      host.className = 'glass-card city-intent-section';
+      host.hidden = true;
+      if (after && after.parentNode) {
+        after.parentNode.insertBefore(host, after.nextSibling);
+      } else {
+        (document.querySelector('main') || document.body).appendChild(host);
+      }
+    }
+    GlotempReactions.intentBoard(citySlug, host).then(function (n) {
+      if (!n && host.parentNode) host.parentNode.removeChild(host);
+    });
+  }
+
   // ---------- mount ----------
   function mount() {
     citySlug = detectCitySlug();
@@ -676,6 +708,7 @@
     refreshAuthState();
     wireWatch();
     loadCheckins();
+    mountIntentBoard();
 
     const moreBtn = document.getElementById('checkin-more');
     if (moreBtn) moreBtn.addEventListener('click', async () => {
