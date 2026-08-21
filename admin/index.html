@@ -318,7 +318,7 @@
 
     function dashboard(overview, byCity, apiOverview, apiKeys, tierCounts, topContributors, leads,
                        traffic, trafficDaily, topPages, topRefs, topCountries, topDevices,
-                       signupsDaily, signupSources, jobs, partners) {
+                       signupsDaily, signupSources, jobs, partners, xPosts) {
       var m = {};
       (overview || []).forEach(function (r) { m[r.metric] = r.value; });
       var a = {};
@@ -409,6 +409,23 @@
             '</div>';
           }).join('')
         : '<p class="adm-copy">Job history unavailable.</p>';
+
+      // X posts are read-only, pre-written copy -- shown newest-day-first
+      // isn't the point here, calendar order is, so they render in the
+      // exact day/slot order the table's own unique(day_number,
+      // slot_number) constraint already sorts them into.
+      var xList = xPosts || [];
+      var xRows = xList.length
+        ? '<div class="adm-x-list">' + xList.map(function (p, i) {
+            var meta = 'Day ' + esc(p.day_number) + ', ' + esc(p.scheduled_time) + ' · ' + esc(p.theme) +
+              (p.image_note && p.image_note !== 'No image' ? ' · ' + esc(p.image_note) : '');
+            return '<div class="adm-row adm-x-row">' +
+              '<span class="adm-row-city">' + esc(p.tweet_text) +
+                '<span class="adm-key-prefix">' + meta + '</span></span>' +
+              '<button type="button" class="adm-revoke adm-x-copy" data-x-index="' + i + '">Copy</button>' +
+            '</div>';
+          }).join('') + '</div>'
+        : '<p class="adm-copy">The calendar has not been seeded yet.</p>';
 
       var signupRows = (signupSources || []).length
         ? signupSources.slice(0, 10).map(function (r) {
@@ -514,6 +531,13 @@
           '</div>' +
           '<p><button class="adm-action" type="submit" id="adm-lead-submit">Add lead</button></p></form>' +
           '<p class="adm-status" id="adm-lead-status-msg" role="status" aria-live="polite"></p>') +
+
+        panel('p-x-content', 'X content', 'manual, copy-paste only -- no posting API',
+          '<div class="adm-grid">' +
+            fig(xList.length.toLocaleString(), 'posts ready') +
+            fig((xList.length ? 30 : 0).toLocaleString(), 'days covered') +
+          '</div>' +
+          xRows) +
 
         panel('p-partners', 'Partners', 'placements and expiries',
           '<div class="adm-grid">' +
@@ -712,6 +736,20 @@
         });
       });
 
+      root.querySelectorAll('.adm-x-copy').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var post = xList[Number(b.getAttribute('data-x-index'))];
+          if (!post) return;
+          if (window.GlotempAdminSpace) GlotempAdminSpace.commit(b);
+          navigator.clipboard.writeText(post.tweet_text).then(function () {
+            b.textContent = 'Copied';
+            setTimeout(function () { b.textContent = 'Copy'; }, 1500);
+          }, function () {
+            b.textContent = 'Select by hand';
+          });
+        });
+      });
+
       root.querySelectorAll('.adm-range button').forEach(function (b) {
         b.addEventListener('click', function () {
           days = Number(b.getAttribute('data-days')) || 7;
@@ -760,6 +798,7 @@
           rpc('admin_signup_sources', { days: days, max_rows: 20 }).catch(none),
           rpc('admin_job_health', { max_rows: 20 }).catch(none),
           restTable('GET', 'partners?select=*&order=created_at.desc').catch(none),
+          restTable('GET', 'x_content_calendar?select=day_number,slot_number,scheduled_time,theme,tweet_text,image_note&order=day_number.asc,slot_number.asc').catch(none),
         ]);
         dashboard.apply(null, results);
       } catch (err) {
