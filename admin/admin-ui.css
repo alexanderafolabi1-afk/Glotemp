@@ -38,8 +38,15 @@
   --rule-strong: 1px solid var(--brass-dim);
 }
 
-/* ---------- page frame ---------- */
-.adm-page .adm { padding: var(--s5) 0 var(--s6); }
+/* ---------- page frame ----------
+   No site-wide numeric max-width convention fits a dashboard: the only
+   max-width anywhere else on the public site is .prose-section's 68ch, a
+   text-reading-measure cap for paragraphs, not a data-grid cap. 1100px is
+   a deliberate, disclosed choice for this page alone -- wide enough for
+   the four-figure .adm-grid.is-wide row on a laptop, narrow enough that
+   panels and ranked-bar rows stay readable instead of stretching edge to
+   edge on a desktop monitor. */
+.adm-page .adm { padding: var(--s5) 0 var(--s6); max-width: 1100px; margin: 0 auto; }
 
 .adm-page .adm-title {
   font-family: var(--font-display);
@@ -295,6 +302,19 @@
   max-width: 100%; overflow-wrap: anywhere;
 }
 .adm-page .adm-row-dead { opacity: 0.45; }
+
+/* A long pre-written list (the X content calendar) scrolls inside its own
+   panel rather than pushing the whole page out -- 90 rows of copy is a
+   reference list to scan and copy from, not something that should force
+   90 rows of vertical scroll on the dashboard itself. */
+.adm-page .adm-x-list {
+  max-height: 26rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border-top: var(--rule-strong);
+}
+.adm-page .adm-x-row { align-items: flex-start; }
+.adm-page .adm-x-row .adm-row-city { line-height: 1.5; }
 
 /* ---------- status marks ---------- */
 .adm-page .adm-dot {

@@ -106,7 +106,13 @@
          framing above. Populated by glotemp-elsewhere.js. -->
     <section class="elsewhere-section" id="elsewhere-root" aria-label="A city you keep"></section>
 
-    <section id="spin-section" class="glass-card spin-section"></section>
+    <!-- Spin instrument beside City Spotlight -- two separate panels, two
+         separate scripts (glotemp-spin.js, city-spotlight.js). Neither
+         reads the other's state. Stacks to one column below 800px. -->
+    <div class="homepage-duo">
+      <section id="spin-section" class="glass-card spin-section"></section>
+      <section id="city-spotlight-section" class="glass-card city-spotlight-section" aria-label="City spotlight"></section>
+    </div>
 
     <!-- Daily check-in ritual. Populated by glotemp-daily-checkin.js. -->
     <section class="daily-checkin-section" aria-label="Daily check-in">
@@ -338,7 +344,7 @@
   <script src="/glotemp-tonight.js" defer></script>
   <script src="/glotemp-showcase.js" defer></script>
   <script src="/glotemp-spin.js" defer></script>
-  <script src="/spin-backdrop.js" defer></script>
+  <script src="/city-spotlight.js" defer></script>
   <script src="/glotemp-hero-instrument.js" defer></script>
   <script src="/eclipse-2026.js" defer></script>
   <script src="/city-tiles.js" defer></script>

@@ -41,7 +41,6 @@
   let spinning = false;
   let rotation = 0;       // accumulated degrees, never reset (keeps motion one-way)
   let variant = VARIANTS[0];
-  let revealToken = 0;    // see finish(): discards a photo fetch that resolves after a newer spin has landed
 
   function esc(s) {
     return String(s == null ? '' : s)
@@ -97,17 +96,9 @@
 
   function shellHTML() {
     return `
-      <div class="spin-backdrop" id="spin-backdrop" aria-hidden="true">
-        <div class="spin-bd-layer"></div>
-        <div class="spin-bd-layer"></div>
-        <div class="spin-bd-scrim"></div>
-        <div class="spin-bd-grain"></div>
-        <div class="spin-bd-vignette"></div>
-      </div>
       <div class="spin-inner">
         <p class="eyebrow">One turn, one answer</p>
         <h2 class="spin-title">Spin the instrument</h2>
-        <div class="spin-caption" id="spin-caption"></div>
         <div class="spin-variants" role="group" aria-label="Spin variant">
           ${VARIANTS.map((v, i) => `<button type="button" class="spin-variant" data-variant="${v.id}" aria-pressed="${i === 0}">${esc(v.label)}</button>`).join('')}
         </div>
@@ -116,15 +107,12 @@
           <button type="button" class="spin-go" id="spin-go">Spin</button>
         </div>
         <p class="spin-sentence" id="spin-sentence" role="status" aria-live="polite">Give it a turn.</p>
-        <div class="spin-photo" id="spin-photo" hidden></div>
-        <div class="spin-facts" id="spin-facts" hidden></div>
         <div class="spin-affiliates" id="spin-affiliates" hidden>
           <a class="spin-aff" id="spin-aff-flight" target="_blank" rel="noopener noreferrer">${AFF_ICONS.flight}<span class="spin-aff-kind">Flight</span><span class="spin-aff-label"></span></a>
           <a class="spin-aff" id="spin-aff-room" target="_blank" rel="noopener noreferrer">${AFF_ICONS.room}<span class="spin-aff-kind">Room</span><span class="spin-aff-label"></span></a>
           <a class="spin-aff" id="spin-aff-table" target="_blank" rel="noopener noreferrer">${AFF_ICONS.table}<span class="spin-aff-kind">Table</span><span class="spin-aff-label"></span></a>
         </div>
         <p class="spin-prov" id="spin-prov"></p>
-        <p class="spin-credit" id="spin-credit" hidden></p>
       </div>`;
   }
 
@@ -173,154 +161,6 @@
     let r = Math.random() * total;
     for (const x of scored) { r -= x.w; if (r <= 0) return x.c; }
     return scored[scored.length - 1].c;
-  }
-
-  // ---------- one real photo of the landing city, every variant ----------
-  // Runs for all four variants -- see revealExtras() below. The dial, the
-  // rotation, the tab switching and the sentence itself have no
-  // dependency on any of this: it is fetched and revealed strictly after
-  // the dial has already settled and the sentence is already on screen,
-  // so a slow or failed fetch here can never affect the spin mechanic.
-  //
-  // Same free, keyless Wikimedia family as city-landmark-photos.js's
-  // Wikipedia REST calls, one step further into Commons' own action API
-  // (as city-of-day-photos.js already does for its background rotation).
-  // This asks for something more specific than "a photo of the city",
-  // though: search text biased toward the quieter corners -- gardens,
-  // historic districts, temples and shrines, old town streets,
-  // sanctuaries, courtyards -- rather than the tallest building or the
-  // widest avenue, since a generic skyline shot is the opposite of what
-  // any of these variants is for, not only "Surprise me". Falls back to
-  // the plain Wikipedia thumbnail (GlotempLandmarkPhotos) if nothing
-  // themed turns up, and to nothing at all -- the sentence alone, exactly
-  // as it renders before any photo resolves -- if that fails too. Never a
-  // broken image, never a placeholder: every URL returned here is a real
-  // Commons or Wikipedia file, or there is no photo this time.
-  const COMMONS_API = 'https://commons.wikimedia.org/w/api.php';
-  const SURPRISE_MIN_DIMENSION = 400;
-  const SURPRISE_THUMB_WIDTH = 900;
-  const SURPRISE_THEMES = ['garden', '"historic district"', 'temple', 'shrine', '"old town"', 'sanctuary', 'courtyard'];
-  const SURPRISE_BAD_TITLE = /logo|coat[\s_]of[\s_]arms|seal[\s_]of|flag[\s_]of|\bmap\b|diagram|chart|icon|emblem|locator/i;
-  const surprisePhotoCache = new Map();
-
-  function looksLikeThemedPhoto(page) {
-    const info = page && page.imageinfo && page.imageinfo[0];
-    if (!info) return false;
-    const mime = String(info.mime || '').toLowerCase();
-    if (mime !== 'image/jpeg' && mime !== 'image/png') return false;
-    if ((info.width || 0) < SURPRISE_MIN_DIMENSION && (info.height || 0) < SURPRISE_MIN_DIMENSION) return false;
-    if (SURPRISE_BAD_TITLE.test(String(page.title || '').replace(/^File:/i, ''))) return false;
-    return !!(info.thumburl || info.url);
-  }
-
-  async function fetchThemedCommonsPhoto(cityName) {
-    try {
-      const params = new URLSearchParams({
-        action: 'query',
-        generator: 'search',
-        gsrsearch: `"${cityName}" (${SURPRISE_THEMES.join(' OR ')})`,
-        gsrnamespace: '6',
-        gsrlimit: '20',
-        prop: 'imageinfo',
-        iiprop: 'url|size|mime',
-        iiurlwidth: String(SURPRISE_THUMB_WIDTH),
-        format: 'json',
-        origin: '*',
-      });
-      const resp = await fetch(`${COMMONS_API}?${params}`);
-      if (!resp.ok) return null;
-      const data = await resp.json();
-      const pages = (data && data.query && data.query.pages) || {};
-      for (const key of Object.keys(pages)) {
-        const page = pages[key];
-        if (!looksLikeThemedPhoto(page)) continue;
-        const info = page.imageinfo[0];
-        return info.thumburl || info.url;
-      }
-      return null;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function fetchSurprisePhoto(city) {
-    if (surprisePhotoCache.has(city.slug)) return surprisePhotoCache.get(city.slug);
-    const promise = (async () => {
-      const themed = await fetchThemedCommonsPhoto(city.name);
-      if (themed) return themed;
-      if (window.GlotempLandmarkPhotos) return (await window.GlotempLandmarkPhotos.getPhotoUrl(city.slug)) || null;
-      return null;
-    })();
-    surprisePhotoCache.set(city.slug, promise);
-    return promise;
-  }
-
-  // ---------- one real fact about the landing city, every variant ----------
-  // Two tiers, tried in order, never a third:
-  //   1. CITY_TRIVIA (city-trivia-data.js) -- hand-curated for ~half the
-  //      roster. Used exactly as written; nothing here rewrites or
-  //      trims it.
-  //   2. Wikipedia's REST summary API -- same endpoint and pattern as
-  //      city-landmark-photos.js and city-wiki.js, one step further:
-  //      the response's real "extract" field, trimmed to its own first
-  //      1-2 sentences (never the whole paragraph, never a paraphrase).
-  //      Tried as the city's bare name first, then "name, country" --
-  //      Wikipedia disambiguates a lot of small-city names by country
-  //      (Cartagena, Cordoba, Faro, Banff...) and the bare name alone
-  //      resolves to a disambiguation page, or a same-named place
-  //      somewhere else, for those.
-  // Neither tier finds anything -> null, and the facts panel simply does
-  // not render for that spin -- the same honesty rule as every other
-  // "nothing to show" state in this project. No fact is ever invented to
-  // fill the gap.
-  const WIKI_SUMMARY_API = 'https://en.wikipedia.org/api/rest_v1/page/summary/';
-  const cityFactCache = new Map();
-
-  function curatedFact(city) {
-    const list = window.CITY_TRIVIA && window.CITY_TRIVIA[city.slug];
-    if (!Array.isArray(list) || !list.length) return null;
-    const clean = list.filter((f) => typeof f === 'string' && f.trim());
-    return clean.length ? clean.join(' ') : null;
-  }
-
-  // The extract's own first 1-2 sentences, split on real sentence-ending
-  // punctuation followed by whitespace -- not a hard character truncation,
-  // which would cut a real sentence off mid-word.
-  function firstSentences(text, max) {
-    const parts = String(text || '').trim().split(/(?<=[.!?])\s+/).filter(Boolean);
-    return parts.length ? parts.slice(0, max).join(' ') : '';
-  }
-
-  async function fetchWikiExtract(title) {
-    try {
-      const resp = await fetch(WIKI_SUMMARY_API + encodeURIComponent(title), {
-        headers: { Accept: 'application/json' },
-      });
-      if (!resp.ok) return null;
-      const data = await resp.json();
-      if (!data || data.type === 'disambiguation' || !data.extract) return null;
-      const sentences = firstSentences(data.extract, 2);
-      return sentences || null;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function fetchWikiFact(city) {
-    if (cityFactCache.has(city.slug)) return cityFactCache.get(city.slug);
-    const promise = (async () => {
-      let fact = await fetchWikiExtract(city.name);
-      if (!fact && city.country) fact = await fetchWikiExtract(`${city.name}, ${city.country}`);
-      return fact;
-    })();
-    cityFactCache.set(city.slug, promise);
-    return promise;
-  }
-
-  function getCityFact(city) {
-    const curated = curatedFact(city);
-    if (curated) return Promise.resolve(curated);
-    return fetchWikiFact(city);
   }
 
   // ---------- the sentence ----------
@@ -398,53 +238,9 @@
     setTimeout(() => finish(choice), 3040);
   }
 
-  // Fire-and-forget, for every variant: the network round trips here
-  // never hold up re-enabling the Spin button or anything else in
-  // finish() above this call -- both the dial and the sentence are
-  // already fully settled by the time this ever runs. revealToken
-  // guards against a slow fetch from an earlier spin landing after a
-  // newer one has already replaced the sentence on screen -- without it,
-  // a stale photo or fact could briefly overwrite the current result.
-  // Photo and fact are fetched in parallel and rendered independently:
-  // one failing (or simply taking longer) never holds up or hides the
-  // other.
-  async function revealExtras(city, token) {
-    const photoEl = document.getElementById('spin-photo');
-    const factsEl = document.getElementById('spin-facts');
-    const [photoUrl, fact] = await Promise.all([fetchSurprisePhoto(city), getCityFact(city)]);
-    if (token !== revealToken) return;
-
-    if (photoUrl && photoEl) {
-      const img = new Image();
-      img.onload = () => {
-        if (token !== revealToken || !photoEl.isConnected) return;
-        photoEl.innerHTML = `<img class="spin-photo-img" src="${esc(photoUrl)}" alt="">`;
-        photoEl.hidden = false;
-      };
-      img.onerror = () => {}; // broken URL: photoEl stays hidden, sentence stands alone
-      img.src = photoUrl;
-    }
-
-    if (fact && factsEl && factsEl.isConnected) {
-      factsEl.innerHTML = `<p class="spin-facts-text">${esc(fact)}</p>`;
-      factsEl.hidden = false;
-    }
-  }
-
   function finish(choice) {
     const sentenceEl = document.getElementById('spin-sentence');
     const provEl = document.getElementById('spin-prov');
-    const photoEl = document.getElementById('spin-photo');
-    const factsEl = document.getElementById('spin-facts');
-    revealToken++;
-    const token = revealToken;
-    // Reset every reveal -- otherwise a photo or fact from a previous
-    // spin would still be showing after switching variants and spinning
-    // again.
-    photoEl.hidden = true;
-    photoEl.innerHTML = '';
-    factsEl.hidden = true;
-    factsEl.innerHTML = '';
     sentenceEl.textContent = buildSentence(choice);
     sentenceEl.classList.remove('is-settling');
     setAffiliates(choice.city);
@@ -453,11 +249,6 @@
     provEl.innerHTML = esc(bits.join(' · ')) + (choice.modelled ? ' · <span class="tonight-modelled">modelled</span>' : '');
     document.getElementById('spin-go').disabled = false;
     spinning = false;
-    // The backdrop follows the landing city. It is already furnished --
-    // this only changes which city it is showing, and does nothing at all
-    // if that city has no licensed photograph (spin-backdrop.js).
-    if (window.GlotempSpinBackdrop) GlotempSpinBackdrop.showCity(choice.city.slug);
-    revealExtras(choice.city, token);
   }
 
   async function mount() {
@@ -493,13 +284,4 @@
   } else {
     mount();
   }
-
-  // Public, minimal: the exact two fetchers used for a spin's own
-  // photo/fact reveal, for spin-backdrop.js's ambient rotation to call
-  // directly rather than re-implementing the same two-tier fact fallback
-  // and themed Commons search a second time. Both already cache
-  // per-city internally, so calling them again here for a city already
-  // fetched (e.g. a spin landing on a city the backdrop just showed) is
-  // free.
-  window.GlotempSpin = { fetchSurprisePhoto, getCityFact };
 })();
