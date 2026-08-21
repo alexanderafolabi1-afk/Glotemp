@@ -9069,3 +9069,223 @@ a:active:not(.btn-neon):not(.nav-logo):not([class*="chip"]) {
   background: var(--band-warm);
   box-shadow: 0 0 6px var(--band-warm);
 }
+
+/* ===== COMMENT REACTIONS =========================================== */
+/* One appearance everywhere: city check-in lists, /feed and the
+   homepage all render the same bar from GlotempReactions.barHTML().
+   Nothing below is surface-specific, deliberately -- a reaction that
+   looks different on the feed than on a city page is two components
+   pretending to be one. */
+
+.gt-reactions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.9rem;
+  margin: 0.55rem 0 0;
+  /* Capped, so that on a wide feed item the report link stays beside the
+     reactions it belongs to instead of being flung to the far edge of a
+     1440px card by margin-left:auto. */
+  max-width: 30rem;
+}
+
+.gt-reactions-set {
+  display: flex;
+  align-items: stretch;
+  gap: 0.15rem;
+  flex-wrap: wrap;
+}
+
+.gt-react {
+  /* 44px is the floor for the whole control, not just its box: the
+     glyph and its label sit inside a target a thumb can actually hit. */
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.55rem;
+  background: none;
+  /* No radius: this file zeroes every corner globally on purpose (see the
+     universal reset near the end) and only true circles are allowed back.
+     A rounded reaction chip would be the one curved thing on the page. */
+  border: 1px solid transparent;
+  color: var(--brass);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.gt-react-mark {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.12rem;
+  line-height: 1;
+}
+
+.gt-react-glyph {
+  width: 17px;
+  height: 17px;
+  display: block;
+}
+
+.gt-react-label {
+  font-family: var(--font-mono);
+  font-size: 0.575rem;
+  font-variant: small-caps;
+  text-transform: lowercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.gt-react-count {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--sand);
+  min-width: 1ch;
+  text-align: left;
+}
+
+/* A count of zero is an invitation, not a result -- present, but not
+   competing with counts that mean something. */
+.gt-react.is-zero .gt-react-count { opacity: 0.42; }
+
+.gt-react:hover,
+.gt-react:focus-visible {
+  border-color: var(--brass-dim);
+  background: rgba(176, 141, 87, 0.07);
+}
+
+.gt-react:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
+/* On. There is no "off" counterpart anywhere in this component: no
+   reaction here can be used against a comment. */
+.gt-react.is-on {
+  border-color: var(--brass);
+  background: rgba(176, 141, 87, 0.15);
+}
+.gt-react.is-on .gt-react-glyph { fill: rgba(176, 141, 87, 0.28); }
+.gt-react.is-on .gt-react-count { color: var(--ivory); }
+
+.gt-react:active { transform: translateY(1px); }
+
+.gt-report {
+  /* 44px both ways. At its natural width the word "Report" is only
+     ~36px across, which is under the tap floor even though its height
+     was already fine. */
+  min-height: 44px;
+  min-width: 44px;
+  margin-left: auto;
+  padding: 0 0.2rem;
+  text-align: center;
+  background: none;
+  border: 0;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-variant: small-caps;
+  text-transform: lowercase;
+  letter-spacing: 0.08em;
+  color: var(--sand);
+  opacity: 0.4;
+  cursor: pointer;
+  transition: opacity 0.18s ease;
+}
+.gt-report:hover,
+.gt-report:focus-visible { opacity: 0.85; }
+.gt-report.is-done,
+.gt-report:disabled { opacity: 0.5; cursor: default; }
+
+.gt-react-note {
+  flex: 1 0 100%;
+  margin: 0.2rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--sand);
+  opacity: 0.8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gt-react { transition: none; }
+  .gt-react:active { transform: none; }
+}
+
+/* ----- the intent board ----- */
+
+.gt-intent-heading {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3.4vw, 1.9rem);
+  margin: 0 0 0.25rem;
+  color: var(--ivory);
+}
+
+.gt-intent-basis {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-variant: small-caps;
+  text-transform: lowercase;
+  letter-spacing: 0.1em;
+  color: var(--sand);
+  opacity: 0.75;
+  margin: 0 0 1.1rem;
+}
+
+.gt-intent-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.05rem;
+}
+
+.gt-intent-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.gt-intent-rank {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--brass);
+  padding-top: 0.15rem;
+  min-width: 1.4ch;
+}
+
+.gt-intent-body { flex: 1 1 auto; min-width: 0; }
+
+.gt-intent-note {
+  margin: 0;
+  color: var(--ivory);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.gt-intent-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.7rem;
+  margin: 0.3rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--sand);
+  opacity: 0.8;
+}
+
+@media (max-width: 420px) {
+  /* Three reactions plus the report link must still fit one line at
+     375px: the labels lose a little tracking rather than the row
+     wrapping into a second line that pushes the next comment down. */
+  .gt-react { padding: 0.25rem 0.38rem; gap: 0.3rem; }
+  .gt-react-label { font-size: 0.545rem; letter-spacing: 0.03em; }
+  .gt-reactions { gap: 0.2rem 0.4rem; }
+}

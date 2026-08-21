@@ -142,6 +142,7 @@
   <script src="/glotemp-core.js"></script>
   <script src="/living-index.js"></script>
   <script src="/glotemp-auth.js"></script>
+  <script src="/glotemp-reactions.js"></script>
   <script src="/seed-observations.js"></script>
   <script>
     const SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
@@ -239,6 +240,7 @@
           </div>
           ${row.note ? `<p class="feed-note">${esc(row.note)}</p>` : ''}
           <time class="feed-time" datetime="${esc(row.created_at)}">${esc(GlotempCore.getTimeAgo(new Date(row.created_at)))}</time>
+          ${window.GlotempReactions ? GlotempReactions.barHTML(row.id) : ''}
         </article>`;
     }
 
@@ -272,6 +274,10 @@
       stream.innerHTML = sampled.map(itemHTML).join('');
       countEl.textContent = `${sampled.length} shown from ${byCity.size} ${byCity.size === 1 ? 'city' : 'cities'}`;
       wirePins();
+      // The feed re-renders on a timer. mount() re-queries only ids it
+      // has not seen, and repaints from what it already holds first, so
+      // a refresh never flashes the counts back to zero.
+      if (window.GlotempReactions) GlotempReactions.mount(stream);
     }
 
     function wirePins() {
