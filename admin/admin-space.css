@@ -1,0 +1,287 @@
+/* Glotemp Admin: the space layer.
+ *
+ * Personality only. Every rule here is either behind the content
+ * (z-index below it), outside it (the astronaut, fixed in a corner and
+ * pointer-events:none), or an accent ON something that already existed.
+ * Nothing here changes the admin's structure, layout or copy: delete this
+ * file and admin-space.js and the panel is exactly what it was.
+ *
+ * THE NON-NEGOTIABLE
+ * The starfield sits behind real, readable data. So the sky has a hard
+ * ceiling on how bright it may get, and a wash sits between the sky and
+ * the content column. tests/admin-contrast.js measures the actual
+ * composited pixels behind every text element, at the brightest the sky
+ * can ever be (clear night, full density), and fails below 4.5:1.
+ */
+
+/* ---------- aurora palette ----------
+   Accents only. Everyday text and data keep the admin's own --ivory and
+   --sand, which are what carry the contrast. */
+:root {
+  --au-violet: #A78BFA;
+  --au-violet-dim: rgba(167, 139, 250, 0.42);
+  --au-teal: #5EEAD4;
+  --au-teal-dim: rgba(94, 234, 212, 0.40);
+  --au-gold: #E8B563;
+  --au-gold-dim: rgba(232, 181, 99, 0.38);
+
+  /* Written by admin-space.js from the real London hour and the real UK
+     weather. Declared here so the page has a sane sky before either
+     resolves, and if both fail it simply stays at these values. */
+  --sky-top: #070610;
+  --sky-bottom: #0C0A14;
+  --sky-glow: rgba(167, 139, 250, 0.10);
+}
+
+/* ---------- the sky ----------
+   Painted on <body> rather than on a wrapper so it covers the full
+   scroll height without a second scroll container. */
+body.adm-space {
+  background: linear-gradient(175deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
+  /* The base has to stay dark whatever the day/night cycle does -- see
+     the luminance ceiling in admin-space.js. */
+  background-attachment: fixed;
+}
+
+/* The canvas: stars, drift and cloud, all of it. Behind everything, and
+   untouchable. */
+#adm-sky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  display: block;
+}
+
+/* A single soft nebula bloom, in CSS rather than canvas -- it never
+   animates per-frame, so there is no reason to make the canvas redraw it
+   sixty times a second. */
+.adm-nebula {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 42% at 78% 12%, var(--sky-glow) 0%, transparent 70%),
+    radial-gradient(52% 38% at 12% 88%, rgba(94, 234, 212, 0.055) 0%, transparent 72%);
+}
+
+/* Everything real sits above the sky. */
+body.adm-space > header,
+body.adm-space > main,
+body.adm-space > footer { position: relative; z-index: 1; }
+
+/* THE READABILITY WASH.
+   Without this, a bright star landing behind a thin mono glyph is the
+   difference between 6:1 and 3:1. It is a flat, very slightly transparent
+   ink laid over the sky and under the content, so the sky still reads as
+   depth at the page edges while the column itself is quiet. */
+body.adm-space main.page-main::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: rgba(6, 5, 9, 0.72);
+}
+body.adm-space main.page-main { position: relative; }
+
+/* ---------- accents on what already exists ---------- */
+
+/* The range picker's active rule goes aurora rather than brass. */
+body.adm-space .adm-range button[aria-pressed="true"] {
+  color: var(--ivory);
+  border-bottom-color: var(--au-teal);
+}
+body.adm-space .adm-range button { transition: color 180ms ease, border-bottom-color 180ms ease; }
+body.adm-space .adm-range button:hover { color: var(--ivory); }
+
+/* Stats: a hairline that warms under the pointer. Nothing moves -- a
+   dashboard where the numbers shift when you sweep across them is a
+   dashboard you cannot read. */
+body.adm-space .adm-stat {
+  transition: border-top-color 220ms ease;
+}
+body.adm-space .adm-stat:hover { border-top-color: var(--au-violet-dim); }
+body.adm-space .adm-stat-value { transition: color 220ms ease, text-shadow 220ms ease; }
+body.adm-space .adm-stat:hover .adm-stat-value {
+  color: #fff;
+  text-shadow: 0 0 18px var(--au-violet-dim);
+}
+
+/* A stat that has gone up since the last visit keeps a small mark. */
+body.adm-space .adm-stat.is-risen .adm-stat-label::after {
+  content: ' \2191';
+  color: var(--au-teal);
+}
+
+/* Rows: a quiet aurora edge on hover, drawn inside so nothing reflows. */
+body.adm-space .adm-row {
+  position: relative;
+  transition: background-color 200ms ease;
+}
+body.adm-space .adm-row::before {
+  content: '';
+  position: absolute;
+  left: -0.75rem; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--au-violet);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+body.adm-space .adm-row:hover::before { opacity: 0.7; }
+body.adm-space .adm-row:hover { background-color: rgba(167, 139, 250, 0.045); }
+
+/* Actions: the underline lights rather than merely recolouring. */
+body.adm-space .adm-action {
+  transition: color 180ms ease, border-bottom-color 180ms ease, box-shadow 180ms ease;
+}
+body.adm-space .adm-action:hover {
+  color: var(--au-gold);
+  border-bottom-color: var(--au-gold);
+  box-shadow: 0 1px 0 0 var(--au-gold-dim);
+}
+body.adm-space .adm-input:focus { border-bottom-color: var(--au-teal); }
+
+/* ---------- micro-interactions on real actions ---------- */
+
+/* Marking a lead. One pulse, 900ms, then gone. The colour says which way
+   it went: teal for contacted, violet for a reply, gold for closed. */
+@keyframes adm-pulse {
+  0%   { box-shadow: inset 0 0 0 0 transparent; background-color: transparent; }
+  22%  { background-color: var(--adm-pulse-tint, rgba(94, 234, 212, 0.16)); }
+  100% { box-shadow: inset 0 0 0 0 transparent; background-color: transparent; }
+}
+body.adm-space .adm-row.is-pulsing {
+  animation: adm-pulse 900ms ease-out;
+}
+body.adm-space .adm-row.is-pulsing::before { opacity: 1; background: var(--adm-pulse-edge, var(--au-teal)); }
+
+/* Saving something: the control breathes once rather than flashing. */
+@keyframes adm-commit {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+body.adm-space .adm-action.is-committing { animation: adm-commit 320ms ease-out; }
+
+/* A freshly issued key, lit for a moment so the eye lands on it. */
+@keyframes adm-reveal-glow {
+  0%   { box-shadow: -2px 0 0 0 var(--au-gold), 0 0 0 0 transparent; }
+  30%  { box-shadow: -2px 0 0 0 var(--au-gold), 0 0 26px 0 var(--au-gold-dim); }
+  100% { box-shadow: -2px 0 0 0 var(--au-gold), 0 0 0 0 transparent; }
+}
+body.adm-space .adm-reveal.is-fresh { animation: adm-reveal-glow 1600ms ease-out; }
+
+/* ---------- the astronaut ----------
+   Fixed in a corner, never in the flow, and pointer-events:none on the
+   wrapper so it can never intercept a tap meant for the panel underneath
+   it -- that is the guarantee that it does not block content. */
+.adm-naut {
+  position: fixed;
+  right: clamp(0.75rem, 2vw, 1.75rem);
+  /* Lifted clear of anything already anchored to the bottom of the
+     viewport -- the cookie consent banner is fixed at bottom:0 with
+     z-index 9999, and the astronaut was sitting underneath it. The lift is
+     measured and set by admin-space.js; it is 0 when nothing is there. */
+  bottom: calc(clamp(0.75rem, 2vw, 1.75rem) + var(--adm-naut-lift, 0px));
+  transition: bottom 260ms ease;
+  z-index: 2;
+  width: clamp(56px, 8vw, 76px);
+  pointer-events: none;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.55));
+}
+.adm-naut svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+/* A short line of speech, only while greeting or celebrating. */
+.adm-naut-say {
+  position: absolute;
+  right: 100%;
+  bottom: 28%;
+  margin-right: 0.6rem;
+  white-space: nowrap;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ivory);
+  background: rgba(8, 6, 14, 0.92);
+  border: 1px solid var(--au-violet-dim);
+  padding: 0.35rem 0.6rem;
+  opacity: 0;
+  transform: translateX(6px);
+  transition: opacity 260ms ease, transform 260ms ease;
+}
+.adm-naut.is-speaking .adm-naut-say { opacity: 1; transform: translateX(0); }
+
+/* Idle: a slow float, the whole figure rising and settling. */
+@keyframes adm-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-7px) rotate(2deg); }
+}
+.adm-naut-body { animation: adm-float 6s ease-in-out infinite; transform-origin: 50% 60%; }
+
+/* The tether drifts a beat behind the body, which is what sells it as
+   weightless rather than merely bobbing. */
+@keyframes adm-tether {
+  0%, 100% { transform: translateY(0) rotate(1deg); }
+  50%      { transform: translateY(-4px) rotate(-3deg); }
+}
+.adm-naut-tether { animation: adm-tether 6s ease-in-out infinite 0.4s; transform-origin: 100% 0%; }
+
+/* Waving: the arm swings, the body keeps floating. */
+@keyframes adm-wave {
+  0%, 100% { transform: rotate(0deg); }
+  20%      { transform: rotate(-26deg); }
+  40%      { transform: rotate(-6deg); }
+  60%      { transform: rotate(-26deg); }
+  80%      { transform: rotate(-6deg); }
+}
+.adm-naut.is-waving .adm-naut-arm { animation: adm-wave 1.8s ease-in-out 1; transform-origin: 72% 52%; }
+
+/* Celebrating: a tumble and a burst of aurora sparks. */
+@keyframes adm-tumble {
+  0%   { transform: translateY(0) rotate(0deg) scale(1); }
+  25%  { transform: translateY(-16px) rotate(140deg) scale(1.06); }
+  60%  { transform: translateY(-6px) rotate(300deg) scale(1.02); }
+  100% { transform: translateY(0) rotate(360deg) scale(1); }
+}
+.adm-naut.is-celebrating .adm-naut-body { animation: adm-tumble 1500ms cubic-bezier(0.3, 0.9, 0.3, 1) 1; }
+
+@keyframes adm-spark {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.4); }
+  25%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(1.1); }
+}
+.adm-naut-spark {
+  position: absolute;
+  left: 50%; top: 45%;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+.adm-naut.is-celebrating .adm-naut-spark { animation: adm-spark 1300ms ease-out 1; }
+
+/* ---------- reduced motion ----------
+   Everything holds still. The scene keeps its colour and its stars; it
+   simply stops moving, and the astronaut rests in its idle pose. */
+@media (prefers-reduced-motion: reduce) {
+  .adm-naut-body,
+  .adm-naut-tether,
+  .adm-naut.is-waving .adm-naut-arm,
+  .adm-naut.is-celebrating .adm-naut-body,
+  .adm-naut.is-celebrating .adm-naut-spark,
+  body.adm-space .adm-row.is-pulsing,
+  body.adm-space .adm-action.is-committing,
+  body.adm-space .adm-reveal.is-fresh {
+    animation: none !important;
+  }
+}
+
+/* ---------- forced colours ----------
+   The system palette wins outright: no sky, no wash, no astronaut. */
+@media (forced-colors: active) {
+  #adm-sky, .adm-nebula, .adm-naut { display: none; }
+  body.adm-space main.page-main::before { display: none; }
+}

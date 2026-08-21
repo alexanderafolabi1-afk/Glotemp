@@ -4,29 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#06060A" />
-  <meta name="description" content="How Glotemp computes a reading: live coverage figures, the confidence ramp, and the modelled-vs-observed split, shown as it stands right now." />
-  <meta name="keywords" content="about Glotemp, methodology, how it works, confidence score, modelled vs observed" />
-  <meta property="og:title" content="How it works - Glotemp" />
-  <meta property="og:description" content="How Glotemp computes a reading: live coverage figures, the confidence ramp, and the modelled-vs-observed split, shown as it stands right now." />
+  <meta name="description" content="Glotemp reads how a city feels right now. Live coverage, a live instrument, and how to reach us." />
+  <meta name="keywords" content="about Glotemp, city mood, live city readings" />
+  <meta property="og:title" content="About Glotemp" />
+  <meta property="og:description" content="Glotemp reads how a city feels right now." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/about" />
   <meta property="og:image" content="https://glo-temp.com/assets/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="How it works - Glotemp" />
-  <meta name="twitter:description" content="Live coverage figures, the confidence ramp, and the modelled-vs-observed split, shown as it stands right now." />
+  <meta name="twitter:title" content="About Glotemp" />
+  <meta name="twitter:description" content="Glotemp reads how a city feels right now." />
   <link rel="canonical" href="https://glo-temp.com/about" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <title>How it works - Glotemp</title>
+  <title>About Glotemp</title>
 
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    "name": "How Glotemp works",
-    "description": "Methodology: how a reading is computed, how signals are weighted, and the modelled-vs-observed split.",
+    "name": "About Glotemp",
+    "description": "Glotemp reads how a city feels right now.",
     "url": "https://glo-temp.com/about"
   }
   </script>
@@ -96,78 +96,35 @@
       color: var(--sand);
       font-size: 0.9rem;
     }
-    .confidence-ramp {
-      display: flex;
-      align-items: flex-end;
-      gap: 0.4rem;
-      height: 80px;
-      padding: 1.5rem;
-      padding-top: 0;
+
+    /* "What you see": three short lines on hairlines, no boxes. */
+    .about-list {
+      padding: 0 0 0.5rem;
+      margin: 0;
+      list-style: none;
     }
-    .confidence-bar {
-      flex: 1;
-      background: var(--band-equilibrium);
-      opacity: 0.25;
-      border-radius: 3px 3px 0 0;
-      transition: height 800ms cubic-bezier(0.25,0.46,0.45,0.94), opacity 400ms;
-      height: 4px;
-    }
-    .split-bar-track {
-      height: 28px;
-      border-radius: 6px;
-      overflow: hidden;
-      display: flex;
-      background: rgba(233, 231, 240, 0.06);
-      margin: 1rem 1.5rem;
-    }
-    .split-bar-modelled, .split-bar-observed {
-      transition: width 800ms cubic-bezier(0.25,0.46,0.45,0.94);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--obsidian);
-      width: 50%;
-    }
-    .split-bar-modelled { background: var(--band-restrained); }
-    .split-bar-observed { background: var(--band-warm); }
-    .split-legend {
-      display: flex;
-      gap: 1.5rem;
-      padding: 0 1.5rem 1.5rem;
-      font-size: 0.85rem;
+    .about-list li {
+      border-top: 1px solid var(--hairline);
+      padding: 1.1rem 0;
       color: var(--sand);
-      flex-wrap: wrap;
+      line-height: 1.7;
+      max-width: 60ch;
     }
-    .split-legend span::before {
-      content: '●';
-      margin-right: 0.4rem;
-    }
-    .split-legend .modelled::before { color: var(--band-restrained); }
-    .split-legend .observed::before { color: var(--band-warm); }
-    .methodology-block {
-      padding: 0 2.5rem 2.5rem;
-    }
-    .methodology-block h3 {
+    .about-list strong {
+      display: block;
       color: var(--ivory);
-      font-weight: var(--fw-regular);
-      margin: 1.75rem 0 0.6rem;
+      font-family: var(--font-display);
+      font-weight: var(--fw-light);
+      font-size: 1.15rem;
+      margin-bottom: 0.3rem;
     }
-    .methodology-block p {
+    .about-lede {
       color: var(--sand);
-      line-height: 1.75;
-      margin-bottom: 1rem;
+      line-height: 1.8;
+      max-width: 54ch;
+      margin: 0 0 1rem;
     }
-    .cta-closing {
-      text-align: center;
-      padding: 3rem 1.5rem;
-    }
-    .cta-closing p {
-      color: var(--sand);
-      max-width: 56ch;
-      margin: 0 auto 1.5rem;
-    }
+    .about-lede.first { color: var(--ivory); font-size: 1.1rem; }
   </style>
   <script src="/glotemp-analytics.js" defer></script>
 </head>
@@ -178,28 +135,29 @@
 
   <main class="page-main">
     <section class="glass-card page-header">
-      <p class="eyebrow">The proof, not the pitch</p>
-      <h1>How a reading gets made</h1>
-      <p class="section-copy" style="color:var(--sand); max-width:64ch;">Every number below is queried live, not written into this page. What follows is the actual mechanism - the same one behind every band, bar and ranking on this site.</p>
+      <p class="eyebrow">About</p>
+      <h1>Cities run hot and cold.</h1>
+      <p class="about-lede first">Not the weather. The feel of the place. Whether tonight is worth it, whether the streets are full, whether you would rather be somewhere else.</p>
+      <p class="about-lede">Glotemp reads that, city by city, and keeps reading it. You get the answer before you book.</p>
     </section>
 
     <section class="glass-card" style="padding:0; overflow:hidden;">
       <div class="proof-stats-grid" id="proof-stats">
         <div class="proof-stat">
           <div class="proof-stat-value count-up" data-target="300" id="stat-cities">0</div>
-          <div class="proof-stat-label">Cities tracked</div>
+          <div class="proof-stat-label">Cities</div>
         </div>
         <div class="proof-stat">
           <div class="proof-stat-value count-up" data-target="0" id="stat-countries">0</div>
-          <div class="proof-stat-label">Countries represented</div>
+          <div class="proof-stat-label">Countries</div>
         </div>
         <div class="proof-stat">
           <div class="proof-stat-value count-up" data-target="12" id="stat-verticals">0</div>
-          <div class="proof-stat-label">Verticals live</div>
+          <div class="proof-stat-label">Verticals</div>
         </div>
         <div class="proof-stat">
           <div class="proof-stat-value count-up" data-target="0" id="stat-readings">0</div>
-          <div class="proof-stat-label">Readings recorded</div>
+          <div class="proof-stat-label">Readings</div>
         </div>
       </div>
     </section>
@@ -208,7 +166,7 @@
       <div class="section-heading" style="padding:1.5rem 1.5rem 0;">
         <div>
           <p class="eyebrow">The instrument</p>
-          <h2>Not described. Demonstrated.</h2>
+          <h2>This one is live.</h2>
         </div>
       </div>
       <div class="instrument-mini">
@@ -216,74 +174,35 @@
         <div class="instrument-mini-readout">
           <div class="instrument-mini-band" id="mini-band-label" style="color:var(--band-equilibrium);">Equilibrium</div>
           <div class="instrument-mini-city" id="mini-city-label">Pin a city to see it move here</div>
-          <p class="instrument-mini-note">This is the exact widget every city page uses - the needle moves because the underlying number moved, nothing more.</p>
+          <p class="instrument-mini-note">The same instrument every city page carries. Pin a city and watch it settle.</p>
         </div>
-      </div>
-    </section>
-
-    <section class="glass-card" style="padding:0; overflow:hidden;">
-      <div class="section-heading" style="padding:1.5rem 1.5rem 0;">
-        <div>
-          <p class="eyebrow">Confidence</p>
-          <h2>How confidence builds</h2>
-        </div>
-      </div>
-      <p style="padding:0 1.5rem; color:var(--sand);">A reading starts at roughly half confidence and rises as more inputs accumulate for the same place and window - this is the actual ramp used across every vertical's edge function:</p>
-      <div class="confidence-ramp" id="confidence-ramp"></div>
-      <div class="split-legend" style="padding-top:0;">
-        <span style="color:var(--sand); font-size:0.78rem; font-family:var(--font-mono);">1 input → ~50% confidence · 50 inputs → ~90% confidence, the practical ceiling</span>
-      </div>
-    </section>
-
-    <section class="glass-card" style="padding:0; overflow:hidden;">
-      <div class="section-heading" style="padding:1.5rem 1.5rem 0;">
-        <div>
-          <p class="eyebrow">Right now</p>
-          <h2>Modelled vs. observed</h2>
-        </div>
-      </div>
-      <p style="padding:0 1.5rem; color:var(--sand);">Some readings come from seed data used to bootstrap a city before real signal arrives. The rest come from a live API call or a submitted reading. This is the current split, queried on load:</p>
-      <div class="split-bar-track" id="split-bar">
-        <div class="split-bar-modelled" id="split-modelled" style="width:50%;">-</div>
-        <div class="split-bar-observed" id="split-observed" style="width:50%;">-</div>
-      </div>
-      <div class="split-legend">
-        <span class="modelled">Modelled (seed / low-confidence fallback)</span>
-        <span class="observed">Observed (live API or submitted reading)</span>
       </div>
     </section>
 
     <section class="glass-card">
-      <div class="methodology-block" style="padding-top:1.5rem;">
-        <p class="eyebrow">Methodology</p>
-        <h2 style="margin-top:0;">The plain version</h2>
-
-        <h3>How a reading is computed</h3>
-        <p>Every observation - a submitted reading, a GDELT sentiment pull, a World Bank indicator, an air-quality reading - lands in one append-only table, tagged with a city, a vertical, a value, a source, and a confidence score. A city's current reading for a vertical is the confidence-weighted average of everything recorded for it in the trailing window, not a single latest value. Nothing is ever overwritten; old readings age out of the average, they aren't deleted.</p>
-
-        <h3>How inputs are weighted</h3>
-        <p>Two things move an input's weight: how confident the source is in it, and how recent it is. A same-hour GDELT pull carries more weight than a three-day-old one. A reading built from fifty inputs carries more weight than one built from a single input - see the ramp above.</p>
-
-        <h3>Why an early reading counts less than a later one</h3>
-        <p>A single observation is real, but it's one data point in a place that never stops changing. The confidence formula treats sample size as the thing that converts an early observation into a trustworthy reading - not because the first input is wrong, but because a broader sample is harder to be wrong than a narrow one.</p>
-      </div>
-    </section>
-
-    <section class="prose-section glass-card">
-      <p class="pull-quote" style="margin-top:0; padding-top:0; border-top:none;">Glotemp is the infrastructure that turns the feeling of cities into intelligence. Real time. Real people. Real value.</p>
-    </section>
-
-    <section class="glass-card cta-closing">
-      <h2>Add a reading</h2>
-      <p>Every reading adds precision to the instrument.</p>
-      <a href="/#observation-form" class="btn-neon" style="--btn-band: var(--band-warm); display:inline-block; text-decoration:none;">Add your first observation</a>
+      <p class="eyebrow">What you see</p>
+      <h2 style="margin-top:0;">A city, as it is right now.</h2>
+      <ul class="about-list">
+        <li>
+          <strong>A band and a number.</strong>
+          Charged, warm, level, restrained, quiet. You will know straight away which one you are in the mood for.
+        </li>
+        <li>
+          <strong>The hour there, and the sky.</strong>
+          What is playing on the radio. What the city is talking about this morning.
+        </li>
+        <li>
+          <strong>Whether tonight is the night.</strong>
+          A room, a flight, a table. One tap, and you are on your way.
+        </li>
+      </ul>
     </section>
 
     <section class="glass-card">
       <p class="eyebrow">Contact</p>
       <h2>Get in touch</h2>
-      <p>General and legal enquiries - <a href="mailto:info@glo-temp.com" class="contact-link">info@glo-temp.com</a>.</p>
-      <p>Advertising and partnerships - <a href="mailto:marketing@glo-temp.com" class="contact-link">marketing@glo-temp.com</a>.</p>
+      <p>General and legal enquiries go to <a href="mailto:info@glo-temp.com" class="contact-link">info@glo-temp.com</a>.</p>
+      <p>Advertising and partnerships go to <a href="mailto:marketing@glo-temp.com" class="contact-link">marketing@glo-temp.com</a>.</p>
     </section>
   </main>
 
@@ -323,21 +242,6 @@
       requestAnimationFrame(tick);
     }
 
-    function renderConfidenceRamp() {
-      const container = document.getElementById('confidence-ramp');
-      const points = [1, 3, 6, 10, 15, 22, 30, 40, 50];
-      container.innerHTML = points.map(n => {
-        const confidence = Math.min(0.9, n / 50);
-        return `<div class="confidence-bar" data-target-height="${confidence * 100}%" title="${n} signal${n > 1 ? 's' : ''} → ${(confidence * 100).toFixed(0)}% confidence"></div>`;
-      }).join('');
-      requestAnimationFrame(() => {
-        container.querySelectorAll('.confidence-bar').forEach(bar => {
-          bar.style.height = bar.getAttribute('data-target-height');
-          bar.style.opacity = '1';
-        });
-      });
-    }
-
     function renderMiniInstrument() {
       const slug = GlotempCore.getPinnedCity();
       const city = slug && window.CITIES_DATA.find(c => c.slug === slug);
@@ -374,36 +278,8 @@
       } catch (e) {
         document.getElementById('stat-readings').textContent = '-';
       }
-
-      try {
-        const resp = await fetch(`${SUPABASE_URL}/rest/v1/readings?select=source,confidence&limit=4000`, {
-          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' },
-        });
-        if (!resp.ok) throw new Error('split fetch failed');
-        const rows = await resp.json();
-        if (!rows.length) throw new Error('no rows');
-        let modelled = 0, observed = 0;
-        rows.forEach(r => {
-          const isModelled = r.source === 'seed' || (typeof r.confidence === 'number' && r.confidence < 0.6);
-          if (isModelled) modelled++; else observed++;
-        });
-        const total = modelled + observed;
-        const modelledPct = Math.round((modelled / total) * 100);
-        const observedPct = 100 - modelledPct;
-        const mEl = document.getElementById('split-modelled');
-        const oEl = document.getElementById('split-observed');
-        mEl.style.width = modelledPct + '%';
-        oEl.style.width = observedPct + '%';
-        mEl.textContent = modelledPct + '%';
-        oEl.textContent = observedPct + '%';
-      } catch (e) {
-        console.warn('Modelled/observed split unavailable:', e.message);
-        document.getElementById('split-modelled').textContent = '-';
-        document.getElementById('split-observed').textContent = '-';
-      }
     }
 
-    renderConfidenceRamp();
     renderMiniInstrument();
     loadLiveStats();
     document.addEventListener('glotemp:city-pinned', renderMiniInstrument);

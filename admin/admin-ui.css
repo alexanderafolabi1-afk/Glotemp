@@ -1,0 +1,333 @@
+/* Glotemp Admin: layout, rhythm and panels.
+ *
+ * ADMIN-SCOPED BY CONSTRUCTION
+ * Every selector below is prefixed with .adm-page, a class this page puts
+ * on its own <body>. Nothing here can reach the public site even though
+ * the public stylesheet is still linked above it for its colour tokens and
+ * the auth modal's styling. Where a shared component's rhythm was wrong
+ * here, it is overridden inside .adm-page rather than changed at source.
+ *
+ * WHY THE OLD PAGE COLLIDED
+ * The section heads carried `border-top` with 1.25rem of padding above the
+ * text, so a heading sat 20px under its own rule while the rule itself sat
+ * 40px under the block before it. Read down the page and the rules looked
+ * attached to the wrong side. The fix is one scale, applied consistently:
+ * a rule belongs to what comes AFTER it, and gets real air beneath it.
+ */
+
+/* ---------- the scale ----------
+   Four steps, nothing in between. Related things sit at --s2, distinct
+   things at --s4, panels at --s6. Density comes from using the small
+   steps far more often than the large ones. */
+.adm-page {
+  --s1: 0.375rem;   /*  6px  inside a single figure          */
+  --s2: 0.75rem;    /* 12px  between related lines           */
+  --s3: 1.125rem;   /* 18px  between rows                    */
+  --s4: 1.75rem;    /* 28px  under a panel heading           */
+  --s5: 2.5rem;     /* 40px  between panels                  */
+  --s6: 3.25rem;    /* 52px  major break                     */
+
+  /* The public --brass (#B08D57) is a hairline and border colour there, not
+     a text colour on a dark ground. Used for the key figures it measured
+     4.09:1, under AA. This is the same hue lifted until it clears the bar:
+     measured 5.99:1 against the lightest pixel the starfield can put
+     behind it. Admin-scoped, so the public token is untouched. */
+  --adm-brass-text: #D4AC71;
+
+  --rule: 1px solid var(--hairline);
+  --rule-strong: 1px solid var(--brass-dim);
+}
+
+/* ---------- page frame ---------- */
+.adm-page .adm { padding: var(--s5) 0 var(--s6); }
+
+.adm-page .adm-title {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: clamp(1.75rem, 5.5vw, 2.4rem);
+  line-height: 1.12;
+  color: var(--ivory);
+  margin: 0 0 var(--s2);
+}
+.adm-page .adm-eyebrow {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--sand);
+  margin: 0 0 var(--s1);
+}
+.adm-page .adm-copy {
+  color: var(--sand);
+  line-height: 1.6;
+  max-width: 56ch;
+  margin: 0 0 var(--s2);
+  font-size: 0.92rem;
+}
+
+/* ---------- panels ----------
+   A panel is a region, not a box: a rule across the top, the heading
+   sitting well clear of it, and space beneath. No borders on the sides, no
+   radius, no fill. */
+.adm-page .adm-panel {
+  border-top: var(--rule-strong);
+  padding-top: var(--s3);
+  margin-top: var(--s5);
+}
+.adm-page .adm-panel:first-of-type { margin-top: var(--s4); }
+
+.adm-page .adm-panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s3);
+  flex-wrap: wrap;
+  /* THE COLLISION FIX. The heading owns the air beneath it, and never
+     sits closer than --s2 to the rule above it. */
+  margin: 0 0 var(--s4);
+}
+.adm-page .adm-h2 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: 1.3rem;
+  line-height: 1.2;
+  color: var(--ivory);
+  margin: 0;
+}
+.adm-page .adm-panel-note {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--sand);
+  margin: 0;
+  opacity: 0.85;
+}
+
+/* A subhead inside a panel: quieter than the panel heading, and it keeps
+   its own clearance so nothing ever butts against the line above. */
+.adm-page .adm-sub {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  color: var(--sand);
+  margin: var(--s4) 0 var(--s2);
+  padding-top: var(--s3);
+  border-top: var(--rule);
+}
+.adm-page .adm-sub:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+/* ---------- figures ----------
+   The numbers are the feature. Denser than before: the old grid used a
+   140px floor and 1.5rem gaps, which pushed six figures onto three rows on
+   a laptop. */
+.adm-page .adm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(116px, 1fr));
+  gap: var(--s3) var(--s3);
+  margin: 0 0 var(--s3);
+}
+.adm-page .adm-grid.is-wide {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.adm-page .adm-stat {
+  border-top: var(--rule);
+  padding-top: var(--s2);
+  min-width: 0;
+}
+.adm-page .adm-stat-value {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: clamp(1.5rem, 5.5vw, 2rem);
+  line-height: 1.05;
+  color: var(--ivory);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+/* The figures that carry the business go brass. */
+.adm-page .adm-stat.is-key .adm-stat-value { color: var(--adm-brass-text); }
+.adm-page .adm-stat-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--sand);
+  margin-top: var(--s1);
+}
+
+/* Trend, next to the figure rather than under it. */
+.adm-page .adm-stat-trend {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s2);
+  margin-top: var(--s1);
+}
+.adm-page .adm-spark { display: block; flex: none; }
+.adm-page .adm-delta {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.adm-page .adm-delta.is-up { color: #7FD99A; }
+.adm-page .adm-delta.is-down { color: #E0A0A0; }
+.adm-page .adm-delta.is-flat { color: var(--sand); opacity: 0.75; }
+
+/* ---------- rows ----------
+   Tighter than before, and the last row in a list keeps its rule so the
+   list reads as closed. */
+.adm-page .adm-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  padding: var(--s2) 0;
+  border-bottom: var(--rule);
+  min-width: 0;
+}
+.adm-page .adm-row-city {
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  color: var(--ivory);
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.adm-page .adm-row-count {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--ivory);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+.adm-page .adm-row-when {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--sand);
+  opacity: 0.8;
+  white-space: nowrap;
+  flex: none;
+}
+.adm-page .adm-key-prefix {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--sand);
+  opacity: 0.7;
+  margin-top: 0.15rem;
+}
+
+/* A bar behind a row, so a top-ten list reads as a shape and not as a
+   column of digits. Drawn inside the row, so it cannot change layout. */
+.adm-page .adm-row.has-bar { position: relative; }
+.adm-page .adm-row.has-bar::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: -1px;
+  height: 2px;
+  width: var(--bar, 0%);
+  background: var(--brass);
+  opacity: 0.55;
+}
+
+/* ---------- controls ---------- */
+.adm-page .adm-range { display: flex; gap: var(--s3); flex-wrap: wrap; }
+.adm-page .adm-range button {
+  background: none; border: none; border-bottom: 1px solid transparent;
+  border-radius: 0; padding: 0.4rem 0; min-height: 44px; cursor: pointer;
+  font-family: var(--font-mono); font-variant-caps: small-caps;
+  font-size: 0.8rem; letter-spacing: 0.07em; color: var(--sand);
+}
+.adm-page .adm-range button[aria-pressed="true"] { color: var(--ivory); border-bottom-color: var(--brass); }
+
+.adm-page .adm-action {
+  display: inline-flex; align-items: center; min-height: 44px;
+  background: none; border: none; border-bottom: 1px solid var(--brass);
+  border-radius: 0; padding: 0.35rem 0; cursor: pointer; text-decoration: none;
+  font-family: var(--font-mono); font-variant-caps: small-caps;
+  font-size: 0.86rem; letter-spacing: 0.09em; color: var(--ivory);
+}
+.adm-page .adm-secondary {
+  display: inline-flex; align-items: center; min-height: 44px; margin-left: var(--s4);
+  font-family: var(--font-mono); font-variant-caps: small-caps; font-size: 0.78rem;
+  letter-spacing: 0.07em; color: var(--sand); text-decoration: none;
+  border-bottom: var(--rule);
+}
+.adm-page .adm-revoke {
+  background: none; border: none; border-bottom: var(--rule);
+  border-radius: 0; padding: 0.35rem 0; min-height: 44px; cursor: pointer;
+  font-family: var(--font-mono); font-variant-caps: small-caps;
+  font-size: 0.72rem; letter-spacing: 0.07em; color: var(--sand);
+  flex: none;
+}
+
+/* ---------- forms ----------
+   Two columns on a wide screen, so a six-field form is not six full-width
+   rows of empty space. */
+.adm-page .adm-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s2) var(--s4);
+  max-width: 46rem;
+  margin-bottom: var(--s3);
+}
+@media (min-width: 700px) {
+  .adm-page .adm-form-grid { grid-template-columns: 1fr 1fr; }
+  .adm-page .adm-form-grid .is-full { grid-column: 1 / -1; }
+}
+.adm-page .adm-field { min-width: 0; }
+.adm-page .adm-input {
+  width: 100%; font-size: 16px; min-height: 44px;   /* 16px or iOS zooms on focus */
+  background: transparent; border: none; border-bottom: 1px solid var(--brass-dim);
+  border-radius: 0; color: var(--ivory); font-family: var(--font-body); padding: 0.45rem 0;
+}
+.adm-page .adm-input:focus { outline: none; border-bottom-color: var(--brass); }
+.adm-page .adm-label {
+  display: block; font-family: var(--font-mono); font-variant-caps: small-caps;
+  font-size: 0.72rem; letter-spacing: 0.07em; color: var(--sand); margin-bottom: 0.25rem;
+}
+.adm-page .adm-status { font-family: var(--font-mono); font-size: 0.76rem; color: var(--sand); margin: var(--s2) 0 0; }
+.adm-page .adm-reveal { border-left: 2px solid var(--brass); padding: var(--s2) 0 var(--s2) var(--s2); margin: var(--s3) 0; }
+.adm-page .adm-key {
+  display: block; font-family: var(--font-mono); font-size: 0.8rem;
+  color: var(--ivory); margin: var(--s1) 0 var(--s2);
+  max-width: 100%; overflow-wrap: anywhere;
+}
+.adm-page .adm-row-dead { opacity: 0.45; }
+
+/* ---------- status marks ---------- */
+.adm-page .adm-dot {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  margin-right: 0.5rem; flex: none; vertical-align: baseline;
+}
+.adm-page .adm-dot.is-ok { background: #7FD99A; }
+.adm-page .adm-dot.is-warn { background: var(--brass); }
+.adm-page .adm-dot.is-bad { background: #E0A0A0; }
+
+/* ---------- top bar ---------- */
+.adm-page .adm-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s3);
+  min-height: 56px; padding: 0 var(--s4); border-bottom: var(--rule);
+}
+.adm-page .adm-back {
+  display: inline-flex; align-items: center; min-height: 44px;
+  font-family: var(--font-mono); font-variant-caps: small-caps;
+  font-size: 0.82rem; letter-spacing: 0.12em; color: var(--sand); text-decoration: none;
+}
+
+/* ---------- mobile ----------
+   375, 390, 414. Rows wrap rather than squeeze, the timestamp drops to its
+   own line, and every control keeps its 44px target. */
+@media (max-width: 430px) {
+  .adm-page { --s4: 1.5rem; --s5: 2rem; --s6: 2.5rem; }
+  .adm-page .adm-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3) var(--s2); }
+  .adm-page .adm-row { flex-wrap: wrap; gap: var(--s1) var(--s2); }
+  .adm-page .adm-row-when { width: 100%; }
+  .adm-page .adm-secondary { margin-left: 0; margin-top: var(--s2); }
+  .adm-page .adm-bar { padding: 0 var(--s3); }
+}
+/* 768: two figures per row is too sparse, four is right. */
+@media (min-width: 600px) and (max-width: 900px) {
+  .adm-page .adm-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
