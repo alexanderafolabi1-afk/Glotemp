@@ -28,6 +28,7 @@ const SOURCES = [
   'glotemp-analytics.js',
   'city-tiles.js', 'city-landmark-photos.js', 'city-photos.js',
   'city-trivia-data.js', 'city-spotlight.js', 'city-tier.js',
+  'pulse-map.js', 'city-weather-mood.js',
   // The one source of nav markup, executed on every page -- a change to
   // it changes what the browser renders sitewide, so it belongs in the
   // build hash as much as index.html does.

@@ -223,6 +223,17 @@
           <span class="trip-reading-value">-</span>
           <span class="trip-reading-band">-</span>
           <span class="trip-reading-city">-</span>
+          <!-- Real Open-Meteo weather for this city -- temperature, air
+               quality, pressure, in plain words. Not a score, not folded
+               into the mood reading above it: see city-weather-mood.js.
+               Hidden until real data arrives, and stays hidden on any
+               fetch failure -- no error shown, matching the rest of the
+               site's empty-state rule. -->
+          <p class="trip-air-mood" id="trip-air-mood" hidden>
+            <span class="trip-air-mood-label">Air &amp; Mood</span>
+            <span class="trip-air-mood-caption">real weather, not a score</span>
+            <span class="trip-air-mood-value" id="trip-air-mood-value"></span>
+          </p>
         </div>
       </div>
     </section>
@@ -306,6 +317,24 @@
       <p class="fastest-source">Every city in the register passes through here.</p>
     </section>
 
+    <!-- Pulse Map: every city as a quiet node on a stylized world map,
+         brightness by real mood, a soft pulse on real mood shifts. A
+         separate, additional section -- does not read from or write to
+         Instrument Room, and does not replace it. See pulse-map.js. -->
+    <section id="pulse-map-section" class="glass-card" aria-label="World pulse map">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">300 cities, at a glance</p>
+          <h2>The pulse map</h2>
+        </div>
+        <p class="section-copy">Every city, positioned by its real coordinates. Brighter means warmer right now. A soft pulse marks a city whose mood just shifted.</p>
+      </div>
+      <div class="pulse-map-search-row">
+        <input type="text" id="pulse-map-search" class="pulse-map-search" placeholder="Find a city on the map" autocomplete="off" aria-label="Find a city on the pulse map">
+      </div>
+      <div class="pulse-map-frame" id="pulse-map-frame" role="group" aria-label="World map of city mood readings"></div>
+    </section>
+
     <!-- Live observations: one rotating snippet, not a wall of cards. -->
     <section id="observations-section" class="glass-card">
       <p class="eyebrow" data-i18n="obs_eyebrow">Live observations</p>
@@ -347,6 +376,8 @@
   <script src="/city-photos.js" defer></script>
   <script src="/glotemp-mood-imagery.js" defer></script>
   <script src="/glotemp-tonight.js" defer></script>
+  <script src="/city-weather-mood.js" defer></script>
+  <script src="/pulse-map.js" defer></script>
   <script src="/glotemp-showcase.js" defer></script>
   <script src="/glotemp-spin.js" defer></script>
   <script src="/city-spotlight.js" defer></script>
