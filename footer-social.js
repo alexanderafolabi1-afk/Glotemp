@@ -55,9 +55,31 @@
     else footer.appendChild(row);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', mount);
-  } else {
+  // A quiet, permanent partner/advertising entry point -- same real
+  // marketing@ address already used on the About page's Contact section,
+  // just also reachable from every footer sitewide, mounted the same
+  // runtime way as the icons above.
+  function mountPartnerLink() {
+    var footer = document.querySelector('footer.footer');
+    if (!footer || footer.querySelector('.footer-partner-link')) return;
+
+    var p = document.createElement('p');
+    p.className = 'small-print footer-partner-row';
+    p.innerHTML = '<a href="mailto:marketing@glo-temp.com?subject=Partnering%20with%20Glotemp" class="contact-link footer-partner-link">Partner with this instrument</a>';
+
+    var langRow = footer.querySelector('.footer-lang-row');
+    if (langRow) footer.insertBefore(p, langRow);
+    else footer.appendChild(p);
+  }
+
+  function mountAll() {
     mount();
+    mountPartnerLink();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mountAll);
+  } else {
+    mountAll();
   }
 })();

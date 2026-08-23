@@ -587,6 +587,36 @@
     el.textContent = n === null ? 'Watchers unavailable' : `${n} ${n === 1 ? 'person is' : 'people are'} watching`;
   }
 
+  // A small, real preview of what following actually delivers -- not just
+  // "Followed!". Real value: this city's band/top-ten notifications (the
+  // same watch-email copy this page already promises above), nothing more
+  // invented. Auto-dismisses; also closable, and never blocks anything.
+  let followConfirmTimer = null;
+  function showFollowConfirm(cityName) {
+    let el = document.getElementById('follow-confirm-toast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'follow-confirm-toast';
+      el.className = 'follow-confirm-toast';
+      el.setAttribute('role', 'status');
+      el.innerHTML =
+        '<p class="follow-confirm-text"></p>' +
+        '<button type="button" class="follow-confirm-close" aria-label="Dismiss">&times;</button>';
+      document.body.appendChild(el);
+      el.querySelector('.follow-confirm-close').addEventListener('click', () => hideFollowConfirm());
+    }
+    el.querySelector('.follow-confirm-text').innerHTML =
+      `<strong>Following ${esc(cityName)}.</strong> We'll let you know when its mood shifts band, or when it enters a top ten -- nothing else, and never more than that.`;
+    el.classList.add('is-visible');
+    clearTimeout(followConfirmTimer);
+    followConfirmTimer = setTimeout(hideFollowConfirm, 6000);
+  }
+  function hideFollowConfirm() {
+    const el = document.getElementById('follow-confirm-toast');
+    if (el) el.classList.remove('is-visible');
+    clearTimeout(followConfirmTimer);
+  }
+
   function wireWatch() {
     const btn = document.getElementById('watch-city-btn');
     if (!btn) return;
@@ -634,6 +664,12 @@
             headers: Object.assign(authHeaders(session), { Prefer: 'resolution=ignore-duplicates,return=minimal' }),
             body: JSON.stringify({ user_id: user.id, city_slug: citySlug }),
           });
+          // Immediate, on-brand acknowledgment of the action just taken --
+          // separate from the push-permission ask below, which is a
+          // different question (browser notifications) and may not even
+          // show (already granted/denied). This one always shows once,
+          // right after a real follow.
+          showFollowConfirm(cityDisplayName());
           // Explicit action just taken (following this city) -- the one
           // moment this prompt is allowed to appear. Never on page load.
           if (window.GlotempPush) {

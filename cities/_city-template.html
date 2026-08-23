@@ -58,8 +58,16 @@
           </div>
           <p id="watch-email-status" class="inline-feedback"></p>
         </div>
+        <!-- Primary action, directly under the mood reading above --
+             placeholder destination for now. -->
+        <a href="/tonight/" class="tonight-cta-btn">Is tonight the night?</a>
       </div>
     </section>
+
+    <!-- Social proof: same honestly-scoped real numbers and strongest
+         readings as the homepage -- see social-proof.js. Hidden until real
+         data actually resolves. -->
+    <section class="glass-card social-proof-section" id="social-proof-mount" aria-label="Real activity across Glotemp" hidden></section>
 
     <!-- City reading: given the first, most prominent placement on the
          page -- right after the hero, before anything else.
@@ -164,6 +172,8 @@
   <script src="/glotemp-personality.js" defer></script>
   <script src="/city-wiki.js" defer></script>
   <script src="/city-header-photo.js" defer></script>
+  <script src="/seed-observations.js" defer></script>
+  <script src="/social-proof.js" defer></script>
   <script src="/city-food-signature.js" defer></script>
   <script src="/city-vertical-signature.js" defer></script>
   <script src="/city-tier.js" defer></script>
