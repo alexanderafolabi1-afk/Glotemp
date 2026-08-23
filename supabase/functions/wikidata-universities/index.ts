@@ -18,10 +18,13 @@
 // meant for hammering: each SPARQL geo query is heavier than a plain
 // REST call, and a run across all 300 cities in one invocation risks
 // the function's own timeout. Same shape as wiki-attention's backfill:
-// a city that already has at least one row is skipped (already covered,
-// re-checked on a future run only if explicitly forced), so repeated
+// a city already recorded in city_university_checks is skipped
+// (re-checked on a future run only if explicitly forced), so repeated
 // daily runs make forward progress across the full city list rather
-// than re-querying the same first N cities every time.
+// than re-querying the same cities every time. A city is marked
+// checked whether or not it found anything real nearby -- a genuine
+// zero result (a small town with no university within RADIUS_KM) is a
+// real finding, not a reason to re-query it forever.
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
@@ -72,9 +75,21 @@ async function loadCities(limit: number, slugs?: string[]): Promise<CityRow[]> {
 }
 
 async function loadAlreadyCovered(): Promise<Set<string>> {
-  const resp = await rest(`city_universities?select=city_slug`);
+  // city_university_checks marks a city done the moment it's actually
+  // queried, whether or not anything real was found nearby -- a real
+  // zero result is a legitimate finding, not something to re-check on
+  // every run. See 20260824093000_city_university_checks.sql.
+  const resp = await rest(`city_university_checks?select=city_slug`);
   const rows = (await resp.json()) as { city_slug: string }[];
   return new Set(rows.map((r) => r.city_slug));
+}
+
+async function markChecked(citySlug: string, foundCount: number) {
+  await rest("city_university_checks?on_conflict=city_slug", {
+    method: "POST",
+    headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify([{ city_slug: citySlug, checked_at: new Date().toISOString(), found_count: foundCount }]),
+  });
 }
 
 interface University { wikidata_id: string; name: string; lat: number; lon: number; website: string | null }
@@ -160,9 +175,12 @@ async function jobFetch(limitCities: number, slugs?: string[], force?: boolean) 
       const unis = await fetchUniversities(c.lat, c.lon);
       if (unis === null) {
         cityErrors.push({ city_slug: c.city_slug, stage: "fetch", detail: "SPARQL query failed" });
+        continue; // left unchecked -- worth retrying on a future run
+      }
+      if (unis.length === 0) {
+        await markChecked(c.city_slug, 0); // genuinely nothing real found nearby -- not an error
         continue;
       }
-      if (unis.length === 0) continue; // genuinely nothing real found nearby -- not an error
 
       const payload = unis.map((u) => ({
         city_slug: c.city_slug,
@@ -177,6 +195,7 @@ async function jobFetch(limitCities: number, slugs?: string[], force?: boolean) 
         headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
         body: JSON.stringify(payload),
       });
+      await markChecked(c.city_slug, payload.length);
       rowsWritten += payload.length;
       citiesWithResults++;
     } catch (e) {
