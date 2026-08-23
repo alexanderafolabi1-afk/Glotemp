@@ -228,6 +228,11 @@
           <span class="trip-reading-value">-</span>
           <span class="trip-reading-band">-</span>
           <span class="trip-reading-city">-</span>
+          <!-- Quiet secondary confidence readout, derived from real
+               observations for this city (count + recency) -- never the
+               mood formula itself. "Forming" when too little real data
+               exists yet. See mood-confidence.js. -->
+          <span class="trip-reading-confidence" id="trip-reading-confidence"></span>
           <!-- Real Open-Meteo weather for this city -- temperature, air
                quality, pressure, in plain words. Not a score, not folded
                into the mood reading above it: see city-weather-mood.js.
@@ -434,6 +439,7 @@
   <script src="/glotemp-mood-imagery.js" defer></script>
   <script src="/glotemp-tonight.js" defer></script>
   <script src="/city-weather-mood.js" defer></script>
+  <script src="/mood-confidence.js" defer></script>
   <script src="/pulse-map.js" defer></script>
   <script src="/social-proof.js" defer></script>
   <script src="/glotemp-showcase.js" defer></script>

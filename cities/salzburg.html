@@ -591,6 +591,12 @@
             const max = METRIC_MAX[reading.metric] || METRIC_MAX_FALLBACK;
             const shownValue = reading.value !== null && reading.value !== undefined ? formatInstrumentValue(reading.value) : null;
             const confidenceNote = typeof reading.confidence === 'number' ? `${Math.round(reading.confidence * 100)}% confidence` : '';
+            // Quiet, secondary confidence readout -- the reading.confidence
+            // value already exists on every row (readings.confidence in the
+            // DB) and was previously only surfaced as a hover title. Never
+            // invented: a row with no confidence value shows "Forming"
+            // rather than guessing a number.
+            const confidencePct = typeof reading.confidence === 'number' ? `${Math.round(reading.confidence * 100)}%` : 'Forming';
             const ariaLabel = `${reading.label || 'Reading'}: ${shownValue !== null ? shownValue : 'n/a'}`;
             const valueClass = shownValue !== null && shownValue.length > 3 ? 'instrument-value instrument-value-compact' : 'instrument-value';
             return `
@@ -600,6 +606,7 @@
                 ${shownValue !== null ? `<span class="${valueClass}">${shownValue}</span>` : ''}
               </div>
               <span class="instrument-label">${reading.label || ''}</span>
+              <span class="instrument-confidence">${confidencePct}</span>
               <time class="instrument-time" datetime="${reading.fetched_at}">${verticals.getTimeAgo(new Date(reading.fetched_at))}</time>
             </div>
           `;

@@ -1841,10 +1841,10 @@ summary:focus:not(:focus-visible) {
   letter-spacing: 0.09em;
   color: var(--ivory);
   text-decoration: none;
-  border-bottom: 1px solid var(--brass);
+  border-bottom: 1px solid var(--brass-dim);
   padding-bottom: 0.2rem;
 }
-.elsewhere-more a:hover { color: var(--brass); }
+.elsewhere-more a:hover { color: var(--brass); border-color: var(--brass); }
 
 @media (min-width: 800px) {
   .elsewhere-strands { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
@@ -4762,6 +4762,20 @@ a:hover .city-landmark-photo,
   white-space: nowrap;
 }
 
+/* Quiet secondary confidence readout -- smaller and more muted than the
+   label above it, never competing with the reading itself. Real value
+   already stored per row (readings.confidence); "Forming" is the honest
+   fallback when that field is null, not a guessed number. */
+.instrument-confidence {
+  display: block;
+  margin-top: 0.15rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  color: var(--sand);
+  opacity: 0.55;
+}
+
 @media (max-width: 480px) {
   .vertical-content { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 2rem 1rem; }
 }
@@ -6086,9 +6100,8 @@ a:hover .city-landmark-photo,
   gap: 1rem;
 }
 .checkin-example {
-  border: 1px dashed var(--brass-dim);
+  border: 1px dashed rgba(176, 141, 87, 0.28);
   padding: 0.85rem 0.9rem;
-  opacity: 0.88;
 }
 .checkin-example-tag {
   display: block;
@@ -6740,7 +6753,7 @@ a:hover .city-landmark-photo,
   display: grid;
   grid-template-columns: minmax(280px, 40%) 1fr;
   align-items: center;
-  gap: 2rem;
+  gap: 2.75rem;
   height: 100%;
   padding: 2rem 0 1rem;
   overflow: hidden;
@@ -6880,9 +6893,9 @@ a:hover .city-landmark-photo,
   z-index: 1;
   justify-self: end;
   min-width: 0;
-  width: min(62vw, 780px);
+  width: min(66vw, 860px);
   aspect-ratio: 1;
-  margin-right: -8%;
+  margin-right: -3%;
   cursor: pointer;
   transform: scale(1);
   animation-name: hero-instrument-breathe;
@@ -6970,6 +6983,16 @@ a:hover .city-landmark-photo,
 }
 @keyframes hero-hand-spin {
   to { transform: rotate(360deg); }
+}
+/* Very subtle, slow breathe layered onto the hand's own rotation --
+   opacity only, so it never reads as a second motion competing with the
+   sweep itself. Set alongside hero-hand-spin in the same animation
+   shorthand string (glotemp-hero-instrument.js) since JS assigns
+   .style.animation as one shorthand per hand and a stylesheet-only
+   animation-name here would simply be overwritten by that assignment. */
+@keyframes hero-hand-pulse {
+  0%, 100% { opacity: 0.82; }
+  50% { opacity: 1; }
 }
 .hero-instrument-weather {
   position: absolute;
@@ -7911,6 +7934,19 @@ time, .instr-clock, .tonight-modelled {
   margin-top: 0.3rem;
   font-size: 0.82rem;
   color: var(--sand);
+}
+/* Quiet secondary confidence readout -- deliberately smaller and more
+   muted than the city name above it, so it never competes with the
+   reading itself. Real value derived from observations for this city
+   (see mood-confidence.js); empty until that resolves. */
+.trip-reading-confidence {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  color: var(--sand);
+  opacity: 0.55;
 }
 .trip-air-mood {
   display: block;

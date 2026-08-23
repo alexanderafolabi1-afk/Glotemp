@@ -1601,6 +1601,9 @@ function updateCity(selected) {
   // Real weather/air-quality secondary line -- see city-weather-mood.js.
   // Purely additive: does not touch synthesizedMood or anything above.
   if (window.GlotempAirMood) GlotempAirMood.showFor(selected);
+  // Quiet confidence readout, derived from real observations for this
+  // city -- see mood-confidence.js. Purely additive, same as the line above.
+  if (window.GlotempMoodConfidence) GlotempMoodConfidence.showFor(selected);
   // Update affiliate links with city name
   if (typeof updateAffiliateLinks === 'function') {
     updateAffiliateLinks(city.name);
