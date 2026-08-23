@@ -230,6 +230,193 @@
     }
   }
 
+  // ---------- decorative weather overlays ----------
+  // Everything above this line is a real reading: the real London hour,
+  // the real UK weather, a real admin event. This layer is the one
+  // deliberate exception -- an occasional, randomised flourish over the
+  // starfield, the same kind of thing the astronaut's celebration sparks
+  // already are. It never reads or writes `weather` or the --sky-* vars,
+  // so it can never be mistaken for a conditions report: the sky stays
+  // exactly as real as it was, this just drifts across the front of it.
+  //
+  // Kept rare and gentle on purpose. Snow and rain sit at a peak alpha
+  // under 0.3, sunshine under 0.12, and lightning -- the one that could
+  // matter for photosensitivity -- is a single soft eased pulse capped at
+  // 0.13 peak alpha, roughly 60 to 90 seconds apart at minimum and never
+  // repeating within one event. There is no strobe here to disable.
+  var FX_TYPES = ['snow', 'rain', 'sun', 'lightning'];
+  var FX_WEIGHTS = { snow: 0.3, rain: 0.28, sun: 0.28, lightning: 0.14 };
+  var FX_DURATIONS = { snow: 17000, rain: 13000, sun: 15000 };
+  var FX_FADE_MS = 1500;
+  var LIGHTNING_DURATION_MS = 220;
+  var LIGHTNING_PEAK_ALPHA = 0.13;
+  var LIGHTNING_MIN_GAP_MS = 65000;   // a floor under the random gap below
+
+  var fx = null;                      // { type, startedAt, duration, particles }
+  var lightningFlash = null;          // { start, duration, peak }
+  var fxTimer = null;
+  var lastLightningAt = -Infinity;
+
+  function pickFxType() {
+    var r = Math.random(), acc = 0;
+    for (var i = 0; i < FX_TYPES.length; i++) {
+      acc += FX_WEIGHTS[FX_TYPES[i]];
+      if (r <= acc) return FX_TYPES[i];
+    }
+    return FX_TYPES[0];
+  }
+
+  function buildFxParticles(type, w, h) {
+    var list = [], i;
+    if (type === 'snow') {
+      for (i = 0; i < 46; i++) {
+        list.push({
+          x: Math.random() * w, y: Math.random() * h,
+          r: 1 + Math.random() * 1.6,
+          vy: 0.16 + Math.random() * 0.26, vx: -0.05 + Math.random() * 0.1,
+          a: 0.22 + Math.random() * 0.28, phase: Math.random() * Math.PI * 2,
+        });
+      }
+    } else if (type === 'rain') {
+      for (i = 0; i < 55; i++) {
+        list.push({
+          x: Math.random() * w, y: Math.random() * h,
+          len: 9 + Math.random() * 12, vy: 2.6 + Math.random() * 1.4,
+          a: 0.12 + Math.random() * 0.14,
+        });
+      }
+    }
+    return list;
+  }
+
+  function fxEnvelope(state, t) {
+    var elapsed = t - state.startedAt;
+    if (elapsed < FX_FADE_MS) return Math.max(0, elapsed / FX_FADE_MS);
+    var remaining = state.duration - elapsed;
+    if (remaining < FX_FADE_MS) return Math.max(0, remaining / FX_FADE_MS);
+    return 1;
+  }
+
+  function drawSnow(state, t, w, h) {
+    var env = fxEnvelope(state, t);
+    if (env <= 0.01) return;
+    var list = state.particles;
+    ctx.fillStyle = '#F4F1E8';
+    for (var i = 0; i < list.length; i++) {
+      var p = list[i];
+      ctx.globalAlpha = p.a * env;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+      p.y += p.vy;
+      p.x += p.vx + Math.sin(t * 0.0009 + p.phase) * 0.05;
+      if (p.y > h + 4) { p.y = -4; p.x = Math.random() * w; }
+      if (p.x < -4) p.x = w + 4; else if (p.x > w + 4) p.x = -4;
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawRain(state, t, w, h) {
+    var env = fxEnvelope(state, t);
+    if (env <= 0.01) return;
+    var list = state.particles;
+    ctx.strokeStyle = '#B4C8DC';
+    ctx.lineWidth = 1;
+    for (var i = 0; i < list.length; i++) {
+      var p = list[i];
+      ctx.globalAlpha = p.a * env;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x - 1.5, p.y + p.len);
+      ctx.stroke();
+      p.y += p.vy * 4;
+      if (p.y > h + p.len) { p.y = -p.len; p.x = Math.random() * w; }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // A warm glow drifting very slowly across an upper corner, breathing
+  // rather than blinking -- "sunshine" read as a passing warmth rather
+  // than a literal disc, so it does not look out of place over a night sky.
+  function drawSunGlow(state, t, w, h) {
+    var env = fxEnvelope(state, t);
+    if (env <= 0.01) return;
+    var elapsed = t - state.startedAt;
+    var breathe = 0.7 + 0.3 * Math.sin(elapsed * 0.0006);
+    var cx = w * (0.7 + 0.08 * Math.sin(elapsed * 0.00011));
+    var cy = h * 0.15;
+    var r = Math.max(w, h) * 0.55;
+    var peak = 0.11 * env * breathe;
+    var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    g.addColorStop(0, 'rgba(232, 181, 99, ' + peak.toFixed(3) + ')');
+    g.addColorStop(1, 'rgba(232, 181, 99, 0)');
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // One flash: eased up, eased down, capped low, then gone. Nothing about
+  // this repeats on its own -- a second flash needs a second, independently
+  // rare roll of the scheduler below.
+  function drawLightning(flash, t, w, h) {
+    // A rAF timestamp marks when the browser began the current frame,
+    // which can land a hair before a `performance.now()` sampled moments
+    // earlier outside that frame -- so a small negative elapsed here is
+    // real and just means "the very start of it," not "expired." Only the
+    // far end of the window means the flash is actually over.
+    var elapsed = Math.max(0, t - flash.start);
+    if (elapsed > flash.duration) { lightningFlash = null; return; }
+    var half = flash.duration / 2;
+    var k = elapsed < half ? (elapsed / half) : (1 - (elapsed - half) / half);
+    ctx.globalAlpha = flash.peak * Math.max(0, k);
+    ctx.fillStyle = '#E8ECFB';
+    ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = 1;
+  }
+
+  function startFx(type, w, h) {
+    fx = {
+      type: type,
+      startedAt: performance.now(),
+      duration: FX_DURATIONS[type] || 14000,
+      particles: buildFxParticles(type, w, h),
+    };
+  }
+
+  function triggerLightning() {
+    lightningFlash = { start: performance.now(), duration: LIGHTNING_DURATION_MS, peak: LIGHTNING_PEAK_ALPHA };
+    lastLightningAt = performance.now();
+  }
+
+  // The scheduler itself: long random gaps, one flourish at a time, and a
+  // hold before the next roll so two effects never overlap and stack their
+  // opacity. A reduced-motion visitor gets none of this -- the sky and the
+  // astronaut already respect that; a page that promised to hold still
+  // should not then have snow drifting across it.
+  function scheduleFx() {
+    if (reduceMotion) return;
+    clearTimeout(fxTimer);
+    var gap = 40000 + Math.random() * 70000;   // 40-110s between flourishes
+    fxTimer = setTimeout(function () {
+      var w = window.innerWidth, h = window.innerHeight;
+      var type = pickFxType();
+      if (type === 'lightning' && performance.now() - lastLightningAt < LIGHTNING_MIN_GAP_MS) {
+        type = Math.random() < 0.5 ? 'snow' : 'rain';   // the floor above, honoured even on an unlucky roll
+      }
+      var holdMs;
+      if (type === 'lightning') {
+        triggerLightning();
+        holdMs = LIGHTNING_DURATION_MS + 400;
+      } else {
+        startFx(type, w, h);
+        holdMs = (FX_DURATIONS[type] || 14000) + 500;
+      }
+      fxTimer = setTimeout(function () { fx = null; scheduleFx(); }, holdMs);
+    }, gap);
+  }
+
   function draw(t) {
     var w = window.innerWidth, h = window.innerHeight;
     var s = lastScene || scene();
@@ -283,6 +470,17 @@
         }
       }
     }
+
+    // The decorative flourish, if the scheduler has one running right now.
+    // Always drawn last so it sits over the stars and cloud, exactly as
+    // "adorning, not replacing" asks.
+    if (fx) {
+      if (fx.type === 'snow') drawSnow(fx, t, w, h);
+      else if (fx.type === 'rain') drawRain(fx, t, w, h);
+      else if (fx.type === 'sun') drawSunGlow(fx, t, w, h);
+    }
+    if (lightningFlash) drawLightning(lightningFlash, t, w, h);
+
     ctx.globalAlpha = 1;
   }
 
@@ -507,6 +705,7 @@
     refreshScene();
     sizeCanvas();
     startLoop();
+    scheduleFx();
 
     // Real weather, then a refresh every quarter hour. The scene is
     // already on screen before this resolves; it only ever adjusts it.
@@ -595,6 +794,16 @@
     },
     setState: setState,
     scene: function () { return lastScene || scene(); },
+    // Testing/verification hook only -- forces one weather flourish
+    // immediately instead of waiting on the random scheduler. Not called
+    // from anywhere in the admin UI itself.
+    forceWeatherFx: function (type) {
+      var w = window.innerWidth, h = window.innerHeight;
+      if (type === 'lightning') { triggerLightning(); return; }
+      if (FX_TYPES.indexOf(type) === -1) return;
+      startFx(type, w, h);
+      if (reduceMotion) draw(performance.now());
+    },
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);

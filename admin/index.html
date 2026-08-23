@@ -249,6 +249,21 @@
       return Math.floor(h / 24) + 'd ago';
     }
 
+    // Each panel remembers whether it was left collapsed, per browser.
+    // Keyed by the same panel id used for aria-labelledby, so it survives
+    // the whole-dashboard re-render a range-button click triggers.
+    var PANEL_STORE_KEY = 'glotemp:admin-panels:v1';
+    function readPanelState() {
+      try { return JSON.parse(localStorage.getItem(PANEL_STORE_KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function isPanelCollapsed(id) { return readPanelState()[id] === true; }
+    function setPanelCollapsed(id, collapsed) {
+      var s = readPanelState();
+      if (collapsed) s[id] = true; else delete s[id];
+      try { localStorage.setItem(PANEL_STORE_KEY, JSON.stringify(s)); } catch (e) { /* private mode */ }
+    }
+
     // ---------- states ----------
     function signedOut() {
       render(
@@ -364,11 +379,20 @@
         return C.ranked((list || []).map(function (r) { return { label: r.label, count: r.count }; }), opts);
       }
       function panel(id, heading, note, body) {
-        return '<section class="adm-panel" aria-labelledby="' + id + '">' +
+        var collapsed = isPanelCollapsed(id);
+        return '<section class="adm-panel' + (collapsed ? ' is-collapsed' : '') + '" aria-labelledby="' + id + '" data-panel="' + id + '">' +
           '<div class="adm-panel-head">' +
-            '<h2 class="adm-h2" id="' + id + '">' + esc(heading) + '</h2>' +
+            '<div class="adm-panel-title">' +
+              '<button type="button" class="adm-panel-toggle" data-panel-toggle="' + id + '" ' +
+                'aria-expanded="' + (!collapsed) + '" aria-controls="' + id + '-body">' +
+                '<span class="adm-panel-toggle-bars" aria-hidden="true"></span>' +
+                '<span class="sr-only">' + (collapsed ? 'Expand' : 'Collapse') + ' ' + esc(heading) + '</span>' +
+              '</button>' +
+              '<h2 class="adm-h2" id="' + id + '">' + esc(heading) + '</h2>' +
+            '</div>' +
             (note ? '<p class="adm-panel-note">' + esc(note) + '</p>' : '') +
-          '</div>' + body +
+          '</div>' +
+          '<div class="adm-panel-collapse"><div class="adm-panel-body" id="' + id + '-body">' + body + '</div></div>' +
         '</section>';
       }
 
@@ -806,6 +830,25 @@
           load();
         });
       });
+
+      // Collapse toggles. State is applied server-side-free, straight into
+      // the markup above from isPanelCollapsed(), so there is nothing to
+      // sync on load -- this only has to handle the click itself.
+      root.querySelectorAll('[data-panel-toggle]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var id = btn.getAttribute('data-panel-toggle');
+          var section = btn.closest('.adm-panel');
+          if (!section) return;
+          var collapsed = !section.classList.contains('is-collapsed');
+          section.classList.toggle('is-collapsed', collapsed);
+          btn.setAttribute('aria-expanded', String(!collapsed));
+          var heading = section.querySelector('.adm-h2');
+          var label = btn.querySelector('.sr-only');
+          if (label) label.textContent = (collapsed ? 'Expand ' : 'Collapse ') + (heading ? heading.textContent : 'panel');
+          setPanelCollapsed(id, collapsed);
+        });
+      });
+
       var out = document.getElementById('adm-signout');
       if (out) out.addEventListener('click', function (e) {
         e.preventDefault(); GlotempAuth.signOut(); signedOut();
