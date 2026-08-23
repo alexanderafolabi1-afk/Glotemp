@@ -58,10 +58,13 @@ async function fetchRemotiveData(city: string, keyword: string) {
 
     const remotePercentage = (cityJobs.filter((j: any) => j.job_type === "fully_remote").length / cityJobs.length) * 100;
 
+    // salary_competitiveness and work_culture_score used to be
+    // Math.random() here -- Remotive's free listing feed has no salary or
+    // culture field, so neither had any real input. Only
+    // remote_work_adoption (real: % of this city's matched listings that
+    // are fully remote) is written.
     return {
       remote_work_adoption: Math.min(100, remotePercentage),
-      salary_competitiveness: 60 + Math.random() * 40,
-      work_culture_score: 6 + Math.random() * 3,
       confidence: Math.min(0.85, cityJobs.length / 50),
     };
   } catch (error) {
@@ -113,14 +116,8 @@ Deno.serve(async (_req: Request) => {
       const result = await fetchRemotiveData(city, keyword);
       if (!result) continue;
 
-      const results = await Promise.all([
-        insertReading(city, "remote_work_adoption", result.remote_work_adoption, "Remote work adoption rate", result.confidence),
-        insertReading(city, "salary_competitiveness", result.salary_competitiveness, "Average salary competitiveness", result.confidence),
-        insertReading(city, "work_culture_score", result.work_culture_score, "Work-life balance perception", result.confidence),
-      ]);
-      const successes = results.filter(Boolean).length;
-      rowsWritten += successes;
-      if (successes > 0) citiesProcessed++;
+      const ok = await insertReading(city, "remote_work_adoption", result.remote_work_adoption, "Remote work adoption rate", result.confidence);
+      if (ok) { rowsWritten++; citiesProcessed++; }
     }
 
     console.log(`[remotive-work-data] wrote ${rowsWritten} row(s) across ${citiesProcessed} of ${Object.keys(cityKeywords).length} cities`);

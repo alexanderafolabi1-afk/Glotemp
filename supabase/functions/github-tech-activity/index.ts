@@ -77,15 +77,15 @@ async function fetchGitHubActivity(city: string, repoInfo: { orgs: string[] }) {
       return null;
     }
 
+    // job_openings and startup_activity used to be Math.random() here --
+    // no real GitHub field backs either, so they're gone. Only
+    // developer_activity (real: open-issue count across each org's real,
+    // currently-live repos) is written.
     const devActivity = Math.min(3000, (totalPRs / repoCount) * 100);
-    const jobOpenings = Math.floor(Math.random() * 400) + 50;
-    const startupActivity = Math.floor(Math.random() * 40) + 10;
 
     return {
       developer_activity: devActivity,
-      job_openings: jobOpenings,
-      startup_activity: startupActivity,
-      confidence: 0.7 + Math.random() * 0.3,
+      confidence: Math.min(0.9, 0.6 + repoCount / 20),
     };
   } catch (error) {
     console.error(`[github-tech-activity] ${city}: exception - ${error.message}`);
@@ -136,14 +136,8 @@ Deno.serve(async (_req: Request) => {
       const result = await fetchGitHubActivity(city, repoInfo);
       if (!result) continue;
 
-      const results = await Promise.all([
-        insertReading(city, "developer_activity", result.developer_activity, "Developer activity (PRs/week)", result.confidence),
-        insertReading(city, "job_openings", result.job_openings, "Tech job openings", result.confidence),
-        insertReading(city, "startup_activity", result.startup_activity, "Startup formation activity", result.confidence),
-      ]);
-      const successes = results.filter(Boolean).length;
-      rowsWritten += successes;
-      if (successes > 0) citiesProcessed++;
+      const ok = await insertReading(city, "developer_activity", result.developer_activity, "Developer activity (open issues)", result.confidence);
+      if (ok) { rowsWritten++; citiesProcessed++; }
     }
 
     console.log(`[github-tech-activity] wrote ${rowsWritten} row(s) across ${citiesProcessed} of ${Object.keys(cityRepos).length} cities`);

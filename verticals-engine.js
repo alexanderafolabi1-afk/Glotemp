@@ -38,7 +38,7 @@ class VerticalsEngine {
   async fetchVerticalData(citySlug, vertical) {
     try {
       const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/readings?city_slug=eq.${citySlug}&vertical=eq.${vertical}&order=fetched_at.desc&limit=100`,
+        `${SUPABASE_URL}/rest/v1/readings?city_slug=eq.${citySlug}&vertical=eq.${vertical}&source=neq.seed&order=fetched_at.desc&limit=100`,
         {
           headers: {
             'apikey': SUPABASE_ANON_KEY,

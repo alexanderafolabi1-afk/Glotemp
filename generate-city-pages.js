@@ -366,7 +366,7 @@ function generateCityPage(city) {
         const contentEl = document.getElementById(\`\${vertical}-content\`);
         try {
           const response = await fetch(
-            \`\${SUPABASE_URL}/rest/v1/readings?city_slug=eq.\${citySlug}&vertical=eq.\${vertical}&order=fetched_at.desc&limit=50\`,
+            \`\${SUPABASE_URL}/rest/v1/readings?city_slug=eq.\${citySlug}&vertical=eq.\${vertical}&source=neq.seed&order=fetched_at.desc&limit=50\`,
             {
               headers: {
                 'apikey': SUPABASE_ANON_KEY,

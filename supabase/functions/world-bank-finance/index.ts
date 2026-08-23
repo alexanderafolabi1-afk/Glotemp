@@ -46,10 +46,12 @@ async function fetchWorldBankData(country: string) {
 
     if (!inflationRate) return null;
 
+    // cost_of_living and currency_strength used to be Math.random() here
+    // -- the World Bank indicator this function actually queries is CPI
+    // inflation, which has no bearing on either. Only inflation_rate
+    // (real) is written.
     return {
-      cost_of_living: 50 + Math.random() * 150,
       inflation_rate: inflationRate,
-      currency_strength: 5 + Math.random() * 5,
       confidence: 0.85,
     };
   } catch (error) {
@@ -87,9 +89,7 @@ Deno.serve(async (req: Request) => {
     for (const [city, country] of Object.entries(cityCountries)) {
       const result = await fetchWorldBankData(country);
       if (result) {
-        await insertReading(city, "cost_of_living", result.cost_of_living, "Cost of Living Index", result.confidence);
         await insertReading(city, "inflation_rate", result.inflation_rate, "Annual inflation %", result.confidence);
-        await insertReading(city, "currency_strength", result.currency_strength, "Currency stability", result.confidence);
         successCount++;
       }
     }
