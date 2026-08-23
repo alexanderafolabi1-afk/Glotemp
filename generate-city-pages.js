@@ -308,6 +308,14 @@ function generateCityPage(city) {
       if (typeof GlotempWorldBank !== 'undefined') {
         contextLoaders.push(...verticalSlugs.map(v => GlotempWorldBank.loadVerticalIndicator('${city.iso}', v, '${city.country}')));
       }
+      // Real universities near this city (Wikidata, see city-campus.js).
+      // Only Education has one of these; it appends into the same
+      // #education-context mount World Bank's literacy fact uses above,
+      // so both real sources sit together rather than competing for a
+      // second element.
+      if (typeof GlotempCampus !== 'undefined') {
+        contextLoaders.push(GlotempCampus.loadCampuses('${city.slug}'));
+      }
       await Promise.all(contextLoaders);
       if (typeof GlotempWiki !== 'undefined') {
         await GlotempWiki.fillEmptyVerticalContexts('${city.name}', '${city.country}', verticalSlugs);

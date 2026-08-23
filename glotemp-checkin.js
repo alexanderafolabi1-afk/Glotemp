@@ -79,6 +79,12 @@
   let offset = 0;
   let selectedMood = DEFAULT_MOOD;
   let postAnonymously = false;
+  // Student ambassador contributions: an optional tag on an ordinary
+  // check-in, nothing more. campusByWikidataId is real per-university
+  // data from city_universities (see city-campus.js / wikidata-universities)
+  // -- name-lookup only, never re-fetched or re-derived here.
+  let campusByWikidataId = new Map();
+  let selectedCampus = '';
 
   function detectCitySlug() {
     const m = window.location.pathname.match(/\/cities\/([a-z0-9-]+)\.html$/i);
@@ -293,6 +299,11 @@
           <textarea id="checkin-note" class="checkin-note" rows="3" maxlength="${NOTE_MAX}" placeholder="What does it feel like right now?"></textarea>
           <button type="button" class="checkin-emoji-toggle" id="checkin-emoji-toggle" aria-expanded="false">&#128522; Add emoji</button>
           <div class="checkin-emoji-row" id="checkin-emoji-row" hidden>${emojiButtons}</div>
+          <!-- Student ambassador tag: filled in only if this city has at
+               least one real university (city_universities). Hidden
+               until then, same convention as every other real-data-only
+               section on this site. -->
+          <div class="checkin-campus-row" id="checkin-campus-row" hidden></div>
           <div class="checkin-visibility" role="group" aria-label="Post as">
             <button type="button" class="checkin-visibility-btn" data-visibility="name" aria-pressed="true">Show my name</button>
             <button type="button" class="checkin-visibility-btn" data-visibility="anon" aria-pressed="false">Post anonymously</button>
@@ -485,6 +496,7 @@
               mood: selectedMood,
               note: text,
               is_anonymous: postAnonymously,
+              campus_wikidata_id: selectedCampus || null,
             }),
           });
           if (!resp.ok) {
@@ -507,6 +519,9 @@
           status.textContent = 'Posted.';
           note.value = '';
           count.textContent = `0/${NOTE_MAX}`;
+          selectedCampus = '';
+          const campusSelect = document.getElementById('checkin-campus');
+          if (campusSelect) campusSelect.value = '';
           offset = 0;
           endLoading();
           try {
@@ -539,6 +554,38 @@
     }
   }
 
+  // ---------- student ambassador tag ----------
+  // Optional only: fetches this city's real universities (same table
+  // city-campus.js reads) and, if any exist, reveals a plain <select> in
+  // the composer. Selecting one does nothing but set selectedCampus,
+  // which rides along in the exact same POST as every other check-in
+  // field -- no new endpoint, no new table, no new moderation path.
+  async function loadCampusOptions() {
+    const row = document.getElementById('checkin-campus-row');
+    if (!row || !citySlug) return;
+    try {
+      const resp = await fetch(
+        `${SUPABASE_URL}/rest/v1/city_universities?city_slug=eq.${encodeURIComponent(citySlug)}` +
+        `&select=wikidata_id,name&order=name.asc`,
+        { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
+      );
+      if (!resp.ok) return;
+      const rows = await resp.json();
+      if (!Array.isArray(rows) || rows.length === 0) return;
+
+      campusByWikidataId = new Map(rows.map(r => [r.wikidata_id, r.name]));
+      row.innerHTML = `
+        <label class="checkin-label" for="checkin-campus">Tag to a university (optional)</label>
+        <select class="checkin-note" id="checkin-campus">
+          <option value="">Not tagged to a university</option>
+          ${rows.map(r => `<option value="${esc(r.wikidata_id)}">${esc(r.name)}</option>`).join('')}
+        </select>`;
+      row.hidden = false;
+      const select = document.getElementById('checkin-campus');
+      if (select) select.addEventListener('change', () => { selectedCampus = select.value; });
+    } catch (e) { /* stays hidden -- no real data to offer */ }
+  }
+
   function refreshAuthState() {
     const form = document.getElementById('checkin-form');
     const signedOut = document.getElementById('checkin-signedout');
@@ -562,6 +609,11 @@
     // anonymously is that nothing here identifies the account, and a tier
     // badge is exactly that kind of identifying signal.
     const reporterTier = row.is_anonymous ? null : (row.profiles && row.profiles.reporter_tier);
+    // Real name looked up from the same real table the composer's
+    // dropdown was built from -- an id campusByWikidataId doesn't
+    // recognize (map not loaded yet on this render, or the university
+    // row has since gone away) renders no chip at all, never the raw id.
+    const campusName = row.campus_wikidata_id ? campusByWikidataId.get(row.campus_wikidata_id) : null;
     return `
       <article class="checkin-item">
         <div class="checkin-item-head">
@@ -569,6 +621,7 @@
           <span class="checkin-item-name">${esc(name)}</span>
           ${reporterTier && window.GlotempReporter ? GlotempReporter.badgeHTML(reporterTier) : ''}
           <span class="checkin-item-mood">${esc(mood ? mood.label : row.mood)}</span>
+          ${campusName ? `<span class="checkin-item-campus">&#127891; ${esc(campusName)}</span>` : ''}
           ${window.GlotempVerify ? GlotempVerify.badgeHTML(row.verify_method) : ''}
           <time class="checkin-item-time" datetime="${esc(row.created_at)}">${esc(timeAgo(row.created_at))}</time>
         </div>
@@ -585,7 +638,7 @@
     try {
       const resp = await fetch(
         `${SUPABASE_URL}/rest/v1/observations?city_slug=eq.${encodeURIComponent(citySlug)}` +
-        `&select=id,mood,is_anonymous,note,created_at,verify_method,profiles(display_name,reporter_tier)` +
+        `&select=id,mood,is_anonymous,note,created_at,verify_method,campus_wikidata_id,profiles(display_name,reporter_tier)` +
         `&order=created_at.desc&offset=${offset}&limit=${PAGE_SIZE}`,
         { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
       );
@@ -827,6 +880,7 @@
     wireWatch();
     loadCheckins();
     mountIntentBoard();
+    loadCampusOptions();
 
     const moreBtn = document.getElementById('checkin-more');
     if (moreBtn) moreBtn.addEventListener('click', async () => {

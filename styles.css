@@ -6685,6 +6685,12 @@ a:hover .city-landmark-photo,
   letter-spacing: 0.06em;
   color: var(--brass);
 }
+.checkin-item-campus {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  color: var(--sand);
+}
 .checkin-item-note {
   color: var(--sand);
   font-size: 0.92rem;
@@ -7866,7 +7872,7 @@ h1, h2, h3, h4, h5, h6,
 /* The mono quirk lives here and nowhere else. */
 .eyebrow, .stat-value, .stat-label,
 .instrument-band-name, .tonight-mode-reading, .tonight-now, .tonight-facts,
-.tonight-prov, .tonight-mode-status, .checkin-item-mood,
+.tonight-prov, .tonight-mode-status, .checkin-item-mood, .checkin-item-campus,
 .checkin-item-time, .feed-mode, .feed-intensity, .feed-time, .band-chip,
 .pagination-btn, .cities-meta-row, .ranking-basis-note, .now-showing-label,
 .spin-variant, .spin-go, .spin-aff-kind, .spin-prov, .checkin-label,
