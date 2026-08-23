@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#14100B" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Content - Glotemp Admin</title>
+
+  <link rel="manifest" href="/admin/manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Glotemp Admin" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=57" />
+  <link rel="stylesheet" href="/admin/admin-ui.css" />
+  <link rel="stylesheet" href="/admin/admin-nav.css" />
+
+  <script src="/glotemp-analytics.js" defer></script>
+  <script src="/admin-i18n.js"></script>
+  <script src="/admin/admin-charts.js" defer></script>
+  <script src="/admin/admin-core.js" defer></script>
+  <script src="/admin/admin-nav.js" defer></script>
+  <link rel="stylesheet" href="/admin/admin-space.css" />
+  <script src="/admin/admin-space.js" defer></script>
+</head>
+<body class="adm-page">
+  <header class="adm-bar" id="adm-nav-bar" data-active="content"></header>
+
+  <main class="page-main">
+    <section class="glass-card">
+      <div class="adm" id="adm-root">
+        <p class="adm-eyebrow">Admin</p>
+        <h1 class="adm-title">Loading.</h1>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer glass">
+    <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
+  </footer>
+
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
+  <script src="/glotemp-auth.js"></script>
+  <script src="/cookie-consent.js" defer></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var root = document.getElementById('adm-root');
+
+    function boot() {
+      var C = window.GlotempAdminCore;
+      if (!C) { root.innerHTML = '<p class="adm-eyebrow">Admin</p><h1 class="adm-title">Could not load that.</h1>'; return; }
+
+      // City suggestions reuse the same public-submits/admin-reviews shape
+      // as outreach_leads' status <select>, rather than inventing a second
+      // pattern for the same kind of decision.
+      var CITY_APP_STATUSES = ['pending', 'approved', 'rejected'];
+
+      function renderContent(xPosts, cityApplications) {
+        var esc = C.esc, panel = C.panel;
+
+        var Ch = window.GlotempAdminCharts;
+        function fig(v, label, opts) { return Ch.stat(v, label, opts || {}); }
+
+        // X posts are read-only, pre-written copy -- shown in the exact
+        // day/slot order the table's own unique(day_number, slot_number)
+        // constraint already sorts them into, not newest-first.
+        var xList = xPosts || [];
+        var xRows = xList.length
+          ? '<div class="adm-x-list">' + xList.map(function (p, i) {
+              var meta = 'Day ' + esc(p.day_number) + ', ' + esc(p.scheduled_time) + ' · ' + esc(p.theme) +
+                (p.image_note && p.image_note !== 'No image' ? ' · ' + esc(p.image_note) : '');
+              return '<div class="adm-row adm-x-row">' +
+                '<span class="adm-row-city">' + esc(p.tweet_text) +
+                  '<span class="adm-key-prefix">' + meta + '</span></span>' +
+                '<button type="button" class="adm-revoke adm-x-copy" data-x-index="' + i + '">Copy</button>' +
+              '</div>';
+            }).join('') + '</div>'
+          : '<p class="adm-copy">The calendar has not been seeded yet.</p>';
+
+        var cityApps = cityApplications || [];
+        function cityAppCount(st) { return cityApps.filter(function (a) { return a.status === st; }).length; }
+        var cityAppRows = cityApps.length
+          ? cityApps.map(function (a) {
+              return '<div class="adm-row adm-city-app-row">' +
+                '<span class="adm-row-city">' + esc(a.city_name) + ', ' + esc(a.country) +
+                  '<span class="adm-key-prefix">' + esc(a.contact_email) + (a.note ? ' · ' + esc(a.note) : '') + '</span>' +
+                '</span>' +
+                '<select class="adm-input adm-city-app-status" data-app-id="' + esc(a.id) + '" data-prev="' + esc(a.status) + '" style="width:auto;max-width:11rem;flex:0 0 auto">' +
+                  CITY_APP_STATUSES.map(function (s) {
+                    return '<option value="' + esc(s) + '"' + (s === a.status ? ' selected' : '') + '>' + esc(s) + '</option>';
+                  }).join('') +
+                '</select>' +
+              '</div>';
+            }).join('')
+          : '<p class="adm-copy">No suggestions yet.</p>';
+
+        root.innerHTML =
+          C.stateHTML('Admin', 'Content',
+            panel('p-x-content', 'X content', 'manual, copy-paste only -- no posting API',
+              '<div class="adm-grid">' +
+                fig(xList.length.toLocaleString(), 'posts ready') +
+                fig((xList.length ? 30 : 0).toLocaleString(), 'days covered') +
+              '</div>' +
+              xRows) +
+            panel('p-city-applications', 'City suggestions', 'public submissions, reviewed by hand -- approving here is a decision, not a publish action',
+              '<div class="adm-grid">' +
+                fig(cityApps.length.toLocaleString(), 'total') +
+                fig(cityAppCount('pending').toLocaleString(), 'pending', { key: true }) +
+                fig(cityAppCount('approved').toLocaleString(), 'approved') +
+                fig(cityAppCount('rejected').toLocaleString(), 'rejected') +
+              '</div>' +
+              cityAppRows)
+          );
+
+        C.wirePanelToggles(root);
+
+        root.querySelectorAll('.adm-x-copy').forEach(function (b) {
+          b.addEventListener('click', function () {
+            var post = xList[Number(b.getAttribute('data-x-index'))];
+            if (!post) return;
+            if (window.GlotempAdminSpace) GlotempAdminSpace.commit(b);
+            navigator.clipboard.writeText(post.tweet_text).then(function () {
+              b.textContent = 'Copied';
+              setTimeout(function () { b.textContent = 'Copy'; }, 1500);
+            }, function () {
+              b.textContent = 'Select by hand';
+            });
+          });
+        });
+
+        root.querySelectorAll('.adm-city-app-status').forEach(function (sel) {
+          sel.addEventListener('change', async function () {
+            var id = sel.getAttribute('data-app-id');
+            var prev = sel.getAttribute('data-prev') || sel.value;
+            sel.disabled = true;
+            try {
+              await C.restTable('PATCH', 'city_applications?id=eq.' + encodeURIComponent(id), { status: sel.value });
+              sel.setAttribute('data-prev', sel.value);
+              if (window.GlotempAdminSpace) {
+                var tone = sel.value === 'approved' ? 'gold' : sel.value === 'rejected' ? 'teal' : 'violet';
+                GlotempAdminSpace.pulseRow(sel.closest('.adm-row'), tone);
+              }
+            } catch (err) {
+              sel.value = prev;
+            } finally {
+              sel.disabled = false;
+            }
+          });
+        });
+      }
+
+      async function load(rootEl) {
+        var none = function () { return []; };
+        var results = await Promise.all([
+          C.restTable('GET', 'x_content_calendar?select=day_number,slot_number,scheduled_time,theme,tweet_text,image_note&order=day_number.asc,slot_number.asc').catch(none),
+          C.restTable('GET', 'city_applications?select=id,city_name,country,contact_email,note,status,created_at&order=created_at.desc').catch(none),
+        ]);
+        renderContent.apply(null, results);
+      }
+
+      C.boot(root, load);
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+    else boot();
+  })();
+  </script>
+</body>
+</html>

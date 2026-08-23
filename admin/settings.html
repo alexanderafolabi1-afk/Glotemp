@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#14100B" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Settings - Glotemp Admin</title>
+
+  <link rel="manifest" href="/admin/manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Glotemp Admin" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=57" />
+  <link rel="stylesheet" href="/admin/admin-ui.css" />
+  <link rel="stylesheet" href="/admin/admin-nav.css" />
+
+  <script src="/glotemp-analytics.js" defer></script>
+  <script src="/admin-i18n.js"></script>
+  <script src="/admin/admin-charts.js" defer></script>
+  <script src="/admin/admin-core.js" defer></script>
+  <script src="/admin/admin-nav.js" defer></script>
+  <script src="/admin/push-admin.js" defer></script>
+  <script src="/admin/admin-refresh.js" defer></script>
+  <link rel="stylesheet" href="/admin/admin-space.css" />
+  <script src="/admin/admin-space.js" defer></script>
+</head>
+<body class="adm-page">
+  <header class="adm-bar" id="adm-nav-bar" data-active="settings"></header>
+
+  <main class="page-main">
+    <section class="glass-card">
+      <div class="adm" id="adm-root">
+        <p class="adm-eyebrow">Admin</p>
+        <h1 class="adm-title">Loading.</h1>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer glass">
+    <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
+  </footer>
+
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
+  <script src="/glotemp-auth.js"></script>
+  <script src="/cookie-consent.js" defer></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var root = document.getElementById('adm-root');
+
+    function boot() {
+      var C = window.GlotempAdminCore;
+      if (!C) { root.innerHTML = '<p class="adm-eyebrow">Admin</p><h1 class="adm-title">Could not load that.</h1>'; return; }
+
+      function renderSettings(overview, jobs) {
+        var esc = C.esc, ago = C.ago, panel = C.panel;
+        var m = {};
+        (overview || []).forEach(function (r) { m[r.metric] = r.value; });
+
+        var Ch = window.GlotempAdminCharts;
+        function fig(v, label, opts) { return Ch.stat(v, label, opts || {}); }
+
+        var jobRows = (jobs || []).length
+          ? jobs.map(function (j) {
+              var fails = Number(j.failures_24h) || 0;
+              var state = !j.active ? 'is-warn' : fails > 0 ? 'is-bad' : 'is-ok';
+              return '<div class="adm-row">' +
+                '<span class="adm-row-city"><span class="adm-dot ' + state + '"></span>' + esc(j.jobname) +
+                  '<span class="adm-key-prefix">' + esc(j.schedule) + '</span></span>' +
+                '<span class="adm-row-count">' + (fails ? esc(fails) + ' failed' : 'ok') + '</span>' +
+                '<span class="adm-row-when">' + esc(j.last_run ? ago(j.last_run) : 'never run') + '</span>' +
+              '</div>';
+            }).join('')
+          : '<p class="adm-copy">Job history unavailable.</p>';
+
+        root.innerHTML =
+          C.stateHTML('Admin', 'Settings',
+            panel('p-system', 'System', 'scheduled jobs, install prompt, account',
+              jobRows +
+              '<p class="adm-sub">App version</p>' +
+              '<p class="adm-copy">This admin panel is a home-screen app -- it can keep showing an old ' +
+                'cached version after a deploy until the service worker controlling it actually checks in. ' +
+                'This forces that check right now: installs the new worker if one exists, clears every cache ' +
+                'this origin holds, then reloads.</p>' +
+              '<div id="adm-refresh-mount"></div>' +
+              '<p class="adm-sub">Install prompt</p>' +
+              '<div class="adm-grid">' +
+                fig((m.prompt_shown || 0).toLocaleString(), 'shown') +
+                fig((m.prompt_dismissed || 0).toLocaleString(), 'dismissed') +
+              '</div>' +
+              '<p class="adm-sub">Notifications</p>' +
+              '<p class="adm-copy">A push straight to this device for new sign-ups, new reactions, ' +
+                'real milestones (a city crossing a check-in threshold, a lead replying, a Keeper/Founder ' +
+                'promotion), and a daily nudge for X posts due that day. Batched into one notification when ' +
+                'several land close together.</p>' +
+              '<div id="adm-push-mount"></div>' +
+              '<p class="adm-sub">Your account</p>' +
+              '<form id="adm-pw-form"><div class="adm-form-grid">' +
+                '<div class="adm-field"><label class="adm-label" for="adm-new-pw">New password</label>' +
+                  '<input class="adm-input" type="password" id="adm-new-pw" required minlength="8" autocomplete="new-password"></div>' +
+                '<div class="adm-field"><label class="adm-label" for="adm-new-pw2">Repeat it</label>' +
+                  '<input class="adm-input" type="password" id="adm-new-pw2" required minlength="8" autocomplete="new-password"></div>' +
+              '</div>' +
+              '<p><button class="adm-action" type="submit" id="adm-pw-submit">Change password</button>' +
+              '<a class="adm-secondary" href="#" id="adm-signout">Sign out</a></p></form>' +
+              '<p class="adm-status" id="adm-pw-status" role="status" aria-live="polite"></p>')
+          );
+
+        C.wirePanelToggles(root);
+
+        document.getElementById('adm-pw-form').addEventListener('submit', async function (e) {
+          e.preventDefault();
+          var a = document.getElementById('adm-new-pw').value;
+          var bb = document.getElementById('adm-new-pw2').value;
+          var st = document.getElementById('adm-pw-status');
+          var btn = document.getElementById('adm-pw-submit');
+          if (btn.disabled) return;
+          // Checked here as well as by minlength, because a paste can leave
+          // a field the browser never validated on input.
+          if (a.length < 8) { st.textContent = 'Use at least 8 characters.'; return; }
+          if (a !== bb) { st.textContent = 'Those two do not match.'; return; }
+          st.textContent = 'Saving...';
+          if (window.GlotempAdminSpace) GlotempAdminSpace.commit(btn);
+          btn.disabled = true;
+          try {
+            await GlotempAuth.updatePassword(a);
+            st.textContent = 'Password changed. Use it next time you sign in.';
+            document.getElementById('adm-new-pw').value = '';
+            document.getElementById('adm-new-pw2').value = '';
+          } catch (err) {
+            st.textContent = (err && err.friendly) || 'Could not change it.';
+          } finally {
+            btn.disabled = false;
+          }
+        });
+
+        if (window.GlotempAdminPush) GlotempAdminPush.mount(document.getElementById('adm-push-mount'));
+        if (window.GlotempAdminRefresh) GlotempAdminRefresh.mount(document.getElementById('adm-refresh-mount'));
+
+        C.wireSignOut(root, function () { return C.boot(root, load); });
+      }
+
+      async function load(rootEl) {
+        var none = function () { return []; };
+        var results = await Promise.all([
+          C.rpc('admin_overview', { days: 7 }).catch(none),
+          C.rpc('admin_job_health', { max_rows: 20 }).catch(none),
+        ]);
+        renderSettings.apply(null, results);
+      }
+
+      C.boot(root, load);
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+    else boot();
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+/* Glotemp Admin: persistent navigation -- the top bar (hamburger + brand)
+ * and the sidebar it opens. Same open/close mechanism as the public
+ * site's nav-panel (see nav-component.js / styles.css's .nav-panel), and
+ * the same full-viewport-backdrop-plus-inner-content structure already
+ * used for .welcome-intro-overlay -- reused rather than reinvented.
+ *
+ * UNLIKE the public nav (hamburger on mobile only, inline links on
+ * desktop), this hamburger is the ONE way in at every width -- five
+ * persistent destinations read better as a real sidebar than as either
+ * a cramped inline bar or a second, different desktop-only pattern.
+ */
+.adm-page .adm-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.adm-page .adm-nav-left {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+}
+
+.adm-page .adm-nav-toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.adm-page .adm-nav-toggle span {
+  display: block;
+  width: 20px;
+  height: 1.5px;
+  background: var(--ivory);
+  margin: 0 auto;
+  border-radius: 1px;
+}
+.adm-page .adm-nav-toggle:hover span { background: var(--adm-brass-text); }
+.adm-page .adm-nav-toggle:focus-visible {
+  outline: 1px solid var(--adm-brass-text);
+  outline-offset: 2px;
+}
+
+.adm-page .adm-nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  min-height: 44px;
+}
+.adm-page .adm-nav-logo {
+  height: 26px;
+  width: auto;
+  display: block;
+}
+.adm-page .adm-nav-wordmark {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  color: var(--sand);
+}
+.adm-page .adm-nav-brand:hover .adm-nav-wordmark { color: var(--ivory); }
+
+/* ---------- the sidebar ---------- */
+.adm-page .adm-nav-panel,
+.adm-nav-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  background: rgba(6, 4, 2, 0.66);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms ease;
+}
+.adm-nav-panel.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.adm-nav-panel-inner {
+  width: min(320px, 85vw);
+  height: 100%;
+  background: var(--obsidian);
+  border-right: 1px solid var(--hairline);
+  padding: 1.5rem 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transform: translateX(-100%);
+  transition: transform 320ms cubic-bezier(0.22, 0.68, 0.35, 1);
+  box-shadow: 24px 0 48px rgba(0, 0, 0, 0.4);
+}
+.adm-nav-panel.open .adm-nav-panel-inner {
+  transform: translateX(0);
+}
+
+.adm-nav-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+}
+.adm-nav-panel-head .adm-nav-logo { height: 30px; }
+.adm-nav-panel-head .adm-nav-wordmark {
+  font-family: var(--font-display);
+  font-variant-caps: normal;
+  letter-spacing: normal;
+  font-size: 1rem;
+  color: var(--ivory);
+  flex: 1;
+  min-width: 0;
+}
+.adm-nav-close {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 1px solid var(--hairline);
+  border-radius: 50%;
+  color: var(--ivory);
+  font-size: 1rem;
+  cursor: pointer;
+}
+.adm-nav-close:hover { border-color: var(--brass); color: var(--adm-brass-text); }
+
+.adm-nav-panel-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.adm-nav-panel-links a {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 0.15rem 0 0.9rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--sand);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+.adm-nav-panel-links a:hover {
+  color: var(--ivory);
+  background: rgba(176, 141, 87, 0.06);
+}
+.adm-nav-panel-links a.active {
+  color: var(--adm-brass-text);
+  border-left-color: var(--brass);
+  background: rgba(176, 141, 87, 0.09);
+  font-weight: var(--fw-semibold);
+}
+
+.adm-nav-panel-exit {
+  margin-top: auto;
+  padding-top: 1.25rem;
+  border-top: var(--rule);
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: var(--sand);
+  text-decoration: none;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.adm-nav-panel-exit:hover { color: var(--ivory); }
+
+@media (prefers-reduced-motion: reduce) {
+  .adm-nav-panel,
+  .adm-nav-panel-inner {
+    transition: none;
+  }
+}
