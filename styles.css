@@ -3934,6 +3934,135 @@ small {
   grid-column: 1 / -1;
 }
 
+/* ---------- Pulse map ----------
+   A separate, additive section: 300 cities as quiet nodes on a stylized
+   (not cartographically precise) world silhouette, positioned by their
+   real coordinates on a standard equirectangular projection. Brightness
+   reads mood; a soft ring marks a real, freshly-arrived mood shift. See
+   pulse-map.js. */
+.pulse-map-search-row { margin: 0 0 1.25rem; }
+.pulse-map-search {
+  width: 100%; max-width: 22rem; font-size: 16px; min-height: 44px;
+  background: transparent; border: none; border-bottom: 1px solid var(--brass-dim);
+  border-radius: 0; color: var(--ivory); font-family: var(--font-body); padding: 0.5rem 0.1rem;
+}
+.pulse-map-search:focus { outline: none; border-bottom-color: var(--brass); }
+.pulse-map-search::placeholder { color: var(--ash); opacity: 0.75; }
+
+.pulse-map-frame {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  aspect-ratio: 2 / 1;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 4px;
+  background: radial-gradient(ellipse at center, rgba(240, 224, 200, 0.035), transparent 72%);
+}
+
+/* Continent shapes are a deliberately soft, non-literal silhouette --
+   irregular rounded blobs positioned at real bounding boxes, not a
+   coastline dataset. The point is context for the dots, not an atlas. */
+.pulse-map-landmass {
+  position: absolute;
+  background: rgba(240, 224, 200, 0.05);
+  pointer-events: none;
+}
+
+.pulse-map-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: -10px 0 0 -10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pulse-map-node-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--brass);
+  opacity: var(--node-glow, 0.4);
+  box-shadow: 0 0 calc(var(--node-glow, 0.4) * 9px) rgba(176, 141, 87, calc(var(--node-glow, 0.4) * 0.9));
+  transition: opacity 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+.pulse-map-node:hover .pulse-map-node-dot,
+.pulse-map-node.is-match .pulse-map-node-dot {
+  opacity: 1;
+  transform: scale(1.6);
+}
+
+/* The soft pulse: a slow, quiet ring expanding outward and fading --
+   never an electric/lightning look. Removed from the DOM once finished. */
+.pulse-map-ring {
+  position: absolute;
+  left: 0; top: 0;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid var(--brass);
+  pointer-events: none;
+  animation: pulse-map-expand 3.2s cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
+}
+@keyframes pulse-map-expand {
+  0%   { width: 6px; height: 6px; opacity: 0.55; }
+  100% { width: 64px; height: 64px; opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-map-ring { animation: none; opacity: 0; }
+}
+
+.pulse-map-popover {
+  position: absolute;
+  z-index: 5;
+  min-width: 11rem;
+  padding: 0.7rem 0.9rem;
+  background: var(--basalt-raised);
+  border: 1px solid var(--brass-dim);
+  border-radius: 2px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  font-size: 0.8rem;
+}
+.pulse-map-popover-city {
+  display: block;
+  font-family: var(--font-display);
+  color: var(--ivory);
+  font-size: 1rem;
+}
+.pulse-map-popover-band {
+  display: block;
+  margin-top: 0.15rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--sand);
+}
+.pulse-map-popover-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: var(--brass);
+  text-decoration: none;
+  border-bottom: 1px solid var(--brass-dim);
+  font-size: 0.78rem;
+}
+.pulse-map-popover-link:hover { color: var(--ivory); border-bottom-color: var(--brass); }
+.pulse-map-popover-close {
+  position: absolute; top: 0.35rem; right: 0.45rem;
+  background: none; border: none; color: var(--sand);
+  font-size: 0.9rem; cursor: pointer; padding: 0.2rem;
+  min-width: 24px; min-height: 24px;
+}
+
+@media (max-width: 600px) {
+  .pulse-map-frame { aspect-ratio: 4 / 3; }
+}
+
 @media (max-width: 768px) {
   .coverage-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -7636,6 +7765,31 @@ time, .instr-clock, .tonight-modelled {
   margin-top: 0.3rem;
   font-size: 0.82rem;
   color: var(--sand);
+}
+.trip-air-mood {
+  display: block;
+  margin-top: 0.75rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--hairline);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+.trip-air-mood-label {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--brass);
+}
+.trip-air-mood-caption {
+  display: block;
+  color: var(--sand);
+  opacity: 0.75;
+  font-size: 0.7rem;
+}
+.trip-air-mood-value {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--ivory);
 }
 @media (max-width: 700px) {
   .trip-reading { border-left: none; border-top: 1px solid var(--hairline); padding: 1.25rem 0 0; text-align: left; }

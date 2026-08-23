@@ -1598,6 +1598,9 @@ function updateCity(selected) {
     tripReading.querySelector('.trip-reading-band').textContent = band.band;
     tripReading.querySelector('.trip-reading-city').textContent = city.name;
   }
+  // Real weather/air-quality secondary line -- see city-weather-mood.js.
+  // Purely additive: does not touch synthesizedMood or anything above.
+  if (window.GlotempAirMood) GlotempAirMood.showFor(selected);
   // Update affiliate links with city name
   if (typeof updateAffiliateLinks === 'function') {
     updateAffiliateLinks(city.name);

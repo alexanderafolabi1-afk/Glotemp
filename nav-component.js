@@ -13,7 +13,7 @@
     { key: 'feed', label: 'Feed', href: '/feed' },
     { key: 'cities', label: 'Cities', href: '/explore' },
     { key: 'about', label: 'About', href: '/about' },
-    { key: 'gem', label: 'Hidden gem', href: '/gem', extraClass: 'nav-gem', icon: '/assets/hidden-gem.png' },
+    { key: 'gem', label: 'Hidden gem', href: '/gem', extraClass: 'nav-gem', icon: '/assets/lost-cities-icon.png' },
   ];
 
   function detectActive() {
