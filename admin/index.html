@@ -147,6 +147,7 @@
   <link rel="stylesheet" href="/admin/admin-ui.css" />
   <script src="/admin/admin-charts.js" defer></script>
   <script src="/admin/push-admin.js" defer></script>
+  <script src="/admin/admin-refresh.js" defer></script>
   <!-- Personality layer. Purely additive: remove these two and the
        admin is exactly the panel it was. -->
   <link rel="stylesheet" href="/admin/admin-space.css" />
@@ -623,6 +624,12 @@
 
         panel('p-system', 'System', 'scheduled jobs, install prompt, account',
           jobRows +
+          '<p class="adm-sub">App version</p>' +
+          '<p class="adm-copy">This admin panel is a home-screen app -- it can keep showing an old ' +
+            'cached version after a deploy until the service worker controlling it actually checks in. ' +
+            'This forces that check right now: installs the new worker if one exists, clears every cache ' +
+            'this origin holds, then reloads.</p>' +
+          '<div id="adm-refresh-mount"></div>' +
           '<p class="adm-sub">Install prompt</p>' +
           '<div class="adm-grid">' +
             fig((m.prompt_shown || 0).toLocaleString(), 'shown') +
@@ -857,6 +864,7 @@
       });
 
       if (window.GlotempAdminPush) GlotempAdminPush.mount(document.getElementById('adm-push-mount'));
+      if (window.GlotempAdminRefresh) GlotempAdminRefresh.mount(document.getElementById('adm-refresh-mount'));
 
       var out = document.getElementById('adm-signout');
       if (out) out.addEventListener('click', function (e) {
