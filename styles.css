@@ -4698,6 +4698,23 @@ a:hover .city-landmark-photo,
   margin-right: 0.5em;
 }
 
+/* Same register as .conditions-line -- a one-line instrument reading,
+   not a callout box -- but only ever set via JS once real stored deltas
+   exist (see city-why.js); starts [hidden] rather than :empty since the
+   template ships it with no content at all until then. */
+.why-line {
+  margin-top: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--sand);
+  letter-spacing: 0.01em;
+}
+.why-eyebrow {
+  font-variant-caps: small-caps;
+  color: var(--brass);
+  margin-right: 0.5em;
+}
+
 .vertical-nav {
   display: flex;
   gap: 1rem;
