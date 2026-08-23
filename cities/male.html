@@ -46,6 +46,11 @@
           <span id="city-metro-pop"></span>
         </div>
         <p class="conditions-line" id="conditions-line" aria-live="polite"></p>
+        <!-- Real "Why" line: built only from stored deltas in
+             city_signal_snapshots (see city-why.js). Hidden until at
+             least two real days of history exist for this city -- never
+             a guess standing in for a trend that isn't there yet. -->
+        <p class="why-line" id="why-line" aria-live="polite" hidden></p>
         <div class="city-action-row">
           <button id="watch-city-btn" class="btn-neon" type="button">Follow this city</button>
           <button id="share-city-btn" class="btn-neon" type="button" style="--btn-band: var(--band-restrained);">Share</button>
@@ -352,6 +357,7 @@
   <script src="/glotemp-reactions.js"></script>
   <script src="/glotemp-checkin.js"></script>
   <script src="/city-attention.js"></script>
+  <script src="/city-why.js"></script>
   <script src="/glotemp-tonight.js"></script>
   <script src="/glotemp-features.js"></script>
   <script src="/glotemp-listings.js" defer></script>
@@ -490,6 +496,7 @@
 
       if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('Malé', 'Maldives');
       if (typeof GlotempAttention !== 'undefined') GlotempAttention.loadCityAttention('male');
+      if (typeof GlotempWhy !== 'undefined') GlotempWhy.loadCityWhy('male');
       if (typeof GlotempCityTier !== 'undefined') GlotempCityTier.loadTier('male');
 
       // Synchronous and static, so it's always in the DOM before any of
