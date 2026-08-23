@@ -2,7 +2,9 @@
 // Ranked by: Internet Penetration Rate × Metro Population
 // Source: ITU World Telecommunication Indicators, World Bank, UN Urbanization
 // Updated: 2026
-// Total: 300 cities across 104 countries
+// Total: 300 cities across 104 countries as of this file's last edit --
+// this list grows over time and is never presented publicly as capped,
+// so keep this count updated (or drop it) as cities are added.
 
 const CITIES_DATA = [
   { slug: 'tokyo', name: 'Tokyo', country: 'Japan', iso: 'JP', region: 'Asia-Pacific', timezone: 'Asia/Tokyo', lat: 35.6762, lon: 139.6503, metro_pop: 37400000, penetration: 0.94, rank: 1, mood: 8.4, available: true },
