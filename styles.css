@@ -1937,6 +1937,26 @@ summary:focus:not(:focus-visible) {
 .reporter-badge-silver { color: var(--reporter-silver); border-color: rgba(198, 203, 206, 0.4); }
 .reporter-badge-platinum { color: var(--reporter-platinum); border-color: rgba(233, 230, 220, 0.45); }
 
+/* City tier: Listed / Verified / Anchor, gated on real data depth
+   (city_tier() RPC). Same hairline-underline language as .reporter-badge
+   -- no fill, ever, and Listed (the open default) gets no badge at all,
+   only Verified and Anchor do. Sits as its own quiet line under "Live",
+   not fused into it, so it never reads as part of the live-data pulse. */
+.city-tier-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--hairline);
+  border-radius: 0;
+  white-space: nowrap;
+  margin-bottom: 0.6rem;
+}
+.city-tier-badge-verified { color: var(--brass); border-color: var(--brass-dim); }
+.city-tier-badge-anchor { color: var(--ivory); border-color: var(--brass); }
+
 /* Fuller standalone panel -- the daily check-in "done" card today. */
 .reporter-panel {
   display: flex;

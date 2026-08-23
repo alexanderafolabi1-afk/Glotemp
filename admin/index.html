@@ -318,7 +318,7 @@
 
     function dashboard(overview, byCity, apiOverview, apiKeys, tierCounts, topContributors, leads,
                        traffic, trafficDaily, topPages, topRefs, topCountries, topDevices,
-                       signupsDaily, signupSources, jobs, partners, xPosts) {
+                       signupsDaily, signupSources, jobs, partners, xPosts, cityApplications) {
       var m = {};
       (overview || []).forEach(function (r) { m[r.metric] = r.value; });
       var a = {};
@@ -426,6 +426,27 @@
             '</div>';
           }).join('') + '</div>'
         : '<p class="adm-copy">The calendar has not been seeded yet.</p>';
+
+      // City suggestions: same public-submits/admin-reviews shape as
+      // outreach_leads' status <select>, reused verbatim rather than
+      // inventing a second pattern for the same kind of decision.
+      var CITY_APP_STATUSES = ['pending', 'approved', 'rejected'];
+      var cityApps = cityApplications || [];
+      function cityAppCount(st) { return cityApps.filter(function (a) { return a.status === st; }).length; }
+      var cityAppRows = cityApps.length
+        ? cityApps.map(function (a) {
+            return '<div class="adm-row adm-city-app-row">' +
+              '<span class="adm-row-city">' + esc(a.city_name) + ', ' + esc(a.country) +
+                '<span class="adm-key-prefix">' + esc(a.contact_email) + (a.note ? ' · ' + esc(a.note) : '') + '</span>' +
+              '</span>' +
+              '<select class="adm-input adm-city-app-status" data-app-id="' + esc(a.id) + '" data-prev="' + esc(a.status) + '" style="width:auto;max-width:11rem;flex:0 0 auto">' +
+                CITY_APP_STATUSES.map(function (s) {
+                  return '<option value="' + esc(s) + '"' + (s === a.status ? ' selected' : '') + '>' + esc(s) + '</option>';
+                }).join('') +
+              '</select>' +
+            '</div>';
+          }).join('')
+        : '<p class="adm-copy">No suggestions yet.</p>';
 
       var signupRows = (signupSources || []).length
         ? signupSources.slice(0, 10).map(function (r) {
@@ -538,6 +559,15 @@
             fig((xList.length ? 30 : 0).toLocaleString(), 'days covered') +
           '</div>' +
           xRows) +
+
+        panel('p-city-applications', 'City suggestions', 'public submissions, reviewed by hand -- approving here is a decision, not a publish action',
+          '<div class="adm-grid">' +
+            fig(cityApps.length.toLocaleString(), 'total') +
+            fig(cityAppCount('pending').toLocaleString(), 'pending', { key: true }) +
+            fig(cityAppCount('approved').toLocaleString(), 'approved') +
+            fig(cityAppCount('rejected').toLocaleString(), 'rejected') +
+          '</div>' +
+          cityAppRows) +
 
         panel('p-partners', 'Partners', 'placements and expiries',
           '<div class="adm-grid">' +
@@ -736,6 +766,26 @@
         });
       });
 
+      root.querySelectorAll('.adm-city-app-status').forEach(function (sel) {
+        sel.addEventListener('change', async function () {
+          var id = sel.getAttribute('data-app-id');
+          var prev = sel.getAttribute('data-prev') || sel.value;
+          sel.disabled = true;
+          try {
+            await restTable('PATCH', 'city_applications?id=eq.' + encodeURIComponent(id), { status: sel.value });
+            sel.setAttribute('data-prev', sel.value);
+            if (window.GlotempAdminSpace) {
+              var tone = sel.value === 'approved' ? 'gold' : sel.value === 'rejected' ? 'teal' : 'violet';
+              GlotempAdminSpace.pulseRow(sel.closest('.adm-row'), tone);
+            }
+          } catch (err) {
+            sel.value = prev;
+          } finally {
+            sel.disabled = false;
+          }
+        });
+      });
+
       root.querySelectorAll('.adm-x-copy').forEach(function (b) {
         b.addEventListener('click', function () {
           var post = xList[Number(b.getAttribute('data-x-index'))];
@@ -799,6 +849,7 @@
           rpc('admin_job_health', { max_rows: 20 }).catch(none),
           restTable('GET', 'partners?select=*&order=created_at.desc').catch(none),
           restTable('GET', 'x_content_calendar?select=day_number,slot_number,scheduled_time,theme,tweet_text,image_note&order=day_number.asc,slot_number.asc').catch(none),
+          restTable('GET', 'city_applications?select=id,city_name,country,contact_email,note,status,created_at&order=created_at.desc').catch(none),
         ]);
         dashboard.apply(null, results);
       } catch (err) {
