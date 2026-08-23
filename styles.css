@@ -543,11 +543,13 @@ main > .glass:first-child,
   margin-bottom: 2rem;
 }
 
-/* No card chrome -- the barometer artwork sits directly on the page
-   ground, five instruments in a row rather than five boxes. The
-   mix-blend-mode transparency trick on .instrument-visual below is
-   self-contained (isolation: isolate), so it keeps working with no
-   background/border/shadow on this wrapper. */
+/* No card BOX -- still no filled rectangle or border-radius container --
+   but each slot now carries a comic-burst SVG plate (.instrument-burst)
+   peeking out from behind the artwork, a shaped card in place of the
+   implicit rectangle the row previously had none of. The mix-blend-mode
+   transparency trick on .instrument-visual below is self-contained
+   (isolation: isolate), so it keeps working unchanged, painted above the
+   burst via stacking order. */
 .instrument-slot {
   position: relative;
   display: flex;
@@ -560,6 +562,44 @@ main > .glass:first-child,
   box-shadow: none;
   transition: transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   animation: instrument-breathe 6s ease-in-out infinite;
+}
+
+/* Comic-burst plate: a jagged starburst behind the barometer, restrained
+   to the same muted brass-on-dark language as the rest of the site --
+   fill and stroke only, no bright comic colours. viewBox 0 0 200 200 with
+   preserveAspectRatio="none" so the same path fills whatever box this is
+   given at each breakpoint (the !important overrides further down resize
+   .instrument-slot itself, and this scales with it for free). Each of the
+   5 slots carries its own path (10/12/9/10/12-spike, different
+   rotations) so the row reads as five distinct stamped plates rather
+   than one shape repeated five times. */
+.instrument-burst {
+  position: absolute;
+  top: -7%;
+  left: -11%;
+  right: -11%;
+  bottom: 26%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.instrument-burst path {
+  fill: rgba(176, 141, 87, 0.07);
+  stroke: var(--brass-dim);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  transition: filter 600ms ease, fill 600ms ease;
+}
+.instrument-slot:hover .instrument-burst path,
+.instrument-slot:focus-within .instrument-burst path,
+.instrument-slot.is-selected .instrument-burst path {
+  fill: rgba(176, 141, 87, 0.12);
+  filter: drop-shadow(0 0 8px var(--slot-glow, var(--brass)));
+}
+.instrument-visual,
+.instrument-label {
+  position: relative;
+  z-index: 1;
 }
 
 .instrument-slot:nth-child(2) { animation-delay: 1.2s; }
@@ -1938,24 +1978,60 @@ summary:focus:not(:focus-visible) {
 .reporter-badge-platinum { color: var(--reporter-platinum); border-color: rgba(233, 230, 220, 0.45); }
 
 /* City tier: Listed / Verified / Anchor, gated on real data depth
-   (city_tier() RPC). Same hairline-underline language as .reporter-badge
-   -- no fill, ever, and Listed (the open default) gets no badge at all,
-   only Verified and Anchor do. Sits as its own quiet line under "Live",
-   not fused into it, so it never reads as part of the live-data pulse. */
+   (city_tier() RPC). Listed (the open default) gets no badge at all, only
+   Verified and Anchor do. Sits as its own quiet line under "Live", not
+   fused into it, so it never reads as part of the live-data pulse.
+   Shaped as a vehicle plate (see city-tier.js's PLATE_SVG) rather than
+   the old plain hairline rectangle -- chamfered corners, an inset
+   engraved line, two rivets, and the city's own real region code + rank
+   stamped in the corner, like a plate reads a state and a number. */
 .city-tier-badge {
-  display: inline-block;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
   font-family: var(--font-mono);
   font-variant-caps: small-caps;
   font-size: 0.66rem;
   letter-spacing: 0.09em;
-  padding: 0.1rem 0.4rem;
-  border: 1px solid var(--hairline);
+  padding: 0.22rem 0.7rem 0.22rem 0.55rem;
+  border: none;
   border-radius: 0;
   white-space: nowrap;
   margin-bottom: 0.6rem;
 }
-.city-tier-badge-verified { color: var(--brass); border-color: var(--brass-dim); }
-.city-tier-badge-anchor { color: var(--ivory); border-color: var(--brass); }
+.tier-plate-shape {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
+.tier-plate-outline { fill: rgba(176, 141, 87, 0.05); stroke: var(--brass-dim); stroke-width: 1.4; }
+.tier-plate-inset { fill: none; stroke: var(--hairline); stroke-width: 0.8; }
+.tier-plate-rivet { fill: var(--brass-dim); }
+.tier-plate-content {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.32em;
+}
+/* Solid --sand rather than a dimmed/low-opacity brass: opacity low enough
+   to read as "secondary" measured under 3:1 against the plate fill,
+   failing the same contrast bar every other readable text on this site
+   is held to. --sand at full opacity clears AA on its own (9.17:1
+   measured against this fill) while still sitting visually behind the
+   brighter tier label. */
+.tier-plate-code { color: var(--sand); }
+.tier-plate-code::after { content: '\00b7'; margin-left: 0.32em; color: var(--sand); }
+.tier-plate-num { font-size: 0.85em; color: var(--sand); }
+.tier-plate-num::before { content: '\2116'; margin-right: 0.06em; }
+
+.city-tier-badge-verified { color: var(--brass); }
+.city-tier-badge-verified .tier-plate-outline { stroke: var(--brass-dim); }
+.city-tier-badge-anchor { color: var(--ivory); }
+.city-tier-badge-anchor .tier-plate-outline { stroke: var(--brass); }
+.city-tier-badge-anchor .tier-plate-rivet { fill: var(--brass); }
 
 /* Fuller standalone panel -- the daily check-in "done" card today. */
 .reporter-panel {
