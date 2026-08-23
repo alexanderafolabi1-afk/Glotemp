@@ -106,6 +106,11 @@
          framing above. Populated by glotemp-elsewhere.js. -->
     <section class="elsewhere-section" id="elsewhere-root" aria-label="A city you keep"></section>
 
+    <!-- Social proof: two honestly-scoped real numbers plus a few of the
+         strongest readings already present in the data -- see
+         social-proof.js. Hidden until real data actually resolves. -->
+    <section class="glass-card social-proof-section" id="social-proof-mount" aria-label="Real activity across Glotemp" hidden></section>
+
     <!-- Spin instrument beside City Spotlight -- two separate panels, two
          separate scripts (glotemp-spin.js, city-spotlight.js). Neither
          reads the other's state. Stacks to one column below 800px. -->
@@ -312,7 +317,59 @@
         <p class="section-copy" data-i18n="fastest_intro">Real-time shifts in city energy. These places are moving fast.</p>
       </div>
       <div id="fastest-cities-grid" class="fastest-grid">
-        <div class="fastest-placeholder" data-i18n="fastest_loading">Loading trending cities...</div>
+        <!-- Static seed cards, in the exact markup shape setupTrendingRotation()
+             (app.js) renders, so the section never shows literal "Loading"
+             text -- real, replaced almost immediately by the live rotation
+             once CITIES_DATA is ready, and left standing as a real (if
+             stale) fallback in the rare case that script fails to load. -->
+        <div class="fastest-card" data-slug="tokyo">
+          <div class="fastest-card-body">
+            <h3 class="fastest-city-name" style="color:#F5A25A">Tokyo</h3>
+            <p class="fastest-shift">Japan</p>
+            <p class="fastest-shift" style="color:#F5A25A">warm - 7.6 / 10</p>
+          </div>
+          <div class="fastest-mood" style="--mood-color:#F5A25A"></div>
+        </div>
+        <div class="fastest-card" data-slug="lisbon">
+          <div class="fastest-card-body">
+            <h3 class="fastest-city-name" style="color:#F0E0C8">Lisbon</h3>
+            <p class="fastest-shift">Portugal</p>
+            <p class="fastest-shift" style="color:#F0E0C8">equilibrium - 6.2 / 10</p>
+          </div>
+          <div class="fastest-mood" style="--mood-color:#F0E0C8"></div>
+        </div>
+        <div class="fastest-card" data-slug="medellin">
+          <div class="fastest-card-body">
+            <h3 class="fastest-city-name" style="color:#C86BE0">Medell&iacute;n</h3>
+            <p class="fastest-shift">Colombia</p>
+            <p class="fastest-shift" style="color:#C86BE0">charged - 8.7 / 10</p>
+          </div>
+          <div class="fastest-mood" style="--mood-color:#C86BE0"></div>
+        </div>
+        <div class="fastest-card" data-slug="bangkok">
+          <div class="fastest-card-body">
+            <h3 class="fastest-city-name" style="color:#F5A25A">Bangkok</h3>
+            <p class="fastest-shift">Thailand</p>
+            <p class="fastest-shift" style="color:#F5A25A">warm - 7.3 / 10</p>
+          </div>
+          <div class="fastest-mood" style="--mood-color:#F5A25A"></div>
+        </div>
+        <div class="fastest-card" data-slug="reykjavik">
+          <div class="fastest-card-body">
+            <h3 class="fastest-city-name" style="color:#6BA8F5">Reykjav&iacute;k</h3>
+            <p class="fastest-shift">Iceland</p>
+            <p class="fastest-shift" style="color:#6BA8F5">restrained - 4.4 / 10</p>
+          </div>
+          <div class="fastest-mood" style="--mood-color:#6BA8F5"></div>
+        </div>
+        <div class="fastest-card" data-slug="cape-town">
+          <div class="fastest-card-body">
+            <h3 class="fastest-city-name" style="color:#F0E0C8">Cape Town</h3>
+            <p class="fastest-shift">South Africa</p>
+            <p class="fastest-shift" style="color:#F0E0C8">equilibrium - 6.8 / 10</p>
+          </div>
+          <div class="fastest-mood" style="--mood-color:#F0E0C8"></div>
+        </div>
       </div>
       <p class="fastest-source">Every city in the register passes through here.</p>
     </section>
@@ -378,6 +435,7 @@
   <script src="/glotemp-tonight.js" defer></script>
   <script src="/city-weather-mood.js" defer></script>
   <script src="/pulse-map.js" defer></script>
+  <script src="/social-proof.js" defer></script>
   <script src="/glotemp-showcase.js" defer></script>
   <script src="/glotemp-spin.js" defer></script>
   <script src="/city-spotlight.js" defer></script>
