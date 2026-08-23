@@ -146,6 +146,7 @@
   <script src="/admin-i18n.js"></script>
   <link rel="stylesheet" href="/admin/admin-ui.css" />
   <script src="/admin/admin-charts.js" defer></script>
+  <script src="/admin/push-admin.js" defer></script>
   <!-- Personality layer. Purely additive: remove these two and the
        admin is exactly the panel it was. -->
   <link rel="stylesheet" href="/admin/admin-space.css" />
@@ -627,6 +628,12 @@
             fig((m.prompt_shown || 0).toLocaleString(), 'shown') +
             fig((m.prompt_dismissed || 0).toLocaleString(), 'dismissed') +
           '</div>' +
+          '<p class="adm-sub">Notifications</p>' +
+          '<p class="adm-copy">A push straight to this device for new sign-ups, new reactions, ' +
+            'real milestones (a city crossing a check-in threshold, a lead replying, a Keeper/Founder ' +
+            'promotion), and a daily nudge for X posts due that day. Batched into one notification when ' +
+            'several land close together.</p>' +
+          '<div id="adm-push-mount"></div>' +
           '<p class="adm-sub">Your account</p>' +
           '<form id="adm-pw-form"><div class="adm-form-grid">' +
             '<div class="adm-field"><label class="adm-label" for="adm-new-pw">New password</label>' +
@@ -848,6 +855,8 @@
           setPanelCollapsed(id, collapsed);
         });
       });
+
+      if (window.GlotempAdminPush) GlotempAdminPush.mount(document.getElementById('adm-push-mount'));
 
       var out = document.getElementById('adm-signout');
       if (out) out.addEventListener('click', function (e) {
