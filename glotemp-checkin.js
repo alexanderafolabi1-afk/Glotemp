@@ -167,6 +167,56 @@
     return `Could not post that: ${detail} ${diag}`;
   }
 
+  // ---------- location enforcement ----------
+  // Mandatory, not optional -- unlike GlotempVerify's post-hoc "I am here"
+  // badge (glotemp-verify.js), which is untouched and stays exactly what
+  // it was: an opt-in signal offered only after a successful post.
+  //
+  // This reuses the same city_points table and Haversine distance
+  // verify_presence already checks a posted reading against, through a
+  // new read-only RPC (check_city_presence, 20260823130000). It can't
+  // reuse verify_presence itself: that function stamps an existing
+  // observation row, and this has to run BEFORE one exists, to block the
+  // post rather than flag it after the fact.
+  //
+  // PRIVACY: the coordinates exist only inside this function's local
+  // variables and the one RPC call body. check_city_presence, like
+  // verify_presence before it, is read-only -- it returns a verdict and
+  // writes nothing. Nothing here puts lat/lon in localStorage, in the
+  // check-in's own POST body, or in any other table.
+  function getPositionForCheckin() {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) { reject({ code: 0 }); return; }
+      navigator.geolocation.getCurrentPosition(
+        (p) => resolve({ lat: p.coords.latitude, lon: p.coords.longitude }),
+        (err) => reject(err),
+        // Same reasoning as glotemp-verify.js's position(): the question
+        // is which city, not which street -- high accuracy would only
+        // drain a battery and collect more than the check needs.
+        { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 }
+      );
+    });
+  }
+
+  async function checkCityPresence(session, slug, lat, lon) {
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/check_city_presence`, {
+      method: 'POST',
+      headers: authHeaders(session),
+      body: JSON.stringify({ p_city_slug: slug, p_lat: lat, p_lon: lon }),
+    });
+    if (!resp.ok) throw new Error(`check_city_presence ${resp.status}`);
+    const rows = await resp.json();
+    return Array.isArray(rows) ? rows[0] : rows;
+  }
+
+  const LOCATION_MESSAGES = {
+    denied: (city) => `Check-ins need your location to confirm you're actually in ${city}. Location access was blocked -- allow it in your browser settings and try again.`,
+    unavailable: (city) => `Couldn't get your location. Check-ins need to confirm you're in ${city} -- try again in a moment.`,
+    bad_position: (city) => `Couldn't get your location. Check-ins need to confirm you're in ${city} -- try again in a moment.`,
+    too_far: (city) => `This check-in needs to come from ${city} itself.`,
+    city_not_mapped: () => `Location check isn't available for this city yet, so check-ins are paused here.`,
+  };
+
   function moodGlyphSVG(key, extraClass) {
     const m = MOOD_BY_KEY[key] || MOOD_BY_KEY[DEFAULT_MOOD];
     return `<svg class="checkin-mood-glyph${extraClass ? ' ' + extraClass : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${m.glyph}</svg>`;
@@ -384,12 +434,44 @@
         submitBtn.disabled = true;
         submitBtn.setAttribute('aria-busy', 'true');
         submitBtn.classList.add('is-loading');
-        status.textContent = 'Posting…';
         function endLoading() {
           submitBtn.disabled = false;
           submitBtn.removeAttribute('aria-busy');
           submitBtn.classList.remove('is-loading');
         }
+
+        // ---- location enforcement: an integrity feature, not optional ----
+        // Blocks the post outright rather than flagging it afterward --
+        // see the LOCATION ENFORCEMENT comment above checkCityPresence
+        // for how this differs from GlotempVerify's optional badge.
+        status.textContent = 'Checking your location…';
+        let geo;
+        try {
+          geo = await getPositionForCheckin();
+        } catch (geoErr) {
+          endLoading();
+          status.textContent = (geoErr && geoErr.code === 1)
+            ? LOCATION_MESSAGES.denied(cityDisplayName())
+            : LOCATION_MESSAGES.unavailable(cityDisplayName());
+          return;
+        }
+
+        let presence;
+        try {
+          presence = await checkCityPresence(session, citySlug, geo.lat, geo.lon);
+        } catch (presenceErr) {
+          endLoading();
+          status.textContent = "Couldn't verify your location right now. Try again in a moment.";
+          return;
+        }
+        if (!presence || !presence.allowed) {
+          const reason = presence && presence.reason;
+          endLoading();
+          status.textContent = (LOCATION_MESSAGES[reason] || LOCATION_MESSAGES.too_far)(cityDisplayName());
+          return;
+        }
+
+        status.textContent = 'Posting…';
         try {
           // representation rather than minimal: the new row's id is what
           // the optional verification step needs, and asking for it here
