@@ -42,6 +42,38 @@
 // quality-only behavior rather than rejecting everything). A qualifying
 // but irrelevant photo is treated exactly like no photo at all: honest
 // no_image_found, never a fallback to something merely well-formed.
+//
+// LIVE VERIFICATION (fixes a real, recurring bug, confirmed in Make's
+// execution history): Instagram's publish step kept failing with two
+// errors that trace to the same root cause --
+//   9004  "Only photo or video can be accepted as media type."
+//   36003 "The aspect ratio is not supported."
+// Both mean this function handed Make a candidate that LOOKED fine by
+// Commons' own metadata but wasn't actually postable. Two gaps caused
+// it: (1) looksLikeRealPhoto trusted the `mime` Commons reports for the
+// STORED file, never the content-type the thumbnail URL actually serves
+// -- Commons' on-demand thumbnailer (thumb.php) can fail (a known,
+// common MediaWiki failure mode for a large or malformed source file)
+// and serve an HTML error page at a URL whose metadata still claims
+// image/jpeg; (2) the only size check was a minimum-dimension floor,
+// with no ceiling on how ELONGATED an image could be -- a real, valid
+// jpeg panorama with a 5:1 or wider aspect ratio passed every check
+// that existed, then failed at Instagram, outside its documented
+// 4:5 (0.8) to 1.91:1 (1.91) accepted range.
+//
+// The fix: hasSupportedAspectRatio adds the missing ceiling/floor using
+// the same width/height Commons already reports (thumbnails are scaled
+// proportionally, so the ratio of the original is the ratio of whatever
+// size is actually served -- no extra fetch needed for this part). And
+// verifyIsDirectImage performs one real HEAD request against the exact
+// URL this function is about to hand back, checking the ACTUAL served
+// Content-Type rather than trusting metadata. The result: this function
+// no longer picks "the first metadata-passing candidate" -- it walks
+// candidates in order and only returns one that also survives a live
+// check, so a broken thumbnail or an unsupported shape is skipped in
+// favor of the next candidate, exactly like an irrelevant photo already
+// was. If every candidate fails, the honest no_image_found response is
+// what Make receives -- never a URL Instagram is going to reject.
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const UA = "glo-temp.com/1.0 (+https://glo-temp.com; info@glo-temp.com)";
@@ -50,6 +82,16 @@ const TIMEOUT_MS = 5000;
 const MIN_DIMENSION = 400;
 const THUMB_WIDTH = 1600;
 const SEARCH_LIMIT = 20;
+
+// Instagram's own documented accepted range for a feed image, width:height.
+// 4:5 is the portrait floor, 1.91:1 is the landscape ceiling. A tiny
+// epsilon absorbs float rounding on real-world pixel dimensions -- it
+// does not meaningfully widen the range.
+const MIN_ASPECT_RATIO = 4 / 5;
+const MAX_ASPECT_RATIO = 1.91;
+const ASPECT_EPSILON = 0.001;
+
+const ACCEPTED_IMAGE_MIME = ["image/jpeg", "image/png"];
 
 const BAD_TITLE = /logo|coat[\s_]of[\s_]arms|seal[\s_]of|flag[\s_]of|\bmap\b|diagram|chart|icon|emblem|locator/i;
 
@@ -85,14 +127,48 @@ interface CommonsPage {
   }>;
 }
 
+// Uses the width/height Commons reports for the original file. Commons'
+// thumb service scales proportionally -- it never crops -- so this ratio
+// is the same ratio whatever size actually gets served, including the
+// THUMB_WIDTH-capped thumburl this function hands back. No extra fetch
+// needed to know the shape; verifyIsDirectImage below is what a real
+// network call is for.
+function hasSupportedAspectRatio(width: number, height: number): boolean {
+  if (!width || !height) return false;
+  const ratio = width / height;
+  return ratio >= MIN_ASPECT_RATIO - ASPECT_EPSILON && ratio <= MAX_ASPECT_RATIO + ASPECT_EPSILON;
+}
+
 function looksLikeRealPhoto(page: CommonsPage): boolean {
   const info = page?.imageinfo?.[0];
   if (!info) return false;
   const mime = String(info.mime || "").toLowerCase();
-  if (mime !== "image/jpeg" && mime !== "image/png") return false;
+  if (!ACCEPTED_IMAGE_MIME.includes(mime)) return false;
   if ((info.width || 0) < MIN_DIMENSION && (info.height || 0) < MIN_DIMENSION) return false;
+  if (!hasSupportedAspectRatio(info.width || 0, info.height || 0)) return false;
   if (BAD_TITLE.test(stripFilePrefix(page.title || ""))) return false;
   return !!(info.thumburl || info.url);
+}
+
+// The one real network check: Commons' `mime` field describes the STORED
+// file, not a guarantee about what a given URL serves right now -- the
+// on-demand thumbnailer can fail and return an HTML error page at a URL
+// whose metadata still claims image/jpeg. A HEAD request costs nothing
+// extra to transfer and answers the only question that matters: is the
+// Content-Type this URL actually serves an accepted image format.
+async function verifyIsDirectImage(url: string): Promise<boolean> {
+  const { signal, done } = withTimeout(TIMEOUT_MS);
+  try {
+    const resp = await fetch(url, { method: "HEAD", headers: { "User-Agent": UA }, signal });
+    if (!resp.ok) return false;
+    const contentType = String(resp.headers.get("content-type") || "").toLowerCase().split(";")[0].trim();
+    return ACCEPTED_IMAGE_MIME.includes(contentType);
+  } catch (e) {
+    console.error(`[social-image-fetch] Live verification failed for ${url}`, String(e));
+    return false;
+  } finally {
+    done();
+  }
 }
 
 // The leading run of capitalized words in `term` -- image_search_term is
@@ -170,20 +246,32 @@ Deno.serve(async (req: Request) => {
   }
 
   const hint = extractLocationHint(term);
-  const match = pages.find((p) => looksLikeRealPhoto(p) && matchesLocation(p, hint));
-  if (!match) {
-    // A real, honest outcome -- not every search term resolves to a
-    // qualifying, relevant photo. Never fabricate a fallback URL, and
-    // never fall back to a well-formed but unrelated-place photo.
-    return json({ term, image_url: null, reason: "no_image_found" }, 200);
+  const candidates = pages.filter((p) => looksLikeRealPhoto(p) && matchesLocation(p, hint));
+
+  // Walk candidates in Commons' own relevance order. Passing the metadata
+  // checks only earns a candidate a live verification -- a candidate that
+  // fails it (broken thumbnail, wrong content-type) is skipped in favor
+  // of the next one, exactly like an irrelevant photo already was. Make
+  // never sees a URL that wasn't actually confirmed postable.
+  for (const candidate of candidates) {
+    const info = candidate.imageinfo![0];
+    const candidateUrl = info.thumburl || info.url!;
+    if (!(await verifyIsDirectImage(candidateUrl))) {
+      console.warn(`[social-image-fetch] Candidate failed live verification, trying next: ${candidateUrl}`);
+      continue;
+    }
+    return json({
+      term,
+      image_url: candidateUrl,
+      source: "wikimedia-commons",
+      page_title: stripFilePrefix(candidate.title || ""),
+      license: info.extmetadata?.LicenseShortName?.value || null,
+    });
   }
 
-  const info = match.imageinfo![0];
-  return json({
-    term,
-    image_url: info.thumburl || info.url,
-    source: "wikimedia-commons",
-    page_title: stripFilePrefix(match.title || ""),
-    license: info.extmetadata?.LicenseShortName?.value || null,
-  });
+  // A real, honest outcome -- not every search term resolves to a
+  // qualifying, relevant, live-verified photo. Never fabricate a
+  // fallback URL, and never hand back a candidate that only looked
+  // right on paper.
+  return json({ term, image_url: null, reason: "no_image_found" }, 200);
 });
