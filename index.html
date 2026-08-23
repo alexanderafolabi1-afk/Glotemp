@@ -34,21 +34,47 @@
 </head>
 <body>
   <div id="app">
-    <!-- Install Banner: elevated, legacy-toned add-to-home-screen -->
-    <div id="install-banner" class="install-banner" style="display:none;" role="dialog" aria-labelledby="install-headline" aria-describedby="install-body">
-      <button id="dismiss-install" class="install-dismiss" aria-label="Dismiss" data-i18n="dismiss">×</button>
-      <div class="install-inner">
-        <div class="install-icon-wrap" aria-hidden="true">
-          <img src="/assets/icon-192.png" alt="" width="56" height="56" class="install-icon">
+    <!-- First-visit intro: three steps (real radio, the check-in concept,
+         then a confident install pitch), shown once per visitor. Replaces
+         the old single-step install banner. -->
+    <div id="welcome-intro-overlay" class="welcome-intro-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="welcome-intro-heading">
+      <div class="welcome-intro-modal">
+        <button type="button" id="welcome-intro-dismiss" class="welcome-intro-dismiss" aria-label="Dismiss">×</button>
+
+        <div class="welcome-intro-dots" aria-hidden="true">
+          <span class="welcome-intro-dot is-active" data-dot="1"></span>
+          <span class="welcome-intro-dot" data-dot="2"></span>
+          <span class="welcome-intro-dot" data-dot="3"></span>
         </div>
-        <div class="install-copy">
-          <p class="install-eyebrow" data-i18n="install_eyebrow">A private companion</p>
-          <h2 id="install-headline" class="install-headline" data-i18n="install_title">Keep the world's pulse close.</h2>
-          <p id="install-body" class="install-body" data-i18n="install_body">Add Glotemp to your home screen. A quiet instrument that tells you how a city truly feels, before you arrive, while you are there, and long after you leave.</p>
+
+        <div class="welcome-intro-step" data-step="1">
+          <p class="welcome-intro-eyebrow">Right now</p>
+          <h2 id="welcome-intro-heading" class="welcome-intro-headline"><span id="welcome-intro-city-name">A city</span>'s radio is playing right now.</h2>
+          <button type="button" class="welcome-intro-radio" id="welcome-intro-radio-btn" disabled>
+            <span class="welcome-intro-radio-icon" aria-hidden="true">&#9654;</span>
+            <span class="welcome-intro-radio-name" id="welcome-intro-station-name">Finding a station…</span>
+          </button>
+          <audio id="welcome-intro-audio" preload="none"></audio>
         </div>
-        <div class="install-actions">
-          <button id="install-btn" class="btn-neon install-cta" data-i18n="install_btn">Place among your essentials</button>
-          <button id="install-later" class="btn-text install-later" data-i18n="install_later">Not now</button>
+
+        <div class="welcome-intro-step" data-step="2" hidden>
+          <p class="welcome-intro-eyebrow">Your part in it</p>
+          <h2 class="welcome-intro-headline">You can shape how a city feels.</h2>
+          <p class="welcome-intro-body">A quick, honest check-in -- a mood, a line about tonight -- folds into the real reading everyone else sees. Not a rating. A pulse.</p>
+          <p class="welcome-intro-fineprint">Check-ins need your real location to match the city, so every reading stays honest.</p>
+        </div>
+
+        <div class="welcome-intro-step" data-step="3" hidden>
+          <p class="welcome-intro-eyebrow">Keep it close</p>
+          <h2 class="welcome-intro-headline">Add us to your home screen.</h2>
+          <p class="welcome-intro-body">Your cities, always with you.</p>
+          <p class="welcome-intro-fallback" id="welcome-intro-install-fallback" hidden></p>
+        </div>
+
+        <div class="welcome-intro-actions">
+          <button type="button" class="btn-text welcome-intro-back" id="welcome-intro-back" hidden>Back</button>
+          <button type="button" class="btn-neon welcome-intro-next" id="welcome-intro-next">Next</button>
+          <button type="button" class="btn-neon welcome-intro-install-btn" id="install-btn" hidden>Add to home screen</button>
         </div>
       </div>
     </div>
@@ -450,6 +476,7 @@
   <script src="/city-tiles.js" defer></script>
   <script src="/city-radio-curated.js" defer></script>
   <script src="/city-radio.js" defer></script>
+  <script src="/welcome-intro.js" defer></script>
   <script src="/city-news.js" defer></script>
   <script src="/city-of-the-day.js" defer></script>
   <script src="/city-of-day-photos.js" defer></script>

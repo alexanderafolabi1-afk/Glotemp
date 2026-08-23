@@ -33,15 +33,6 @@ function buildTripLine(city, reading) {
 // ----- i18n Setup -----
 const translations = {
   en: {
-    // These four must stay in step with the banner markup in index.html.
-    // The i18n pass overwrites element text at runtime, so leaving the old
-    // short strings here would silently replace the elevated copy.
-    install_eyebrow: "A private companion",
-    install_title: "Keep the world's pulse close.",
-    install_body: "Add Glotemp to your home screen. A quiet instrument that tells you how a city truly feels, before you arrive, while you are there, and long after you leave.",
-    install_btn: "Place among your essentials",
-    install_later: "Not now",
-    dismiss: "✕",
     mood: "Mood",
     trip_engine_title: "Trip Engine",
     trip_question: "Should you travel to {city} this weekend?",
@@ -174,9 +165,6 @@ const translations = {
     fastest_loading: "Loading trending cities..."
   },
   es: {
-    install_title: "Añadir Glotemp a inicio",
-    install_btn: "Instalar",
-    dismiss: "✕",
     mood: "Ánimo",
     trip_engine_title: "Motor de Viaje",
     trip_question: "¿Deberías viajar a {city} este fin de semana?",
@@ -284,9 +272,6 @@ const translations = {
     fastest_loading: "Cargando ciudades en tendencia..."
   },
   fr: {
-    install_title: "Ajouter Glotemp à l'écran d'accueil",
-    install_btn: "Installer",
-    dismiss: "✕",
     mood: "Humeur",
     trip_engine_title: "Moteur de Voyage",
     trip_question: "Devriez-vous voyager à {city} ce week-end ?",
@@ -394,9 +379,6 @@ const translations = {
     fastest_loading: "Chargement des villes en tendance..."
   },
   de: {
-    install_title: "Glotemp zum Startbildschirm hinzufügen",
-    install_btn: "Installieren",
-    dismiss: "✕",
     mood: "Stimmung",
     trip_engine_title: "Reise-Engine",
     trip_question: "Sollten Sie dieses Wochenende nach {city} reisen?",
@@ -504,9 +486,6 @@ const translations = {
     fastest_loading: "Lade Trend-Städte..."
   },
   pt: {
-    install_title: "Adicionar Glotemp à tela inicial",
-    install_btn: "Instalar",
-    dismiss: "✕",
     mood: "Humor",
     trip_engine_title: "Motor de Viagem",
     trip_question: "Você deveria viajar para {city} neste fim de semana?",
@@ -614,9 +593,6 @@ const translations = {
     fastest_loading: "Carregando cidades em tendência..."
   },
   ja: {
-    install_title: "Glotempをホーム画面に追加",
-    install_btn: "インストール",
-    dismiss: "✕",
     mood: "ムード",
     trip_engine_title: "トリップエンジン",
     trip_question: "今週末{city}へ旅行すべきですか？",
@@ -1969,48 +1945,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Install prompt
+  // Install prompt. The banner this used to show/hide directly
+  // (#install-banner) is gone -- welcome-intro.js now owns that surface
+  // as the third step of the first-visit intro, and reuses install-btn's
+  // id so the click handler below still finds and drives it without
+  // either file needing to know about the other's markup.
   let deferredPrompt;
-  // Both this and the cookie strip are fixed to the bottom edge, and the
-  // cookie strip sits at a higher z-index, so showing them together buries
-  // this one. It waits its turn instead.
-  function showInstallBanner() {
-    const banner = document.getElementById('install-banner');
-    if (!banner) return;
-    if (document.getElementById('cookie-consent-banner')) {
-      window.addEventListener('glotemp:consent-dismissed', showInstallBanner, { once: true });
-      return;
-    }
-    banner.style.display = 'block';
-  }
-
+  // Read-only accessor + event so welcome-intro.js can tell, without
+  // duplicating this listener, whether the real install action is
+  // actually available -- it uses this to decide between showing
+  // install-btn and a manual-instructions fallback on step 3.
+  window.GlotempInstall = { isAvailable: () => !!deferredPrompt };
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    showInstallBanner();
+    window.dispatchEvent(new CustomEvent('glotemp:install-available'));
   });
-  // Guarded: cities/ and verticals/ load this file but carry no banner.
+  // Guarded: cities/ and verticals/ load this file but carry no install button.
   const installBtn = document.getElementById('install-btn');
   if (installBtn) installBtn.addEventListener('click', async () => {
     if (deferredPrompt) {
       // Announced rather than measured here, so glotemp-analytics.js owns
-      // every event and this file keeps owning the banner.
+      // every event and this file keeps owning the prompt itself.
+      // welcome-intro.js listens for the outcome event to close its own
+      // overlay -- deliberately not done here, so this file never has to
+      // reach into that module's markup.
       window.dispatchEvent(new CustomEvent('glotemp:install-prompt-shown'));
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       window.dispatchEvent(new CustomEvent('glotemp:install-prompt-outcome', { detail: { outcome } }));
       deferredPrompt = null;
-      document.getElementById('install-banner').style.display = 'none';
     }
-  });
-  // Two ways out of the banner: the corner cross and the "Not now" button.
-  // Both close it, so neither is a control that appears to do nothing.
-  ['dismiss-install', 'install-later'].forEach((id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener('click', () => {
-      document.getElementById('install-banner').style.display = 'none';
-    });
   });
 
 });
