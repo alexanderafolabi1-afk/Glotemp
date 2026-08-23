@@ -375,6 +375,7 @@
   <script src="/city-vertical-signature.js" defer></script>
   <script src="/city-tier.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
+  <script src="/city-campus.js" defer></script>
   <script src="/city-radio-curated.js" defer></script>
   <script src="/city-radio.js" defer></script>
   <script src="/city-venues.js" defer></script>
@@ -517,6 +518,14 @@
       }
       if (typeof GlotempWorldBank !== 'undefined') {
         contextLoaders.push(...verticalSlugs.map(v => GlotempWorldBank.loadVerticalIndicator('PK', v, 'Pakistan')));
+      }
+      // Real universities near this city (Wikidata, see city-campus.js).
+      // Only Education has one of these; it appends into the same
+      // #education-context mount World Bank's literacy fact uses above,
+      // so both real sources sit together rather than competing for a
+      // second element.
+      if (typeof GlotempCampus !== 'undefined') {
+        contextLoaders.push(GlotempCampus.loadCampuses('lahore'));
       }
       await Promise.all(contextLoaders);
       if (typeof GlotempWiki !== 'undefined') {
