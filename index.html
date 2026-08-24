@@ -15,6 +15,39 @@
   <meta name="twitter:description" content="Glotemp - the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
   <link rel="canonical" href="https://glo-temp.com/" />
   <link rel="manifest" href="/manifest.json" />
+
+  <!-- Structured data: Organization + WebSite with a SearchAction, so
+       search engines can render a real search box in results and
+       correctly attribute the site as a named entity. Static, at build
+       time -- not client-rendered, since crawlers that don't execute JS
+       (Bing among them) would otherwise never see it. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Glotemp",
+    "url": "https://glo-temp.com/",
+    "logo": "https://glo-temp.com/assets/logo.png",
+    "sameAs": []
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Glotemp",
+    "url": "https://glo-temp.com/",
+    "description": "Live city pulse and real data across 300 cities — mood, tech, finance, work, property, education, sport, entertainment, fashion, food, health and transport, checked in by real people.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://glo-temp.com/cities/{search_term_string}.html"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
@@ -84,7 +117,38 @@
 <script src="/nav-component.js"></script>
 <script src="/footer-social.js" defer></script>
 
-    
+    <!-- ============================================================
+         HOMEPAGE SECTION ORDER -- deliberately restructured so a
+         first-time visitor reaches concrete proof of what Glotemp
+         offers within the first few sections, before any ask to
+         participate. Order:
+
+         1. Hero            -- the hook (headline + search)
+         2. Elsewhere       -- "show don't tell": one of 300 real
+                                cities, alive right now (clock, sky,
+                                radio, press, photo, all live)
+         3. Instrument Room -- the breadth proof: five cities' real
+                                mood readings, visually, at once
+         4. Social proof    -- two honest real numbers, reinforcing
+                                the scale claim right after showing it
+         5. Trip Engine     -- the concrete utility hook ("should I
+                                go", with real booking actions)
+         6. Daily Pulse     -- one city, held up as a single example
+         7. Spin + Spotlight -- exploratory tools, once value is clear
+         8. Pulse map       -- the full 300-city scale, visually
+         9. City reading    -- the primary "add your voice" CTA
+         10. Daily check-in -- the secondary, ritual CTA
+         11. Trending        -- the platform visibly moving
+         12. Observations    -- other people's real voices
+         13. Home Frequency  -- a returning-visitor feature (needs a
+                                 kept city already), placed last since
+                                 it has nothing to offer a first visit
+         14. Footer
+
+         Every section below keeps its original id/classes/attributes
+         untouched -- every script that mounts into one still finds it
+         by id regardless of where it now sits in the page. -->
+
     <!-- Hero instrument: instrument-base.png (uploaded artwork, never
          modified) plus a live SVG layer over its aperture, driven by
          whichever city is pinned. See glotemp-hero-instrument.js. -->
@@ -127,36 +191,15 @@
       <button type="button" class="hero-sound-toggle" id="hero-sound-toggle" aria-pressed="false" aria-label="Turn on instrument sound" title="Instrument sound: off">&#128263;</button>
     </section>
 
-    <!-- Spin: most prominent interactive element on the page -->
-    <!-- Second section, under the hero: the counterweight to the traveller
-         framing above. Populated by glotemp-elsewhere.js. -->
+    <!-- "Somewhere else is awake" -- show, don't tell. One of 300 real
+         cities, live: its own clock, sky, radio, press and photo, no
+         claim spoken aloud. See glotemp-elsewhere.js. -->
     <section class="elsewhere-section" id="elsewhere-root" aria-label="A city you keep"></section>
 
-    <!-- Social proof: two honestly-scoped real numbers plus a few of the
-         strongest readings already present in the data -- see
-         social-proof.js. Hidden until real data actually resolves. -->
-    <section class="glass-card social-proof-section" id="social-proof-mount" aria-label="Real activity across Glotemp" hidden></section>
-
-    <!-- Spin instrument beside City Spotlight -- two separate panels, two
-         separate scripts (glotemp-spin.js, city-spotlight.js). Neither
-         reads the other's state. Stacks to one column below 800px. -->
-    <div class="homepage-duo">
-      <section id="spin-section" class="glass-card spin-section"></section>
-      <section id="city-spotlight-section" class="glass-card city-spotlight-section" aria-label="City spotlight"></section>
-    </div>
-
-    <!-- Daily check-in ritual. Populated by glotemp-daily-checkin.js. -->
-    <section class="daily-checkin-section" aria-label="Daily check-in">
-      <div id="daily-checkin-root"></div>
-    </section>
-
-    <!-- Home Frequency: a private daily letter from one kept city.
-         Populated by glotemp-home-frequency.js. -->
-    <section class="hf-section" aria-label="Home Frequency">
-      <div id="home-frequency-root"></div>
-    </section>
-
-    <!-- Hero City Pulse -->
+    <!-- Instrument Room: moved up from deep in the page to right after
+         the two hook sections above, since this is where the breadth of
+         what Glotemp actually tracks becomes visible at a glance --
+         five real cities' live mood readings, side by side. -->
     <section class="hero-section">
       <div class="section-heading">
         <div>
@@ -252,8 +295,16 @@
       </div>
     </section>
 
+    <!-- Social proof: two honestly-scoped real numbers plus a few of the
+         strongest readings already present in the data -- see
+         social-proof.js. Hidden until real data actually resolves.
+         Placed right after Instrument Room so the scale claim just
+         shown visually is immediately backed by real figures. -->
+    <section class="glass-card social-proof-section" id="social-proof-mount" aria-label="Real activity across Glotemp" hidden></section>
+
     <!-- Trip Engine: verdict line plus the three real action links (room,
-         flight, table). -->
+         flight, table). Moved up: this is the single most concrete
+         "what's in it for me right now" hook on the page. -->
     <section class="glass-card trip-slot">
       <p class="eyebrow" data-i18n="trip_engine_title">Should you go</p>
       <div class="trip-body">
@@ -299,7 +350,41 @@
       </div>
     </section>
 
-    <!-- City reading -->
+    <!-- Spin instrument beside City Spotlight -- two separate panels, two
+         separate scripts (glotemp-spin.js, city-spotlight.js). Neither
+         reads the other's state. Stacks to one column below 800px.
+         Exploratory tools -- placed after the value/utility sections
+         above rather than before them. -->
+    <div class="homepage-duo">
+      <section id="spin-section" class="glass-card spin-section"></section>
+      <section id="city-spotlight-section" class="glass-card city-spotlight-section" aria-label="City spotlight"></section>
+    </div>
+
+    <!-- Pulse Map: every city as a quiet node on a stylized world map,
+         brightness by real mood, a soft pulse on real mood shifts. A
+         separate, additional section -- does not read from or write to
+         Instrument Room, and does not replace it. See pulse-map.js.
+         Moved up: this is the clearest single visual for "300 real
+         cities", worth reaching before the participation asks below. -->
+    <section id="pulse-map-section" class="glass-card" aria-label="World pulse map">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">300 cities, at a glance</p>
+          <h2>The pulse map</h2>
+        </div>
+        <p class="section-copy">Every city, positioned by its real coordinates. Brighter means warmer right now. A soft pulse marks a city whose mood just shifted.</p>
+      </div>
+      <div class="pulse-map-search-row">
+        <input type="text" id="pulse-map-search" class="pulse-map-search" placeholder="Find a city on the map" autocomplete="off" aria-label="Find a city on the pulse map">
+      </div>
+      <div class="pulse-map-frame" id="pulse-map-frame" role="group" aria-label="World map of city mood readings"></div>
+    </section>
+
+    <!-- City reading: the primary "add your voice" call to action. Kept
+         together with Daily check-in immediately below it, right after
+         the value sections above rather than scattered among them, so a
+         visitor who is ready to participate finds one clear place to do
+         it instead of several separate half-asks. -->
     <section class="check-in glass-card checkin-hero-section">
       <div class="section-heading">
         <div>
@@ -352,6 +437,11 @@
           <p id="observation-feedback" class="inline-feedback" aria-live="polite"></p>
         </div>
       </form>
+    </section>
+
+    <!-- Daily check-in ritual. Populated by glotemp-daily-checkin.js. -->
+    <section class="daily-checkin-section" aria-label="Daily check-in">
+      <div id="daily-checkin-root"></div>
     </section>
 
     <section id="fastest-moods" class="glass-card">
@@ -420,24 +510,6 @@
       <p class="fastest-source">Every city in the register passes through here.</p>
     </section>
 
-    <!-- Pulse Map: every city as a quiet node on a stylized world map,
-         brightness by real mood, a soft pulse on real mood shifts. A
-         separate, additional section -- does not read from or write to
-         Instrument Room, and does not replace it. See pulse-map.js. -->
-    <section id="pulse-map-section" class="glass-card" aria-label="World pulse map">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">300 cities, at a glance</p>
-          <h2>The pulse map</h2>
-        </div>
-        <p class="section-copy">Every city, positioned by its real coordinates. Brighter means warmer right now. A soft pulse marks a city whose mood just shifted.</p>
-      </div>
-      <div class="pulse-map-search-row">
-        <input type="text" id="pulse-map-search" class="pulse-map-search" placeholder="Find a city on the map" autocomplete="off" aria-label="Find a city on the pulse map">
-      </div>
-      <div class="pulse-map-frame" id="pulse-map-frame" role="group" aria-label="World map of city mood readings"></div>
-    </section>
-
     <!-- Live observations: one rotating snippet, not a wall of cards. -->
     <section id="observations-section" class="glass-card">
       <p class="eyebrow" data-i18n="obs_eyebrow">Live observations</p>
@@ -451,6 +523,15 @@
         <p class="add-voice-copy" data-i18n="add_voice_copy">Want to add your own read on a city?</p>
         <button type="button" class="btn-neon" id="add-voice-btn" data-i18n="add_voice_btn">Add your voice ↑</button>
       </div>
+    </section>
+
+    <!-- Home Frequency: a private daily letter from one kept city.
+         Populated by glotemp-home-frequency.js. Placed last: this
+         feature only means anything once a visitor already keeps a
+         city, so it has nothing to offer a first-time visitor and would
+         only read as confusing higher up the page. -->
+    <section class="hf-section" aria-label="Home Frequency">
+      <div id="home-frequency-root"></div>
     </section>
 
     <footer class="footer glass">
