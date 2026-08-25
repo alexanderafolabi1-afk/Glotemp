@@ -134,10 +134,12 @@ function generateCityPage(city) {
   const desc = `Live profile of ${city.name} across all 12 dimensions. Real-time data on mood, opportunities, economy, and city vitality.`;
   const ogDesc = `Explore what ${city.name} is like right now across all 12 dimensions.`;
   const canonical = `https://glo-temp.com/cities/${city.slug}`;
-  // Per-city share card (see generate-city-share-cards.js) -- an SVG stat
-  // card carrying this city's own name and live mood/band, instead of the
-  // one generic logo every city page used to share alike.
-  const ogImage = `https://glo-temp.com/og/${city.slug}.svg`;
+  // Per-city share card (see generate-city-share-cards.js +
+  // rasterize-share-cards.js) -- a PNG stat card carrying this city's own
+  // name and live mood/band, instead of the one generic logo every city
+  // page used to share alike. PNG, not SVG: X/Twitter's card crawler
+  // does not render SVG for og:image / twitter:image.
+  const ogImage = `https://glo-temp.com/og/${city.slug}.png`;
 
   // schema.org City, not TouristAttraction -- this page covers Tech,
   // Finance, Work and nine other verticals, not just visiting. Only
