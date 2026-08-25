@@ -5679,6 +5679,55 @@ a:hover .city-landmark-photo,
   opacity: 0.8;
 }
 
+/* Pulse Gravity: onward links to cities with a similar mood right now
+   (see glotemp-pulse-gravity.js). Same restrained card language as
+   social-proof, an accent stripe per item carrying that city's own band
+   color rather than a shared brand color. */
+.pulse-gravity-section {
+  text-align: left;
+}
+
+.pulse-gravity-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.pulse-gravity-item {
+  display: block;
+  padding: 0.75rem 0.9rem 0.75rem 0.9rem;
+  border-top: 2px solid var(--pg-color, var(--brass));
+  background: var(--basalt-raised);
+  border-radius: 8px;
+  text-decoration: none;
+  transition: transform var(--transition), background var(--transition);
+}
+
+.pulse-gravity-item:hover,
+.pulse-gravity-item:focus-visible {
+  transform: translateY(-2px);
+  background: var(--basalt);
+}
+
+.pulse-gravity-name {
+  display: block;
+  color: var(--ivory);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: var(--fw-semibold);
+}
+
+.pulse-gravity-meta {
+  display: block;
+  color: var(--sand);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  margin-top: 0.3rem;
+  opacity: 0.8;
+}
+
 /* Follow confirmation toast -- modeled on .push-prompt's fixed, bottom
    card, but its own quieter/simpler element: a short-lived acknowledgment
    with no action buttons, not a permission ask. */
