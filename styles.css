@@ -1502,6 +1502,24 @@ body.scroll-reveals-enabled section.revealed {
   color: var(--ivory);
 }
 
+.nav-account-link {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  color: var(--sand);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: background var(--transition), color var(--transition);
+  box-sizing: border-box;
+}
+.nav-account-link:hover,
+.nav-account-link:focus-visible {
+  background: rgba(176, 141, 87, 0.16);
+  color: var(--ivory);
+}
+
 /* Mobile panel: full-width like the language switch, sitting under the
    stacked nav links rather than floating a dropdown over a full-screen
    panel. */
@@ -10177,3 +10195,174 @@ a:active:not(.btn-neon):not(.nav-logo):not([class*="chip"]) {
   .gt-react-label { font-size: 0.545rem; letter-spacing: 0.03em; }
   .gt-reactions { gap: 0.2rem 0.4rem; }
 }
+
+/* Offers Panel (see glotemp-offers.js): "Tonight in [City]", on a city's
+   own page (every vertical) and on the vertical page it belongs to. By
+   design, this is text, not UI chrome -- no cards, no boxes, no images,
+   no price slashes, no percentages shouted. A brass hairline between
+   entries is the only division; .offers-action buttons render as plain
+   mono text links, never boxed buttons. Renders nothing (section stays
+   [hidden]) when a city has no active offers -- no empty state, no gap. */
+.offers-heading {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  color: var(--sand);
+  margin: 0 0 1.1rem;
+}
+
+.offers-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.offers-line {
+  padding: 1rem 0;
+}
+.offers-line + .offers-line {
+  border-top: 1px solid var(--hairline);
+}
+.offers-list-rest:not([hidden]) .offers-line:first-child {
+  border-top: 1px solid var(--hairline);
+}
+
+.offers-business {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: var(--fw-semibold);
+  color: var(--ivory);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.offers-detail {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--sand);
+  margin: 0.25rem 0 0;
+  line-height: 1.5;
+}
+
+.offers-line-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.1rem;
+  margin-top: 0.6rem;
+}
+
+.offers-action {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--brass);
+  cursor: pointer;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+}
+.offers-action:hover,
+.offers-action:focus-visible {
+  text-decoration: underline;
+}
+.offers-action:disabled {
+  color: var(--sand);
+  cursor: default;
+  text-decoration: none;
+  opacity: 0.75;
+}
+
+.offers-reveal-panel,
+.offers-terms-panel {
+  margin-top: 0.7rem;
+  max-width: 56ch;
+}
+
+.offers-code {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  color: var(--brass);
+  margin: 0;
+}
+
+.offers-code-instruction {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--sand);
+  margin: 0.3rem 0 0;
+  line-height: 1.5;
+}
+
+.offers-more-detail {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--sand);
+  margin: 0 0 0.5rem;
+  line-height: 1.5;
+}
+
+.offers-terms-text {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--sand);
+  opacity: 0.9;
+  margin: 0;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.offers-more-btn {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0.9rem 0 0;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  color: var(--brass);
+  cursor: pointer;
+  min-height: 32px;
+}
+.offers-more-btn:hover,
+.offers-more-btn:focus-visible {
+  text-decoration: underline;
+}
+
+.offers-partner-line {
+  margin: 1.3rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.03em;
+  color: var(--sand);
+  opacity: 0.85;
+}
+.offers-partner-line a {
+  color: inherit;
+  text-decoration: none;
+}
+.offers-partner-line a:hover,
+.offers-partner-line a:focus-visible {
+  text-decoration: underline;
+}
+
+/* /redeem -- the partner code-check page (see glotemp-offer-redeem.js). */
+.redeem-result {
+  margin-top: 1.2rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+}
+.redeem-result.is-valid { color: #6FCF97; }
+.redeem-result.is-used { color: var(--sand); }
+.redeem-result.is-invalid { color: #E07856; }

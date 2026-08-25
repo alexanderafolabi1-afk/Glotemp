@@ -103,6 +103,11 @@
       <ul class="live-blog-list" id="live-blog-list"></ul>
     </section>
 
+    <!-- Offers Panel: "Tonight in [City]", every vertical. See
+         glotemp-offers.js. Renders nothing at all when this city has no
+         active offers -- no empty state, no gap. -->
+    <section class="glass-card offers-panel" id="offers-panel" aria-label="Tonight in this city" hidden></section>
+
     <section class="glass-card city-affiliate-row">
       <p class="eyebrow">Plan your visit</p>
       <div class="affiliate-links" id="city-affiliate-links"></div>
@@ -393,6 +398,7 @@
   <script src="/glotemp-vertical-style.js" defer></script>
   <script src="/glotemp-live-blog-data.js" defer></script>
   <script src="/glotemp-live-blog-city.js" defer></script>
+  <script src="/glotemp-offers.js" defer></script>
   <script src="/city-tier.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
   <script src="/city-campus.js" defer></script>
