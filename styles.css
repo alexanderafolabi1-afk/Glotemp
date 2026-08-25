@@ -2027,6 +2027,42 @@ summary:focus:not(:focus-visible) {
 .tier-plate-num { font-size: 0.85em; color: var(--sand); }
 .tier-plate-num::before { content: '\2116'; margin-right: 0.06em; }
 
+/* City flavor badge (see glotemp-city-flavor.js): a quiet pill for the
+   short, curated list of cities with a famous legal claim to fame --
+   sized and spaced to match .city-tier-badge next to it, a plain hairline
+   pill rather than the tier badge's engraved plate so the two read as
+   related but distinct. The joke lives in the title tooltip, not the
+   pill itself -- nothing here shouts. */
+.city-flavor-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  padding: 0.22rem 0.7rem 0.22rem 0.55rem;
+  margin: 0 0 0.6rem 0.5rem;
+  color: var(--sand);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  white-space: nowrap;
+  cursor: default;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.city-flavor-badge svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+}
+
+.city-flavor-badge:hover,
+.city-flavor-badge:focus-visible {
+  color: var(--brass);
+  border-color: var(--brass-dim);
+}
+
 .city-tier-badge-verified { color: var(--brass); }
 .city-tier-badge-verified .tier-plate-outline { stroke: var(--brass-dim); }
 .city-tier-badge-anchor { color: var(--ivory); }
