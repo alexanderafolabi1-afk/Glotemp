@@ -141,6 +141,15 @@
       <div class="city-sell-shelf" id="city-sell-shelf" role="list"></div>
     </section>
 
+    <!-- Live Blog, homepage edition: one cinematic dispatch, a different
+         random city every few seconds. See glotemp-live-blog-home.js and
+         glotemp-live-blog-data.js (the shared dispatch source, also used
+         by each city's own Live Blog). Hidden until populated. -->
+    <section class="glass-card live-blog-home-section" id="live-blog-home-section" aria-label="Live from the network" hidden>
+      <p class="eyebrow">Somewhere else, right now</p>
+      <div class="live-blog-home-card" id="live-blog-home-card" role="status" aria-live="polite"></div>
+    </section>
+
     <!-- Spin: most prominent interactive element on the page -->
     <!-- Second section, under the hero: the counterweight to the traveller
          framing above. Populated by glotemp-elsewhere.js. -->
@@ -503,7 +512,10 @@
   <script src="/glotemp-hero-instrument.js" defer></script>
   <script src="/city-vertical-signature.js" defer></script>
   <script src="/city-food-signature.js" defer></script>
+  <script src="/glotemp-vertical-style.js" defer></script>
   <script src="/glotemp-city-sell.js" defer></script>
+  <script src="/glotemp-live-blog-data.js" defer></script>
+  <script src="/glotemp-live-blog-home.js" defer></script>
   <script src="/eclipse-2026.js" defer></script>
   <script src="/city-tiles.js" defer></script>
   <script src="/city-radio-curated.js" defer></script>

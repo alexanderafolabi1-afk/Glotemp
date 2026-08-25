@@ -93,6 +93,16 @@
       <div id="city-observation-feed" class="vertical-content"></div>
     </section>
 
+    <!-- Live Blog: a vertical journal of real dispatches about this city
+         only, built from data the page already trusts elsewhere. See
+         glotemp-live-blog-city.js and glotemp-live-blog-data.js. Hidden
+         until populated. -->
+    <section class="glass-card live-blog-section" id="live-blog" aria-label="This city's live blog" hidden>
+      <p class="eyebrow">The living log</p>
+      <h2 id="live-blog-heading">&nbsp;</h2>
+      <ul class="live-blog-list" id="live-blog-list"></ul>
+    </section>
+
     <section class="glass-card city-affiliate-row">
       <p class="eyebrow">Plan your visit</p>
       <div class="affiliate-links" id="city-affiliate-links"></div>
@@ -380,6 +390,9 @@
   <script src="/social-proof.js" defer></script>
   <script src="/city-food-signature.js" defer></script>
   <script src="/city-vertical-signature.js" defer></script>
+  <script src="/glotemp-vertical-style.js" defer></script>
+  <script src="/glotemp-live-blog-data.js" defer></script>
+  <script src="/glotemp-live-blog-city.js" defer></script>
   <script src="/city-tier.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
   <script src="/city-campus.js" defer></script>
