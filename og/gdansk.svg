@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0F0C08"/>
+  <rect x="0" y="0" width="14" height="630" fill="#F5A25A"/>
+  <circle cx="1050" cy="150" r="220" fill="#F5A25A" opacity="0.10"/>
+  <text x="90" y="150" font-family="Georgia, 'Times New Roman', serif" font-size="30" letter-spacing="6" fill="#F5A25A">GLOTEMP</text>
+  <text x="90" y="330" font-family="Georgia, 'Times New Roman', serif" font-size="108" font-weight="600" fill="#F5EFE3">Gdańsk</text>
+  <text x="90" y="390" font-family="'Courier New', monospace" font-size="34" letter-spacing="2" fill="#C9B79C">Poland</text>
+  <text x="90" y="500" font-family="'Courier New', monospace" font-size="64" font-weight="700" fill="#F5A25A">7.3<tspan font-size="28" fill="#C9B79C"> / 10</tspan></text>
+  <text x="90" y="540" font-family="'Courier New', monospace" font-size="24" letter-spacing="4" fill="#C9B79C">WARM &#183; RIGHT NOW</text>
+  <text x="90" y="590" font-family="'Courier New', monospace" font-size="22" fill="#7A6E5C">glo-temp.com</text>
+</svg>

@@ -10,7 +10,11 @@
   <meta property="og:description" content="Explore what Denver is like right now across all 12 dimensions.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://glo-temp.com/cities/denver">
-  <meta property="og:image" content="https://glo-temp.com/assets/logo.png">
+  <meta property="og:image" content="https://glo-temp.com/og/denver.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Denver | Glotemp">
+  <meta name="twitter:description" content="Explore what Denver is like right now across all 12 dimensions.">
+  <meta name="twitter:image" content="https://glo-temp.com/og/denver.png">
   <meta name="theme-color" content="#06060A">
 
   <!-- Structured data, populated at build time below (in generate-city-pages.js) --
@@ -29,6 +33,9 @@
   <nav id="site-nav"></nav>
 <script src="/nav-component.js"></script>
 <script src="/footer-social.js" defer></script>
+<script src="/glotemp-pulse-gravity.js" defer></script>
+<script src="/city-flavor-data.js" defer></script>
+<script src="/glotemp-city-flavor.js" defer></script>
 
   <main class="page-content">
     <section class="city-header glass-card">
@@ -85,6 +92,21 @@
       <p class="vertical-description">How this city feels right now.</p>
       <div id="city-observation-feed" class="vertical-content"></div>
     </section>
+
+    <!-- Live Blog: a vertical journal of real dispatches about this city
+         only, built from data the page already trusts elsewhere. See
+         glotemp-live-blog-city.js and glotemp-live-blog-data.js. Hidden
+         until populated. -->
+    <section class="glass-card live-blog-section" id="live-blog" aria-label="This city's live blog" hidden>
+      <p class="eyebrow">The living log</p>
+      <h2 id="live-blog-heading">&nbsp;</h2>
+      <ul class="live-blog-list" id="live-blog-list"></ul>
+    </section>
+
+    <!-- Offers Panel: "Tonight in [City]", every vertical. See
+         glotemp-offers.js. Renders nothing at all when this city has no
+         active offers -- no empty state, no gap. -->
+    <section class="glass-card offers-panel" id="offers-panel" aria-label="Tonight in this city" hidden></section>
 
     <section class="glass-card city-affiliate-row">
       <p class="eyebrow">Plan your visit</p>
@@ -373,6 +395,10 @@
   <script src="/social-proof.js" defer></script>
   <script src="/city-food-signature.js" defer></script>
   <script src="/city-vertical-signature.js" defer></script>
+  <script src="/glotemp-vertical-style.js" defer></script>
+  <script src="/glotemp-live-blog-data.js" defer></script>
+  <script src="/glotemp-live-blog-city.js" defer></script>
+  <script src="/glotemp-offers.js" defer></script>
   <script src="/city-tier.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
   <script src="/city-campus.js" defer></script>

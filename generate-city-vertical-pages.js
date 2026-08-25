@@ -91,6 +91,11 @@ function pageHTML(city, v) {
       ${LISTINGS_VERTICALS.has(v.slug) ? `<div class="vertical-listings" data-city="${city.slug}" data-vertical="${v.slug}"></div>` : ''}
     </section>
 
+    <!-- Offers Panel: "Tonight in [City]", filtered to this vertical. See
+         glotemp-offers.js. Renders nothing at all when there are no
+         active offers for this vertical here -- no empty state, no gap. -->
+    <section class="glass-card offers-panel" id="offers-panel" aria-label="Tonight in this city" hidden></section>
+
     <section class="glass-card" style="padding:2rem; text-align:center;">
       <div class="secondary-links-row">
         <a href="/cities/${city.slug}.html" class="secondary-link">🏙️ Full ${city.name} profile</a>
@@ -115,6 +120,8 @@ function pageHTML(city, v) {
 
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
+  <script src="/glotemp-auth.js"></script>
+  <script src="/glotemp-offers.js" defer></script>
   <script src="/city-wiki.js" defer></script>
   <script src="/city-food-signature.js" defer></script>
   <script src="/city-worldbank.js" defer></script>

@@ -10,9 +10,11 @@
   <meta property="og:description" content="Glotemp - the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/" />
+  <meta property="og:image" content="https://glo-temp.com/og/home.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Glotemp – Live City Pulse" />
   <meta name="twitter:description" content="Glotemp - the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
+  <meta name="twitter:image" content="https://glo-temp.com/og/home.png" />
   <link rel="canonical" href="https://glo-temp.com/" />
   <link rel="manifest" href="/manifest.json" />
 
@@ -191,10 +193,38 @@
       <button type="button" class="hero-sound-toggle" id="hero-sound-toggle" aria-pressed="false" aria-label="Turn on instrument sound" title="Instrument sound: off">&#128263;</button>
     </section>
 
+    <!-- City sell: the second thing a first-time visitor sees, right
+         after the hero -- a personalized hook (guesses roughly where
+         they are with zero permission prompt, via browser timezone, not
+         GPS -- see glotemp-city-sell.js) making the case for that city
+         across every vertical the site tracks, using only facts the
+         site already has elsewhere. Hidden until populated. Placed
+         first among the "show, don't tell" sections below since it's
+         the only one addressed to this specific visitor rather than a
+         generic "some city, somewhere" case. -->
+    <section class="glass-card city-sell-section" id="city-sell-section" aria-label="Why this city" hidden>
+      <p class="eyebrow" id="city-sell-eyebrow">Right now, near you</p>
+      <h2 id="city-sell-headline">&nbsp;</h2>
+      <p class="city-sell-subhead" id="city-sell-subhead"></p>
+      <div class="city-sell-shelf" id="city-sell-shelf" role="list"></div>
+    </section>
+
     <!-- "Somewhere else is awake" -- show, don't tell. One of 300 real
          cities, live: its own clock, sky, radio, press and photo, no
          claim spoken aloud. See glotemp-elsewhere.js. -->
     <section class="elsewhere-section" id="elsewhere-root" aria-label="A city you keep"></section>
+
+    <!-- Live Blog, homepage edition: one cinematic dispatch, a different
+         random city every few seconds. See glotemp-live-blog-home.js and
+         glotemp-live-blog-data.js (the shared dispatch source, also used
+         by each city's own Live Blog). Hidden until populated. Placed
+         right after Elsewhere: both are the same "watch one real city,
+         live" mechanism, so they read as one beat rather than two
+         competing ones. -->
+    <section class="glass-card live-blog-home-section" id="live-blog-home-section" aria-label="Live from the network" hidden>
+      <p class="eyebrow">Somewhere else, right now</p>
+      <div class="live-blog-home-card" id="live-blog-home-card" role="status" aria-live="polite"></div>
+    </section>
 
     <!-- Instrument Room: moved up from deep in the page to right after
          the two hook sections above, since this is where the breadth of
@@ -539,6 +569,12 @@
   <script src="/glotemp-spin.js" defer></script>
   <script src="/city-spotlight.js" defer></script>
   <script src="/glotemp-hero-instrument.js" defer></script>
+  <script src="/city-vertical-signature.js" defer></script>
+  <script src="/city-food-signature.js" defer></script>
+  <script src="/glotemp-vertical-style.js" defer></script>
+  <script src="/glotemp-city-sell.js" defer></script>
+  <script src="/glotemp-live-blog-data.js" defer></script>
+  <script src="/glotemp-live-blog-home.js" defer></script>
   <script src="/eclipse-2026.js" defer></script>
   <script src="/city-tiles.js" defer></script>
   <script src="/city-radio-curated.js" defer></script>
