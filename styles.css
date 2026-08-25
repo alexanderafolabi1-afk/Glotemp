@@ -6535,6 +6535,59 @@ a:hover .city-landmark-photo,
   margin-bottom: 0.75rem;
 }
 
+/* The real reading, shown right where the composer asks a visitor to add
+   their own -- same restrained mono/brass register as the rest of the
+   instrument readouts on this site, never a loud banner. */
+.checkin-current-reading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  color: var(--sand);
+  margin-bottom: 0.6rem;
+}
+.checkin-reading-label {
+  color: var(--sand);
+  opacity: 0.75;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.74rem;
+}
+.checkin-reading-band {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.checkin-reading-score {
+  color: var(--sand);
+  opacity: 0.85;
+}
+/* A small warm aside, not a second reading -- deliberately softer than
+   the real band/score beside it. */
+.checkin-reading-flourish {
+  color: var(--brass);
+  font-style: italic;
+  opacity: 0.9;
+}
+
+.checkin-trivia-line {
+  color: var(--sand);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin-bottom: 1.1rem;
+  max-width: 60ch;
+}
+.checkin-trivia-eyebrow {
+  display: block;
+  color: var(--brass);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  margin-bottom: 0.25rem;
+}
+
 /* The rewards teaser -- a single quiet line, never a banner. Structured
    as its own class so a real backend (vouchers, raffle entries, partner
    codes) can hook in later without touching the surrounding markup. */
