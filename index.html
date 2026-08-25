@@ -384,59 +384,30 @@
          together with Daily check-in immediately below it, right after
          the value sections above rather than scattered among them, so a
          visitor who is ready to participate finds one clear place to do
-         it instead of several separate half-asks. -->
-    <section class="check-in glass-card checkin-hero-section">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow" data-i18n="checkin_eyebrow">City reading</p>
-          <h2 class="checkin-neon-title"><span data-i18n="checkin_title">How</span> <span class="checkin-glow" id="checkin-city-name">New York</span> feels right now</h2>
-        </div>
-        <p class="section-copy" data-i18n="checkin_intro">Pick a mood and add a note if you like.</p>
-      </div>
+         it instead of several separate half-asks.
 
+         FIXED: this section used to hold its own standalone mood-picker
+         form (observation-form / recordObservation() in app.js) that
+         never checked sign-in and never wrote to the real database --
+         it only pushed into a local, client-only array. That is a
+         second, fake contribution path sitting next to the real one
+         city pages already use. Removed entirely. #city-observation-feed
+         below is the exact mount point glotemp-checkin.js looks for; the
+         city picker (#city-tiles) still lets a visitor choose which
+         city, but the composer itself is now the same real one -- sign
+         in required, real location verification, a real Supabase write,
+         the same moderation queue -- for whichever city is selected. See
+         GlotempCheckin.mountForCity(), wired from updateCity() in
+         app.js so the composer re-mounts every time the selection
+         changes. -->
+    <section class="check-in glass-card checkin-hero-section">
       <!-- Live city browser. Purely additive: tiles set the existing hidden
            #city-select and dispatch its change event, which is what app.js
            already listens for. See city-tiles.js. -->
       <div id="city-tiles" class="city-tiles" role="group" aria-label="Choose a city to read"></div>
       <p class="city-tiles-hint">Live readings across a growing register of cities. Choose one, then add yours.</p>
 
-      <div class="mood-buttons" role="group" aria-label="How does your city feel right now?">
-        <button class="mood-btn" data-mood="🔥" data-band="charged"     data-label="Energized" title="Energized"><span class="mood-btn-icon" aria-hidden="true">🔥</span><span class="mood-btn-label">Energized</span></button>
-        <button class="mood-btn" data-mood="😊" data-band="warm"        data-label="Good"      title="Good"><span class="mood-btn-icon" aria-hidden="true">😊</span><span class="mood-btn-label">Good</span></button>
-        <button class="mood-btn" data-mood="😐" data-band="equilibrium" data-label="Neutral"   title="Neutral"><span class="mood-btn-icon" aria-hidden="true">😐</span><span class="mood-btn-label">Neutral</span></button>
-        <button class="mood-btn" data-mood="😞" data-band="restrained"  data-label="Low"       title="Low"><span class="mood-btn-icon" aria-hidden="true">😞</span><span class="mood-btn-label">Low</span></button>
-        <button class="mood-btn" data-mood="😟" data-band="low"         data-label="Cautious"  title="Cautious"><span class="mood-btn-icon" aria-hidden="true">😟</span><span class="mood-btn-label">Cautious</span></button>
-      </div>
-      <form id="observation-form" class="observation-form">
-        <div class="form-grid">
-          <label>
-            <span data-i18n="intensity_label">Intensity</span>
-            <input id="intensity-range" type="range" min="10" max="100" step="5" value="65" />
-            <strong id="intensity-value">65</strong>
-          </label>
-          <label>
-            <span data-i18n="scene_label">Where are you?</span>
-            <select id="scene-select">
-              <option value="street" data-i18n="scene_street">🚶 Out and about</option>
-              <option value="work" data-i18n="scene_work">💼 Work</option>
-              <option value="education" data-i18n="scene_school">🎓 School / campus</option>
-              <option value="food" data-i18n="scene_restaurant">🍽️ Restaurant / café</option>
-              <option value="entertainment" data-i18n="scene_concert">🎤 Concert / nightlife</option>
-              <option value="sport" data-i18n="scene_sport">🏋️ Gym / sport</option>
-              <option value="transport" data-i18n="scene_transit">🚇 Transit</option>
-              <option value="property" data-i18n="scene_home">🏠 Home</option>
-            </select>
-          </label>
-        </div>
-        <label class="full-width">
-          <span data-i18n="context_label">Optional local note</span>
-          <textarea id="context-note" rows="3" maxlength="240" data-i18n-placeholder="context_placeholder" placeholder="A small observation, event note, or mood context."></textarea>
-        </label>
-        <div class="form-actions">
-          <button id="record-observation" type="submit" class="btn-neon checkin-neon-btn" data-i18n="record_observation">Add reading</button>
-          <p id="observation-feedback" class="inline-feedback" aria-live="polite"></p>
-        </div>
-      </form>
+      <div id="city-observation-feed"></div>
     </section>
 
     <!-- Daily check-in ritual. Populated by glotemp-daily-checkin.js. -->
@@ -581,6 +552,13 @@
   <script src="/glotemp-auth.js" defer></script>
   <script src="/glotemp-reactions.js" defer></script>
   <script src="/glotemp-reporter.js" defer></script>
+  <!-- The real check-in composer -- sign-in required, real location
+       verification, real Supabase write, same moderation queue as every
+       city page. Mounted for whichever city is selected via
+       GlotempCheckin.mountForCity(), called from updateCity() in app.js.
+       See the "City reading" section above for why this replaced the
+       old standalone form. -->
+  <script src="/glotemp-checkin.js" defer></script>
   <script src="/glotemp-daily-checkin.js" defer></script>
   <script src="/glotemp-home-frequency.js" defer></script>
   <script src="/tempo-economy.js" defer></script>

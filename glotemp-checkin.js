@@ -847,8 +847,13 @@
   }
 
   // ---------- mount ----------
-  function mount() {
-    citySlug = detectCitySlug();
+  // Accepts an explicit slug so a page whose city isn't fixed by its own
+  // URL (the homepage, which lets a visitor pick among many cities) can
+  // still mount this exact composer -- same sign-in gate, same location
+  // verification, same real Supabase write and moderation queue as every
+  // city page uses. See window.GlotempCheckin.mountForCity below.
+  function mount(explicitSlug) {
+    citySlug = explicitSlug || detectCitySlug();
     if (!citySlug) return;
     const cityName = cityDisplayName();
 
@@ -906,8 +911,24 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', mount);
+    // Wrapped rather than passed directly: mount() now takes an optional
+    // explicit slug (see window.GlotempCheckin.mountForCity below), and a
+    // DOM event listener would otherwise hand it the Event object itself.
+    document.addEventListener('DOMContentLoaded', () => mount());
   } else {
     mount();
   }
+
+  // Public API: lets a page whose city isn't fixed by its own URL (the
+  // homepage, which lets a visitor choose among many cities) mount this
+  // exact composer for whichever city is currently selected -- the same
+  // sign-in gate, location verification, real Supabase write and
+  // moderation queue every city page already uses, rather than a second,
+  // separate contribution path with none of that.
+  window.GlotempCheckin = {
+    mountForCity: function (slug) {
+      if (!slug) return;
+      mount(slug);
+    },
+  };
 })();
