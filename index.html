@@ -129,6 +129,18 @@
       <button type="button" class="hero-sound-toggle" id="hero-sound-toggle" aria-pressed="false" aria-label="Turn on instrument sound" title="Instrument sound: off">&#128263;</button>
     </section>
 
+    <!-- City sell: the second thing a first-time visitor sees. Guesses
+         roughly where they are with zero permission prompt (browser
+         timezone, not GPS -- see glotemp-city-sell.js) and makes the case
+         for that city across every vertical the site tracks, using only
+         facts the site already has elsewhere. Hidden until populated. -->
+    <section class="glass-card city-sell-section" id="city-sell-section" aria-label="Why this city" hidden>
+      <p class="eyebrow" id="city-sell-eyebrow">Right now, near you</p>
+      <h2 id="city-sell-headline">&nbsp;</h2>
+      <p class="city-sell-subhead" id="city-sell-subhead"></p>
+      <div class="city-sell-shelf" id="city-sell-shelf" role="list"></div>
+    </section>
+
     <!-- Spin: most prominent interactive element on the page -->
     <!-- Second section, under the hero: the counterweight to the traveller
          framing above. Populated by glotemp-elsewhere.js. -->
@@ -489,6 +501,9 @@
   <script src="/glotemp-spin.js" defer></script>
   <script src="/city-spotlight.js" defer></script>
   <script src="/glotemp-hero-instrument.js" defer></script>
+  <script src="/city-vertical-signature.js" defer></script>
+  <script src="/city-food-signature.js" defer></script>
+  <script src="/glotemp-city-sell.js" defer></script>
   <script src="/eclipse-2026.js" defer></script>
   <script src="/city-tiles.js" defer></script>
   <script src="/city-radio-curated.js" defer></script>
