@@ -1333,56 +1333,6 @@ function renderSignalPanels() {
   if (regions) regions.innerHTML = getRegionIncentives().map(item => `<li>${item}</li>`).join('');
 }
 
-function recordObservation(event) {
-  event.preventDefault();
-  const activeMood = document.querySelector('.mood-btn.active');
-  if (!activeMood) {
-    document.getElementById('observation-feedback').textContent = t('select_mood_first');
-    return;
-  }
-  const note = document.getElementById('context-note').value.trim();
-  const selectedMood = activeMood.dataset.label;
-  // The scene picker ties a check-in to real place-in-the-world context --
-  // school, restaurant, concert -- which map straight onto Glotemp's own
-  // vertical taxonomy (education, food, entertainment...), so a check-in
-  // is never just a mood in the abstract. It replaces a hardcoded 'street'
-  // default that used to stand in for every check-in regardless of where
-  // the person actually was.
-  const sceneEl = document.getElementById('scene-select');
-  const scene = sceneEl ? sceneEl.value : 'street';
-  const citySlug = document.getElementById('city-select')?.value || 'nyc';
-  const observation = {
-    mood: selectedMood,
-    intensity: Number(document.getElementById('intensity-range').value),
-    scene,
-    lens: 'global',
-    cadence: 'midday',
-    note,
-    city: cities[citySlug]?.name || 'New York',
-    createdAt: new Date().toISOString()
-  };
-  window.dispatchEvent(new CustomEvent('glotemp:checkin', {
-    detail: { city: document.getElementById('city-select')?.value || null }
-  }));
-  observatoryState.observations.unshift(observation);
-  observatoryState.observations = observatoryState.observations.slice(0, 24);
-  saveObservatory();
-  addStars(note ? 18 : 12);
-  renderSignalPanels();
-  const feedbackEl = document.getElementById('observation-feedback');
-  feedbackEl.textContent = t('observation_saved');
-  // Fold the new reading into the rotating snippet pool and show it now,
-  // so submitting feels like it landed somewhere instead of vanishing.
-  if (typeof refreshObsSnippetPool === 'function') refreshObsSnippetPool(citySlug);
-  // Update the live observation count
-  const obsEl = document.getElementById('obs-count');
-  if (obsEl) {
-    const total = (window.SEED_OBSERVATIONS || []).length + observatoryState.observations.length;
-    obsEl.textContent = total;
-  }
-  if (observatoryState.pendingMoment) openConstellationMoment(observatoryState.pendingMoment);
-}
-
 // ----- Pulse Simulation & Canvas -----
 const canvas = document.getElementById('pulse-canvas');
 const ctx = canvas ? canvas.getContext('2d') : null;
@@ -1539,10 +1489,12 @@ function updateCity(selected) {
   if (cityNameEl) cityNameEl.textContent = city.name;
   const tripCityEl = document.getElementById('trip-city');
   if (tripCityEl) tripCityEl.textContent = city.name;
-  // The check-in composer always names the city it's recording for --
-  // never a hidden default the visitor can't see.
-  const checkinCityEl = document.getElementById('checkin-city-name');
-  if (checkinCityEl) checkinCityEl.textContent = city.name;
+  // Mount the real check-in composer (sign-in required, real location
+  // verification, real Supabase write, same moderation queue as every
+  // city page) for whichever city is now selected. See glotemp-checkin.js.
+  if (window.GlotempCheckin && GlotempCheckin.mountForCity) {
+    GlotempCheckin.mountForCity(selected);
+  }
 
   // dimensions
   const dimNames = t('dimensions');
@@ -1924,11 +1876,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderConstellationWall();
   renderSignalPanels();
   if (observatoryState.pendingMoment) setTimeout(() => openConstellationMoment(observatoryState.pendingMoment), 800);
-
-  const intensityRange = document.getElementById('intensity-range');
-  const intensityValue = document.getElementById('intensity-value');
-  intensityRange?.addEventListener('input', () => { intensityValue.textContent = intensityRange.value; });
-  document.getElementById('observation-form')?.addEventListener('submit', recordObservation);
 
   // Mood check-in buttons with pulse animation
   document.querySelectorAll('.mood-btn').forEach(btn => {
