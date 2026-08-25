@@ -270,6 +270,47 @@
       </div>`;
   }
 
+  // ---------- current reading + trivia ----------
+  // Real per-city mood value already used everywhere else on the site
+  // (band coloring, hover previews, share text) -- nothing new fetched
+  // or invented here, just finally shown on the city's own page next to
+  // the composer that asks a visitor to add to it.
+  //
+  // LANZAROTE_HIGH_MOOD_FLOURISH: a small, understated aside next to the
+  // real reading, shown only for Lanzarote, only when its real mood
+  // value is already at or above the "charged" band threshold (8.5, the
+  // same cutoff moodToBand() in glotemp-core.js uses) -- never replacing
+  // the real number, only sitting beside it. Hardcoded to this one city
+  // for now, per this round's brief. Future idea (not built tonight): a
+  // small city-slug -> flourish-word map, so any city crossing its own
+  // "genuinely high" mark gets its own aside the same way, instead of
+  // this single if-check.
+  const LANZAROTE_HIGH_MOOD_FLOURISH = 'properly Lanzagood';
+
+  function currentReadingAndTriviaHTML(slug, cityName) {
+    const city = (window.CITIES_DATA || []).find((c) => c.slug === slug);
+    if (!city || typeof city.mood !== 'number' || !window.GlotempCore) return '';
+    const { band, color } = window.GlotempCore.moodToBand(city.mood);
+
+    const flourish = slug === 'lanzarote' && city.mood >= 8.5
+      ? ` <span class="checkin-reading-flourish">${esc(LANZAROTE_HIGH_MOOD_FLOURISH)}</span>`
+      : '';
+
+    const readingLine = `
+      <p class="checkin-current-reading" id="checkin-current-reading">
+        <span class="checkin-reading-label">Reading right now</span>
+        <span class="checkin-reading-band" style="color:${color};">${esc(band)}</span>
+        <span class="checkin-reading-score">${city.mood.toFixed(1)}/10</span>${flourish}
+      </p>`;
+
+    const facts = (window.CITY_TRIVIA && window.CITY_TRIVIA[slug]) || [];
+    const triviaLine = facts.length
+      ? `<p class="checkin-trivia-line"><span class="checkin-trivia-eyebrow">Worth knowing about ${esc(cityName)}</span> ${esc(facts[0])}</p>`
+      : '';
+
+    return readingLine + triviaLine;
+  }
+
   // ---------- composer ----------
   function composerHTML(cityName) {
     const name = cityName || 'this city';
@@ -286,6 +327,7 @@
       <div class="checkin-composer" id="checkin-composer">
         <p class="eyebrow">City reading</p>
         <h2 class="checkin-neon-title">How <span class="checkin-glow">${esc(name)}</span> feels right now</h2>
+        ${currentReadingAndTriviaHTML(citySlug, name)}
         ${insigniaHTML()}
         <div class="checkin-signedout" id="checkin-signedout">
           <p class="checkin-copy">Sign in to add a check-in. Browsing stays anonymous.</p>

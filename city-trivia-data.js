@@ -537,6 +537,10 @@ const CITY_TRIVIA = {
   "milton-keynes": [
     "Milton Keynes was purpose-built as a new town from 1967, laid out on a grid and famous for its roundabouts and grazing concrete cows.",
   ],
+  lanzarote: [
+    "In La Geria, Lanzarote's vines are grown in individual pits dug into volcanic ash and sheltered by small crescent-shaped stone walls called zocos, a wine-growing method found almost nowhere else on Earth.",
+    "Lanzarote-born artist César Manrique shaped much of the island's architecture, including Jameos del Agua and Mirador del Río, around blending directly into its volcanic landscape rather than standing apart from it.",
+  ],
 };
 
 if (typeof window !== 'undefined') window.CITY_TRIVIA = CITY_TRIVIA;
