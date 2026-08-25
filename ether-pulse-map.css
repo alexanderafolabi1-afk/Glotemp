@@ -1,0 +1,174 @@
+/* Ether Pulse Map.
+ *
+ * Its own stylesheet rather than another block appended to the 9,000-line
+ * styles.css: this component replaces one homepage section and nothing
+ * else, and keeping its rules in one file makes that boundary visible
+ * and reversible. Loaded only by the homepage.
+ *
+ * Every colour here is either an existing token or a deliberate darkening
+ * of one -- the ground is the site's ink pulled toward purple, and every
+ * accent is brass, sand or ivory. */
+
+/* Full-bleed: the map is a horizon, and a horizon inset behind page
+   gutters is not a horizon.
+   The selector is #app > .ether-section rather than .ether-section
+   because styles.css sets `#app > section { padding-left/right:
+   var(--panel-gutter) }` at specificity (1,0,1) -- a plain class at
+   (0,1,0) loses to it, and the section quietly keeps its gutters. This
+   is (1,1,0), so it wins without reaching for !important.
+   Width comes from cancelling #app's own gutters rather than from
+   100vw: 100vw includes the scrollbar, which is a horizontal overflow
+   on any desktop that shows one. */
+#app > .ether-section {
+  position: relative;
+  padding: clamp(2.2rem, 5vw, 3.6rem) 0 clamp(1.6rem, 3vw, 2.4rem);
+  margin-left: calc(var(--page-gutter) * -1);
+  margin-right: calc(var(--page-gutter) * -1);
+  background: #08060E;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  overflow: hidden;
+}
+
+.ether-head {
+  max-width: 1180px;
+  margin: 0 auto clamp(1.1rem, 2.4vw, 1.7rem);
+  padding: 0 clamp(1.1rem, 4vw, 2.4rem);
+}
+
+.ether-head .eyebrow { margin-bottom: 0.35rem; }
+
+.ether-head h2 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: clamp(26px, 4vw, 44px);
+  line-height: 1.08;
+  color: var(--ivory);
+}
+
+.ether-copy {
+  margin: 0;
+  max-width: 58ch;
+  color: var(--sand);
+  font-size: clamp(0.92rem, 1.5vw, 1.02rem);
+  line-height: 1.6;
+}
+
+/* The canvas box. aspect-ratio does the responsive work, with a floor so
+   the map never collapses to a strip on a narrow phone and a ceiling so
+   it never eats a whole desktop viewport. */
+.ether-map {
+  position: relative;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  aspect-ratio: 2.45 / 1;
+  min-height: 300px;
+  max-height: 640px;
+  touch-action: pan-y;
+}
+
+.ether-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Readout on hover. Positioned by the script in canvas coordinates.
+   The [hidden] rule is load-bearing, not defensive: `display: flex`
+   below is a class selector and beats the UA stylesheet's
+   `[hidden] { display: none }`, so without this the tooltip sits
+   permanently visible in the corner as an empty bordered box. */
+.ether-tip[hidden] { display: none; }
+
+.ether-tip {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  padding: 0.4rem 0.6rem;
+  background: rgba(8, 6, 14, 0.92);
+  border: 1px solid var(--brass-dim);
+  white-space: nowrap;
+}
+
+.ether-tip-city {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--ivory);
+  line-height: 1.2;
+}
+
+.ether-tip-band {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-variant-caps: small-caps;
+  letter-spacing: 0.06em;
+  color: var(--brass);
+  line-height: 1.2;
+}
+
+/* The key. Small caps, same language as the rest of the site's data
+   furniture, and it states what the colours mean rather than leaving a
+   visitor to infer it from a gradient. */
+.ether-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.4rem;
+  max-width: 1180px;
+  margin: clamp(1rem, 2.2vw, 1.5rem) auto 0;
+  padding: 0 clamp(1.1rem, 4vw, 2.4rem);
+  list-style: none;
+}
+
+.ether-key li {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-variant-caps: small-caps;
+  letter-spacing: 0.08em;
+  color: var(--sand);
+}
+
+.ether-key .dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50% !important;   /* one of the permitted curves */
+  flex: 0 0 auto;
+}
+
+.ether-key .dot.is-charged   { background: #FFF6DE; box-shadow: 0 0 8px rgba(255, 246, 222, 0.75); }
+.ether-key .dot.is-energized { background: #D89BE8; box-shadow: 0 0 8px rgba(216, 155, 232, 0.6); }
+.ether-key .dot.is-neutral   { background: #E8C98A; box-shadow: 0 0 7px rgba(232, 201, 138, 0.45); }
+.ether-key .dot.is-cautious  { background: #9A7038; }
+
+.ether-hint {
+  max-width: 1180px;
+  margin: 0.9rem auto 0;
+  padding: 0 clamp(1.1rem, 4vw, 2.4rem);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-variant-caps: small-caps;
+  letter-spacing: 0.08em;
+  color: var(--sand);
+  opacity: 0.66;
+}
+
+@media (max-width: 640px) {
+  .ether-map {
+    aspect-ratio: 1.7 / 1;   /* taller, so nodes stay separable */
+    min-height: 260px;
+  }
+  .ether-key { gap: 0.4rem 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The script already refuses to schedule an arc under this setting;
+     this is the belt to that pair of braces. */
+  .ether-canvas { animation: none !important; transition: none !important; }
+}

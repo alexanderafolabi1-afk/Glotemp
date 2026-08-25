@@ -28,6 +28,7 @@
   <!-- Version must be bumped on CSS-affecting deploys -->
   <link rel="stylesheet" href="/styles.css?v=59" />
   <link rel="stylesheet" href="/daily-checkin.css" />
+  <link rel="stylesheet" href="/ether-pulse-map.css?v=1" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
   <script src="/glotemp-analytics.js" defer></script>
@@ -125,69 +126,45 @@
       <div id="home-frequency-root"></div>
     </section>
 
+    <!-- Ether Pulse Map. Replaces the five rotating barometers that used
+         to sit here. All 300 cities at once, drawn by ether-pulse-map.js;
+         tapping a node runs the same loadCityBySlug() the barometers did,
+         so #city-select, the city panel and the trip verdict below are
+         driven exactly as before. -->
+    <section class="ether-section" id="ether-map-section" aria-labelledby="ether-title">
+      <div class="ether-head">
+        <p class="eyebrow" data-i18n="pulse_eyebrow">Live instruments</p>
+        <h2 id="ether-title">Ether pulse map</h2>
+        <!-- No data-i18n on this line or the hint below. The old keys
+             (pulse_intro, instrument_hint) describe the five-barometer
+             component this replaced -- "Five cities, chosen from what's
+             moving right now" and "Tap any city below" are both untrue
+             of a 300-city map, and every translation of them says the
+             same wrong thing. Leaving them wired would have shipped that
+             copy to every non-English visitor. These two strings are
+             English-only until real translations are written; the
+             eyebrow above keeps its key because "Right now, live" is
+             still accurate. -->
+        <p class="ether-copy">All 300 tracked cities at once. Brightness is the reading; a line means a city just moved. Tap one to pin it.</p>
+      </div>
+      <div class="ether-map" id="ether-map"></div>
+      <ul class="ether-key">
+        <li><span class="dot is-charged" aria-hidden="true"></span>Charged</li>
+        <li><span class="dot is-energized" aria-hidden="true"></span>Energized</li>
+        <li><span class="dot is-neutral" aria-hidden="true"></span>Neutral</li>
+        <li><span class="dot is-cautious" aria-hidden="true"></span>Cautious</li>
+      </ul>
+      <p class="ether-hint">Tap any city to see if today&rsquo;s the day to go.</p>
+    </section>
+
     <!-- Hero City Pulse -->
     <section class="hero-section">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow" data-i18n="pulse_eyebrow">Live instruments</p>
-          <h2 data-i18n="pulse_title">Instrument room</h2>
-        </div>
-        <p class="section-copy" data-i18n="pulse_intro">Watch the mood of cities turning over in real time. Select any city to pin it and dive deeper.</p>
-      </div>
-
-      <p class="instrument-hint" data-i18n="instrument_hint">Tap any city below to see if today's the day to go.</p>
-      <div class="instrument-images" id="instrument-row">
-        <div class="instrument-slot" data-slot="0">
-          <div class="instrument-visual">
-            <div class="instrument-weather" aria-hidden="true"></div>
-            <img class="instrument-image" src="/assets/barometer-equilibrium.png" alt="Barometer" width="300" height="537">
-          </div>
-          <div class="instrument-label">
-            <span class="instrument-city-name">-</span>
-            <span class="instrument-band-name">-</span>
-          </div>
-        </div>
-        <div class="instrument-slot" data-slot="1">
-          <div class="instrument-visual">
-            <div class="instrument-weather" aria-hidden="true"></div>
-            <img class="instrument-image" src="/assets/barometer-warm.png" alt="Barometer" width="300" height="537">
-          </div>
-          <div class="instrument-label">
-            <span class="instrument-city-name">-</span>
-            <span class="instrument-band-name">-</span>
-          </div>
-        </div>
-        <div class="instrument-slot" data-slot="2">
-          <div class="instrument-visual">
-            <div class="instrument-weather" aria-hidden="true"></div>
-            <img class="instrument-image" src="/assets/barometer-equilibrium.png" alt="Barometer" width="300" height="537">
-          </div>
-          <div class="instrument-label">
-            <span class="instrument-city-name">-</span>
-            <span class="instrument-band-name">-</span>
-          </div>
-        </div>
-        <div class="instrument-slot" data-slot="3">
-          <div class="instrument-visual">
-            <div class="instrument-weather" aria-hidden="true"></div>
-            <img class="instrument-image" src="/assets/barometer-low.png" alt="Barometer" width="300" height="537">
-          </div>
-          <div class="instrument-label">
-            <span class="instrument-city-name">-</span>
-            <span class="instrument-band-name">-</span>
-          </div>
-        </div>
-        <div class="instrument-slot" data-slot="4">
-          <div class="instrument-visual">
-            <div class="instrument-weather" aria-hidden="true"></div>
-            <img class="instrument-image" src="/assets/barometer-charged.png" alt="Barometer" width="300" height="537">
-          </div>
-          <div class="instrument-label">
-            <span class="instrument-city-name">-</span>
-            <span class="instrument-band-name">-</span>
-          </div>
-        </div>
-      </div>
+      <!-- The five rotating barometers that stood here are gone; the
+           Ether Pulse Map above replaces them. setupBarometerRotation()
+           in app.js is left untouched and self-disables -- its first
+           line returns when no .instrument-slot exists -- so no other
+           call site or data path had to change. The barometer artwork in
+           /assets/ is untouched and still used elsewhere. -->
 
       <!-- City Selector Dropdown -->
       <select id="city-select" style="display:none;"></select>
@@ -362,6 +339,7 @@
   <script src="/app.js?v=58" defer></script>
   <script src="/glotemp-auth.js" defer></script>
   <script src="/glotemp-reactions.js" defer></script>
+  <script src="/ether-pulse-map.js" defer></script>
   <script src="/glotemp-reporter.js" defer></script>
   <script src="/glotemp-daily-checkin.js" defer></script>
   <script src="/glotemp-home-frequency.js" defer></script>

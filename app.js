@@ -2241,8 +2241,12 @@ function loadCityBySlug(slug) {
   const select = document.getElementById('city-select');
   if (select) select.value = slug;
   updateCity(slug);
-  // Smooth-scroll to instrument row so user sees the update
-  const row = document.getElementById('instrument-row');
+  // Smooth-scroll to the live instrument so the visitor sees the update.
+  // The Ether Pulse Map replaced the barometer row here; the old id is
+  // kept as a fallback so this still works on any page that has not been
+  // rebuilt.
+  const row = document.getElementById('ether-map-section')
+    || document.getElementById('instrument-row');
   if (row) row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
