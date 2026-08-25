@@ -43,6 +43,7 @@ const urls = [
   { loc: 'https://glo-temp.com/gem', priority: '0.6', changefreq: 'daily' },
   { loc: 'https://glo-temp.com/methodology', priority: '0.5', changefreq: 'monthly' },
   { loc: 'https://glo-temp.com/movers', priority: '0.7', changefreq: 'daily' },
+  { loc: 'https://glo-temp.com/partners', priority: '0.5', changefreq: 'monthly' },
   { loc: 'https://glo-temp.com/verticals', priority: '0.8', changefreq: 'weekly' },
   { loc: 'https://glo-temp.com/privacy', priority: '0.3', changefreq: 'monthly' },
   { loc: 'https://glo-temp.com/terms', priority: '0.3', changefreq: 'monthly' },

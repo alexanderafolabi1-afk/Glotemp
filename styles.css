@@ -1502,6 +1502,24 @@ body.scroll-reveals-enabled section.revealed {
   color: var(--ivory);
 }
 
+.nav-account-link {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  color: var(--sand);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: background var(--transition), color var(--transition);
+  box-sizing: border-box;
+}
+.nav-account-link:hover,
+.nav-account-link:focus-visible {
+  background: rgba(176, 141, 87, 0.16);
+  color: var(--ivory);
+}
+
 /* Mobile panel: full-width like the language switch, sitting under the
    stacked nav links rather than floating a dropdown over a full-screen
    panel. */
@@ -2026,6 +2044,42 @@ summary:focus:not(:focus-visible) {
 .tier-plate-code::after { content: '\00b7'; margin-left: 0.32em; color: var(--sand); }
 .tier-plate-num { font-size: 0.85em; color: var(--sand); }
 .tier-plate-num::before { content: '\2116'; margin-right: 0.06em; }
+
+/* City flavor badge (see glotemp-city-flavor.js): a quiet pill for the
+   short, curated list of cities with a famous legal claim to fame --
+   sized and spaced to match .city-tier-badge next to it, a plain hairline
+   pill rather than the tier badge's engraved plate so the two read as
+   related but distinct. The joke lives in the title tooltip, not the
+   pill itself -- nothing here shouts. */
+.city-flavor-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  padding: 0.22rem 0.7rem 0.22rem 0.55rem;
+  margin: 0 0 0.6rem 0.5rem;
+  color: var(--sand);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  white-space: nowrap;
+  cursor: default;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.city-flavor-badge svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+}
+
+.city-flavor-badge:hover,
+.city-flavor-badge:focus-visible {
+  color: var(--brass);
+  border-color: var(--brass-dim);
+}
 
 .city-tier-badge-verified { color: var(--brass); }
 .city-tier-badge-verified .tier-plate-outline { stroke: var(--brass-dim); }
@@ -5726,6 +5780,331 @@ a:hover .city-landmark-photo,
   letter-spacing: 0.02em;
   margin-top: 0.3rem;
   opacity: 0.8;
+}
+
+/* City Sell (see glotemp-city-sell.js): the second thing a first-time
+   visitor sees, right under the hero instrument. A horizontal shelf, not
+   a grid -- cards ride a gentle wave (each card's own --card-wave, set in
+   JS) instead of sitting in rows, and scroll-snaps like a filmstrip
+   rather than wrapping. Every vertical gets its own vivid accent
+   (--card-color, set per card) -- the one deliberately bright exception
+   to the desaturated brass-family instrument colors used everywhere
+   else, reserved for this one welcome moment. */
+.city-sell-section {
+  overflow: hidden;
+}
+
+.city-sell-headline {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.4vw, 38px);
+  font-weight: var(--fw-light);
+  color: var(--ivory);
+  line-height: 1.16;
+  margin: 0 0 0.5rem;
+}
+
+.city-sell-subhead {
+  font-family: var(--font-body);
+  color: var(--sand);
+  font-size: 1rem;
+  line-height: 1.55;
+  max-width: 56ch;
+  margin: 0 0 1.75rem;
+}
+
+.city-sell-shelf {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.1rem;
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-snap-type: x proximity;
+  padding: 1.6rem 0.3rem 2.2rem;
+  margin: 0 -0.3rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.city-sell-shelf::-webkit-scrollbar {
+  height: 6px;
+}
+.city-sell-shelf::-webkit-scrollbar-thumb {
+  background: var(--brass-dim);
+  border-radius: 999px;
+}
+
+.city-sell-card {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: 208px;
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.15rem 1.15rem 1.3rem;
+  border-radius: 18px;
+  text-decoration: none;
+  background:
+    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--card-color) 22%, transparent), transparent 60%),
+    var(--basalt-raised);
+  border: 1px solid color-mix(in srgb, var(--card-color) 35%, var(--hairline));
+  transform: translateY(var(--card-wave, 0px));
+  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+.city-sell-card:hover,
+.city-sell-card:focus-visible {
+  transform: translateY(calc(var(--card-wave, 0px) - 6px));
+  border-color: var(--card-color);
+  box-shadow: 0 14px 30px -14px color-mix(in srgb, var(--card-color) 55%, transparent);
+}
+
+.city-sell-icon {
+  width: 30px;
+  height: 30px;
+  color: var(--card-color);
+}
+.city-sell-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.city-sell-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--card-color);
+}
+
+.city-sell-fact {
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--sand);
+  margin: 0;
+  flex: 1;
+}
+
+.city-sell-score {
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.city-sell-score-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--card-color);
+  border-radius: inherit;
+  transition: width 0.5s ease;
+}
+
+.city-sell-card--cta {
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1px dashed var(--brass-dim);
+}
+.city-sell-card--cta:hover,
+.city-sell-card--cta:focus-visible {
+  border-color: var(--brass);
+  border-style: solid;
+  box-shadow: none;
+}
+.city-sell-cta-text {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--ivory);
+  line-height: 1.3;
+}
+.city-sell-cta-arrow {
+  font-size: 1.3rem;
+  color: var(--brass);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .city-sell-card { transition: none; }
+}
+
+/* Live Blog, homepage edition (see glotemp-live-blog-home.js): one large
+   cinematic card, not a feed to scroll -- a broadcast that changes to a
+   different random city every few seconds. A thin top progress bar
+   (.live-blog-home-progress) reads like a stories timer, giving the
+   rotation a felt rhythm instead of just changing content underfoot. */
+.live-blog-home-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 260px;
+  border-radius: 20px;
+  padding: 2.2rem 2rem 2rem;
+  background:
+    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--card-color, var(--brass)) 26%, transparent), transparent 62%),
+    var(--basalt-raised);
+  border: 1px solid color-mix(in srgb, var(--card-color, var(--brass)) 35%, var(--hairline));
+}
+
+.live-blog-home-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: var(--card-color, var(--brass));
+}
+.live-blog-home-card.is-live .live-blog-home-progress {
+  animation: liveBlogProgress 8s linear;
+}
+@keyframes liveBlogProgress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.live-blog-home-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-width: 62ch;
+}
+
+.live-blog-home-icon {
+  width: 34px;
+  height: 34px;
+  color: var(--card-color, var(--brass));
+  margin-bottom: 0.2rem;
+}
+.live-blog-home-icon svg { width: 100%; height: 100%; }
+
+.live-blog-home-city {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--card-color, var(--brass));
+  margin: 0;
+}
+.live-blog-home-country {
+  color: var(--sand);
+  text-transform: none;
+  letter-spacing: normal;
+  margin-left: 0.6em;
+  opacity: 0.75;
+}
+
+.live-blog-home-headline {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.6vw, 30px);
+  font-weight: var(--fw-light);
+  color: var(--ivory);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.live-blog-home-fact {
+  font-family: var(--font-body);
+  color: var(--sand);
+  font-size: 1rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.live-blog-home-link {
+  margin-top: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--card-color, var(--brass));
+  text-decoration: none;
+  width: fit-content;
+}
+.live-blog-home-link:hover,
+.live-blog-home-link:focus-visible {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-blog-home-progress { display: none; }
+}
+
+/* Live Blog, city edition (see glotemp-live-blog-city.js): a vertical
+   journal, not a grid -- entries thread down a single accent line, each
+   with its own vertical-colored dot and card, the way a timeline or a
+   ship's log reads rather than a dashboard. */
+.live-blog-list {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0 0 0 1.6rem;
+  position: relative;
+}
+.live-blog-list::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: var(--hairline);
+}
+
+.live-blog-entry {
+  position: relative;
+  margin-bottom: 1.4rem;
+}
+.live-blog-entry:last-child {
+  margin-bottom: 0;
+}
+
+.live-blog-entry-dot {
+  position: absolute;
+  left: -1.6rem;
+  top: 0.35rem;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--entry-color);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--entry-color) 20%, transparent);
+}
+
+.live-blog-entry-card {
+  padding: 0.9rem 1.1rem 1.05rem;
+  border-radius: 12px;
+  background: var(--basalt-raised);
+  border-left: 2px solid var(--entry-color);
+}
+
+.live-blog-entry-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--entry-color);
+  margin-bottom: 0.4rem;
+}
+.live-blog-entry-icon {
+  width: 15px;
+  height: 15px;
+}
+.live-blog-entry-icon svg { width: 100%; height: 100%; }
+
+.live-blog-entry-headline {
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  font-weight: var(--fw-semibold);
+  color: var(--ivory);
+  margin: 0 0 0.35rem;
+  line-height: 1.3;
+}
+
+.live-blog-entry-body {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--sand);
+  margin: 0;
 }
 
 /* Follow confirmation toast -- modeled on .push-prompt's fixed, bottom
@@ -9816,3 +10195,174 @@ a:active:not(.btn-neon):not(.nav-logo):not([class*="chip"]) {
   .gt-react-label { font-size: 0.545rem; letter-spacing: 0.03em; }
   .gt-reactions { gap: 0.2rem 0.4rem; }
 }
+
+/* Offers Panel (see glotemp-offers.js): "Tonight in [City]", on a city's
+   own page (every vertical) and on the vertical page it belongs to. By
+   design, this is text, not UI chrome -- no cards, no boxes, no images,
+   no price slashes, no percentages shouted. A brass hairline between
+   entries is the only division; .offers-action buttons render as plain
+   mono text links, never boxed buttons. Renders nothing (section stays
+   [hidden]) when a city has no active offers -- no empty state, no gap. */
+.offers-heading {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  color: var(--sand);
+  margin: 0 0 1.1rem;
+}
+
+.offers-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.offers-line {
+  padding: 1rem 0;
+}
+.offers-line + .offers-line {
+  border-top: 1px solid var(--hairline);
+}
+.offers-list-rest:not([hidden]) .offers-line:first-child {
+  border-top: 1px solid var(--hairline);
+}
+
+.offers-business {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: var(--fw-semibold);
+  color: var(--ivory);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.offers-detail {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--sand);
+  margin: 0.25rem 0 0;
+  line-height: 1.5;
+}
+
+.offers-line-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.1rem;
+  margin-top: 0.6rem;
+}
+
+.offers-action {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--brass);
+  cursor: pointer;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+}
+.offers-action:hover,
+.offers-action:focus-visible {
+  text-decoration: underline;
+}
+.offers-action:disabled {
+  color: var(--sand);
+  cursor: default;
+  text-decoration: none;
+  opacity: 0.75;
+}
+
+.offers-reveal-panel,
+.offers-terms-panel {
+  margin-top: 0.7rem;
+  max-width: 56ch;
+}
+
+.offers-code {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  color: var(--brass);
+  margin: 0;
+}
+
+.offers-code-instruction {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--sand);
+  margin: 0.3rem 0 0;
+  line-height: 1.5;
+}
+
+.offers-more-detail {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--sand);
+  margin: 0 0 0.5rem;
+  line-height: 1.5;
+}
+
+.offers-terms-text {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--sand);
+  opacity: 0.9;
+  margin: 0;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.offers-more-btn {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0.9rem 0 0;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  color: var(--brass);
+  cursor: pointer;
+  min-height: 32px;
+}
+.offers-more-btn:hover,
+.offers-more-btn:focus-visible {
+  text-decoration: underline;
+}
+
+.offers-partner-line {
+  margin: 1.3rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.03em;
+  color: var(--sand);
+  opacity: 0.85;
+}
+.offers-partner-line a {
+  color: inherit;
+  text-decoration: none;
+}
+.offers-partner-line a:hover,
+.offers-partner-line a:focus-visible {
+  text-decoration: underline;
+}
+
+/* /redeem -- the partner code-check page (see glotemp-offer-redeem.js). */
+.redeem-result {
+  margin-top: 1.2rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+}
+.redeem-result.is-valid { color: #6FCF97; }
+.redeem-result.is-used { color: var(--sand); }
+.redeem-result.is-invalid { color: #E07856; }

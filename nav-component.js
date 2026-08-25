@@ -98,6 +98,7 @@
           // and this must never show anyone else's numbers -- it only
           // ever exists inside the signed-in owner's own dropdown).
           '<div class="nav-account-stars" id="nav-account-stars' + idSuffix + '"></div>' +
+          '<a class="nav-account-link" href="/account/">My saved offers</a>' +
           '<button type="button" class="nav-account-signout" id="nav-account-signout' + idSuffix + '">Sign out</button>' +
         '</div>' +
       '</div>'
