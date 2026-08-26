@@ -432,6 +432,10 @@
         <input type="text" id="pulse-map-search" class="pulse-map-search" placeholder="Find a city on the map" autocomplete="off" aria-label="Find a city on the pulse map">
       </div>
       <div class="pulse-map-frame" id="pulse-map-frame" role="group" aria-label="World map of city mood readings"></div>
+      <!-- Real, computed dawn/dusk line -- see pulse-map.js for the
+           astronomical math. Empty and hidden whenever no real city is
+           actually inside its sunrise/sunset window right now. -->
+      <p class="pulse-map-terminator-note" id="pulse-map-terminator-note" aria-live="polite" hidden></p>
     </section>
 
     <!-- City reading: the primary "add your voice" call to action. Kept

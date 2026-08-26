@@ -4225,16 +4225,129 @@ small {
   margin: 0 auto;
   overflow: hidden;
   border-radius: 4px;
-  background: radial-gradient(ellipse at center, rgba(240, 224, 200, 0.035), transparent 72%);
+  background: radial-gradient(ellipse at center, rgba(30, 24, 44, 0.4), rgba(6, 6, 10, 0.9) 78%);
+}
+
+/* Real day/night glow, rasterized on a canvas from the exact solar
+   elevation formula in pulse-map.js -- an indigo dusk deepening to night,
+   a warm amber band right at the real horizon, fading to nothing in full
+   day. The blur turns the low-res grid into a soft atmospheric wash
+   rather than a blocky heatmap. */
+.pulse-map-glow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: blur(2.5px);
+  pointer-events: none;
+}
+
+/* A fixed sky of map points, each one only ever lit while real night
+   sits over it right now -- see pulse-map.js's renderStars(). */
+.pulse-map-star {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--ivory);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 900ms ease;
+}
+.pulse-map-star.is-visible {
+  animation: pulse-map-twinkle 4s ease-in-out infinite;
+  box-shadow: 0 0 3px rgba(240, 224, 200, 0.5);
+}
+@keyframes pulse-map-twinkle {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.95; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-map-star.is-visible { animation: none; opacity: 0.6; }
+}
+
+/* The one real point on Earth directly under the sun right now. */
+.pulse-map-sun {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6df 0%, var(--brass) 55%, transparent 78%);
+  box-shadow: 0 0 18px 6px rgba(240, 200, 130, 0.45);
+  pointer-events: none;
+  animation: pulse-map-sun-breathe 5s ease-in-out infinite;
+}
+@keyframes pulse-map-sun-breathe {
+  0%, 100% { opacity: 0.82; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-map-sun { animation: none; opacity: 0.9; }
 }
 
 /* Continent shapes are a deliberately soft, non-literal silhouette --
    irregular rounded blobs positioned at real bounding boxes, not a
-   coastline dataset. The point is context for the dots, not an atlas. */
+   coastline dataset. The point is context for the dots, not an atlas.
+   A soft radial glow rather than a flat fill, blended into the real
+   day/night wash beneath rather than sitting on top of it as a flat
+   grey card. */
 .pulse-map-landmass {
   position: absolute;
-  background: rgba(240, 224, 200, 0.05);
+  background: radial-gradient(ellipse at 35% 30%, rgba(240, 224, 200, 0.16), rgba(240, 224, 200, 0.03) 72%);
+  mix-blend-mode: screen;
   pointer-events: none;
+}
+
+/* Real day/night terminator -- a computed polyline, not an image or a
+   canned animation. See pulse-map.js for the astronomical math. Sits
+   above the landmasses and below the city nodes, quiet and unobtrusive:
+   one thin line, no shading, no glow beyond a soft brass haze in the
+   same family as the node glow. */
+.pulse-map-terminator {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+.pulse-map-terminator-line,
+.pulse-map-terminator-glow {
+  fill: none;
+  stroke: var(--brass);
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.pulse-map-terminator-line {
+  stroke-width: 1;
+  opacity: 0.68;
+  stroke-dasharray: 1 2.4;
+  animation: pulse-map-terminator-flow 40s linear infinite;
+}
+.pulse-map-terminator-glow {
+  stroke-width: 5;
+  opacity: 0.16;
+  filter: blur(2px);
+}
+@keyframes pulse-map-terminator-flow {
+  to { stroke-dashoffset: -100; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-map-terminator-line { animation: none; }
+}
+
+.pulse-map-terminator-note {
+  max-width: 34rem;
+  margin: 0.85rem auto 0;
+  padding: 0 0.5rem;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--sand);
+  opacity: 0.82;
+  font-style: italic;
 }
 
 .pulse-map-node {
@@ -4255,9 +4368,9 @@ small {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--brass);
+  background: radial-gradient(circle, var(--ivory) 0%, var(--brass) 60%, transparent 100%);
   opacity: var(--node-glow, 0.4);
-  box-shadow: 0 0 calc(var(--node-glow, 0.4) * 9px) rgba(176, 141, 87, calc(var(--node-glow, 0.4) * 0.9));
+  box-shadow: 0 0 calc(var(--node-glow, 0.4) * 11px) rgba(176, 141, 87, calc(var(--node-glow, 0.4) * 0.95));
   transition: opacity 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 .pulse-map-node:hover .pulse-map-node-dot,

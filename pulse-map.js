@@ -8,7 +8,14 @@
 // CITIES_DATA. The continent shapes behind the dots are a deliberately
 // soft, non-literal silhouette -- rounded blobs positioned at real
 // bounding boxes on the same projection, not a coastline dataset. CSS
-// only, no map library.
+// only, no map library, no external images or fetched assets.
+//
+// ATMOSPHERE: the glow wash, star field and sun marker below are all
+// driven by the same real sun-position math as the terminator line --
+// nothing here is a decorative image or a canned animation. The wash is
+// a low-res canvas of real per-point solar elevation, upscaled and
+// blurred by CSS into a soft glowing band; stars only ever show over a
+// map point that is genuinely dark right now.
 //
 // SHIFTS: a soft pulse plays on a node only when a real, freshly-posted
 // row appears in `observations` for that city after this page loaded --
@@ -21,6 +28,93 @@
   var SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
   var SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
   var POLL_MS = 90000; // quiet cadence -- this is a slow ambient signal, not a live ticker
+
+  // ---------- real-time day/night terminator ----------
+  // Pure astronomical math, computed client-side, no external API. Uses
+  // the standard low-precision solar-position series from the
+  // Astronomical Almanac (accurate to a few arcminutes -- plenty for a
+  // map line): the sun's current ecliptic longitude gives its equatorial
+  // right ascension and declination, and the current Greenwich sidereal
+  // time locates it over a longitude. From those few numbers alone we
+  // get, for ANY longitude, the latitude where the sun sits exactly on
+  // the horizon (the terminator), and for ANY city's real lat/lon, the
+  // sun's real current elevation there. Same formula for all 300 cities
+  // -- equatorial or near-arctic, none of them a special case -- so
+  // there is no coordinate this can fail to cover.
+  var RAD = Math.PI / 180;
+  var TERMINATOR_REFRESH_MS = 60000; // the line drifts ~0.25 deg/minute -- no need to recompute faster than this
+  var DAWN_DUSK_WINDOW_DEG = 4; // "narrow window" either side of the geometric horizon, roughly +/-16 real minutes at the equator
+  var DAWN_DUSK_ROTATE_MS = 5000;
+
+  function norm360(deg) { deg = deg % 360; return deg < 0 ? deg + 360 : deg; }
+  function norm180(deg) { return ((deg + 180) % 360 + 360) % 360 - 180; }
+
+  function julianDate(date) {
+    return date.getTime() / 86400000 + 2440587.5;
+  }
+
+  // Sun's apparent ecliptic longitude, low-precision series (good to
+  // ~0.01 deg) -- the same formula behind most simple solar calculators.
+  function sunEclipticLongitudeDeg(daysSinceJ2000) {
+    var L = norm360(280.460 + 0.9856474 * daysSinceJ2000);
+    var g = norm360(357.528 + 0.9856003 * daysSinceJ2000) * RAD;
+    return norm360(L + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g));
+  }
+
+  function obliquityDeg(daysSinceJ2000) {
+    return 23.439 - 0.0000004 * daysSinceJ2000;
+  }
+
+  // Greenwich Mean Sidereal Time, in degrees.
+  function gmstDeg(jd) {
+    var d = jd - 2451545.0;
+    return norm360((18.697374558 + 24.06570982441908 * d) * 15);
+  }
+
+  // Current sun geometry: right ascension + declination (equatorial,
+  // degrees) and Greenwich sidereal time (degrees). Everything below --
+  // the terminator line and every city's real elevation -- is derived
+  // from just these three numbers plus a longitude.
+  function sunGeometry(date) {
+    var jd = julianDate(date);
+    var n = jd - 2451545.0;
+    var lambda = sunEclipticLongitudeDeg(n) * RAD;
+    var epsilon = obliquityDeg(n) * RAD;
+    var alpha = Math.atan2(Math.cos(epsilon) * Math.sin(lambda), Math.cos(lambda)) / RAD;
+    var delta = Math.asin(Math.sin(epsilon) * Math.sin(lambda)) / RAD;
+    return { alpha: norm360(alpha), delta: delta, gmst: gmstDeg(jd) };
+  }
+
+  // Local hour angle of the sun at a given real longitude: negative
+  // before solar noon there (morning), positive after (afternoon).
+  function hourAngleDeg(lonDeg, sun) {
+    return norm180(sun.gmst + lonDeg - sun.alpha);
+  }
+
+  // Latitude of the terminator at a given real longitude -- the point on
+  // that meridian where the sun sits exactly on the horizon. Standard
+  // spherical-trigonometry result for the great circle 90 deg from the
+  // subsolar point.
+  function terminatorLatAt(lonDeg, sun) {
+    var H = hourAngleDeg(lonDeg, sun) * RAD;
+    return Math.atan(-Math.cos(H) / Math.tan(sun.delta * RAD)) / RAD;
+  }
+
+  // Real current solar elevation (degrees above/below the geometric
+  // horizon) for any real lat/lon.
+  function solarElevationDeg(latDeg, lonDeg, sun) {
+    var H = hourAngleDeg(lonDeg, sun) * RAD;
+    var lat = latDeg * RAD, delta = sun.delta * RAD;
+    var sinAlt = Math.sin(lat) * Math.sin(delta) + Math.cos(lat) * Math.cos(delta) * Math.cos(H);
+    return Math.asin(Math.max(-1, Math.min(1, sinAlt))) / RAD;
+  }
+
+  // The subsolar point: the one real place on Earth where the sun is
+  // directly overhead right now (elevation 90 deg). Its latitude is just
+  // the declination; its longitude is wherever the hour angle is zero.
+  function subsolarPoint(sun) {
+    return { lat: sun.delta, lon: norm180(sun.alpha - sun.gmst) };
+  }
 
   // Rough real-world bounding boxes on the same equirectangular
   // projection as the city dots (left%, top%, width%, height%), so the
@@ -111,6 +205,226 @@
     // Belt-and-braces cleanup if the animation event never fires (e.g.
     // reduced-motion, where the animation is disabled in CSS).
     setTimeout(function () { if (ring.isConnected) ring.remove(); }, 3600);
+  }
+
+  // The line itself: a polyline traced across every longitude at the
+  // real current terminator latitude, on the same equirectangular
+  // percent-grid as the city nodes, so it lines up with them exactly.
+  var terminatorLine = null;
+  var terminatorGlow = null;
+
+  function ensureTerminatorSvg() {
+    if (terminatorLine) return;
+    var svgNS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('class', 'pulse-map-terminator');
+    svg.setAttribute('viewBox', '0 0 100 100');
+    svg.setAttribute('preserveAspectRatio', 'none');
+    svg.setAttribute('aria-hidden', 'true');
+
+    terminatorGlow = document.createElementNS(svgNS, 'polyline');
+    terminatorGlow.setAttribute('class', 'pulse-map-terminator-glow');
+    svg.appendChild(terminatorGlow);
+
+    terminatorLine = document.createElementNS(svgNS, 'polyline');
+    terminatorLine.setAttribute('class', 'pulse-map-terminator-line');
+    svg.appendChild(terminatorLine);
+
+    frame.appendChild(svg);
+  }
+
+  function renderTerminator(sun) {
+    ensureTerminatorSvg();
+    var points = [];
+    for (var lon = -180; lon <= 180; lon += 2) {
+      var lat = terminatorLatAt(lon, sun);
+      if (!isFinite(lat)) continue;
+      var pos = project(Math.max(-90, Math.min(90, lat)), lon);
+      points.push(pos.left.toFixed(2) + ',' + pos.top.toFixed(2));
+    }
+    var d = points.join(' ');
+    terminatorLine.setAttribute('points', d);
+    terminatorGlow.setAttribute('points', d);
+  }
+
+  // ---------- real day/night glow wash + star field + sun marker ----------
+  // The same elevation formula above, rasterized onto a low-res canvas and
+  // let the browser's own upscaling soften it into a glowing band --
+  // genuinely computed from real sun geometry, not a decorative image.
+  // Deliberately NOT a simple "which side of the line" fill: exactly at
+  // the equinoxes the night side flips from north-of-curve to
+  // south-of-curve (the terminator briefly runs pole-to-pole instead of
+  // east-to-west), so only a real per-point elevation test is correct
+  // year-round.
+  var GLOW_COLS = 90, GLOW_ROWS = 45;
+  var glowCanvas = null, glowCtx = null;
+
+  function ensureGlowCanvas() {
+    if (glowCanvas) return;
+    glowCanvas = document.createElement('canvas');
+    glowCanvas.className = 'pulse-map-glow';
+    glowCanvas.width = GLOW_COLS;
+    glowCanvas.height = GLOW_ROWS;
+    glowCanvas.setAttribute('aria-hidden', 'true');
+    glowCtx = glowCanvas.getContext('2d');
+    frame.appendChild(glowCanvas);
+  }
+
+  // Night -> a deep indigo dusk. Right at the horizon -> a warm amber
+  // band (the "ring of fire" every real day/night boundary actually has).
+  // Deep day -> fully transparent, so the map's own colors carry through.
+  function elevationToRGBA(el) {
+    if (el <= -14) return [38, 30, 74, 0.55];
+    if (el <= -3) {
+      var t1 = (el + 14) / 11; // -14..-3 -> 0..1
+      return [
+        Math.round(38 + t1 * (196 - 38)),
+        Math.round(30 + t1 * (104 - 30)),
+        Math.round(74 + t1 * (58 - 74)),
+        0.55 - t1 * 0.17,
+      ];
+    }
+    if (el <= 8) {
+      var t2 = (el + 3) / 11; // -3..8 -> 0..1
+      return [196 - t2 * 40, 104 - t2 * 24, 58 + t2 * 60, 0.38 - t2 * 0.38];
+    }
+    return [240, 224, 200, 0];
+  }
+
+  function renderGlowWash(sun) {
+    ensureGlowCanvas();
+    var img = glowCtx.createImageData(GLOW_COLS, GLOW_ROWS);
+    for (var row = 0; row < GLOW_ROWS; row++) {
+      var lat = 90 - ((row + 0.5) / GLOW_ROWS) * 180;
+      for (var col = 0; col < GLOW_COLS; col++) {
+        var lon = ((col + 0.5) / GLOW_COLS) * 360 - 180;
+        var el = solarElevationDeg(lat, lon, sun);
+        var rgba = elevationToRGBA(el);
+        var i = (row * GLOW_COLS + col) * 4;
+        img.data[i] = rgba[0]; img.data[i + 1] = rgba[1]; img.data[i + 2] = rgba[2];
+        img.data[i + 3] = Math.round(rgba[3] * 255);
+      }
+    }
+    glowCtx.putImageData(img, 0, 0);
+  }
+
+  // A fixed sky of real map coordinates (not tied to any city), each one
+  // only actually shown while genuine night sits over that map point --
+  // computed from the exact same sun geometry as everything else here,
+  // never a static decoration.
+  var STAR_COUNT = 130;
+  var stars = [];
+
+  function ensureStars() {
+    if (stars.length) return;
+    for (var i = 0; i < STAR_COUNT; i++) {
+      var xPct = Math.random() * 100;
+      var yPct = Math.random() * 100;
+      var el = document.createElement('span');
+      el.className = 'pulse-map-star';
+      el.style.left = xPct.toFixed(2) + '%';
+      el.style.top = yPct.toFixed(2) + '%';
+      var size = 1.1 + Math.random() * 2.1;
+      el.style.width = size.toFixed(1) + 'px';
+      el.style.height = size.toFixed(1) + 'px';
+      el.style.animationDuration = (2.6 + Math.random() * 3.2).toFixed(1) + 's';
+      el.style.animationDelay = (Math.random() * 4).toFixed(1) + 's';
+      frame.appendChild(el);
+      stars.push({
+        lat: 90 - (yPct / 100) * 180,
+        lon: (xPct / 100) * 360 - 180,
+        el: el,
+      });
+    }
+  }
+
+  function renderStars(sun) {
+    stars.forEach(function (star) {
+      var el = solarElevationDeg(star.lat, star.lon, sun);
+      star.el.classList.toggle('is-visible', el < -4);
+    });
+  }
+
+  // The one real point on Earth where the sun is directly overhead right
+  // now -- a small glowing marker, positioned by the same subsolar
+  // calculation used for the glow wash and the dawn/dusk note.
+  var sunMarker = null;
+
+  function ensureSunMarker() {
+    if (sunMarker) return;
+    sunMarker = document.createElement('span');
+    sunMarker.className = 'pulse-map-sun';
+    sunMarker.setAttribute('aria-hidden', 'true');
+    sunMarker.title = 'Solar noon is happening here right now';
+    frame.appendChild(sunMarker);
+  }
+
+  function renderSunMarker(sun) {
+    ensureSunMarker();
+    var sub = subsolarPoint(sun);
+    var pos = project(sub.lat, sub.lon);
+    sunMarker.style.left = pos.left + '%';
+    sunMarker.style.top = pos.top + '%';
+  }
+
+  // ---------- real per-city dawn/dusk note ----------
+  var dawnDuskMatches = [];
+  var dawnDuskIndex = 0;
+  var dawnDuskRotateTimer = null;
+  var terminatorNote = null;
+
+  // Every real city within the narrow elevation window right now, each
+  // correctly resolved as dawn or dusk from its own hour angle -- never
+  // one rule applied uniformly across longitudes.
+  function computeDawnDusk(cities, sun) {
+    var matches = [];
+    cities.forEach(function (city) {
+      if (typeof city.lat !== 'number' || typeof city.lon !== 'number') return;
+      var elevation = solarElevationDeg(city.lat, city.lon, sun);
+      if (Math.abs(elevation) > DAWN_DUSK_WINDOW_DEG) return;
+      var phase = hourAngleDeg(city.lon, sun) < 0 ? 'dawn' : 'dusk';
+      matches.push({ name: city.name, phase: phase });
+    });
+    return matches;
+  }
+
+  function renderDawnDuskNote() {
+    if (!terminatorNote) return;
+    if (!dawnDuskMatches.length) {
+      terminatorNote.textContent = '';
+      terminatorNote.hidden = true;
+      return;
+    }
+    var m = dawnDuskMatches[dawnDuskIndex % dawnDuskMatches.length];
+    terminatorNote.textContent = m.phase === 'dawn'
+      ? 'Dawn is breaking over ' + m.name + '.'
+      : 'Dusk is settling over ' + m.name + '.';
+    terminatorNote.hidden = false;
+  }
+
+  function stopDawnDuskRotation() {
+    if (dawnDuskRotateTimer) { clearInterval(dawnDuskRotateTimer); dawnDuskRotateTimer = null; }
+  }
+
+  function startDawnDuskRotation() {
+    stopDawnDuskRotation();
+    if (dawnDuskMatches.length <= 1) return;
+    dawnDuskRotateTimer = setInterval(function () {
+      dawnDuskIndex = (dawnDuskIndex + 1) % dawnDuskMatches.length;
+      renderDawnDuskNote();
+    }, DAWN_DUSK_ROTATE_MS);
+  }
+
+  function refreshTerminator(cities) {
+    var sun = sunGeometry(new Date());
+    renderGlowWash(sun);
+    renderStars(sun);
+    renderTerminator(sun);
+    renderSunMarker(sun);
+    dawnDuskMatches = computeDawnDusk(cities, sun);
+    dawnDuskIndex = 0;
+    renderDawnDuskNote();
+    startDawnDuskRotation();
   }
 
   function renderLandmasses() {
@@ -250,7 +564,13 @@
     var cities = (window.CITIES_DATA || []).filter(function (c) { return c.available !== false; });
     if (!cities.length) return;
 
+    // Stacking order, back to front: glow wash, stars, landmasses,
+    // terminator line, sun marker, then the clickable city nodes on top.
+    ensureGlowCanvas();
+    ensureStars();
     renderLandmasses();
+    ensureTerminatorSvg();
+    ensureSunMarker();
     renderNodes(cities);
     wireSearch();
     frame.addEventListener('click', handleFrameClick);
@@ -263,6 +583,10 @@
     });
 
     setInterval(pollForShifts, POLL_MS);
+
+    terminatorNote = document.getElementById('pulse-map-terminator-note');
+    refreshTerminator(cities);
+    setInterval(function () { refreshTerminator(cities); }, TERMINATOR_REFRESH_MS);
   }
 
   window.GlotempPulseMap = { pulseNode: pulseNode };
