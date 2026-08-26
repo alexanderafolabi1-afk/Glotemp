@@ -55,6 +55,13 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
   <title>Glotemp – Live City Pulse</title>
 
+  <link rel="alternate" hreflang="en" href="https://glo-temp.com/" />
+  <link rel="alternate" hreflang="es" href="https://glo-temp.com/" />
+  <link rel="alternate" hreflang="fr" href="https://glo-temp.com/" />
+  <link rel="alternate" hreflang="de" href="https://glo-temp.com/" />
+  <link rel="alternate" hreflang="pt" href="https://glo-temp.com/" />
+  <link rel="alternate" hreflang="ja" href="https://glo-temp.com/" />
+  <link rel="alternate" hreflang="x-default" href="https://glo-temp.com/" />
   <!-- Type system: Fraunces (display), Manrope (body), IBM Plex Mono (data) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -82,6 +89,13 @@
           <span class="welcome-intro-dot" data-dot="3"></span>
         </div>
 
+        <!-- Persistent across all 3 steps, built from real signals
+             (document.referrer, a real search-query param if present) --
+             see welcome-intro.js's personalizationLine(). Never fabricated:
+             if none of those signals are present, this reads as a plain
+             direct-visit line, not a guess dressed up as one. -->
+        <p class="welcome-intro-recognition" id="welcome-intro-recognition"></p>
+
         <div class="welcome-intro-step" data-step="1">
           <p class="welcome-intro-eyebrow">Right now</p>
           <h2 id="welcome-intro-heading" class="welcome-intro-headline"><span id="welcome-intro-city-name">A city</span>'s radio is playing right now.</h2>
@@ -92,22 +106,32 @@
           <audio id="welcome-intro-audio" preload="none"></audio>
         </div>
 
+        <!-- Rotates through real rows from the `readings` table (the same
+             12-vertical collector data city pages already show) -- never a
+             fixed list, see welcome-intro.js's fetchLiveExamples(). The
+             comic-burst shape is the exact same SVG language the homepage
+             Instrument Room uses (#instrument-row above), just at modal
+             scale, so this reads as the same family rather than a new
+             visual system. -->
         <div class="welcome-intro-step" data-step="2" hidden>
-          <p class="welcome-intro-eyebrow">Your part in it</p>
-          <h2 class="welcome-intro-headline">You can shape how a city feels.</h2>
-          <p class="welcome-intro-body">A quick, honest check-in -- a mood, a line about tonight -- folds into the real reading everyone else sees. Not a rating. A pulse.</p>
-          <p class="welcome-intro-fineprint">Check-ins need your real location to match the city, so every reading stays honest.</p>
+          <p class="welcome-intro-eyebrow">Live, not staged</p>
+          <h2 class="welcome-intro-headline">This is happening right now.</h2>
+          <div class="welcome-intro-example" id="welcome-intro-example" aria-live="polite"></div>
+          <p class="welcome-intro-fineprint">Every number above comes from a real source, refreshed automatically. Add your own reading and it joins them -- check-ins need your real location, so every reading stays honest.</p>
         </div>
 
         <div class="welcome-intro-step" data-step="3" hidden>
-          <p class="welcome-intro-eyebrow">Keep it close</p>
-          <h2 class="welcome-intro-headline">Add us to your home screen.</h2>
-          <p class="welcome-intro-body">Your cities, always with you.</p>
+          <p class="welcome-intro-eyebrow">Be part of it</p>
+          <h2 class="welcome-intro-headline">Every city here stays honest because someone kept it close.</h2>
+          <p class="welcome-intro-body">Add us to your home screen, and help keep <span id="welcome-intro-city-name-2">your city</span> -- and every city here -- read for real.</p>
           <p class="welcome-intro-fallback" id="welcome-intro-install-fallback" hidden></p>
         </div>
 
         <div class="welcome-intro-actions">
           <button type="button" class="btn-text welcome-intro-back" id="welcome-intro-back" hidden>Back</button>
+          <svg class="welcome-intro-arrow" id="welcome-intro-arrow" viewBox="0 0 16 10" aria-hidden="true" hidden>
+            <path d="M2 1l6 7 6-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
           <button type="button" class="btn-neon welcome-intro-next" id="welcome-intro-next">Next</button>
           <button type="button" class="btn-neon welcome-intro-install-btn" id="install-btn" hidden>Add to home screen</button>
         </div>
