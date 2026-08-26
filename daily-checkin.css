@@ -60,7 +60,7 @@
    Deliberately the same muted register as .daily-checkin-copy.subtle, not
    the neon/brass treatment used for actionable state, so it reads as an
    aside rather than a call to gamify. */
-.daily-checkin-founding-note {
+.daily-checkin-perks-note {
   font-size: 0.82rem;
   line-height: 1.55;
   color: rgba(244,241,234,0.58);

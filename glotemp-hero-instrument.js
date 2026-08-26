@@ -624,7 +624,7 @@
     const band = window.GlotempCore ? GlotempCore.moodToBand(city.mood).band : 'equilibrium';
     const lines = SPARK_LINES[band] || SPARK_LINES.equilibrium;
     const line = lines[Math.floor(Math.random() * lines.length)];
-    el.textContent = `${city.name} — ${line}`;
+    el.textContent = `${city.name}: ${line}`;
     el.classList.add('is-visible');
     clearTimeout(el._sparkTimer);
     el._sparkTimer = setTimeout(() => el.classList.remove('is-visible'), 5000);
