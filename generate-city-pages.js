@@ -513,10 +513,10 @@ function generateCityPage(city) {
               },
               body: JSON.stringify({ city_slug: citySlug, email }),
             });
-            statusEl.textContent = "You're on the list -- we'll notify " + email + '.';
+            statusEl.textContent = "You're on the list. We'll notify " + email + '.';
             emailInput.value = '';
           } catch (e) {
-            statusEl.textContent = "Saved locally -- we'll sync this once you're back online.";
+            statusEl.textContent = "Saved locally. We'll sync this once you're back online.";
           }
           submitBtn.disabled = false;
         });

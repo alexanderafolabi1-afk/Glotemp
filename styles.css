@@ -2242,9 +2242,8 @@ summary:focus:not(:focus-visible) {
 
 /* ===== WELCOME INTRO =====
    The first-visit 3-step intro that replaced the old single-step install
-   banner. Same registered visual language as .gt-auth-overlay/.gt-auth-modal
-   (dark gradient card, blurred backdrop, brass accents) rather than a new
-   idiom -- this is a dialog like that one is, not a marketing banner. */
+   banner. Same glass modal surface as the rest of the site, brass
+   accents, a dialog rather than a marketing banner. */
 .welcome-intro-overlay {
   position: fixed;
   inset: 0;
@@ -2261,25 +2260,48 @@ summary:focus:not(:focus-visible) {
 
 .welcome-intro-overlay[hidden] { display: none; }
 
-/* Chamfered plate, not a rounded rectangle: same two-corner-cut language
-   as the city-tier plate badges and the /developers route plates
-   (top-left and bottom-right cut, the other two square) -- one shape
-   family across the site instead of a fourth, unrelated modal style.
-   The dismiss button sits at top-right (a square corner) and the
-   actions row hugs the bottom-left (also square), so nothing real gets
-   clipped by the chamfer. */
+/* Softened glass card, matching the modal surface used across the rest
+   of the site (see --glass-opacity/--glass-blur and .lang-list): the
+   same dark grained ground as the page itself showing through a blurred
+   pane, rounded corners, not a flat bordered rectangle. A gentle
+   fade-and-scale plays automatically the moment this leaves display:none,
+   since a CSS animation always restarts when an element re-enters the
+   render tree -- no open/close JS required for the motion itself. */
 .welcome-intro-modal {
   position: relative;
   width: 100%;
   max-width: 440px;
-  background: linear-gradient(180deg, rgba(30, 24, 17, 0.96) 0%, rgba(14, 12, 9, 0.98) 100%);
-  border: 1px solid var(--brass-dim);
-  clip-path: polygon(28px 0, 100% 0, 100% calc(100% - 28px), calc(100% - 28px) 100%, 0 100%, 0 28px);
+  background:
+    radial-gradient(ellipse 140px 100px at 18% 20%, rgba(240, 224, 200, 0.03) 0%, transparent 45%),
+    radial-gradient(ellipse 120px 90px at 78% 65%, rgba(240, 224, 200, 0.026) 0%, transparent 45%),
+    repeating-linear-gradient(45deg, transparent 0px, transparent 2px, rgba(240, 224, 200, 0.012) 2px, rgba(240, 224, 200, 0.012) 3px),
+    repeating-linear-gradient(-45deg, transparent 0px, transparent 2px, rgba(240, 224, 200, 0.01) 2px, rgba(240, 224, 200, 0.01) 3px),
+    linear-gradient(180deg, rgba(30, 24, 17, var(--glass-opacity)) 0%, rgba(10, 8, 6, var(--glass-opacity)) 100%);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--radius);
   padding: 2.25rem 1.85rem 1.75rem;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
   max-height: calc(100vh - 2.5rem);
   overflow-y: auto;
   color: var(--ivory);
+  animation: modal-surface-in 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modal-surface-in {
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome-intro-modal { animation: none; }
+}
+.welcome-intro-modal.is-closing {
+  animation: modal-surface-out 200ms ease-in forwards;
+}
+@keyframes modal-surface-out {
+  to { opacity: 0; transform: scale(0.97) translateY(4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome-intro-modal.is-closing { animation: none; }
 }
 
 .welcome-intro-dismiss {
@@ -2514,7 +2536,7 @@ summary:focus:not(:focus-visible) {
 @media (max-width: 480px) {
   .welcome-intro-modal {
     padding: 1.85rem 1.15rem 1.35rem;
-    clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+    border-radius: 16px;
   }
   .welcome-intro-example { height: 176px; }
 }
@@ -3460,9 +3482,18 @@ summary:focus:not(:focus-visible) {
   width: min(920px, 100%);
   padding: 1.5rem;
   position: relative;
-  background: linear-gradient(180deg, rgba(35, 28, 20, 0.95), rgba(15, 16, 24, 0.98));
+  background:
+    radial-gradient(ellipse 160px 110px at 22% 22%, rgba(240, 224, 200, 0.03) 0%, transparent 45%),
+    repeating-linear-gradient(45deg, transparent 0px, transparent 2px, rgba(240, 224, 200, 0.012) 2px, rgba(240, 224, 200, 0.012) 3px),
+    linear-gradient(180deg, rgba(35, 28, 20, var(--glass-opacity)), rgba(15, 16, 24, var(--glass-opacity)));
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border-radius: var(--radius);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  animation: modal-surface-in 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .constellation-dialog { animation: none; }
 }
 
 .constellation-close {
@@ -3705,14 +3736,22 @@ summary:focus:not(:focus-visible) {
 }
 
 .lang-list {
-  background: rgba(35, 28, 20, var(--glass-opacity));
+  background:
+    radial-gradient(ellipse 120px 90px at 20% 20%, rgba(240, 224, 200, 0.03) 0%, transparent 45%),
+    repeating-linear-gradient(45deg, transparent 0px, transparent 2px, rgba(240, 224, 200, 0.012) 2px, rgba(240, 224, 200, 0.012) 3px),
+    rgba(35, 28, 20, var(--glass-opacity));
   backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   padding: 2rem;
   border-radius: var(--radius);
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 0.5rem;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  animation: modal-surface-in 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .lang-list { animation: none; }
 }
 
 .lang-option {
@@ -4402,12 +4441,20 @@ small {
   position: absolute;
   z-index: 5;
   min-width: 11rem;
-  padding: 0.7rem 0.9rem;
-  background: var(--basalt-raised);
-  border: 1px solid var(--brass-dim);
-  border-radius: 2px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  padding: 0.85rem 1rem;
+  background:
+    radial-gradient(ellipse 90px 60px at 20% 25%, rgba(240, 224, 200, 0.03) 0%, transparent 45%),
+    repeating-linear-gradient(45deg, transparent 0px, transparent 2px, rgba(240, 224, 200, 0.012) 2px, rgba(240, 224, 200, 0.012) 3px),
+    rgba(20, 16, 12, var(--glass-opacity));
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: 14px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
   font-size: 0.8rem;
+  animation: modal-surface-in 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-map-popover { animation: none; }
 }
 .pulse-map-popover-city {
   display: block;
@@ -6554,12 +6601,21 @@ a:hover .city-landmark-photo,
   position: relative;
   width: 100%;
   max-width: 420px;
-  background: linear-gradient(180deg, rgba(30, 24, 17, 0.96) 0%, rgba(14, 12, 9, 0.98) 100%);
+  background:
+    radial-gradient(ellipse 140px 100px at 20% 20%, rgba(240, 224, 200, 0.03) 0%, transparent 45%),
+    repeating-linear-gradient(45deg, transparent 0px, transparent 2px, rgba(240, 224, 200, 0.012) 2px, rgba(240, 224, 200, 0.012) 3px),
+    linear-gradient(180deg, rgba(30, 24, 17, var(--glass-opacity)) 0%, rgba(10, 8, 6, var(--glass-opacity)) 100%);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border-radius: var(--radius);
   padding: 2rem 1.75rem 1.75rem;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
   max-height: calc(100vh - 2.5rem);
   overflow-y: auto;
+  animation: modal-surface-in 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .gt-auth-modal { animation: none; }
 }
 
 .gt-auth-close {
@@ -8817,9 +8873,9 @@ time, .instr-clock, .tonight-modelled {
 }
 .trip-action:hover { border-color: var(--brass); color: var(--brass); }
 .trip-action svg { flex: 0 0 auto; }
-/* ===== AUTH MODAL: hairlines, not stacked boxes ===== */
-.gt-auth-modal { border-radius: 0; border: none; background: var(--obsidian); box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6); }
-.gt-auth-close { border-radius: 0; }
+/* ===== AUTH MODAL: form rows stay hairline-divided, not stacked boxes,
+   but the modal surface itself now matches the rest of the site's glass
+   treatment (see .gt-auth-modal above) rather than a flat rectangle. */
 .gt-auth-provider {
   border-radius: 0; background: transparent; color: var(--ivory);
   border: none; border-bottom: 1px solid var(--brass-dim);

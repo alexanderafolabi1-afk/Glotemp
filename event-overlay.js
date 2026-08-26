@@ -52,9 +52,9 @@
       const dayOpts = { month: 'short', day: 'numeric', timeZone: 'UTC' };
       const startStr = new Intl.DateTimeFormat('en-US', dayOpts).format(start);
       const endStr = new Intl.DateTimeFormat('en-US', { ...dayOpts, year: 'numeric' }).format(end);
-      return `${startStr} – ${endStr}`;
+      return `${startStr} to ${endStr}`;
     } catch (e) {
-      return `${startISO} – ${endISO}`;
+      return `${startISO} to ${endISO}`;
     }
   }
 

@@ -1,25 +1,22 @@
-// Glotemp: the first-visit intro. Evolves the earlier fixed 3-step
-// version -- same mechanics (once per visitor, dismissible from any step,
-// nothing gated behind a click), but the content now actually reflects
-// the visitor rather than being identical for everyone:
+// Glotemp: the first-visit intro. Same mechanics as before (once per
+// visitor, dismissible from any step, nothing gated behind a click), and
+// the content reflects the visitor rather than being identical for
+// everyone. A recognition line is built from signals: document.referrer,
+// and a search-query URL param if one is present, never invented. The
+// resolved city falls back to a zero-permission timezone guess (the same
+// approach glotemp-city-sell.js already uses) instead of "the first city
+// in the array" when GPS isn't granted or the hero instrument hasn't
+// resolved yet. Step 2 rotates through rows from the `readings` table
+// (the same 12-vertical collector data every city page already shows),
+// never a hardcoded list; whichever verticals have the freshest,
+// highest-confidence signal right now are what shows.
 //
-//   - a recognition line built from real signals (document.referrer, a
-//     real search-query URL param if one is present) -- never invented
-//   - the resolved city now falls back to a real zero-permission
-//     timezone guess (the same approach glotemp-city-sell.js already
-//     uses) instead of "the first city in the array" when GPS isn't
-//     granted or the hero instrument hasn't resolved yet
-//   - step 2 rotates through real rows from the `readings` table (the
-//     same 12-vertical collector data every city page already shows),
-//     never a hardcoded list -- whichever verticals have the freshest,
-//     highest-confidence signal right now are what shows
-//
-// Visually: the modal is a chamfered plate (the same two-corner-cut
-// language as the city-tier badges and the /developers route plates),
-// step 2's rotating example sits inside the exact comic-burst SVG shape
-// the homepage Instrument Room uses, and step 3 carries the same chevron
-// arrow checkin-insignia's "Check in" sign already uses, rotated to
-// point at the install button -- one shape family, not a fourth one.
+// Visually: the modal is the same glass surface used across the rest of
+// the site. Step 2's rotating example sits inside the exact comic-burst
+// SVG shape the homepage Instrument Room uses, and step 3 carries the
+// same chevron arrow checkin-insignia's "Check in" sign already uses,
+// rotated to point at the install button, one shape family, not a
+// separate one.
 (function () {
   'use strict';
 
@@ -30,7 +27,7 @@
   const EXAMPLE_ROTATE_MS = 3200;
 
   // The 5 comic-burst paths #instrument-row already carries (viewBox
-  // 0 0 200 200, preserveAspectRatio="none") -- copied verbatim rather
+  // 0 0 200 200, preserveAspectRatio="none"), copied verbatim rather
   // than re-derived, so step 2's plates are drawn from the same stamped
   // set the homepage uses, not a lookalike redrawn by hand.
   const BURST_PATHS = [
@@ -60,7 +57,7 @@
 
   // ---------- real signal: rough browser location, zero permission ----------
   // Mirrors glotemp-city-sell.js's guessNearbyCity() exactly (timezone
-  // exact-match, then closest UTC offset, then top-ranked) -- duplicated
+  // exact-match, then closest UTC offset, then top-ranked), duplicated
   // rather than imported since that module keeps it private to its own
   // IIFE, same "small pure function, independently kept" precedent as
   // city-conditions.js's localHour().
@@ -155,7 +152,7 @@
       if (/google\.|bing\.|duckduckgo\.|yahoo\./.test(host)) return 'You searched, and found us.';
       if (host && host !== 'glo-temp.com') return 'Someone pointed you here.';
     }
-    return 'You came straight to us.';
+    return 'Glad you’re here.';
   }
 
   // ---------- step 1: real radio ----------
@@ -240,9 +237,9 @@
     return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
   }
 
-  // Pulls real rows from `readings` -- the same 12-vertical collector
-  // data every city/vertical page already shows -- and keeps only the
-  // freshest row per vertical above a real-confidence floor. Which
+  // Pulls rows from `readings` (the same 12-vertical collector data
+  // every city/vertical page already shows) and keeps only the
+  // freshest row per vertical above a confidence floor. Which
   // verticals actually show up, and in what order, is decided entirely
   // by what data exists right now: never a hardcoded list.
   async function fetchLiveExamples() {
@@ -292,7 +289,7 @@
         '<span class="welcome-intro-example-icon" style="color:' + color + '">' + icon + '</span>' +
         '<span class="welcome-intro-example-vertical" style="color:' + color + '">' + esc(label) + '</span>' +
         '<p class="welcome-intro-example-city">' + esc(ex.city.name) + '</p>' +
-        '<p class="welcome-intro-example-fact">' + esc(ex.label) + ': <strong>' + formatValue(ex.value) + '</strong></p>' +
+        '<p class="welcome-intro-example-fact">' + esc(ex.label) + ' sits at <strong>' + formatValue(ex.value) + '</strong> right now.</p>' +
       '</div>'
     );
   }
@@ -302,7 +299,7 @@
     if (!mount) return;
     if (!liveExamples.length) {
       mount.classList.remove('is-entering');
-      mount.innerHTML = '<p class="welcome-intro-example-empty">Live readings are quietly building right now.</p>';
+      mount.innerHTML = '<p class="welcome-intro-example-empty">Every city here has a story right now.</p>';
       return;
     }
     const ex = liveExamples[exampleIndex % liveExamples.length];
@@ -328,7 +325,7 @@
   // ---------- step 3: install action, or a manual fallback ----------
   // beforeinstallprompt never fires on iOS (every iOS browser is WebKit
   // under the hood, and WebKit doesn't implement it) or for a visitor who
-  // already has us installed -- on those, install-btn would be a
+  // already has us installed. On those, install-btn would be a
   // guaranteed dead click. Detect both and swap in plain instructions
   // instead, so the button is only ever shown when it will actually do
   // something.
@@ -341,7 +338,7 @@
   function isIOS() {
     const ua = window.navigator.userAgent || '';
     return /iPad|iPhone|iPod/.test(ua) ||
-      // iPadOS 13+ reports as "MacIntel" with a real touchscreen -- the
+      // iPadOS 13+ reports as "MacIntel" with a real touchscreen, the
       // one thing a touch-capable Mac claim never is otherwise.
       (window.navigator.platform === 'MacIntel' && (window.navigator.maxTouchPoints || 0) > 1);
   }
@@ -352,7 +349,7 @@
     const arrow = document.getElementById('welcome-intro-arrow');
     if (!install || !fallback) return;
     // .hidden as a JS property isn't reliably reflected on SVGElement the
-    // way it is on HTMLElement -- setting arrow.hidden = false silently
+    // way it is on HTMLElement: setting arrow.hidden = false silently
     // no-ops as a plain expando in some engines, leaving the real
     // `hidden` attribute (and the [hidden]{display:none} UA rule) still
     // in effect. Attribute calls work on any element type.
@@ -382,7 +379,7 @@
       fallback.textContent = 'Tap Share, then "Add to Home Screen."';
       return;
     }
-    // Not iOS, not standalone, not installable yet -- a supported browser
+    // Not iOS, not standalone, not installable yet: a supported browser
     // (Chrome/Edge/Android) where beforeinstallprompt just hasn't fired
     // by this render. Keep the real button: app.js's handler already
     // no-ops safely if clicked before the event arrives, and the
@@ -418,11 +415,25 @@
     }
   }
 
+  function prefersReducedMotion() {
+    try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
+  }
+
   function close() {
     const overlay = document.getElementById('welcome-intro-overlay');
-    if (overlay) overlay.hidden = true;
     if (audioEl && playing) { audioEl.pause(); playing = false; }
     stopExampleRotation();
+    if (!overlay) return;
+    const modal = overlay.querySelector('.welcome-intro-modal');
+    if (modal && !prefersReducedMotion()) {
+      modal.classList.add('is-closing');
+      setTimeout(() => {
+        overlay.hidden = true;
+        modal.classList.remove('is-closing');
+      }, 200);
+    } else {
+      overlay.hidden = true;
+    }
   }
 
   async function show() {

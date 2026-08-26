@@ -179,7 +179,7 @@ const CITY_TRIVIA = {
     "Monterrey is framed by the dramatic Cerro de la Silla, a mountain shaped like a saddle.",
   ],
   dallas: [
-    "Dallas–Fort Worth shares one of the largest airports in the world by land area.",
+    "Dallas-Fort Worth shares one of the largest airports in the world by land area.",
   ],
   minneapolis: [
     "Minneapolis has more theatre seats per capita than any US city outside New York.",

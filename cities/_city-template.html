@@ -60,9 +60,9 @@
           <span id="city-metro-pop"></span>
         </div>
         <p class="conditions-line" id="conditions-line" aria-live="polite"></p>
-        <!-- Real "Why" line: built only from stored deltas in
+        <!-- "Why" line: built only from stored deltas in
              city_signal_snapshots (see city-why.js). Hidden until at
-             least two real days of history exist for this city -- never
+             least two days of history exist for this city, never
              a guess standing in for a trend that isn't there yet. -->
         <p class="why-line" id="why-line" aria-live="polite" hidden></p>
         <div class="city-action-row">
@@ -77,19 +77,16 @@
           </div>
           <p id="watch-email-status" class="inline-feedback"></p>
         </div>
-        <!-- Primary action, directly under the mood reading above --
-             placeholder destination for now. -->
-        <a href="/tonight/" class="tonight-cta-btn">Is tonight the night?</a>
       </div>
     </section>
 
-    <!-- Social proof: same honestly-scoped real numbers and strongest
-         readings as the homepage -- see social-proof.js. Hidden until real
+    <!-- Social proof: same honestly-scoped numbers and strongest
+         readings as the homepage, see social-proof.js. Hidden until
          data actually resolves. -->
     <section class="glass-card social-proof-section" id="social-proof-mount" aria-label="Real activity across Glotemp" hidden></section>
 
     <!-- City reading: given the first, most prominent placement on the
-         page -- right after the hero, before anything else.
+         page, right after the hero, before anything else.
          glotemp-checkin.js finds #city-observation-feed by id regardless
          of where it sits in the DOM, so moving it here is safe; it
          replaces this section's contents with the live composer (or,
@@ -112,7 +109,7 @@
 
     <!-- Offers Panel: "Tonight in [City]", every vertical. See
          glotemp-offers.js. Renders nothing at all when this city has no
-         active offers -- no empty state, no gap. -->
+         active offers: no empty state, no gap. -->
     <section class="glass-card offers-panel" id="offers-panel" aria-label="Tonight in this city" hidden></section>
 
     <section class="glass-card city-affiliate-row">
@@ -129,8 +126,8 @@
     </section>
 
     <!-- Attention layer: Wikipedia pageviews + edit-activity, fetched
-         client-side with a 5s timeout -- see city-attention.js. Hidden by
-         default; only shown once real data actually loads, so a failed
+         client-side with a 5s timeout, see city-attention.js. Hidden by
+         default; only shown once data actually loads, so a failed
          or slow fetch never leaves a stuck spinner or an empty box. -->
     <section class="glass-card city-attention-section" id="city-attention-section" style="display:none;">
       <p class="eyebrow">Attention</p>
