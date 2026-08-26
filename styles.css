@@ -2261,13 +2261,20 @@ summary:focus:not(:focus-visible) {
 
 .welcome-intro-overlay[hidden] { display: none; }
 
+/* Chamfered plate, not a rounded rectangle: same two-corner-cut language
+   as the city-tier plate badges and the /developers route plates
+   (top-left and bottom-right cut, the other two square) -- one shape
+   family across the site instead of a fourth, unrelated modal style.
+   The dismiss button sits at top-right (a square corner) and the
+   actions row hugs the bottom-left (also square), so nothing real gets
+   clipped by the chamfer. */
 .welcome-intro-modal {
   position: relative;
   width: 100%;
   max-width: 440px;
   background: linear-gradient(180deg, rgba(30, 24, 17, 0.96) 0%, rgba(14, 12, 9, 0.98) 100%);
   border: 1px solid var(--brass-dim);
-  border-radius: var(--radius);
+  clip-path: polygon(28px 0, 100% 0, 100% calc(100% - 28px), calc(100% - 28px) 100%, 0 100%, 0 28px);
   padding: 2.25rem 1.85rem 1.75rem;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
   max-height: calc(100vh - 2.5rem);
@@ -2400,8 +2407,116 @@ summary:focus:not(:focus-visible) {
   padding: 0 1.5rem;
 }
 
+/* The recognition line: built from real signals (referrer, a real search
+   query param) -- see welcome-intro.js's personalizationLine(). Persistent
+   across all 3 steps, directly under the dots, so the "this already knows
+   something about me" feeling isn't confined to one step. */
+.welcome-intro-recognition {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.03em;
+  color: var(--brass);
+  opacity: 0.85;
+  margin: 0 0 1.1rem;
+}
+
+/* Step 2's rotating live example: a comic-burst plate (same SVG language
+   as #instrument-row above and the .instrument-burst it uses) sized down
+   for the modal, one distinct real reading at a time. */
+.welcome-intro-example {
+  position: relative;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.6rem 0 1rem;
+}
+.welcome-intro-burst {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.welcome-intro-burst path {
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  transition: fill 400ms ease, stroke 400ms ease, filter 400ms ease;
+}
+.welcome-intro-example-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.3rem;
+  padding: 1rem 1.5rem;
+}
+.welcome-intro-example-icon { width: 26px; height: 26px; }
+.welcome-intro-example-icon svg { width: 100%; height: 100%; }
+.welcome-intro-example-vertical {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.welcome-intro-example-city {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: 1.15rem;
+  color: var(--ivory);
+  margin: 0;
+}
+.welcome-intro-example-fact {
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+  color: var(--sand);
+  margin: 0;
+  max-width: 30ch;
+}
+.welcome-intro-example-fact strong { color: var(--ivory); font-weight: 600; }
+.welcome-intro-example-empty {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--sand);
+  text-align: center;
+}
+/* Restarted on every rotation by toggling this class off/on in JS
+   (welcome-intro.js's renderExample) rather than a CSS-only loop, so a
+   fresh entrance plays each time the content actually changes. */
+.welcome-intro-example.is-entering .welcome-intro-burst,
+.welcome-intro-example.is-entering .welcome-intro-example-body {
+  animation: welcome-intro-example-in 460ms ease-out;
+}
+@keyframes welcome-intro-example-in {
+  from { opacity: 0; transform: scale(0.93); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Step 3's install cue: the exact chevron path checkin-insignia's "Check
+   in" sign already uses, rotated to point at the button beside it rather
+   than reinventing a new arrow shape. */
+.welcome-intro-arrow {
+  width: 20px;
+  height: 20px;
+  color: var(--brass);
+  animation: welcome-intro-arrow-nudge 1.4s ease-in-out infinite;
+}
+.welcome-intro-arrow[hidden] { display: none; }
+@keyframes welcome-intro-arrow-nudge {
+  0%, 100% { transform: rotate(-90deg) translateX(0); opacity: 0.55; }
+  50% { transform: rotate(-90deg) translateX(4px); opacity: 1; }
+}
+
 @media (max-width: 480px) {
-  .welcome-intro-modal { padding: 1.85rem 1.15rem 1.35rem; }
+  .welcome-intro-modal {
+    padding: 1.85rem 1.15rem 1.35rem;
+    clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+  }
+  .welcome-intro-example { height: 176px; }
 }
 
 /* ===== PUSH NOTIFICATION PROMPT =====
