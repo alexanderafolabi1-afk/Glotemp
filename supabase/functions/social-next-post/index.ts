@@ -39,15 +39,21 @@
 // reason (claim_lost_to_concurrent_call) rather than silently trying
 // another row, so a real race is visible in the response, not masked.
 //
-// The claim is released (claimed_at reset to null) by social-mark-posted
-// the moment a platform is genuinely marked posted -- so a row still
-// needing its other platform isn't blocked from being reclaimed until
-// expiry. CLAIM_EXPIRY_MINUTES exists only for the crash case: an
-// execution that claims a row and then dies before ever calling
-// social-mark-posted (Make itself crashing, a network partition, etc).
-// Without an expiry that row would be locked forever; with it, the row
-// becomes claimable again once the claim is older than
-// CLAIM_EXPIRY_MINUTES, comfortably inside the next poll cycle.
+// The claim is released ONLY by expiry -- CLAIM_EXPIRY_MINUTES, below.
+// social-mark-posted does NOT null claimed_at when it marks a platform
+// posted (real bug, confirmed live, fixed: it used to, which reopened
+// this exact claim to a concurrent execution the moment the FIRST of a
+// row's two platforms succeeded, mid-execution, well before the second
+// platform was posted -- a live-confirmed duplicate post, not a
+// hypothetical one; see social-mark-posted's header comment for the
+// full story). CLAIM_EXPIRY_MINUTES exists for the crash case: an
+// execution that claims a row and then dies before finishing both
+// platforms (Make itself crashing, a network partition, etc). Without
+// an expiry that row would be locked forever; with it, the row becomes
+// claimable again once the claim is older than CLAIM_EXPIRY_MINUTES,
+// comfortably inside the next poll cycle -- a delay that only matters
+// for that crash case, since a normal single execution never re-polls
+// mid-run and so never needs the claim released early.
 //
 // CAMPAIGN_START_DATE (env var, with a real default below)
 // social_content_queue rows are keyed by day_number (1-30), not a
