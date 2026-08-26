@@ -40,6 +40,7 @@ const urls = [
   { loc: 'https://glo-temp.com/explore', priority: '0.9', changefreq: 'daily' },
   { loc: 'https://glo-temp.com/about', priority: '0.8', changefreq: 'weekly' },
   { loc: 'https://glo-temp.com/feed', priority: '0.9', changefreq: 'daily' },
+  { loc: 'https://glo-temp.com/developers', priority: '0.7', changefreq: 'weekly' },
   { loc: 'https://glo-temp.com/gem', priority: '0.6', changefreq: 'daily' },
   { loc: 'https://glo-temp.com/methodology', priority: '0.5', changefreq: 'monthly' },
   { loc: 'https://glo-temp.com/movers', priority: '0.7', changefreq: 'daily' },
