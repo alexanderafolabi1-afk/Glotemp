@@ -2424,10 +2424,57 @@ function applyWeatherToSlot(slotEl, category) {
   if (category === 'snow') renderSnowflakes(weatherEl, 14);
 }
 
-// Barometer rotation - 5 slots, staggered, session-shuffled
-// Rotation pool: the top 20 cities by living index (see living-index.js) --
-// the same pool /explore's "Now showing" row draws from, so the homepage
-// and /explore never disagree about which cities are currently "hot".
+// Real current reading for a city: the live pulse-vertical average from
+// Supabase (ranking.cities[].pulseReading, computed in living-index.js),
+// falling back to the city's static baseline mood only when no live pulse
+// reading exists yet for it -- the exact fallback living-index.js itself
+// already documents and uses. Never a fabricated number.
+function effectiveMood(cityData) {
+  if (cityData.pulseReading != null) return cityData.pulseReading;
+  if (cityData.mood != null) return cityData.mood;
+  return 7.0;
+}
+
+// Groups a pool of real cities by their real current band, shuffles within
+// each band, then round-robins across bands (in a shuffled band order) so
+// the first N picks favor N distinct bands before ever repeating one. Only
+// ever returns cities that are actually in the pool with their own real
+// reading -- diversity comes from which real band each one already sits
+// in, never a forced or invented spread.
+function pickBandDiverseCities(pool, count) {
+  const buckets = {};
+  pool.forEach(c => {
+    const band = moodToBand(effectiveMood(c)).band;
+    (buckets[band] = buckets[band] || []).push(c);
+  });
+  Object.values(buckets).forEach(arr => arr.sort(() => Math.random() - 0.5));
+  const bandOrder = Object.keys(buckets).sort(() => Math.random() - 0.5);
+  const picked = [];
+  const pickedSlugs = new Set();
+  for (let round = 0; picked.length < count && round < pool.length; round++) {
+    let addedThisRound = false;
+    for (const band of bandOrder) {
+      if (picked.length >= count) break;
+      const candidate = buckets[band][round];
+      if (candidate && !pickedSlugs.has(candidate.slug)) {
+        picked.push(candidate);
+        pickedSlugs.add(candidate.slug);
+        addedThisRound = true;
+      }
+    }
+    if (!addedThisRound) break;
+  }
+  return picked;
+}
+
+// Barometer rotation - 5 slots, staggered, session-shuffled, band-diverse.
+// Rotation pool: every available city's real current reading (see
+// effectiveMood above) -- previously this was narrowed to the top 20 by
+// living index (the same pool /explore's "Now showing" row draws from),
+// but that pool skews toward the "charged" band by construction, which
+// left the row showing five identical bands instead of the spread its own
+// copy promises. The wider pool plus pickBandDiverseCities below fixes
+// that without inventing any data.
 async function setupBarometerRotation() {
   const slots = document.querySelectorAll('.instrument-slot');
   if (!slots.length) return;
@@ -2436,7 +2483,12 @@ async function setupBarometerRotation() {
   try {
     const ranking = await GlotempLivingIndex.getRanking();
     const citiesBySlug = new Map((window.CITIES_DATA || []).map(c => [c.slug, c]));
-    pool = (ranking.top20 || []).map(c => citiesBySlug.get(c.slug) || c).filter(Boolean);
+    pool = (ranking.cities || [])
+      .map(rc => {
+        const full = citiesBySlug.get(rc.slug);
+        return full ? Object.assign({}, full, { pulseReading: rc.pulseReading }) : null;
+      })
+      .filter(Boolean);
   } catch (e) {
     pool = [];
   }
@@ -2447,22 +2499,19 @@ async function setupBarometerRotation() {
   }
   if (pool.length < 5) return;
 
-  // Shuffle once per session
-  const shuffled = pool.slice().sort(() => Math.random() - 0.5);
-  let cursor = 0;
+  const assigned = pickBandDiverseCities(pool, 5);
 
-  // Assign 5 unique starting cities
-  const assigned = [];
-  for (let i = 0; i < 5; i++) {
-    assigned.push(shuffled[cursor++ % shuffled.length]);
-  }
-
-  function nextUniqueCity(excluding) {
-    for (let tries = 0; tries < shuffled.length * 2; tries++) {
-      const c = shuffled[cursor++ % shuffled.length];
-      if (!excluding.includes(c.slug)) return c;
-    }
-    return shuffled[0];
+  // Next replacement for a rotating slot: prefer a real city whose band
+  // isn't already showing on one of the other slots, so the row keeps
+  // reading as distinct bands over time instead of drifting back to a
+  // repeat. Falls back to any unused city if every band is already
+  // represented or exhausted.
+  function nextDiverseCity(excludingSlugs, excludingBands) {
+    const candidates = pool.filter(c => !excludingSlugs.includes(c.slug));
+    if (!candidates.length) return null;
+    const fresh = candidates.filter(c => !excludingBands.includes(moodToBand(effectiveMood(c)).band));
+    const from = fresh.length ? fresh : candidates;
+    return from[Math.floor(Math.random() * from.length)];
   }
 
   function updateSlot(slotEl, cityData) {
@@ -2471,7 +2520,7 @@ async function setupBarometerRotation() {
     const bandEl = slotEl.querySelector('.instrument-band-name');
     if (!img || !nameEl || !bandEl) return;
 
-    const { band, color, img: imgSrc } = moodToBand(cityData.mood || 7.0);
+    const { band, color, img: imgSrc } = moodToBand(effectiveMood(cityData));
     const isChange = img.getAttribute('src') !== imgSrc && img.getAttribute('src') && img.getAttribute('src').indexOf('barometer') !== -1;
 
     if (isChange) {
@@ -2543,8 +2592,12 @@ async function setupBarometerRotation() {
     setTimeout(() => {
       setInterval(() => {
         if (paused || slot.matches(':hover')) return;
-        const current = assigned.map(c => c.slug);
-        const next = nextUniqueCity(current);
+        const currentSlugs = assigned.map(c => c.slug);
+        const otherBands = assigned
+          .filter((_, idx) => idx !== i)
+          .map(c => moodToBand(effectiveMood(c)).band);
+        const next = nextDiverseCity(currentSlugs, otherBands);
+        if (!next) return;
         assigned[i] = next;
         updateSlot(slot, next);
       }, INTERVAL_MS);
