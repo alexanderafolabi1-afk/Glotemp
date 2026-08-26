@@ -72,9 +72,27 @@
     else footer.appendChild(p);
   }
 
+  // The public API + embeddable badge page. Same runtime-mounted pattern
+  // as the icons and the partner link above -- real, permanent,
+  // reachable from every page's footer, without crowding the five-item
+  // top nav.
+  function mountDevelopersLink() {
+    var footer = document.querySelector('footer.footer');
+    if (!footer || footer.querySelector('.footer-developers-link')) return;
+
+    var p = document.createElement('p');
+    p.className = 'small-print footer-developers-row';
+    p.innerHTML = '<a href="/developers" class="contact-link footer-developers-link">Build with Glotemp&#39;s data</a>';
+
+    var langRow = footer.querySelector('.footer-lang-row');
+    if (langRow) footer.insertBefore(p, langRow);
+    else footer.appendChild(p);
+  }
+
   function mountAll() {
     mount();
     mountPartnerLink();
+    mountDevelopersLink();
   }
 
   if (document.readyState === 'loading') {

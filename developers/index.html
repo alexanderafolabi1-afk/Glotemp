@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#06060A" />
+  <meta name="description" content="Build with Glotemp's live city data. A free embeddable badge for any of 300 cities, and a metered API for real crowd readings -- both real, both documented here." />
+  <meta name="keywords" content="Glotemp API, city mood API, embeddable city badge, developers" />
+  <meta property="og:title" content="Build with Glotemp" />
+  <meta property="og:description" content="A free embeddable badge for any of 300 cities, and a metered API for real crowd readings." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://glo-temp.com/developers" />
+  <meta property="og:image" content="https://glo-temp.com/assets/logo.png" />
+  <meta name="twitter:image" content="https://glo-temp.com/assets/logo.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Build with Glotemp" />
+  <meta name="twitter:description" content="A free embeddable badge for any of 300 cities, and a metered API for real crowd readings." />
+  <link rel="canonical" href="https://glo-temp.com/developers" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <title>Build with Glotemp — Developers</title>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Build with Glotemp",
+    "description": "A free embeddable badge for any of 300 cities, and a metered API for real crowd readings.",
+    "url": "https://glo-temp.com/developers"
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=58" />
+
+  <style>
+    /* This page's own shapes -- deliberately not another rectangle grid.
+       The chamfer (two corners cut) echoes the plate badges already used
+       for city tiers elsewhere on the site; the ring echoes the badge
+       widget itself. Same family, different rooms. */
+    .dev-hero-dial {
+      position: absolute;
+      top: -2.5rem;
+      right: -2.5rem;
+      width: 160px;
+      height: 160px;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .dev-plate {
+      position: relative;
+      background: #0B0A10;
+      border: 1px solid rgba(240, 224, 200, 0.14);
+      clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+      padding: 1.4rem 1.6rem;
+    }
+    .dev-plate + .dev-plate { margin-top: 1rem; }
+    .dev-route {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      color: var(--ivory);
+      margin: 0 0 0.35rem;
+    }
+    .dev-route .dev-method {
+      color: #4FD8E8;
+      margin-right: 0.5rem;
+    }
+    .dev-route-note { color: var(--sand); font-size: 0.88rem; margin: 0; }
+
+    .dev-picker-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      align-items: flex-start;
+      margin-top: 1.25rem;
+    }
+    .dev-picker-col { flex: 1 1 260px; min-width: 240px; }
+    .dev-search-wrap { position: relative; }
+    .dev-search-input {
+      width: 100%;
+      box-sizing: border-box;
+      background: rgba(240, 224, 200, 0.06);
+      border: 1px solid rgba(240, 224, 200, 0.18);
+      border-radius: 999px;
+      padding: 0.7rem 1.1rem;
+      color: var(--ivory);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+    }
+    .dev-search-input:focus { outline: none; border-color: var(--brass); }
+    .dev-search-results {
+      position: absolute;
+      left: 0; right: 0; top: calc(100% + 0.4rem);
+      background: #0B0A10;
+      border: 1px solid rgba(240, 224, 200, 0.18);
+      border-radius: 14px;
+      max-height: 260px;
+      overflow-y: auto;
+      z-index: 20;
+      display: none;
+    }
+    .dev-search-results.is-open { display: block; }
+    .dev-search-result {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      padding: 0.55rem 1rem;
+      color: var(--sand);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .dev-search-result:hover, .dev-search-result:focus-visible {
+      background: rgba(176, 141, 87, 0.14);
+      color: var(--ivory);
+    }
+    .dev-preview-col {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      min-height: 52px;
+    }
+
+    .dev-snippet {
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--ivory);
+      white-space: pre-wrap;
+      word-break: break-all;
+      line-height: 1.6;
+    }
+    .dev-copy-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.9rem;
+    }
+    .dev-copy-status {
+      font-size: 0.82rem;
+      color: var(--brass);
+      opacity: 0;
+      transition: opacity 200ms ease;
+    }
+    .dev-copy-status.is-visible { opacity: 1; }
+
+    .dev-signup-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .dev-signup-row input[type="email"],
+    .dev-signup-row input[type="text"] {
+      flex: 1 1 220px;
+      box-sizing: border-box;
+      background: rgba(240, 224, 200, 0.06);
+      border: 1px solid rgba(240, 224, 200, 0.18);
+      border-radius: 10px;
+      padding: 0.65rem 0.9rem;
+      color: var(--ivory);
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+    }
+    .dev-signup-row input:focus { outline: none; border-color: var(--brass); }
+    .dev-key-reveal {
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: #C86BE0;
+      word-break: break-all;
+    }
+    .dev-status-line { margin-top: 0.75rem; font-size: 0.88rem; color: var(--sand); }
+    .dev-status-line.is-error { color: #F5A25A; }
+  </style>
+  <script src="/glotemp-analytics.js" defer></script>
+</head>
+<body>
+  <nav id="site-nav"></nav>
+<script src="/nav-component.js"></script>
+<script src="/footer-social.js" defer></script>
+
+  <main class="page-main">
+    <section class="glass-card page-header" style="position:relative; overflow:hidden;">
+      <svg class="dev-hero-dial" viewBox="0 0 160 160" aria-hidden="true">
+        <circle cx="80" cy="80" r="62" fill="none" stroke="rgba(240,224,200,0.12)" stroke-width="6"/>
+        <circle cx="80" cy="80" r="62" fill="none" stroke="#C86BE0" stroke-width="6" stroke-linecap="round"
+          stroke-dasharray="270 390" transform="rotate(-90 80 80)"/>
+      </svg>
+      <p class="eyebrow">Developers</p>
+      <h1>Build with the live instrument.</h1>
+      <p class="about-lede first">Every reading a visitor sees on a Glotemp city page is real -- no synthetic data, no filler. Two ways to use it outside this site: a free badge for any of 300 cities, and a metered API for real crowd readings as they come in.</p>
+    </section>
+
+    <section class="glass-card">
+      <p class="eyebrow">Try one now</p>
+      <h2 style="margin-top:0;">A live badge, live on this page.</h2>
+      <p class="about-lede">This is not a mockup -- it is the exact widget, fetching the exact reading, that a visitor to Lanzarote's own page would see right now.</p>
+      <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
+        <div class="glotemp-badge" data-glotemp-city="lanzarote"></div>
+        <div class="glotemp-badge" data-glotemp-city="tokyo"></div>
+        <div class="glotemp-badge" data-glotemp-city="nyc"></div>
+      </div>
+    </section>
+
+    <section class="glass-card">
+      <p class="eyebrow">Get your own</p>
+      <h2 style="margin-top:0;">Pick a city, take the code.</h2>
+      <p class="about-lede">No key, no sign-up, no rate limit that matters to a normal site. It updates on its own -- nothing to keep in sync.</p>
+
+      <div class="dev-picker-row">
+        <div class="dev-picker-col">
+          <div class="dev-search-wrap">
+            <input type="text" class="dev-search-input" id="dev-city-search" placeholder="Search any of 300 cities…" autocomplete="off" aria-label="Search for a city">
+            <div class="dev-search-results" id="dev-city-results"></div>
+          </div>
+        </div>
+        <div class="dev-preview-col" id="dev-badge-preview">
+          <div class="glotemp-badge" data-glotemp-city="lanzarote"></div>
+        </div>
+      </div>
+
+      <div class="dev-plate">
+        <pre class="dev-snippet" id="dev-snippet"><code>&lt;div class="glotemp-badge" data-glotemp-city="lanzarote"&gt;&lt;/div&gt;
+&lt;script src="https://glo-temp.com/embed.js" async&gt;&lt;/script&gt;</code></pre>
+        <div class="dev-copy-row">
+          <button type="button" class="btn-neon" id="dev-copy-btn">Copy snippet</button>
+          <span class="dev-copy-status" id="dev-copy-status">Copied</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="glass-card">
+      <p class="eyebrow">The routes</p>
+      <h2 style="margin-top:0;">Two products, honestly different.</h2>
+      <p class="about-lede">The badge and the API answer different questions. Neither pretends to be the other.</p>
+
+      <div class="dev-plate">
+        <p class="dev-route"><span class="dev-method">GET</span>/v1/badge/{slug}</p>
+        <p class="dev-route-note">No key. The same curated reading that city's own Glotemp page shows right now -- band and a 0-10 score. This is what embed.js calls. Cached 5 minutes.</p>
+      </div>
+      <div class="dev-plate">
+        <p class="dev-route"><span class="dev-method">GET</span>/v1/cities/{slug}?hours=24</p>
+        <p class="dev-route-note">Key required (<code>Authorization: Bearer glo_live_...</code> or <code>X-API-Key</code>). Real crowd check-ins over a rolling window (1-168h) -- observation count, average intensity, band, most common mode. Sparse where check-ins are still sparse; that is reported honestly rather than padded. Free plan: 500 calls/month.</p>
+      </div>
+      <div class="dev-plate">
+        <p class="dev-route"><span class="dev-method">GET</span>/v1/health</p>
+        <p class="dev-route-note">No key. Uptime check.</p>
+      </div>
+
+      <p class="about-lede" style="margin-top:1.25rem;">Example:</p>
+      <div class="dev-plate">
+        <pre class="dev-snippet">curl https://hnysztednzqfzbmiqqgl.supabase.co/functions/v1/api-v1/v1/cities/lanzarote \
+  -H "Authorization: Bearer glo_live_your_key_here"</pre>
+      </div>
+    </section>
+
+    <section class="glass-card">
+      <p class="eyebrow">Free key</p>
+      <h2 style="margin-top:0;">For the metered API.</h2>
+      <p class="about-lede">One key per email, 500 calls a month, shown once. The badge above needs none of this -- this is only for <code>/v1/cities</code>.</p>
+
+      <form class="dev-signup-row" id="dev-signup-form">
+        <input type="email" id="dev-signup-email" placeholder="you@example.com" required aria-label="Email">
+        <input type="text" id="dev-signup-label" placeholder="What are you building? (optional)" aria-label="Label">
+        <button type="submit" class="btn-neon" id="dev-signup-submit">Get a free key</button>
+      </form>
+      <p class="dev-status-line" id="dev-signup-status"></p>
+      <p class="dev-key-reveal" id="dev-key-reveal" hidden></p>
+    </section>
+
+    <section class="glass-card">
+      <p class="eyebrow">Contact</p>
+      <h2 style="margin-top:0;">Need more than 500 calls?</h2>
+      <p>Write to <a href="mailto:marketing@glo-temp.com?subject=Glotemp%20API" class="contact-link">marketing@glo-temp.com</a> -- paid plans exist for real usage.</p>
+    </section>
+  </main>
+
+  <footer class="footer glass">
+    <p>© 2026 RenviaIT Ltd. All rights reserved.</p>
+    <p class="small-print">
+      <a href="/privacy">Privacy Policy</a> |
+      <a href="/terms">Terms of Service</a> |
+      <a href="#" id="cookie-settings">Cookie Settings</a>
+    </p>
+    <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
+    <p class="small-print"><a href="mailto:info@glo-temp.com" class="contact-link">info@glo-temp.com</a></p>
+    <p class="small-print footer-lang-row">
+      <button type="button" id="lang-switch" class="footer-lang">Language</button>
+    </p>
+  </footer>
+
+  <script src="/cities-data.js"></script>
+  <script src="/embed.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
+      var SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
+
+      // ---------- city search ----------
+      var input = document.getElementById('dev-city-search');
+      var results = document.getElementById('dev-city-results');
+      var preview = document.getElementById('dev-badge-preview');
+      var snippet = document.getElementById('dev-snippet');
+
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+
+      function setCity(slug, name) {
+        input.value = name;
+        results.classList.remove('is-open');
+
+        var badge = document.createElement('div');
+        badge.className = 'glotemp-badge';
+        badge.setAttribute('data-glotemp-city', slug);
+        preview.innerHTML = '';
+        preview.appendChild(badge);
+        if (window.GlotempEmbed) window.GlotempEmbed.mount();
+
+        snippet.innerHTML =
+          '<code>&lt;div class="glotemp-badge" data-glotemp-city="' + esc(slug) + '"&gt;&lt;/div&gt;\n' +
+          '&lt;script src="https://glo-temp.com/embed.js" async&gt;&lt;/script&gt;</code>';
+      }
+
+      function renderResults(query) {
+        var q = query.trim().toLowerCase();
+        if (!q) { results.classList.remove('is-open'); return; }
+        var pool = (window.CITIES_DATA || []).filter(function (c) {
+          return c.name.toLowerCase().indexOf(q) !== -1 || c.slug.indexOf(q) !== -1;
+        }).slice(0, 8);
+        if (!pool.length) { results.classList.remove('is-open'); return; }
+        results.innerHTML = pool.map(function (c) {
+          return '<button type="button" class="dev-search-result" data-slug="' + esc(c.slug) + '" data-name="' + esc(c.name) + '">' +
+            esc(c.name) + ', ' + esc(c.country) + '</button>';
+        }).join('');
+        results.classList.add('is-open');
+      }
+
+      if (input) {
+        input.addEventListener('input', function () { renderResults(input.value); });
+        input.addEventListener('focus', function () { if (input.value) renderResults(input.value); });
+        document.addEventListener('click', function (e) {
+          if (!results.contains(e.target) && e.target !== input) results.classList.remove('is-open');
+        });
+        results.addEventListener('click', function (e) {
+          var btn = e.target.closest('.dev-search-result');
+          if (!btn) return;
+          setCity(btn.getAttribute('data-slug'), btn.getAttribute('data-name'));
+        });
+      }
+
+      // ---------- copy snippet ----------
+      var copyBtn = document.getElementById('dev-copy-btn');
+      var copyStatus = document.getElementById('dev-copy-status');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', function () {
+          var text = snippet.textContent;
+          navigator.clipboard.writeText(text).then(function () {
+            copyStatus.classList.add('is-visible');
+            setTimeout(function () { copyStatus.classList.remove('is-visible'); }, 1800);
+          }).catch(function () {});
+        });
+      }
+
+      // ---------- self-serve key ----------
+      var form = document.getElementById('dev-signup-form');
+      var statusEl = document.getElementById('dev-signup-status');
+      var reveal = document.getElementById('dev-key-reveal');
+      var submitBtn = document.getElementById('dev-signup-submit');
+
+      if (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var email = document.getElementById('dev-signup-email').value.trim();
+          var label = document.getElementById('dev-signup-label').value.trim();
+          if (!email) return;
+
+          submitBtn.disabled = true;
+          statusEl.textContent = 'Requesting…';
+          statusEl.classList.remove('is-error');
+          reveal.hidden = true;
+
+          fetch(SUPABASE_URL + '/rest/v1/rpc/request_api_key', {
+            method: 'POST',
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: 'Bearer ' + SUPABASE_ANON_KEY,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ p_email: email, p_label: label || 'Self-serve' }),
+          })
+            .then(function (resp) {
+              return resp.json().then(function (body) { return { ok: resp.ok, body: body }; });
+            })
+            .then(function (res) {
+              submitBtn.disabled = false;
+              if (!res.ok) {
+                var msg = (res.body && res.body.message) || '';
+                if (/key_already_issued/.test(msg)) {
+                  statusEl.textContent = 'That email already has an active key. Check your records, or write to marketing@glo-temp.com if you’ve lost it.';
+                } else if (/invalid_email/.test(msg)) {
+                  statusEl.textContent = 'That doesn’t look like a valid email.';
+                } else {
+                  statusEl.textContent = 'Could not issue a key right now. Try again shortly.';
+                }
+                statusEl.classList.add('is-error');
+                return;
+              }
+              var row = Array.isArray(res.body) ? res.body[0] : res.body;
+              statusEl.textContent = 'Key issued. Copy it now -- it will not be shown again.';
+              reveal.hidden = false;
+              reveal.textContent = row.api_key;
+              form.reset();
+            })
+            .catch(function () {
+              submitBtn.disabled = false;
+              statusEl.textContent = 'Could not reach the server. Try again shortly.';
+              statusEl.classList.add('is-error');
+            });
+        });
+      }
+    })();
+  </script>
+  <script src="/cookie-consent.js" defer></script>
+</body>
+</html>
