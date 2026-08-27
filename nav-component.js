@@ -122,8 +122,21 @@
         var stars = results[0];
         var code = results[1] || stars.referral_code;
         var link = code ? (window.location.origin + '/?ref=' + encodeURIComponent(code)) : null;
+        // Reporter tier badge is optional here -- glotemp-reporter.js
+        // isn't loaded on every page nav-component.js mounts on, and
+        // this panel must degrade cleanly (no error, just no badge)
+        // rather than assume it's present.
+        var profile = window.GlotempAuth.getCachedProfile && window.GlotempAuth.getCachedProfile();
+        var tierBadge = (profile && profile.reporter_tier && window.GlotempReporter)
+          ? window.GlotempReporter.badgeHTML(profile.reporter_tier) : '';
+        // Real, private, per-user count of distinct cities this account
+        // has actually checked into -- Part 1, Pulse Streaks. Extends
+        // get_my_stars() (see glotemp-auth.js), same self-scoped RPC
+        // stars already come from; never shown to anyone but the owner.
+        var citiesCount = stars.cities_checked_into || 0;
         box.innerHTML =
-          '<p class="nav-account-stars-count">' + escapeHTML(stars.total_stars) + ' star' + (stars.total_stars === 1 ? '' : 's') + '</p>' +
+          '<p class="nav-account-stars-count">' + tierBadge + escapeHTML(stars.total_stars) + ' star' + (stars.total_stars === 1 ? '' : 's') + '</p>' +
+          '<p class="nav-account-cities-count">' + escapeHTML(citiesCount) + ' ' + (citiesCount === 1 ? 'city' : 'cities') + ' checked into</p>' +
           (link
             ? '<p class="nav-account-invite-label">Your invite link</p>' +
               '<div class="nav-account-invite-row">' +
