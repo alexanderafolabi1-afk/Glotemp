@@ -6914,6 +6914,18 @@ a:hover .city-landmark-photo,
   align-items: center;
   transform-origin: top center;
   animation: checkin-sign-sway 5.5s ease-in-out infinite;
+  /* Real <button> now (see glotemp-checkin.js) -- reset the UA chrome so
+     it keeps reading as the same hand-drawn sign, not a form control. */
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+.checkin-insignia-sign:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 4px;
 }
 .checkin-insignia-chain { width: 12px; height: 16px; color: var(--brass-dim); }
 .checkin-insignia-panel {
