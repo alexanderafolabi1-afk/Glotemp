@@ -251,22 +251,32 @@
   }
 
   // ---------- insignia ----------
+  // REAL BUG, CONFIRMED LIVE (a real visitor clicked this and got no
+  // response at all): this was built as pure decoration -- "the register
+  // of a backstreet izakaya sign rather than a UI badge" (see its CSS
+  // comment), aria-hidden and wired to nothing, with the actual sign-in
+  // trigger a plain text link below it that the arrow merely points at.
+  // But it renders as a bordered, glowing panel literally labeled "Check
+  // in" -- the single most button-shaped, most prominent thing in the
+  // composer. Every real visitor reads it as the button. It now is one:
+  // a real <button>, wired in wireComposer() to the exact same action the
+  // arrow was already pointing at.
   function insigniaHTML() {
     return `
-      <div class="checkin-insignia" aria-hidden="true">
-        <div class="checkin-insignia-sign">
+      <div class="checkin-insignia">
+        <button type="button" class="checkin-insignia-sign" id="checkin-insignia-btn" aria-label="Add a check-in for this city">
           <svg class="checkin-insignia-chain" viewBox="0 0 12 16" aria-hidden="true">
             <line x1="6" y1="0" x2="6" y2="10" stroke="currentColor" stroke-width="1.1"/>
             <circle cx="6" cy="3.4" r="1.9" fill="none" stroke="currentColor" stroke-width="1.1"/>
           </svg>
-          <div class="checkin-insignia-panel">
-            <span class="checkin-insignia-glow"></span>
+          <span class="checkin-insignia-panel">
+            <span class="checkin-insignia-glow" aria-hidden="true"></span>
             <span class="checkin-insignia-text">Check<br>in</span>
-          </div>
+          </span>
           <svg class="checkin-insignia-arrow" viewBox="0 0 16 10" aria-hidden="true">
             <path d="M2 1l6 7 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-        </div>
+        </button>
       </div>`;
   }
 
@@ -416,6 +426,23 @@
           note.setSelectionRange(caret, caret);
           if (count) count.textContent = `${note.value.length}/${NOTE_MAX}`;
         });
+      });
+    }
+
+    // The "Check in" sign: see insigniaHTML()'s comment. Real <button> now,
+    // wired to whatever the arrow beneath it was already pointing at --
+    // sign-in when there's nothing to check in to yet, or straight to the
+    // composer when there already is.
+    const insigniaBtn = document.getElementById('checkin-insignia-btn');
+    if (insigniaBtn) {
+      insigniaBtn.addEventListener('click', async () => {
+        if (form && !form.hidden) {
+          form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (note) note.focus();
+          return;
+        }
+        const ok = await GlotempAuth.requireAuth('Sign in to add a check-in for this city.');
+        if (ok) refreshAuthState();
       });
     }
 
