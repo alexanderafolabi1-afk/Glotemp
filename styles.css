@@ -1441,6 +1441,21 @@ body.scroll-reveals-enabled section.revealed {
   font-size: 1.1rem;
   color: var(--ivory);
   font-variant-numeric: tabular-nums;
+  margin: 0 0 0.15rem;
+}
+.nav-account-stars-count .reporter-badge {
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+/* Real, private, per-user count of distinct cities checked into -- Part
+   1, Pulse Streaks. Same private-to-owner-only scope as the star total
+   above it (get_my_stars(), self-scoped by auth.uid()), just a quieter
+   secondary line, not a second headline number. */
+.nav-account-cities-count {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--sand);
+  font-variant-numeric: tabular-nums;
   margin: 0 0 0.6rem;
 }
 .nav-account-invite-label {
