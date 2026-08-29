@@ -134,6 +134,46 @@
       <div id="city-attention-panel"></div>
     </section>
 
+    <!-- Time-Traveler Archive: real per-day history from
+         city_signal_snapshots, see city-archive.js. Hidden until at
+         least one real snapshot exists for this city; scrubbing to a day
+         in range with no stored row says so honestly rather than
+         inventing a value. -->
+    <section class="glass-card city-archive-section" id="city-archive-section" aria-label="Real daily history for this city" hidden>
+      <p class="eyebrow">Time-Traveler Archive</p>
+      <p class="archive-range" id="city-archive-range"></p>
+      <div class="archive-controls">
+        <button type="button" id="city-archive-prev" class="archive-step-btn" aria-label="Previous day">&larr;</button>
+        <input type="range" id="city-archive-slider" class="archive-slider" min="0" max="0" value="0" step="1" disabled aria-label="Scrub to a stored date">
+        <button type="button" id="city-archive-next" class="archive-step-btn" aria-label="Next day">&rarr;</button>
+      </div>
+      <p class="archive-date" id="city-archive-date" aria-live="polite"></p>
+      <div class="archive-panel" id="city-archive-panel" aria-live="polite"></div>
+    </section>
+
+    <!-- Global Audio-Stream Integration (Part 3): three real, additive
+         sources alongside the existing live radio player -- Mixcloud
+         DJ-set search, Freesound.org location-tagged field recordings,
+         and (only when Freesound has nothing real) a procedural Web
+         Audio ambient tied to this city's real current weather. See
+         city-soundscape.js. Hidden until at least one of those three is
+         real for this city; never touches city-radio.js or its data. -->
+    <section class="glass-card city-soundscape-section" id="city-soundscape-section" aria-label="More real sound from this city" hidden>
+      <p class="eyebrow">More from this city</p>
+      <div id="soundscape-mixcloud-mount"></div>
+      <div id="soundscape-ambient-mount"></div>
+    </section>
+
+    <!-- Hyper-Local Creator Drops (Part 4): real creator work attached
+         to this city for a real time window, see city-drops.js. Rows
+         only ever come from staff reviewing a real /creators
+         submission by hand -- hidden entirely when this city has no
+         live drop right now. -->
+    <section class="glass-card city-drops-section" id="city-drops-section" aria-label="Real creator work for this city" hidden>
+      <p class="eyebrow">Creator drop</p>
+      <div id="city-drops-mount"></div>
+    </section>
+
     <!-- Vertical Navigation -->
     <div class="vertical-nav glass-card">
       <a href="#pulse" class="vertical-link" data-vertical="pulse">💓 Pulse</a>
@@ -366,6 +406,7 @@
       <p class="small-print" data-i18n="footer_copyright">&copy; 2026 Glotemp. Live city intelligence.</p>
       <p class="small-print"><a href="mailto:info@glo-temp.com" class="contact-link">info@glo-temp.com</a></p>
       <p class="small-print"><a href="mailto:marketing@glo-temp.com?subject=Sponsoring%20a%20city" class="contact-link">Sponsor a city's reading</a></p>
+      <p class="small-print"><a href="/creators" class="contact-link">Attach your real work to this city</a></p>
     </div>
     <p class="small-print footer-lang-row">
       <button type="button" id="lang-switch" class="footer-lang">Language</button>
@@ -384,6 +425,9 @@
   <script src="/glotemp-checkin.js"></script>
   <script src="/city-attention.js"></script>
   <script src="/city-why.js"></script>
+  <script src="/city-archive.js"></script>
+  <script src="/city-soundscape.js"></script>
+  <script src="/city-drops.js"></script>
   <script src="/glotemp-tonight.js"></script>
   <script src="/glotemp-features.js"></script>
   <script src="/glotemp-listings.js" defer></script>
@@ -528,6 +572,8 @@
       if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('Innsbruck', 'Austria');
       if (typeof GlotempAttention !== 'undefined') GlotempAttention.loadCityAttention('innsbruck');
       if (typeof GlotempWhy !== 'undefined') GlotempWhy.loadCityWhy('innsbruck');
+      if (typeof GlotempArchive !== 'undefined') GlotempArchive.loadCityArchive('innsbruck');
+      if (typeof GlotempDrops !== 'undefined') GlotempDrops.loadDrops('innsbruck');
       if (typeof GlotempCityTier !== 'undefined') GlotempCityTier.loadTier('innsbruck');
 
       // Synchronous and static, so it's always in the DOM before any of
@@ -567,6 +613,12 @@
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
         GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country, city.slug);
+      }
+
+      // Three additive real audio sources alongside Radio above -- see
+      // city-soundscape.js. Does not read or write anything Radio uses.
+      if (typeof GlotempSoundscape !== 'undefined' && city) {
+        GlotempSoundscape.loadSoundscape(city.slug, city.name, city.lat, city.lon);
       }
 
       // Real named places from OpenStreetMap. Same treatment as Radio:

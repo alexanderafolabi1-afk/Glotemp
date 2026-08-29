@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#14100B" />
+  <meta name="description" content="Attach your real work to a real city on Glotemp. A short film, a mix, a photo essay, a piece of writing, a real event -- for a real time window. Every submission is read by a person before anything goes live." />
+  <meta property="og:title" content="Creator Drops - Glotemp" />
+  <meta property="og:description" content="Attach your real work to a real city on Glotemp, for a real time window." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://glo-temp.com/creators" />
+  <meta property="og:image" content="https://glo-temp.com/og/home.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Creator Drops - Glotemp" />
+  <meta name="twitter:description" content="Attach your real work to a real city on Glotemp, for a real time window." />
+  <meta name="twitter:image" content="https://glo-temp.com/og/home.png" />
+  <link rel="canonical" href="https://glo-temp.com/creators" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <title>Creator Drops - Glotemp</title>
+  <link rel="alternate" hreflang="en" href="https://glo-temp.com/creators" />
+  <link rel="alternate" hreflang="es" href="https://glo-temp.com/creators" />
+  <link rel="alternate" hreflang="fr" href="https://glo-temp.com/creators" />
+  <link rel="alternate" hreflang="de" href="https://glo-temp.com/creators" />
+  <link rel="alternate" hreflang="pt" href="https://glo-temp.com/creators" />
+  <link rel="alternate" hreflang="ja" href="https://glo-temp.com/creators" />
+  <link rel="alternate" hreflang="x-default" href="https://glo-temp.com/creators" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=58" />
+
+  <script src="/glotemp-analytics.js" defer></script>
+</head>
+<body>
+  <nav id="site-nav"></nav>
+<script src="/nav-component.js"></script>
+<script src="/footer-social.js" defer></script>
+
+  <main class="page-main">
+    <section class="glass-card page-header">
+      <p class="eyebrow">For creators</p>
+      <h1>Attach your real work to a city</h1>
+      <p class="section-copy" style="color:var(--sand); max-width:64ch;">A short film, a mix, a photo essay, a piece of writing, a real local event. If it's real and it's yours, it can sit on that city's page for a real window of time. No fabricated content, ever -- every submission is read by a person before anything goes live.</p>
+    </section>
+
+    <section class="glass-card">
+      <form id="creator-drop-form" class="observation-form">
+        <div class="form-grid">
+          <label>
+            <span>Your name</span>
+            <input type="text" id="creator-name" maxlength="160" required autocomplete="off" placeholder="e.g. Amara Okafor">
+          </label>
+          <label>
+            <span>Your real portfolio or profile link</span>
+            <input type="url" id="creator-url" maxlength="500" required autocomplete="off" placeholder="https://...">
+          </label>
+        </div>
+        <div class="form-grid">
+          <label>
+            <span>City</span>
+            <input type="text" id="creator-city" maxlength="120" required autocomplete="off" list="creator-city-list" placeholder="e.g. Lagos">
+            <datalist id="creator-city-list"></datalist>
+          </label>
+          <label>
+            <span>What kind of work</span>
+            <select id="creator-content-type" required>
+              <option value="video">Video</option>
+              <option value="audio">Audio</option>
+              <option value="photo">Photo</option>
+              <option value="writing">Writing</option>
+              <option value="event">Real event</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+        </div>
+        <label class="full-width">
+          <span>Link to the real work</span>
+          <input type="url" id="creator-content-url" maxlength="500" required autocomplete="off" placeholder="https://...">
+        </label>
+        <div class="form-grid">
+          <label>
+            <span>Proposed start date (optional)</span>
+            <input type="date" id="creator-starts-at">
+          </label>
+          <label>
+            <span>Proposed end date (optional)</span>
+            <input type="date" id="creator-ends-at">
+          </label>
+        </div>
+        <label class="full-width">
+          <span>Your email</span>
+          <input type="email" id="creator-email" maxlength="320" required autocomplete="email" placeholder="you@example.com">
+        </label>
+        <label class="full-width">
+          <span>Anything else (optional)</span>
+          <textarea id="creator-note" rows="4" maxlength="1000" placeholder="Context for the reviewer -- why this city, why now."></textarea>
+        </label>
+        <div class="form-actions">
+          <button type="submit" id="creator-submit" class="btn-neon">Submit for review</button>
+          <p id="creator-feedback" class="inline-feedback" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer glass">
+    <p>&copy; 2026 RenviaIT Ltd. All rights reserved.</p>
+    <p class="small-print">
+      <a href="/privacy">Privacy Policy</a> |
+      <a href="/terms">Terms of Service</a> |
+      <a href="/methodology">Methodology</a> |
+      <a href="#" id="cookie-settings">Cookie Settings</a>
+    </p>
+    <p class="small-print"><a href="mailto:info@glo-temp.com" class="contact-link">info@glo-temp.com</a></p>
+    <p class="small-print footer-lang-row">
+      <button type="button" id="lang-switch" class="footer-lang">Language</button>
+    </p>
+  </footer>
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
+  <script src="/creator-enquiry.js"></script>
+  <script src="/cookie-consent.js" defer></script>
+</body>
+</html>
