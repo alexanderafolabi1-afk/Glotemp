@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#14100B" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Outreach - Glotemp Admin</title>
+
+  <link rel="manifest" href="/admin/manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Glotemp Admin" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=57" />
+  <link rel="stylesheet" href="/admin/admin-ui.css" />
+  <link rel="stylesheet" href="/admin/admin-nav.css" />
+
+  <script src="/glotemp-analytics.js" defer></script>
+  <script src="/admin-i18n.js"></script>
+  <script src="/admin/admin-charts.js" defer></script>
+  <script src="/admin/admin-core.js" defer></script>
+  <script src="/admin/admin-nav.js" defer></script>
+  <link rel="stylesheet" href="/admin/admin-space.css" />
+  <script src="/admin/admin-space.js" defer></script>
+</head>
+<body class="adm-page">
+  <header class="adm-bar" id="adm-nav-bar" data-active="outreach"></header>
+
+  <main class="page-main">
+    <section class="glass-card">
+      <div class="adm" id="adm-root">
+        <p class="adm-eyebrow">Admin</p>
+        <h1 class="adm-title">Loading.</h1>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer glass">
+    <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
+  </footer>
+
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
+  <script src="/glotemp-auth.js"></script>
+  <script src="/cookie-consent.js" defer></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var root = document.getElementById('adm-root');
+
+    function boot() {
+      var C = window.GlotempAdminCore;
+      if (!C) { root.innerHTML = '<p class="adm-eyebrow">Admin</p><h1 class="adm-title">Could not load that.</h1>'; return; }
+
+      function renderOutreach(apiOverview, apiKeys, leads, partners) {
+        var esc = C.esc, panel = C.panel, LEAD_STATUSES = C.LEAD_STATUSES, leadStatusLabel = C.leadStatusLabel;
+        var a = {};
+        (apiOverview || []).forEach(function (r) { a[r.metric] = r.value; });
+
+        var Ch = window.GlotempAdminCharts;
+        function fig(v, label, opts) { return Ch.stat(v, label, opts || {}); }
+
+        var leadList = leads || [];
+        function leadCount(st) { return leadList.filter(function (l) { return l.status === st; }).length; }
+        var contacted = leadCount('contacted') + leadCount('replied') + leadCount('closed');
+        var replied = leadCount('replied');
+        var replyRate = contacted ? Math.round((replied / contacted) * 100) + '%' : '-';
+
+        var leadRows = leadList.length
+          ? leadList.map(function (lead) {
+              return '<div class="adm-row adm-lead-row">' +
+                '<span class="adm-row-city">' + esc(lead.org_name) +
+                  (lead.category ? '<span class="adm-key-prefix">' + esc(lead.category) + '</span>' : '') +
+                '</span>' +
+                '<select class="adm-input adm-lead-status" data-lead-id="' + esc(lead.id) + '" data-prev="' + esc(lead.status) + '" style="width:auto;max-width:11rem;flex:0 0 auto">' +
+                  LEAD_STATUSES.map(function (st) {
+                    return '<option value="' + esc(st) + '"' + (st === lead.status ? ' selected' : '') + '>' + esc(leadStatusLabel(st)) + '</option>';
+                  }).join('') +
+                '</select>' +
+              '</div>';
+            }).join('')
+          : '<p class="adm-copy">No leads yet.</p>';
+
+        var keyRows = (apiKeys || []).length
+          ? apiKeys.map(function (k) {
+              var used = k.monthly_limit
+                ? k.calls_this_month + ' / ' + k.monthly_limit
+                : String(k.calls_this_month);
+              return '<div class="adm-row' + (k.revoked_at ? ' adm-row-dead' : '') + '">' +
+                '<span class="adm-row-city">' + esc(k.label) +
+                  '<span class="adm-key-prefix">' + esc(k.key_prefix) + '...</span></span>' +
+                '<span class="adm-row-count">' + esc(used) + '</span>' +
+                '<span class="adm-row-when">' + esc(k.plan) +
+                  (k.revoked_at ? ', revoked' : '') + '</span>' +
+                (k.revoked_at ? ''
+                  : '<button type="button" class="adm-revoke" data-key-id="' + esc(k.id) + '">Revoke</button>') +
+              '</div>';
+            }).join('')
+          : '<p class="adm-copy">No keys issued yet.</p>';
+
+        var partnerRows = (partners || []).length
+          ? partners.map(function (pn) {
+              var ends = pn.ends_at ? new Date(pn.ends_at) : null;
+              var daysLeft = ends ? Math.ceil((ends.getTime() - Date.now()) / 86400000) : null;
+              var state = daysLeft === null ? 'is-warn' : daysLeft < 0 ? 'is-bad' : daysLeft <= 14 ? 'is-warn' : 'is-ok';
+              var when = daysLeft === null ? 'no end date' : daysLeft < 0 ? 'expired' : daysLeft + ' days left';
+              return '<div class="adm-row">' +
+                '<span class="adm-row-city"><span class="adm-dot ' + state + '"></span>' +
+                  esc(pn.name || pn.org_name || 'Partner') +
+                  (pn.placement ? '<span class="adm-key-prefix">' + esc(pn.placement) + '</span>' : '') +
+                '</span>' +
+                '<span class="adm-row-when">' + esc(when) + '</span>' +
+              '</div>';
+            }).join('')
+          : '<p class="adm-copy">No active placements.</p>';
+
+        root.innerHTML =
+          C.stateHTML('Admin', 'Outreach',
+            panel('p-outreach', 'Email outreach', 'sponsor and partner leads',
+              '<div class="adm-grid">' +
+                fig(leadList.length.toLocaleString(), 'leads') +
+                fig(contacted.toLocaleString(), 'contacted') +
+                fig(replied.toLocaleString(), 'replied', { key: true }) +
+                fig(replyRate, 'reply rate') +
+                fig(leadCount('closed').toLocaleString(), 'closed') +
+                fig(leadCount('not_contacted').toLocaleString(), 'untouched') +
+              '</div>' +
+              leadRows +
+              '<p class="adm-sub">Add a lead</p>' +
+              '<form id="adm-lead-form"><div class="adm-form-grid">' +
+                '<div class="adm-field"><label class="adm-label" for="adm-lead-org">Organisation</label>' +
+                  '<input class="adm-input" type="text" id="adm-lead-org" maxlength="120" required></div>' +
+                '<div class="adm-field"><label class="adm-label" for="adm-lead-category">Category</label>' +
+                  '<input class="adm-input" type="text" id="adm-lead-category" maxlength="60" placeholder="Tourism board"></div>' +
+                '<div class="adm-field"><label class="adm-label" for="adm-lead-contact-name">Contact name</label>' +
+                  '<input class="adm-input" type="text" id="adm-lead-contact-name" maxlength="120"></div>' +
+                '<div class="adm-field"><label class="adm-label" for="adm-lead-contact-email">Contact email</label>' +
+                  '<input class="adm-input" type="email" id="adm-lead-contact-email"></div>' +
+                '<div class="adm-field is-full"><label class="adm-label" for="adm-lead-notes">Notes</label>' +
+                  '<input class="adm-input" type="text" id="adm-lead-notes" maxlength="500"></div>' +
+              '</div>' +
+              '<p><button class="adm-action" type="submit" id="adm-lead-submit">Add lead</button></p></form>' +
+              '<p class="adm-status" id="adm-lead-status-msg" role="status" aria-live="polite"></p>') +
+            panel('p-partners', 'Partners', 'placements and expiries',
+              '<div class="adm-grid">' +
+                fig((a.paying_keys || 0).toLocaleString(), 'paying keys', { key: true }) +
+                fig(((partners || []).length).toLocaleString(), 'placements') +
+                fig((a.calls || 0).toLocaleString(), 'calls 30d') +
+                fig((a.calls_rejected || 0).toLocaleString(), 'rejected') +
+              '</div>' +
+              partnerRows +
+              '<p class="adm-sub">API keys</p>' + keyRows +
+              '<p class="adm-sub">Issue a key</p>' +
+              '<form id="adm-key-form"><div class="adm-form-grid">' +
+                '<div class="adm-field"><label class="adm-label" for="adm-key-label">Who is it for</label>' +
+                  '<input class="adm-input" type="text" id="adm-key-label" maxlength="80" required placeholder="Acme Corp"></div>' +
+                '<div class="adm-field"><label class="adm-label" for="adm-key-email">Their email</label>' +
+                  '<input class="adm-input" type="email" id="adm-key-email" placeholder="dev@acme.com"></div>' +
+                '<div class="adm-field is-full"><label class="adm-label" for="adm-key-plan">Plan</label>' +
+                  '<select class="adm-input" id="adm-key-plan">' +
+                    '<option value="free">Free, 1,000 calls</option>' +
+                    '<option value="starter">Starter, 50,000 calls</option>' +
+                    '<option value="growth">Growth, 500,000 calls</option>' +
+                    '<option value="scale">Scale, no ceiling</option>' +
+                  '</select></div>' +
+              '</div>' +
+              '<p><button class="adm-action" type="submit" id="adm-key-submit">Issue key</button></p></form>' +
+              '<p class="adm-status" id="adm-key-status" role="status" aria-live="polite"></p>' +
+              '<div id="adm-key-reveal"></div>')
+          );
+
+        C.wirePanelToggles(root);
+
+        // Limits live here rather than in the database default so the plan
+        // named on screen and the ceiling actually applied are one thing.
+        var PLAN_LIMITS = { free: 1000, starter: 50000, growth: 500000, scale: null };
+
+        document.getElementById('adm-key-form').addEventListener('submit', async function (e) {
+          e.preventDefault();
+          var label = document.getElementById('adm-key-label').value.trim();
+          var email = document.getElementById('adm-key-email').value.trim();
+          var plan = document.getElementById('adm-key-plan').value;
+          var st = document.getElementById('adm-key-status');
+          var btn = document.getElementById('adm-key-submit');
+          if (!label || btn.disabled) return;
+          st.textContent = 'Issuing...';
+          if (window.GlotempAdminSpace) GlotempAdminSpace.commit(btn);
+          btn.disabled = true;
+          try {
+            var res = await C.rpc('admin_issue_api_key', {
+              p_label: label,
+              p_contact_email: email || null,
+              p_plan: plan,
+              p_monthly_limit: PLAN_LIMITS[plan],
+            });
+            var row = Array.isArray(res) ? res[0] : res;
+            st.textContent = '';
+            document.getElementById('adm-key-reveal').innerHTML =
+              '<div class="adm-reveal">' +
+                '<p class="adm-label">Copy this now. It cannot be shown again.</p>' +
+                '<code class="adm-key">' + esc(row.api_key) + '</code>' +
+                '<p><button type="button" class="adm-action" id="adm-key-copy">Copy</button></p>' +
+              '</div>';
+            document.getElementById('adm-key-copy').addEventListener('click', function () {
+              if (window.GlotempAdminSpace) GlotempAdminSpace.commit(this);
+              navigator.clipboard.writeText(row.api_key).then(function () {
+                document.getElementById('adm-key-copy').textContent = 'Copied';
+              }, function () {
+                document.getElementById('adm-key-copy').textContent = 'Select it by hand';
+              });
+            });
+            document.getElementById('adm-key-label').value = '';
+            document.getElementById('adm-key-email').value = '';
+            var reveal = document.querySelector('#adm-key-reveal .adm-reveal');
+            if (reveal) reveal.classList.add('is-fresh');
+            document.dispatchEvent(new CustomEvent('admin:key-issued'));
+          } catch (err) {
+            st.textContent = 'Could not issue that key.';
+          } finally {
+            btn.disabled = false;
+          }
+        });
+
+        root.querySelectorAll('.adm-revoke').forEach(function (b) {
+          b.addEventListener('click', async function () {
+            if (!window.confirm('Revoke this key? Whoever holds it stops working immediately.')) return;
+            b.disabled = true;
+            try {
+              await C.rpc('admin_revoke_api_key', { p_id: b.getAttribute('data-key-id') });
+              if (window.GlotempAdminSpace) GlotempAdminSpace.pulseRow(b.closest('.adm-row'), 'gold');
+              await load(root);
+            } catch (err) {
+              b.disabled = false;
+              document.getElementById('adm-key-status').textContent = 'Could not revoke that key.';
+            }
+          });
+        });
+
+        var leadForm = document.getElementById('adm-lead-form');
+        if (leadForm) leadForm.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          var org = document.getElementById('adm-lead-org').value.trim();
+          var category = document.getElementById('adm-lead-category').value.trim();
+          var contactName = document.getElementById('adm-lead-contact-name').value.trim();
+          var contactEmail = document.getElementById('adm-lead-contact-email').value.trim();
+          var notes = document.getElementById('adm-lead-notes').value.trim();
+          var st = document.getElementById('adm-lead-status-msg');
+          var btn = document.getElementById('adm-lead-submit');
+          if (!org || btn.disabled) return;
+          st.textContent = 'Saving...';
+          btn.disabled = true;
+          try {
+            await C.restTable('POST', 'outreach_leads', {
+              org_name: org,
+              category: category || null,
+              contact_name: contactName || null,
+              contact_email: contactEmail || null,
+              notes: notes || null,
+            });
+            st.textContent = '';
+            await load(root);
+          } catch (err) {
+            st.textContent = 'Could not save that lead.';
+          } finally {
+            btn.disabled = false;
+          }
+        });
+
+        root.querySelectorAll('.adm-lead-status').forEach(function (sel) {
+          sel.addEventListener('change', async function () {
+            var id = sel.getAttribute('data-lead-id');
+            var prev = sel.getAttribute('data-prev') || sel.value;
+            sel.disabled = true;
+            try {
+              await C.restTable('PATCH', 'outreach_leads?id=eq.' + encodeURIComponent(id), { status: sel.value });
+              sel.setAttribute('data-prev', sel.value);
+              if (window.GlotempAdminSpace) {
+                var tone = sel.value === 'replied' ? 'violet'
+                         : sel.value === 'closed' ? 'gold' : 'teal';
+                GlotempAdminSpace.pulseRow(sel.closest('.adm-row'), tone);
+              }
+              document.dispatchEvent(new CustomEvent('admin:lead-status', {
+                detail: { status: sel.value },
+              }));
+            } catch (err) {
+              sel.value = prev;
+            } finally {
+              sel.disabled = false;
+            }
+          });
+        });
+      }
+
+      async function load(rootEl) {
+        var none = function () { return []; };
+        var results = await Promise.all([
+          C.rpc('admin_api_overview', { days: 30 }).catch(none),
+          C.rpc('admin_api_keys', {}).catch(none),
+          C.restTable('GET', 'outreach_leads?select=id,org_name,category,status,notes&order=created_at.desc').catch(none),
+          C.restTable('GET', 'partners?select=*&order=created_at.desc').catch(none),
+        ]);
+        renderOutreach.apply(null, results);
+      }
+
+      C.boot(root, load);
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+    else boot();
+  })();
+  </script>
+</body>
+</html>

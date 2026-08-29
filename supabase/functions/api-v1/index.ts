@@ -11,10 +11,24 @@
 // them. If this function's source leaked it would give an attacker
 // nothing, which is the same property the admin page has.
 //
+// verify_jwt is OFF for this function: it implements its own API-key
+// authentication below (readKey + api_authorise), and a customer's
+// glo_live_... key is not a Supabase JWT -- requiring one on top would
+// contradict every example in these route docs.
+//
 // Routes:
-//   GET /v1/cities/{slug}            one city's current reading
+//   GET /v1/cities/{slug}            one city's current reading (key required)
 //   GET /v1/cities/{slug}?hours=48   same, over a longer window (1..168)
+//   GET /v1/badge/{slug}             the embeddable-badge reading (no key)
 //   GET /v1/health                   no key needed, for uptime checks
+//
+// /v1/badge is deliberately a different product from /v1/cities: it
+// reads city_mood, the same curated per-city figure every Glotemp page
+// already shows (band coloring, hover previews, the City reading
+// section) -- not the metered, crowd-observation reading /v1/cities
+// reports. A badge on someone else's site should always agree with what
+// that city's own Glotemp page says; it is not the thing being sold, so
+// it asks for no key and is not gated through api_authorise.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
 
@@ -25,7 +39,7 @@ const db = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-api-key, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-api-key, content-type, apikey",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
 };
 
@@ -69,6 +83,34 @@ Deno.serve(async (req: Request) => {
 
   if (path === "/v1/health" || path === "/health") {
     return json({ status: "ok", time: new Date().toISOString() });
+  }
+
+  // No key: this is the free, embeddable reading, not the metered
+  // product. See the routing comment above for why it reads a different
+  // table than /v1/cities.
+  const badge = path.match(/^\/v1\/badge\/([a-z0-9-]+)\/?$/);
+  if (badge) {
+    const { data, error } = await db
+      .from("city_mood")
+      .select("city_slug, name, mood, band, updated_at")
+      .eq("city_slug", badge[1])
+      .maybeSingle();
+
+    if (error) {
+      console.error("[api-v1] badge failed", error.message);
+      return fail(503, "unavailable", "Could not read that city right now. Try again shortly.");
+    }
+    if (!data) return fail(404, "not_found", "No such city.");
+
+    return json({
+      city: data.city_slug,
+      name: data.name,
+      band: data.band,
+      mood: Number(data.mood),
+      as_of: data.updated_at,
+    }, 200, {
+      "Cache-Control": "public, max-age=300",
+    });
   }
 
   const key = readKey(req);

@@ -179,7 +179,7 @@ const CITY_TRIVIA = {
     "Monterrey is framed by the dramatic Cerro de la Silla, a mountain shaped like a saddle.",
   ],
   dallas: [
-    "Dallas–Fort Worth shares one of the largest airports in the world by land area.",
+    "Dallas-Fort Worth shares one of the largest airports in the world by land area.",
   ],
   minneapolis: [
     "Minneapolis has more theatre seats per capita than any US city outside New York.",
@@ -536,6 +536,10 @@ const CITY_TRIVIA = {
   ],
   "milton-keynes": [
     "Milton Keynes was purpose-built as a new town from 1967, laid out on a grid and famous for its roundabouts and grazing concrete cows.",
+  ],
+  lanzarote: [
+    "In La Geria, Lanzarote's vines are grown in individual pits dug into volcanic ash and sheltered by small crescent-shaped stone walls called zocos, a wine-growing method found almost nowhere else on Earth.",
+    "Lanzarote-born artist César Manrique shaped much of the island's architecture, including Jameos del Agua and Mirador del Río, around blending directly into its volcanic landscape rather than standing apart from it.",
   ],
 };
 

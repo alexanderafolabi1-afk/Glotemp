@@ -33,15 +33,6 @@ function buildTripLine(city, reading) {
 // ----- i18n Setup -----
 const translations = {
   en: {
-    // These four must stay in step with the banner markup in index.html.
-    // The i18n pass overwrites element text at runtime, so leaving the old
-    // short strings here would silently replace the elevated copy.
-    install_eyebrow: "A private companion",
-    install_title: "Keep the world's pulse close.",
-    install_body: "Add Glotemp to your home screen. A quiet instrument that tells you how a city truly feels, before you arrive, while you are there, and long after you leave.",
-    install_btn: "Place among your essentials",
-    install_later: "Not now",
-    dismiss: "✕",
     mood: "Mood",
     trip_engine_title: "Trip Engine",
     trip_question: "Should you travel to {city} this weekend?",
@@ -98,19 +89,19 @@ const translations = {
     scene_transit: "🚇 Transit",
     scene_home: "🏠 Home",
     language_label: "Language lens",
-    milestone_title_1000: "Founding Observer – 1k",
+    milestone_title_1000: "Founding Observer: 1k",
     milestone_line_1000: "The first quiet thousand taught the instrument to listen.",
-    milestone_title_2500: "Founding Observer – 2.5k",
+    milestone_title_2500: "Founding Observer: 2.5k",
     milestone_line_2500: "A wider ring of cities began to glow in sympathy.",
-    milestone_title_5000: "Founding Observer – 5k",
+    milestone_title_5000: "Founding Observer: 5k",
     milestone_line_5000: "The atlas learned to hold many evenings at once.",
-    milestone_title_10000: "Founding Observer – 10k",
+    milestone_title_10000: "Founding Observer: 10k",
     milestone_line_10000: "A new constellation formed in the disciplined dark.",
-    milestone_title_25000: "Founding Observer – 25k",
+    milestone_title_25000: "Founding Observer: 25k",
     milestone_line_25000: "The observatory acquired a true planetary hum.",
-    milestone_title_50000: "Founding Observer – 50k",
+    milestone_title_50000: "Founding Observer: 50k",
     milestone_line_50000: "Half a hundred thousand witnesses refined the signal.",
-    milestone_title_100000: "Centenary Observer – 100k",
+    milestone_title_100000: "Centenary Observer: 100k",
     milestone_line_100000: "One hundred thousand observers taught the sky a new geometry.",
     cadence_label: "Contribution cadence",
     context_label: "Optional local note",
@@ -174,9 +165,6 @@ const translations = {
     fastest_loading: "Loading trending cities..."
   },
   es: {
-    install_title: "Añadir Glotemp a inicio",
-    install_btn: "Instalar",
-    dismiss: "✕",
     mood: "Ánimo",
     trip_engine_title: "Motor de Viaje",
     trip_question: "¿Deberías viajar a {city} este fin de semana?",
@@ -284,9 +272,6 @@ const translations = {
     fastest_loading: "Cargando ciudades en tendencia..."
   },
   fr: {
-    install_title: "Ajouter Glotemp à l'écran d'accueil",
-    install_btn: "Installer",
-    dismiss: "✕",
     mood: "Humeur",
     trip_engine_title: "Moteur de Voyage",
     trip_question: "Devriez-vous voyager à {city} ce week-end ?",
@@ -394,9 +379,6 @@ const translations = {
     fastest_loading: "Chargement des villes en tendance..."
   },
   de: {
-    install_title: "Glotemp zum Startbildschirm hinzufügen",
-    install_btn: "Installieren",
-    dismiss: "✕",
     mood: "Stimmung",
     trip_engine_title: "Reise-Engine",
     trip_question: "Sollten Sie dieses Wochenende nach {city} reisen?",
@@ -504,9 +486,6 @@ const translations = {
     fastest_loading: "Lade Trend-Städte..."
   },
   pt: {
-    install_title: "Adicionar Glotemp à tela inicial",
-    install_btn: "Instalar",
-    dismiss: "✕",
     mood: "Humor",
     trip_engine_title: "Motor de Viagem",
     trip_question: "Você deveria viajar para {city} neste fim de semana?",
@@ -614,9 +593,6 @@ const translations = {
     fastest_loading: "Carregando cidades em tendência..."
   },
   ja: {
-    install_title: "Glotempをホーム画面に追加",
-    install_btn: "インストール",
-    dismiss: "✕",
     mood: "ムード",
     trip_engine_title: "トリップエンジン",
     trip_question: "今週末{city}へ旅行すべきですか？",
@@ -1357,56 +1333,6 @@ function renderSignalPanels() {
   if (regions) regions.innerHTML = getRegionIncentives().map(item => `<li>${item}</li>`).join('');
 }
 
-function recordObservation(event) {
-  event.preventDefault();
-  const activeMood = document.querySelector('.mood-btn.active');
-  if (!activeMood) {
-    document.getElementById('observation-feedback').textContent = t('select_mood_first');
-    return;
-  }
-  const note = document.getElementById('context-note').value.trim();
-  const selectedMood = activeMood.dataset.label;
-  // The scene picker ties a check-in to real place-in-the-world context --
-  // school, restaurant, concert -- which map straight onto Glotemp's own
-  // vertical taxonomy (education, food, entertainment...), so a check-in
-  // is never just a mood in the abstract. It replaces a hardcoded 'street'
-  // default that used to stand in for every check-in regardless of where
-  // the person actually was.
-  const sceneEl = document.getElementById('scene-select');
-  const scene = sceneEl ? sceneEl.value : 'street';
-  const citySlug = document.getElementById('city-select')?.value || 'nyc';
-  const observation = {
-    mood: selectedMood,
-    intensity: Number(document.getElementById('intensity-range').value),
-    scene,
-    lens: 'global',
-    cadence: 'midday',
-    note,
-    city: cities[citySlug]?.name || 'New York',
-    createdAt: new Date().toISOString()
-  };
-  window.dispatchEvent(new CustomEvent('glotemp:checkin', {
-    detail: { city: document.getElementById('city-select')?.value || null }
-  }));
-  observatoryState.observations.unshift(observation);
-  observatoryState.observations = observatoryState.observations.slice(0, 24);
-  saveObservatory();
-  addStars(note ? 18 : 12);
-  renderSignalPanels();
-  const feedbackEl = document.getElementById('observation-feedback');
-  feedbackEl.textContent = t('observation_saved');
-  // Fold the new reading into the rotating snippet pool and show it now,
-  // so submitting feels like it landed somewhere instead of vanishing.
-  if (typeof refreshObsSnippetPool === 'function') refreshObsSnippetPool(citySlug);
-  // Update the live observation count
-  const obsEl = document.getElementById('obs-count');
-  if (obsEl) {
-    const total = (window.SEED_OBSERVATIONS || []).length + observatoryState.observations.length;
-    obsEl.textContent = total;
-  }
-  if (observatoryState.pendingMoment) openConstellationMoment(observatoryState.pendingMoment);
-}
-
 // ----- Pulse Simulation & Canvas -----
 const canvas = document.getElementById('pulse-canvas');
 const ctx = canvas ? canvas.getContext('2d') : null;
@@ -1563,10 +1489,12 @@ function updateCity(selected) {
   if (cityNameEl) cityNameEl.textContent = city.name;
   const tripCityEl = document.getElementById('trip-city');
   if (tripCityEl) tripCityEl.textContent = city.name;
-  // The check-in composer always names the city it's recording for --
-  // never a hidden default the visitor can't see.
-  const checkinCityEl = document.getElementById('checkin-city-name');
-  if (checkinCityEl) checkinCityEl.textContent = city.name;
+  // Mount the real check-in composer (sign-in required, real location
+  // verification, real Supabase write, same moderation queue as every
+  // city page) for whichever city is now selected. See glotemp-checkin.js.
+  if (window.GlotempCheckin && GlotempCheckin.mountForCity) {
+    GlotempCheckin.mountForCity(selected);
+  }
 
   // dimensions
   const dimNames = t('dimensions');
@@ -1598,6 +1526,12 @@ function updateCity(selected) {
     tripReading.querySelector('.trip-reading-band').textContent = band.band;
     tripReading.querySelector('.trip-reading-city').textContent = city.name;
   }
+  // Real weather/air-quality secondary line -- see city-weather-mood.js.
+  // Purely additive: does not touch synthesizedMood or anything above.
+  if (window.GlotempAirMood) GlotempAirMood.showFor(selected);
+  // Quiet confidence readout, derived from real observations for this
+  // city -- see mood-confidence.js. Purely additive, same as the line above.
+  if (window.GlotempMoodConfidence) GlotempMoodConfidence.showFor(selected);
   // Update affiliate links with city name
   if (typeof updateAffiliateLinks === 'function') {
     updateAffiliateLinks(city.name);
@@ -1943,11 +1877,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderSignalPanels();
   if (observatoryState.pendingMoment) setTimeout(() => openConstellationMoment(observatoryState.pendingMoment), 800);
 
-  const intensityRange = document.getElementById('intensity-range');
-  const intensityValue = document.getElementById('intensity-value');
-  intensityRange?.addEventListener('input', () => { intensityValue.textContent = intensityRange.value; });
-  document.getElementById('observation-form')?.addEventListener('submit', recordObservation);
-
   // Mood check-in buttons with pulse animation
   document.querySelectorAll('.mood-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1963,48 +1892,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Install prompt
+  // Install prompt. The banner this used to show/hide directly
+  // (#install-banner) is gone -- welcome-intro.js now owns that surface
+  // as the third step of the first-visit intro, and reuses install-btn's
+  // id so the click handler below still finds and drives it without
+  // either file needing to know about the other's markup.
   let deferredPrompt;
-  // Both this and the cookie strip are fixed to the bottom edge, and the
-  // cookie strip sits at a higher z-index, so showing them together buries
-  // this one. It waits its turn instead.
-  function showInstallBanner() {
-    const banner = document.getElementById('install-banner');
-    if (!banner) return;
-    if (document.getElementById('cookie-consent-banner')) {
-      window.addEventListener('glotemp:consent-dismissed', showInstallBanner, { once: true });
-      return;
-    }
-    banner.style.display = 'block';
-  }
-
+  // Read-only accessor + event so welcome-intro.js can tell, without
+  // duplicating this listener, whether the real install action is
+  // actually available -- it uses this to decide between showing
+  // install-btn and a manual-instructions fallback on step 3.
+  window.GlotempInstall = { isAvailable: () => !!deferredPrompt };
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    showInstallBanner();
+    window.dispatchEvent(new CustomEvent('glotemp:install-available'));
   });
-  // Guarded: cities/ and verticals/ load this file but carry no banner.
+  // Guarded: cities/ and verticals/ load this file but carry no install button.
   const installBtn = document.getElementById('install-btn');
   if (installBtn) installBtn.addEventListener('click', async () => {
     if (deferredPrompt) {
       // Announced rather than measured here, so glotemp-analytics.js owns
-      // every event and this file keeps owning the banner.
+      // every event and this file keeps owning the prompt itself.
+      // welcome-intro.js listens for the outcome event to close its own
+      // overlay -- deliberately not done here, so this file never has to
+      // reach into that module's markup.
       window.dispatchEvent(new CustomEvent('glotemp:install-prompt-shown'));
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       window.dispatchEvent(new CustomEvent('glotemp:install-prompt-outcome', { detail: { outcome } }));
       deferredPrompt = null;
-      document.getElementById('install-banner').style.display = 'none';
     }
-  });
-  // Two ways out of the banner: the corner cross and the "Not now" button.
-  // Both close it, so neither is a control that appears to do nothing.
-  ['dismiss-install', 'install-later'].forEach((id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener('click', () => {
-      document.getElementById('install-banner').style.display = 'none';
-    });
   });
 
 });
@@ -2510,10 +2428,57 @@ function applyWeatherToSlot(slotEl, category) {
   if (category === 'snow') renderSnowflakes(weatherEl, 14);
 }
 
-// Barometer rotation - 5 slots, staggered, session-shuffled
-// Rotation pool: the top 20 cities by living index (see living-index.js) --
-// the same pool /explore's "Now showing" row draws from, so the homepage
-// and /explore never disagree about which cities are currently "hot".
+// Real current reading for a city: the live pulse-vertical average from
+// Supabase (ranking.cities[].pulseReading, computed in living-index.js),
+// falling back to the city's static baseline mood only when no live pulse
+// reading exists yet for it -- the exact fallback living-index.js itself
+// already documents and uses. Never a fabricated number.
+function effectiveMood(cityData) {
+  if (cityData.pulseReading != null) return cityData.pulseReading;
+  if (cityData.mood != null) return cityData.mood;
+  return 7.0;
+}
+
+// Groups a pool of real cities by their real current band, shuffles within
+// each band, then round-robins across bands (in a shuffled band order) so
+// the first N picks favor N distinct bands before ever repeating one. Only
+// ever returns cities that are actually in the pool with their own real
+// reading -- diversity comes from which real band each one already sits
+// in, never a forced or invented spread.
+function pickBandDiverseCities(pool, count) {
+  const buckets = {};
+  pool.forEach(c => {
+    const band = moodToBand(effectiveMood(c)).band;
+    (buckets[band] = buckets[band] || []).push(c);
+  });
+  Object.values(buckets).forEach(arr => arr.sort(() => Math.random() - 0.5));
+  const bandOrder = Object.keys(buckets).sort(() => Math.random() - 0.5);
+  const picked = [];
+  const pickedSlugs = new Set();
+  for (let round = 0; picked.length < count && round < pool.length; round++) {
+    let addedThisRound = false;
+    for (const band of bandOrder) {
+      if (picked.length >= count) break;
+      const candidate = buckets[band][round];
+      if (candidate && !pickedSlugs.has(candidate.slug)) {
+        picked.push(candidate);
+        pickedSlugs.add(candidate.slug);
+        addedThisRound = true;
+      }
+    }
+    if (!addedThisRound) break;
+  }
+  return picked;
+}
+
+// Barometer rotation - 5 slots, staggered, session-shuffled, band-diverse.
+// Rotation pool: every available city's real current reading (see
+// effectiveMood above) -- previously this was narrowed to the top 20 by
+// living index (the same pool /explore's "Now showing" row draws from),
+// but that pool skews toward the "charged" band by construction, which
+// left the row showing five identical bands instead of the spread its own
+// copy promises. The wider pool plus pickBandDiverseCities below fixes
+// that without inventing any data.
 async function setupBarometerRotation() {
   const slots = document.querySelectorAll('.instrument-slot');
   if (!slots.length) return;
@@ -2522,7 +2487,12 @@ async function setupBarometerRotation() {
   try {
     const ranking = await GlotempLivingIndex.getRanking();
     const citiesBySlug = new Map((window.CITIES_DATA || []).map(c => [c.slug, c]));
-    pool = (ranking.top20 || []).map(c => citiesBySlug.get(c.slug) || c).filter(Boolean);
+    pool = (ranking.cities || [])
+      .map(rc => {
+        const full = citiesBySlug.get(rc.slug);
+        return full ? Object.assign({}, full, { pulseReading: rc.pulseReading }) : null;
+      })
+      .filter(Boolean);
   } catch (e) {
     pool = [];
   }
@@ -2533,22 +2503,19 @@ async function setupBarometerRotation() {
   }
   if (pool.length < 5) return;
 
-  // Shuffle once per session
-  const shuffled = pool.slice().sort(() => Math.random() - 0.5);
-  let cursor = 0;
+  const assigned = pickBandDiverseCities(pool, 5);
 
-  // Assign 5 unique starting cities
-  const assigned = [];
-  for (let i = 0; i < 5; i++) {
-    assigned.push(shuffled[cursor++ % shuffled.length]);
-  }
-
-  function nextUniqueCity(excluding) {
-    for (let tries = 0; tries < shuffled.length * 2; tries++) {
-      const c = shuffled[cursor++ % shuffled.length];
-      if (!excluding.includes(c.slug)) return c;
-    }
-    return shuffled[0];
+  // Next replacement for a rotating slot: prefer a real city whose band
+  // isn't already showing on one of the other slots, so the row keeps
+  // reading as distinct bands over time instead of drifting back to a
+  // repeat. Falls back to any unused city if every band is already
+  // represented or exhausted.
+  function nextDiverseCity(excludingSlugs, excludingBands) {
+    const candidates = pool.filter(c => !excludingSlugs.includes(c.slug));
+    if (!candidates.length) return null;
+    const fresh = candidates.filter(c => !excludingBands.includes(moodToBand(effectiveMood(c)).band));
+    const from = fresh.length ? fresh : candidates;
+    return from[Math.floor(Math.random() * from.length)];
   }
 
   function updateSlot(slotEl, cityData) {
@@ -2557,7 +2524,7 @@ async function setupBarometerRotation() {
     const bandEl = slotEl.querySelector('.instrument-band-name');
     if (!img || !nameEl || !bandEl) return;
 
-    const { band, color, img: imgSrc } = moodToBand(cityData.mood || 7.0);
+    const { band, color, img: imgSrc } = moodToBand(effectiveMood(cityData));
     const isChange = img.getAttribute('src') !== imgSrc && img.getAttribute('src') && img.getAttribute('src').indexOf('barometer') !== -1;
 
     if (isChange) {
@@ -2629,8 +2596,12 @@ async function setupBarometerRotation() {
     setTimeout(() => {
       setInterval(() => {
         if (paused || slot.matches(':hover')) return;
-        const current = assigned.map(c => c.slug);
-        const next = nextUniqueCity(current);
+        const currentSlugs = assigned.map(c => c.slug);
+        const otherBands = assigned
+          .filter((_, idx) => idx !== i)
+          .map(c => moodToBand(effectiveMood(c)).band);
+        const next = nextDiverseCity(currentSlugs, otherBands);
+        if (!next) return;
         assigned[i] = next;
         updateSlot(slot, next);
       }, INTERVAL_MS);

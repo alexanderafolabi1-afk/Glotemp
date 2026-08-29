@@ -134,6 +134,12 @@ function generateCityPage(city) {
   const desc = `Live profile of ${city.name} across all 12 dimensions. Real-time data on mood, opportunities, economy, and city vitality.`;
   const ogDesc = `Explore what ${city.name} is like right now across all 12 dimensions.`;
   const canonical = `https://glo-temp.com/cities/${city.slug}`;
+  // Per-city share card (see generate-city-share-cards.js +
+  // rasterize-share-cards.js) -- a PNG stat card carrying this city's own
+  // name and live mood/band, instead of the one generic logo every city
+  // page used to share alike. PNG, not SVG: X/Twitter's card crawler
+  // does not render SVG for og:image / twitter:image.
+  const ogImage = `https://glo-temp.com/og/${city.slug}.png`;
 
   // schema.org City, not TouristAttraction -- this page covers Tech,
   // Finance, Work and nine other verticals, not just visiting. Only
@@ -157,6 +163,7 @@ function generateCityPage(city) {
     .replace(/__CITY_DESC__/g, escHtml(desc))
     .replace(/__CITY_OG_DESC__/g, escHtml(ogDesc))
     .replace(/__CITY_CANONICAL__/g, escHtml(canonical))
+    .replace(/__CITY_OG_IMAGE__/g, escHtml(ogImage))
     .replace(/__CITY_SCHEMA_JSON__/g, escForScriptTag(JSON.stringify(citySchema)));
 
   // Update vertical navigation to include all 12 verticals
@@ -286,6 +293,8 @@ function generateCityPage(city) {
 
       if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('${city.name}', '${city.country}');
       if (typeof GlotempAttention !== 'undefined') GlotempAttention.loadCityAttention('${city.slug}');
+      if (typeof GlotempWhy !== 'undefined') GlotempWhy.loadCityWhy('${city.slug}');
+      if (typeof GlotempCityTier !== 'undefined') GlotempCityTier.loadTier('${city.slug}');
 
       // Synchronous and static, so it's always in the DOM before any of
       // the async context loaders below append their own findings --
@@ -305,6 +314,14 @@ function generateCityPage(city) {
       }
       if (typeof GlotempWorldBank !== 'undefined') {
         contextLoaders.push(...verticalSlugs.map(v => GlotempWorldBank.loadVerticalIndicator('${city.iso}', v, '${city.country}')));
+      }
+      // Real universities near this city (Wikidata, see city-campus.js).
+      // Only Education has one of these; it appends into the same
+      // #education-context mount World Bank's literacy fact uses above,
+      // so both real sources sit together rather than competing for a
+      // second element.
+      if (typeof GlotempCampus !== 'undefined') {
+        contextLoaders.push(GlotempCampus.loadCampuses('${city.slug}'));
       }
       await Promise.all(contextLoaders);
       if (typeof GlotempWiki !== 'undefined') {
@@ -356,7 +373,7 @@ function generateCityPage(city) {
         const contentEl = document.getElementById(\`\${vertical}-content\`);
         try {
           const response = await fetch(
-            \`\${SUPABASE_URL}/rest/v1/readings?city_slug=eq.\${citySlug}&vertical=eq.\${vertical}&order=fetched_at.desc&limit=50\`,
+            \`\${SUPABASE_URL}/rest/v1/readings?city_slug=eq.\${citySlug}&vertical=eq.\${vertical}&source=neq.seed&order=fetched_at.desc&limit=50\`,
             {
               headers: {
                 'apikey': SUPABASE_ANON_KEY,
@@ -386,6 +403,12 @@ function generateCityPage(city) {
             const max = METRIC_MAX[reading.metric] || METRIC_MAX_FALLBACK;
             const shownValue = reading.value !== null && reading.value !== undefined ? formatInstrumentValue(reading.value) : null;
             const confidenceNote = typeof reading.confidence === 'number' ? \`\${Math.round(reading.confidence * 100)}% confidence\` : '';
+            // Quiet, secondary confidence readout -- the reading.confidence
+            // value already exists on every row (readings.confidence in the
+            // DB) and was previously only surfaced as a hover title. Never
+            // invented: a row with no confidence value shows "Forming"
+            // rather than guessing a number.
+            const confidencePct = typeof reading.confidence === 'number' ? \`\${Math.round(reading.confidence * 100)}%\` : 'Forming';
             const ariaLabel = \`\${reading.label || 'Reading'}: \${shownValue !== null ? shownValue : 'n/a'}\`;
             const valueClass = shownValue !== null && shownValue.length > 3 ? 'instrument-value instrument-value-compact' : 'instrument-value';
             return \`
@@ -395,6 +418,7 @@ function generateCityPage(city) {
                 \${shownValue !== null ? \`<span class="\${valueClass}">\${shownValue}</span>\` : ''}
               </div>
               <span class="instrument-label">\${reading.label || ''}</span>
+              <span class="instrument-confidence">\${confidencePct}</span>
               <time class="instrument-time" datetime="\${reading.fetched_at}">\${verticals.getTimeAgo(new Date(reading.fetched_at))}</time>
             </div>
           \`;
@@ -489,10 +513,10 @@ function generateCityPage(city) {
               },
               body: JSON.stringify({ city_slug: citySlug, email }),
             });
-            statusEl.textContent = "You're on the list -- we'll notify " + email + '.';
+            statusEl.textContent = "You're on the list. We'll notify " + email + '.';
             emailInput.value = '';
           } catch (e) {
-            statusEl.textContent = "Saved locally -- we'll sync this once you're back online.";
+            statusEl.textContent = "Saved locally. We'll sync this once you're back online.";
           }
           submitBtn.disabled = false;
         });

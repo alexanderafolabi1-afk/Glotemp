@@ -27,15 +27,20 @@ const SOURCES = [
   'living-index.js', 'cities-data.js', 'tempo-economy.js',
   'glotemp-analytics.js',
   'city-tiles.js', 'city-landmark-photos.js', 'city-photos.js',
-  'city-trivia-data.js', 'city-spotlight.js',
+  'city-trivia-data.js', 'city-spotlight.js', 'city-tier.js',
+  'pulse-map.js', 'city-weather-mood.js', 'social-proof.js',
+  'seed-observations.js', 'glotemp-hero-instrument.js', 'mood-confidence.js',
+  'welcome-intro.js',
   // The one source of nav markup, executed on every page -- a change to
   // it changes what the browser renders sitewide, so it belongs in the
-  // build hash as much as index.html does.
-  'nav-component.js',
+  // build hash as much as index.html does. footer-social.js is the same
+  // kind of sitewide-executed file, just for the footer.
+  'nav-component.js', 'footer-social.js',
   'glotemp-elsewhere.js', 'city-of-the-day.js', 'city-of-day-photos.js',
   'verticals-engine.js', 'stories.js', 'cookie-consent.js',
   'about/index.html', 'explore/index.html', 'feed/index.html',
   'gem/index.html', 'methodology/index.html', 'movers/index.html',
+  'suggest-city/index.html', 'city-suggestions.js', 'tonight/index.html',
 ];
 
 const hash = crypto.createHash('sha256');

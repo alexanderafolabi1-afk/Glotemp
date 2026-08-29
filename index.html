@@ -4,22 +4,64 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#06060A" />
-  <meta name="description" content="Glotemp - the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
+  <meta name="description" content="Glotemp: the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
   <meta name="keywords" content="city mood, travel intelligence, urban energy, real-time city data, location intelligence, collective mood" />
-  <meta property="og:title" content="Glotemp – Live City Pulse" />
-  <meta property="og:description" content="Glotemp - the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
+  <meta property="og:title" content="Glotemp: Live City Pulse" />
+  <meta property="og:description" content="Glotemp: the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/" />
+  <meta property="og:image" content="https://glo-temp.com/og/home.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Glotemp – Live City Pulse" />
-  <meta name="twitter:description" content="Glotemp - the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
+  <meta name="twitter:title" content="Glotemp: Live City Pulse" />
+  <meta name="twitter:description" content="Glotemp: the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
+  <meta name="twitter:image" content="https://glo-temp.com/og/home.png" />
   <link rel="canonical" href="https://glo-temp.com/" />
   <link rel="manifest" href="/manifest.json" />
+
+  <!-- Structured data: Organization + WebSite with a SearchAction, so
+       search engines can render a real search box in results and
+       correctly attribute the site as a named entity. Static, at build
+       time -- not client-rendered, since crawlers that don't execute JS
+       (Bing among them) would otherwise never see it. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Glotemp",
+    "url": "https://glo-temp.com/",
+    "logo": "https://glo-temp.com/assets/logo.png",
+    "sameAs": []
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Glotemp",
+    "url": "https://glo-temp.com/",
+    "description": "City pulse across 300 cities: mood, tech, finance, work, property, education, sport, entertainment, fashion, food, health and transport, checked in by people on the ground.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://glo-temp.com/cities/{search_term_string}.html"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <title>Glotemp – Live City Pulse</title>
+  <title>Glotemp: Live City Pulse</title>
 
+  <link rel="alternate" hreflang="en" href="https://glo-temp.com/" />
+  <link rel="alternate" hreflang="es" href="https://glo-temp.com/" />
+  <link rel="alternate" hreflang="fr" href="https://glo-temp.com/" />
+  <link rel="alternate" hreflang="de" href="https://glo-temp.com/" />
+  <link rel="alternate" hreflang="pt" href="https://glo-temp.com/" />
+  <link rel="alternate" hreflang="ja" href="https://glo-temp.com/" />
+  <link rel="alternate" hreflang="x-default" href="https://glo-temp.com/" />
   <!-- Type system: Fraunces (display), Manrope (body), IBM Plex Mono (data) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -35,21 +77,64 @@
 </head>
 <body>
   <div id="app">
-    <!-- Install Banner: elevated, legacy-toned add-to-home-screen -->
-    <div id="install-banner" class="install-banner" style="display:none;" role="dialog" aria-labelledby="install-headline" aria-describedby="install-body">
-      <button id="dismiss-install" class="install-dismiss" aria-label="Dismiss" data-i18n="dismiss">×</button>
-      <div class="install-inner">
-        <div class="install-icon-wrap" aria-hidden="true">
-          <img src="/assets/icon-192.png" alt="" width="56" height="56" class="install-icon">
+    <!-- First-visit intro: three steps (real radio, the check-in concept,
+         then a confident install pitch), shown once per visitor. Replaces
+         the old single-step install banner. -->
+    <div id="welcome-intro-overlay" class="welcome-intro-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="welcome-intro-heading">
+      <div class="welcome-intro-modal">
+        <button type="button" id="welcome-intro-dismiss" class="welcome-intro-dismiss" aria-label="Dismiss">×</button>
+
+        <div class="welcome-intro-dots" aria-hidden="true">
+          <span class="welcome-intro-dot is-active" data-dot="1"></span>
+          <span class="welcome-intro-dot" data-dot="2"></span>
+          <span class="welcome-intro-dot" data-dot="3"></span>
         </div>
-        <div class="install-copy">
-          <p class="install-eyebrow" data-i18n="install_eyebrow">A private companion</p>
-          <h2 id="install-headline" class="install-headline" data-i18n="install_title">Keep the world's pulse close.</h2>
-          <p id="install-body" class="install-body" data-i18n="install_body">Add Glotemp to your home screen. A quiet instrument that tells you how a city truly feels, before you arrive, while you are there, and long after you leave.</p>
+
+        <!-- Persistent across all 3 steps, built from signals
+             (document.referrer, a search-query param if present), see
+             welcome-intro.js's personalizationLine(). Never fabricated:
+             if none of those signals are present, this reads as a plain
+             welcome, not a guess dressed up as one. -->
+        <p class="welcome-intro-recognition" id="welcome-intro-recognition"></p>
+
+        <div class="welcome-intro-step" data-step="1">
+          <p class="welcome-intro-eyebrow">Right now</p>
+          <h2 id="welcome-intro-heading" class="welcome-intro-headline"><span id="welcome-intro-city-name">A city</span>'s radio is playing right now.</h2>
+          <button type="button" class="welcome-intro-radio" id="welcome-intro-radio-btn" disabled>
+            <span class="welcome-intro-radio-icon" aria-hidden="true">&#9654;</span>
+            <span class="welcome-intro-radio-name" id="welcome-intro-station-name">Finding a station…</span>
+          </button>
+          <audio id="welcome-intro-audio" preload="none"></audio>
         </div>
-        <div class="install-actions">
-          <button id="install-btn" class="btn-neon install-cta" data-i18n="install_btn">Place among your essentials</button>
-          <button id="install-later" class="btn-text install-later" data-i18n="install_later">Not now</button>
+
+        <!-- Rotates through rows from the `readings` table (the same
+             12-vertical collector data city pages already show), never a
+             fixed list, see welcome-intro.js's fetchLiveExamples(). The
+             comic-burst shape is the exact same SVG language the homepage
+             Instrument Room uses (#instrument-row above), just at modal
+             scale, so this reads as the same family rather than a new
+             visual system. -->
+        <div class="welcome-intro-step" data-step="2" hidden>
+          <p class="welcome-intro-eyebrow">Across the map</p>
+          <h2 class="welcome-intro-headline">What's moving today.</h2>
+          <div class="welcome-intro-example" id="welcome-intro-example" aria-live="polite"></div>
+          <p class="welcome-intro-fineprint">Add your own reading, tied to where you are, and it joins the map.</p>
+        </div>
+
+        <div class="welcome-intro-step" data-step="3" hidden>
+          <p class="welcome-intro-eyebrow">Be part of it</p>
+          <h2 class="welcome-intro-headline">Every city here runs on people who show up for it.</h2>
+          <p class="welcome-intro-body">Add us to your home screen, and be part of keeping <span id="welcome-intro-city-name-2">your city</span>, and every city here, moving.</p>
+          <p class="welcome-intro-fallback" id="welcome-intro-install-fallback" hidden></p>
+        </div>
+
+        <div class="welcome-intro-actions">
+          <button type="button" class="btn-text welcome-intro-back" id="welcome-intro-back" hidden>Back</button>
+          <svg class="welcome-intro-arrow" id="welcome-intro-arrow" viewBox="0 0 16 10" aria-hidden="true" hidden>
+            <path d="M2 1l6 7 6-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <button type="button" class="btn-neon welcome-intro-next" id="welcome-intro-next">Next</button>
+          <button type="button" class="btn-neon welcome-intro-install-btn" id="install-btn" hidden>Add to home screen</button>
         </div>
       </div>
     </div>
@@ -59,7 +144,38 @@
 <script src="/nav-component.js"></script>
 <script src="/footer-social.js" defer></script>
 
-    
+    <!-- ============================================================
+         HOMEPAGE SECTION ORDER -- deliberately restructured so a
+         first-time visitor reaches concrete proof of what Glotemp
+         offers within the first few sections, before any ask to
+         participate. Order:
+
+         1. Hero            -- the hook (headline + search)
+         2. Elsewhere       -- "show don't tell": one of 300 real
+                                cities, alive right now (clock, sky,
+                                radio, press, photo, all live)
+         3. Instrument Room -- the breadth proof: five cities' real
+                                mood readings, visually, at once
+         4. Social proof    -- two honest real numbers, reinforcing
+                                the scale claim right after showing it
+         5. Trip Engine     -- the concrete utility hook ("should I
+                                go", with real booking actions)
+         6. Daily Pulse     -- one city, held up as a single example
+         7. Spin + Spotlight -- exploratory tools, once value is clear
+         8. Pulse map       -- the full 300-city scale, visually
+         9. City reading    -- the primary "add your voice" CTA
+         10. Daily check-in -- the secondary, ritual CTA
+         11. Trending        -- the platform visibly moving
+         12. Observations    -- other people's real voices
+         13. Home Frequency  -- a returning-visitor feature (needs a
+                                 kept city already), placed last since
+                                 it has nothing to offer a first visit
+         14. Footer
+
+         Every section below keeps its original id/classes/attributes
+         untouched -- every script that mounts into one still finds it
+         by id regardless of where it now sits in the page. -->
+
     <!-- Hero instrument: instrument-base.png (uploaded artwork, never
          modified) plus a live SVG layer over its aperture, driven by
          whichever city is pinned. See glotemp-hero-instrument.js. -->
@@ -71,7 +187,7 @@
         <div class="hero-copy">
           <div class="eclipse-note" id="eclipse-note" hidden></div>
           <h1 class="hero-headline">Know how a city feels before you go.</h1>
-          <p class="hero-subhead">Live readings across 300 cities.</p>
+          <p class="hero-subhead">Live readings across a growing register of cities.</p>
           <form class="hero-search" id="hero-city-search" role="search">
             <input type="text" id="hero-city-input" class="hero-search-input" list="hero-city-list"
                    placeholder="Search a city" autocomplete="off" aria-label="Search a city">
@@ -102,35 +218,49 @@
       <button type="button" class="hero-sound-toggle" id="hero-sound-toggle" aria-pressed="false" aria-label="Turn on instrument sound" title="Instrument sound: off">&#128263;</button>
     </section>
 
-    <!-- Spin: most prominent interactive element on the page -->
-    <!-- Second section, under the hero: the counterweight to the traveller
-         framing above. Populated by glotemp-elsewhere.js. -->
+    <!-- City sell: the second thing a first-time visitor sees, right
+         after the hero -- a personalized hook (guesses roughly where
+         they are with zero permission prompt, via browser timezone, not
+         GPS -- see glotemp-city-sell.js) making the case for that city
+         across every vertical the site tracks, using only facts the
+         site already has elsewhere. Hidden until populated. Placed
+         first among the "show, don't tell" sections below since it's
+         the only one addressed to this specific visitor rather than a
+         generic "some city, somewhere" case. -->
+    <section class="glass-card city-sell-section" id="city-sell-section" aria-label="Why this city" hidden>
+      <p class="eyebrow" id="city-sell-eyebrow">Right now, near you</p>
+      <h2 id="city-sell-headline">&nbsp;</h2>
+      <p class="city-sell-subhead" id="city-sell-subhead"></p>
+      <div class="city-sell-shelf" id="city-sell-shelf" role="list"></div>
+    </section>
+
+    <!-- "Somewhere else is awake" -- show, don't tell. One of 300 real
+         cities, live: its own clock, sky, radio, press and photo, no
+         claim spoken aloud. See glotemp-elsewhere.js. -->
     <section class="elsewhere-section" id="elsewhere-root" aria-label="A city you keep"></section>
 
-    <!-- Spin instrument beside City Spotlight -- two separate panels, two
-         separate scripts (glotemp-spin.js, city-spotlight.js). Neither
-         reads the other's state. Stacks to one column below 800px. -->
-    <div class="homepage-duo">
-      <section id="spin-section" class="glass-card spin-section"></section>
-      <section id="city-spotlight-section" class="glass-card city-spotlight-section" aria-label="City spotlight"></section>
-    </div>
-
-    <!-- Daily check-in ritual. Populated by glotemp-daily-checkin.js. -->
-    <section class="daily-checkin-section" aria-label="Daily check-in">
-      <div id="daily-checkin-root"></div>
+    <!-- Live Blog, homepage edition: one cinematic dispatch, a different
+         random city every few seconds. See glotemp-live-blog-home.js and
+         glotemp-live-blog-data.js (the shared dispatch source, also used
+         by each city's own Live Blog). Hidden until populated. Placed
+         right after Elsewhere: both are the same "watch one real city,
+         live" mechanism, so they read as one beat rather than two
+         competing ones. -->
+    <section class="glass-card live-blog-home-section" id="live-blog-home-section" aria-label="Live from the network" hidden>
+      <p class="eyebrow">Somewhere else, right now</p>
+      <div class="live-blog-home-card" id="live-blog-home-card" role="status" aria-live="polite"></div>
     </section>
 
-    <!-- Home Frequency: a private daily letter from one kept city.
-         Populated by glotemp-home-frequency.js. -->
-    <section class="hf-section" aria-label="Home Frequency">
-      <div id="home-frequency-root"></div>
-    </section>
-
-    <!-- Ether Pulse Map. Replaces the five rotating barometers that used
-         to sit here. All 300 cities at once, drawn by ether-pulse-map.js;
-         tapping a node runs the same loadCityBySlug() the barometers did,
-         so #city-select, the city panel and the trip verdict below are
-         driven exactly as before. -->
+    <!-- Ether Pulse Map, in the slot main moved the Instrument Room to:
+         right after the two hook sections, where the breadth of what
+         Glotemp tracks becomes visible at a glance. It replaces the five
+         rotating barometers that stood here -- over 300 cities at once,
+         drawn by ether-pulse-map.js. Tapping a node runs the same
+         loadCityBySlug() the barometers did, so #city-select, the city
+         panel and the trip verdict below are driven exactly as before.
+         Home Frequency is NOT repeated here: main relocated it further
+         down the page, and keeping this branch's copy as well would have
+         put two #home-frequency-root elements on one page. -->
     <section class="ether-section" id="ether-map-section" aria-labelledby="ether-title">
       <div class="ether-head">
         <p class="eyebrow" data-i18n="pulse_eyebrow">Live instruments</p>
@@ -139,13 +269,13 @@
              (pulse_intro, instrument_hint) describe the five-barometer
              component this replaced -- "Five cities, chosen from what's
              moving right now" and "Tap any city below" are both untrue
-             of a 300-city map, and every translation of them says the
-             same wrong thing. Leaving them wired would have shipped that
-             copy to every non-English visitor. These two strings are
+             of this map, and every translation of them says the same
+             wrong thing. Leaving them wired would have shipped that copy
+             to every non-English visitor. These two strings are
              English-only until real translations are written; the
              eyebrow above keeps its key because "Right now, live" is
              still accurate. -->
-        <p class="ether-copy">All 300 tracked cities at once. Brightness is the reading; a line means a city just moved. Tap one to pin it.</p>
+        <p class="ether-copy">Over 300 tracked cities at once. Brightness is the reading; a line means a city just moved. Tap one to pin it.</p>
       </div>
       <div class="ether-map" id="ether-map"></div>
       <ul class="ether-key">
@@ -160,11 +290,13 @@
     <!-- Hero City Pulse -->
     <section class="hero-section">
       <!-- The five rotating barometers that stood here are gone; the
-           Ether Pulse Map above replaces them. setupBarometerRotation()
-           in app.js is left untouched and self-disables -- its first
-           line returns when no .instrument-slot exists -- so no other
-           call site or data path had to change. The barometer artwork in
-           /assets/ is untouched and still used elsewhere. -->
+           Ether Pulse Map above replaces them. main added decorative
+           .instrument-burst SVGs to those slots in the meantime -- they
+           go with the slots. setupBarometerRotation() in app.js is left
+           untouched and self-disables (its first line returns when no
+           .instrument-slot exists), so no other call site or data path
+           had to change. The barometer artwork in /assets/ is untouched
+           and still used elsewhere. -->
 
       <!-- City Selector Dropdown -->
       <select id="city-select" style="display:none;"></select>
@@ -183,8 +315,16 @@
       </div>
     </section>
 
+    <!-- Social proof: two honestly-scoped real numbers plus a few of the
+         strongest readings already present in the data -- see
+         social-proof.js. Hidden until real data actually resolves.
+         Placed right after Instrument Room so the scale claim just
+         shown visually is immediately backed by real figures. -->
+    <section class="glass-card social-proof-section" id="social-proof-mount" aria-label="Real activity across Glotemp" hidden></section>
+
     <!-- Trip Engine: verdict line plus the three real action links (room,
-         flight, table). -->
+         flight, table). Moved up: this is the single most concrete
+         "what's in it for me right now" hook on the page. -->
     <section class="glass-card trip-slot">
       <p class="eyebrow" data-i18n="trip_engine_title">Should you go</p>
       <div class="trip-body">
@@ -200,6 +340,22 @@
           <span class="trip-reading-value">-</span>
           <span class="trip-reading-band">-</span>
           <span class="trip-reading-city">-</span>
+          <!-- Quiet secondary confidence readout, derived from real
+               observations for this city (count + recency) -- never the
+               mood formula itself. "Forming" when too little real data
+               exists yet. See mood-confidence.js. -->
+          <span class="trip-reading-confidence" id="trip-reading-confidence"></span>
+          <!-- Real Open-Meteo weather for this city -- temperature, air
+               quality, pressure, in plain words. Not a score, not folded
+               into the mood reading above it: see city-weather-mood.js.
+               Hidden until real data arrives, and stays hidden on any
+               fetch failure -- no error shown, matching the rest of the
+               site's empty-state rule. -->
+          <p class="trip-air-mood" id="trip-air-mood" hidden>
+            <span class="trip-air-mood-label">Air &amp; Mood</span>
+            <span class="trip-air-mood-caption">real weather, not a score</span>
+            <span class="trip-air-mood-value" id="trip-air-mood-value"></span>
+          </p>
         </div>
       </div>
     </section>
@@ -214,59 +370,73 @@
       </div>
     </section>
 
-    <!-- City reading -->
-    <section class="check-in glass-card checkin-hero-section">
+    <!-- Spin instrument beside City Spotlight -- two separate panels, two
+         separate scripts (glotemp-spin.js, city-spotlight.js). Neither
+         reads the other's state. Stacks to one column below 800px.
+         Exploratory tools -- placed after the value/utility sections
+         above rather than before them. -->
+    <div class="homepage-duo">
+      <section id="spin-section" class="glass-card spin-section"></section>
+      <section id="city-spotlight-section" class="glass-card city-spotlight-section" aria-label="City spotlight"></section>
+    </div>
+
+    <!-- Pulse Map: every city as a quiet node on a stylized world map,
+         brightness by real mood, a soft pulse on real mood shifts. A
+         separate, additional section -- does not read from or write to
+         Instrument Room, and does not replace it. See pulse-map.js.
+         Moved up: this is the clearest single visual for "300 real
+         cities", worth reaching before the participation asks below. -->
+    <section id="pulse-map-section" class="glass-card" aria-label="World pulse map">
       <div class="section-heading">
         <div>
-          <p class="eyebrow" data-i18n="checkin_eyebrow">City reading</p>
-          <h2 class="checkin-neon-title"><span data-i18n="checkin_title">How</span> <span class="checkin-glow" id="checkin-city-name">New York</span> feels right now</h2>
+          <p class="eyebrow">300 cities, at a glance</p>
+          <h2>The pulse map</h2>
         </div>
-        <p class="section-copy" data-i18n="checkin_intro">Pick a mood and add a note if you like.</p>
+        <p class="section-copy">Every city, positioned by its real coordinates. Brighter means warmer right now. A soft pulse marks a city whose mood just shifted.</p>
       </div>
+      <div class="pulse-map-search-row">
+        <input type="text" id="pulse-map-search" class="pulse-map-search" placeholder="Find a city on the map" autocomplete="off" aria-label="Find a city on the pulse map">
+      </div>
+      <div class="pulse-map-frame" id="pulse-map-frame" role="group" aria-label="World map of city mood readings"></div>
+      <!-- Real, computed dawn/dusk line -- see pulse-map.js for the
+           astronomical math. Empty and hidden whenever no real city is
+           actually inside its sunrise/sunset window right now. -->
+      <p class="pulse-map-terminator-note" id="pulse-map-terminator-note" aria-live="polite" hidden></p>
+    </section>
 
+    <!-- City reading: the primary "add your voice" call to action. Kept
+         together with Daily check-in immediately below it, right after
+         the value sections above rather than scattered among them, so a
+         visitor who is ready to participate finds one clear place to do
+         it instead of several separate half-asks.
+
+         FIXED: this section used to hold its own standalone mood-picker
+         form (observation-form / recordObservation() in app.js) that
+         never checked sign-in and never wrote to the real database --
+         it only pushed into a local, client-only array. That is a
+         second, fake contribution path sitting next to the real one
+         city pages already use. Removed entirely. #city-observation-feed
+         below is the exact mount point glotemp-checkin.js looks for; the
+         city picker (#city-tiles) still lets a visitor choose which
+         city, but the composer itself is now the same real one -- sign
+         in required, real location verification, a real Supabase write,
+         the same moderation queue -- for whichever city is selected. See
+         GlotempCheckin.mountForCity(), wired from updateCity() in
+         app.js so the composer re-mounts every time the selection
+         changes. -->
+    <section class="check-in glass-card checkin-hero-section">
       <!-- Live city browser. Purely additive: tiles set the existing hidden
            #city-select and dispatch its change event, which is what app.js
            already listens for. See city-tiles.js. -->
       <div id="city-tiles" class="city-tiles" role="group" aria-label="Choose a city to read"></div>
-      <p class="city-tiles-hint">Live readings across 300 cities. Choose one, then add yours.</p>
+      <p class="city-tiles-hint">Live readings across a growing register of cities. Choose one, then add yours.</p>
 
-      <div class="mood-buttons" role="group" aria-label="How does your city feel right now?">
-        <button class="mood-btn" data-mood="🔥" data-band="charged"     data-label="Energized" title="Energized"><span class="mood-btn-icon" aria-hidden="true">🔥</span><span class="mood-btn-label">Energized</span></button>
-        <button class="mood-btn" data-mood="😊" data-band="warm"        data-label="Good"      title="Good"><span class="mood-btn-icon" aria-hidden="true">😊</span><span class="mood-btn-label">Good</span></button>
-        <button class="mood-btn" data-mood="😐" data-band="equilibrium" data-label="Neutral"   title="Neutral"><span class="mood-btn-icon" aria-hidden="true">😐</span><span class="mood-btn-label">Neutral</span></button>
-        <button class="mood-btn" data-mood="😞" data-band="restrained"  data-label="Low"       title="Low"><span class="mood-btn-icon" aria-hidden="true">😞</span><span class="mood-btn-label">Low</span></button>
-        <button class="mood-btn" data-mood="😟" data-band="low"         data-label="Cautious"  title="Cautious"><span class="mood-btn-icon" aria-hidden="true">😟</span><span class="mood-btn-label">Cautious</span></button>
-      </div>
-      <form id="observation-form" class="observation-form">
-        <div class="form-grid">
-          <label>
-            <span data-i18n="intensity_label">Intensity</span>
-            <input id="intensity-range" type="range" min="10" max="100" step="5" value="65" />
-            <strong id="intensity-value">65</strong>
-          </label>
-          <label>
-            <span data-i18n="scene_label">Where are you?</span>
-            <select id="scene-select">
-              <option value="street" data-i18n="scene_street">🚶 Out and about</option>
-              <option value="work" data-i18n="scene_work">💼 Work</option>
-              <option value="education" data-i18n="scene_school">🎓 School / campus</option>
-              <option value="food" data-i18n="scene_restaurant">🍽️ Restaurant / café</option>
-              <option value="entertainment" data-i18n="scene_concert">🎤 Concert / nightlife</option>
-              <option value="sport" data-i18n="scene_sport">🏋️ Gym / sport</option>
-              <option value="transport" data-i18n="scene_transit">🚇 Transit</option>
-              <option value="property" data-i18n="scene_home">🏠 Home</option>
-            </select>
-          </label>
-        </div>
-        <label class="full-width">
-          <span data-i18n="context_label">Optional local note</span>
-          <textarea id="context-note" rows="3" maxlength="240" data-i18n-placeholder="context_placeholder" placeholder="A small observation, event note, or mood context."></textarea>
-        </label>
-        <div class="form-actions">
-          <button id="record-observation" type="submit" class="btn-neon checkin-neon-btn" data-i18n="record_observation">Add reading</button>
-          <p id="observation-feedback" class="inline-feedback" aria-live="polite"></p>
-        </div>
-      </form>
+      <div id="city-observation-feed"></div>
+    </section>
+
+    <!-- Daily check-in ritual. Populated by glotemp-daily-checkin.js. -->
+    <section class="daily-checkin-section" aria-label="Daily check-in">
+      <div id="daily-checkin-root"></div>
     </section>
 
     <section id="fastest-moods" class="glass-card">
@@ -278,9 +448,61 @@
         <p class="section-copy" data-i18n="fastest_intro">Real-time shifts in city energy. These places are moving fast.</p>
       </div>
       <div id="fastest-cities-grid" class="fastest-grid">
-        <div class="fastest-placeholder" data-i18n="fastest_loading">Loading trending cities...</div>
+        <!-- Static seed cards, in the exact markup shape setupTrendingRotation()
+             (app.js) renders, so the section never shows literal "Loading"
+             text -- real, replaced almost immediately by the live rotation
+             once CITIES_DATA is ready, and left standing as a real (if
+             stale) fallback in the rare case that script fails to load. -->
+        <div class="fastest-card" data-slug="tokyo">
+          <div class="fastest-card-body">
+            <h3 class="fastest-city-name" style="color:#F5A25A">Tokyo</h3>
+            <p class="fastest-shift">Japan</p>
+            <p class="fastest-shift" style="color:#F5A25A">warm - 7.6 / 10</p>
+          </div>
+          <div class="fastest-mood" style="--mood-color:#F5A25A"></div>
+        </div>
+        <div class="fastest-card" data-slug="lisbon">
+          <div class="fastest-card-body">
+            <h3 class="fastest-city-name" style="color:#F0E0C8">Lisbon</h3>
+            <p class="fastest-shift">Portugal</p>
+            <p class="fastest-shift" style="color:#F0E0C8">equilibrium - 6.2 / 10</p>
+          </div>
+          <div class="fastest-mood" style="--mood-color:#F0E0C8"></div>
+        </div>
+        <div class="fastest-card" data-slug="medellin">
+          <div class="fastest-card-body">
+            <h3 class="fastest-city-name" style="color:#C86BE0">Medell&iacute;n</h3>
+            <p class="fastest-shift">Colombia</p>
+            <p class="fastest-shift" style="color:#C86BE0">charged - 8.7 / 10</p>
+          </div>
+          <div class="fastest-mood" style="--mood-color:#C86BE0"></div>
+        </div>
+        <div class="fastest-card" data-slug="bangkok">
+          <div class="fastest-card-body">
+            <h3 class="fastest-city-name" style="color:#F5A25A">Bangkok</h3>
+            <p class="fastest-shift">Thailand</p>
+            <p class="fastest-shift" style="color:#F5A25A">warm - 7.3 / 10</p>
+          </div>
+          <div class="fastest-mood" style="--mood-color:#F5A25A"></div>
+        </div>
+        <div class="fastest-card" data-slug="reykjavik">
+          <div class="fastest-card-body">
+            <h3 class="fastest-city-name" style="color:#6BA8F5">Reykjav&iacute;k</h3>
+            <p class="fastest-shift">Iceland</p>
+            <p class="fastest-shift" style="color:#6BA8F5">restrained - 4.4 / 10</p>
+          </div>
+          <div class="fastest-mood" style="--mood-color:#6BA8F5"></div>
+        </div>
+        <div class="fastest-card" data-slug="cape-town">
+          <div class="fastest-card-body">
+            <h3 class="fastest-city-name" style="color:#F0E0C8">Cape Town</h3>
+            <p class="fastest-shift">South Africa</p>
+            <p class="fastest-shift" style="color:#F0E0C8">equilibrium - 6.8 / 10</p>
+          </div>
+          <div class="fastest-mood" style="--mood-color:#F0E0C8"></div>
+        </div>
       </div>
-      <p class="fastest-source">All 300 cities pass through here.</p>
+      <p class="fastest-source">Every city in the register passes through here.</p>
     </section>
 
     <!-- Live observations: one rotating snippet, not a wall of cards. -->
@@ -296,6 +518,15 @@
         <p class="add-voice-copy" data-i18n="add_voice_copy">Want to add your own read on a city?</p>
         <button type="button" class="btn-neon" id="add-voice-btn" data-i18n="add_voice_btn">Add your voice ↑</button>
       </div>
+    </section>
+
+    <!-- Home Frequency: a private daily letter from one kept city.
+         Populated by glotemp-home-frequency.js. Placed last: this
+         feature only means anything once a visitor already keeps a
+         city, so it has nothing to offer a first-time visitor and would
+         only read as confusing higher up the page. -->
+    <section class="hf-section" aria-label="Home Frequency">
+      <div id="home-frequency-root"></div>
     </section>
 
     <footer class="footer glass">
@@ -324,14 +555,25 @@
   <script src="/city-photos.js" defer></script>
   <script src="/glotemp-mood-imagery.js" defer></script>
   <script src="/glotemp-tonight.js" defer></script>
+  <script src="/city-weather-mood.js" defer></script>
+  <script src="/mood-confidence.js" defer></script>
+  <script src="/pulse-map.js" defer></script>
+  <script src="/social-proof.js" defer></script>
   <script src="/glotemp-showcase.js" defer></script>
   <script src="/glotemp-spin.js" defer></script>
   <script src="/city-spotlight.js" defer></script>
   <script src="/glotemp-hero-instrument.js" defer></script>
+  <script src="/city-vertical-signature.js" defer></script>
+  <script src="/city-food-signature.js" defer></script>
+  <script src="/glotemp-vertical-style.js" defer></script>
+  <script src="/glotemp-city-sell.js" defer></script>
+  <script src="/glotemp-live-blog-data.js" defer></script>
+  <script src="/glotemp-live-blog-home.js" defer></script>
   <script src="/eclipse-2026.js" defer></script>
   <script src="/city-tiles.js" defer></script>
   <script src="/city-radio-curated.js" defer></script>
   <script src="/city-radio.js" defer></script>
+  <script src="/welcome-intro.js" defer></script>
   <script src="/city-news.js" defer></script>
   <script src="/city-of-the-day.js" defer></script>
   <script src="/city-of-day-photos.js" defer></script>
@@ -341,6 +583,13 @@
   <script src="/glotemp-reactions.js" defer></script>
   <script src="/ether-pulse-map.js" defer></script>
   <script src="/glotemp-reporter.js" defer></script>
+  <!-- The real check-in composer -- sign-in required, real location
+       verification, real Supabase write, same moderation queue as every
+       city page. Mounted for whichever city is selected via
+       GlotempCheckin.mountForCity(), called from updateCity() in app.js.
+       See the "City reading" section above for why this replaced the
+       old standalone form. -->
+  <script src="/glotemp-checkin.js" defer></script>
   <script src="/glotemp-daily-checkin.js" defer></script>
   <script src="/glotemp-home-frequency.js" defer></script>
   <script src="/tempo-economy.js" defer></script>

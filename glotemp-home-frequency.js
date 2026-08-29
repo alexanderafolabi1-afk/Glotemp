@@ -115,7 +115,7 @@
   function renderPicker(profile) {
     const cities = window.CITIES_DATA || [];
     const options = cities
-      .map((c) => `<option value="${esc(c.name)} — ${esc(c.country)}" data-slug="${esc(c.slug)}"></option>`)
+      .map((c) => `<option value="${esc(c.name)}, ${esc(c.country)}" data-slug="${esc(c.slug)}"></option>`)
       .join('');
     const pref = (profile && profile.home_frequency_pref) || 'morning';
 
@@ -152,7 +152,7 @@
       const status = document.getElementById('hf-picker-status');
       const input = document.getElementById('hf-city-input');
       const val = input.value.trim();
-      const match = cities.find((c) => `${c.name} — ${c.country}` === val)
+      const match = cities.find((c) => `${c.name}, ${c.country}` === val)
         || cities.find((c) => c.name.toLowerCase() === val.toLowerCase());
       if (!match) {
         status.textContent = 'Pick a city from the list.';
@@ -346,7 +346,7 @@
         ${fragmentHTML(fragment, city)}
         <form class="hf-note-form" id="hf-note-form">
           <label class="hf-label" for="hf-note-input">Leave yourself a note</label>
-          <textarea class="hf-note-input" id="hf-note-input" rows="2" maxlength="${NOTE_MAX}" placeholder="Optional — only you will see this.">${esc(todayNote)}</textarea>
+          <textarea class="hf-note-input" id="hf-note-input" rows="2" maxlength="${NOTE_MAX}" placeholder="Optional. Only you will see this.">${esc(todayNote)}</textarea>
           <div class="hf-note-actions">
             <button type="submit" class="hf-note-save">Save note</button>
             <span class="hf-note-status" id="hf-note-status" role="status" aria-live="polite"></span>

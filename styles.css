@@ -543,11 +543,13 @@ main > .glass:first-child,
   margin-bottom: 2rem;
 }
 
-/* No card chrome -- the barometer artwork sits directly on the page
-   ground, five instruments in a row rather than five boxes. The
-   mix-blend-mode transparency trick on .instrument-visual below is
-   self-contained (isolation: isolate), so it keeps working with no
-   background/border/shadow on this wrapper. */
+/* No card BOX -- still no filled rectangle or border-radius container --
+   but each slot now carries a comic-burst SVG plate (.instrument-burst)
+   peeking out from behind the artwork, a shaped card in place of the
+   implicit rectangle the row previously had none of. The mix-blend-mode
+   transparency trick on .instrument-visual below is self-contained
+   (isolation: isolate), so it keeps working unchanged, painted above the
+   burst via stacking order. */
 .instrument-slot {
   position: relative;
   display: flex;
@@ -560,6 +562,44 @@ main > .glass:first-child,
   box-shadow: none;
   transition: transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   animation: instrument-breathe 6s ease-in-out infinite;
+}
+
+/* Comic-burst plate: a jagged starburst behind the barometer, restrained
+   to the same muted brass-on-dark language as the rest of the site --
+   fill and stroke only, no bright comic colours. viewBox 0 0 200 200 with
+   preserveAspectRatio="none" so the same path fills whatever box this is
+   given at each breakpoint (the !important overrides further down resize
+   .instrument-slot itself, and this scales with it for free). Each of the
+   5 slots carries its own path (10/12/9/10/12-spike, different
+   rotations) so the row reads as five distinct stamped plates rather
+   than one shape repeated five times. */
+.instrument-burst {
+  position: absolute;
+  top: -7%;
+  left: -11%;
+  right: -11%;
+  bottom: 26%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.instrument-burst path {
+  fill: rgba(176, 141, 87, 0.07);
+  stroke: var(--brass-dim);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  transition: filter 600ms ease, fill 600ms ease;
+}
+.instrument-slot:hover .instrument-burst path,
+.instrument-slot:focus-within .instrument-burst path,
+.instrument-slot.is-selected .instrument-burst path {
+  fill: rgba(176, 141, 87, 0.12);
+  filter: drop-shadow(0 0 8px var(--slot-glow, var(--brass)));
+}
+.instrument-visual,
+.instrument-label {
+  position: relative;
+  z-index: 1;
 }
 
 .instrument-slot:nth-child(2) { animation-delay: 1.2s; }
@@ -1401,6 +1441,21 @@ body.scroll-reveals-enabled section.revealed {
   font-size: 1.1rem;
   color: var(--ivory);
   font-variant-numeric: tabular-nums;
+  margin: 0 0 0.15rem;
+}
+.nav-account-stars-count .reporter-badge {
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+/* Real, private, per-user count of distinct cities checked into -- Part
+   1, Pulse Streaks. Same private-to-owner-only scope as the star total
+   above it (get_my_stars(), self-scoped by auth.uid()), just a quieter
+   secondary line, not a second headline number. */
+.nav-account-cities-count {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--sand);
+  font-variant-numeric: tabular-nums;
   margin: 0 0 0.6rem;
 }
 .nav-account-invite-label {
@@ -1458,6 +1513,24 @@ body.scroll-reveals-enabled section.revealed {
   transition: background var(--transition), color var(--transition);
 }
 .nav-account-signout:hover {
+  background: rgba(176, 141, 87, 0.16);
+  color: var(--ivory);
+}
+
+.nav-account-link {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  color: var(--sand);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: background var(--transition), color var(--transition);
+  box-sizing: border-box;
+}
+.nav-account-link:hover,
+.nav-account-link:focus-visible {
   background: rgba(176, 141, 87, 0.16);
   color: var(--ivory);
 }
@@ -1841,10 +1914,10 @@ summary:focus:not(:focus-visible) {
   letter-spacing: 0.09em;
   color: var(--ivory);
   text-decoration: none;
-  border-bottom: 1px solid var(--brass);
+  border-bottom: 1px solid var(--brass-dim);
   padding-bottom: 0.2rem;
 }
-.elsewhere-more a:hover { color: var(--brass); }
+.elsewhere-more a:hover { color: var(--brass); border-color: var(--brass); }
 
 @media (min-width: 800px) {
   .elsewhere-strands { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
@@ -1936,6 +2009,98 @@ summary:focus:not(:focus-visible) {
 .reporter-badge-brass { color: var(--brass); border-color: var(--brass-dim); }
 .reporter-badge-silver { color: var(--reporter-silver); border-color: rgba(198, 203, 206, 0.4); }
 .reporter-badge-platinum { color: var(--reporter-platinum); border-color: rgba(233, 230, 220, 0.45); }
+
+/* City tier: Listed / Verified / Anchor, gated on real data depth
+   (city_tier() RPC). Listed (the open default) gets no badge at all, only
+   Verified and Anchor do. Sits as its own quiet line under "Live", not
+   fused into it, so it never reads as part of the live-data pulse.
+   Shaped as a vehicle plate (see city-tier.js's PLATE_SVG) rather than
+   the old plain hairline rectangle -- chamfered corners, an inset
+   engraved line, two rivets, and the city's own real region code + rank
+   stamped in the corner, like a plate reads a state and a number. */
+.city-tier-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  padding: 0.22rem 0.7rem 0.22rem 0.55rem;
+  border: none;
+  border-radius: 0;
+  white-space: nowrap;
+  margin-bottom: 0.6rem;
+}
+.tier-plate-shape {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
+.tier-plate-outline { fill: rgba(176, 141, 87, 0.05); stroke: var(--brass-dim); stroke-width: 1.4; }
+.tier-plate-inset { fill: none; stroke: var(--hairline); stroke-width: 0.8; }
+.tier-plate-rivet { fill: var(--brass-dim); }
+.tier-plate-content {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.32em;
+}
+/* Solid --sand rather than a dimmed/low-opacity brass: opacity low enough
+   to read as "secondary" measured under 3:1 against the plate fill,
+   failing the same contrast bar every other readable text on this site
+   is held to. --sand at full opacity clears AA on its own (9.17:1
+   measured against this fill) while still sitting visually behind the
+   brighter tier label. */
+.tier-plate-code { color: var(--sand); }
+.tier-plate-code::after { content: '\00b7'; margin-left: 0.32em; color: var(--sand); }
+.tier-plate-num { font-size: 0.85em; color: var(--sand); }
+.tier-plate-num::before { content: '\2116'; margin-right: 0.06em; }
+
+/* City flavor badge (see glotemp-city-flavor.js): a quiet pill for the
+   short, curated list of cities with a famous legal claim to fame --
+   sized and spaced to match .city-tier-badge next to it, a plain hairline
+   pill rather than the tier badge's engraved plate so the two read as
+   related but distinct. The joke lives in the title tooltip, not the
+   pill itself -- nothing here shouts. */
+.city-flavor-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  padding: 0.22rem 0.7rem 0.22rem 0.55rem;
+  margin: 0 0 0.6rem 0.5rem;
+  color: var(--sand);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  white-space: nowrap;
+  cursor: default;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.city-flavor-badge svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+}
+
+.city-flavor-badge:hover,
+.city-flavor-badge:focus-visible {
+  color: var(--brass);
+  border-color: var(--brass-dim);
+}
+
+.city-tier-badge-verified { color: var(--brass); }
+.city-tier-badge-verified .tier-plate-outline { stroke: var(--brass-dim); }
+.city-tier-badge-anchor { color: var(--ivory); }
+.city-tier-badge-anchor .tier-plate-outline { stroke: var(--brass); }
+.city-tier-badge-anchor .tier-plate-rivet { fill: var(--brass); }
 
 /* Fuller standalone panel -- the daily check-in "done" card today. */
 .reporter-panel {
@@ -2090,145 +2255,305 @@ summary:focus:not(:focus-visible) {
 .venue-attribution a { color: var(--sand); }
 .venue-attribution a:hover { color: var(--brass); }
 
-/* ===== INSTALL BANNER =====
-   The markup carries its own classes rather than .glass-card, so every
-   surface it needs is declared here. Mobile first: a full-width sheet
-   pinned to the bottom edge at 320px, becoming a centred card once there
-   is room. */
-#install-banner {
+/* ===== WELCOME INTRO =====
+   The first-visit 3-step intro that replaced the old single-step install
+   banner. Same glass modal surface as the rest of the site, brass
+   accents, a dialog rather than a marketing banner. */
+.welcome-intro-overlay {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1000;
-  padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(180deg, var(--basalt-raised) 0%, var(--basalt) 100%);
-  border-top: 1px solid var(--brass-dim);
-  box-shadow: 0 -18px 44px rgba(0, 0, 0, 0.55);
-  color: var(--ivory);
-}
-
-.install-inner {
+  inset: 0;
+  z-index: 2000;
+  background: rgba(6, 6, 10, 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.75rem;
-  max-width: 640px;
-  margin: 0 auto;
-  /* Flex children default to min-width:auto, which refuses to shrink and
-     is what produces horizontal scroll at 320px. */
-  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  overflow-y: auto;
 }
 
-.install-icon-wrap {
-  flex: none;
+.welcome-intro-overlay[hidden] { display: none; }
+
+/* Softened glass card, matching the modal surface used across the rest
+   of the site (see --glass-opacity/--glass-blur and .lang-list): the
+   same dark grained ground as the page itself showing through a blurred
+   pane, rounded corners, not a flat bordered rectangle. A gentle
+   fade-and-scale plays automatically the moment this leaves display:none,
+   since a CSS animation always restarts when an element re-enters the
+   render tree -- no open/close JS required for the motion itself. */
+.welcome-intro-modal {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  background:
+    radial-gradient(ellipse 140px 100px at 18% 20%, rgba(240, 224, 200, 0.03) 0%, transparent 45%),
+    radial-gradient(ellipse 120px 90px at 78% 65%, rgba(240, 224, 200, 0.026) 0%, transparent 45%),
+    repeating-linear-gradient(45deg, transparent 0px, transparent 2px, rgba(240, 224, 200, 0.012) 2px, rgba(240, 224, 200, 0.012) 3px),
+    repeating-linear-gradient(-45deg, transparent 0px, transparent 2px, rgba(240, 224, 200, 0.01) 2px, rgba(240, 224, 200, 0.01) 3px),
+    linear-gradient(180deg, rgba(30, 24, 17, var(--glass-opacity)) 0%, rgba(10, 8, 6, var(--glass-opacity)) 100%);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--radius);
+  padding: 2.25rem 1.85rem 1.75rem;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  max-height: calc(100vh - 2.5rem);
+  overflow-y: auto;
+  color: var(--ivory);
+  animation: modal-surface-in 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modal-surface-in {
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome-intro-modal { animation: none; }
+}
+.welcome-intro-modal.is-closing {
+  animation: modal-surface-out 200ms ease-in forwards;
+}
+@keyframes modal-surface-out {
+  to { opacity: 0; transform: scale(0.97) translateY(4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome-intro-modal.is-closing { animation: none; }
 }
 
-.install-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  display: block;
+.welcome-intro-dismiss {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 1px solid var(--brass-dim);
+  border-radius: 50%;
+  color: var(--sand);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
 }
+.welcome-intro-dismiss:hover { color: var(--ivory); border-color: var(--brass); }
 
-.install-copy {
-  min-width: 0;
+.welcome-intro-dots {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0 0 1.5rem;
 }
+.welcome-intro-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brass-dim);
+  opacity: 0.5;
+  transition: opacity var(--transition), background var(--transition);
+}
+.welcome-intro-dot.is-active { background: var(--brass); opacity: 1; }
 
-.install-eyebrow {
+.welcome-intro-eyebrow {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.72rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--brass);
-  margin: 0 0 0.35rem;
+  margin: 0 0 0.5rem;
 }
 
-.install-headline {
+.welcome-intro-headline {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-weight: var(--fw-light);
+  font-size: 1.55rem;
   line-height: 1.25;
-  font-weight: var(--fw-semibold);
   color: var(--ivory);
-  margin: 0 0 0.4rem;
+  margin: 0 0 0.85rem;
 }
 
-.install-body {
+.welcome-intro-body {
   font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 0.95rem;
+  line-height: 1.6;
   color: var(--sand);
+  margin: 0 0 0.85rem;
+}
+
+.welcome-intro-fineprint {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  line-height: 1.55;
+  color: var(--sand);
+  opacity: 0.75;
   margin: 0;
 }
 
-.install-actions {
+.welcome-intro-radio {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.85rem 1.1rem;
+  background: rgba(176, 141, 87, 0.08);
+  border: 1px solid var(--brass-dim);
+  border-radius: 999px;
+  color: var(--ivory);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+.welcome-intro-radio:hover:not(:disabled) { border-color: var(--brass); background: rgba(176, 141, 87, 0.14); }
+.welcome-intro-radio:disabled { cursor: default; opacity: 0.65; }
+.welcome-intro-radio-icon { flex: none; color: var(--brass); font-size: 0.75rem; }
+.welcome-intro-radio-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Step 3's non-interactive stand-in for the install button, shown instead
+   of it on platforms beforeinstallprompt never fires on (iOS, or a
+   visitor who already has us installed) -- same pill footprint as
+   .welcome-intro-radio above so swapping one for the other causes no
+   layout jump. */
+.welcome-intro-fallback {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--ivory);
+  margin: 0.5rem 0 0;
+  padding: 0.85rem 1.1rem;
+  background: rgba(176, 141, 87, 0.08);
+  border: 1px solid var(--brass-dim);
+  border-radius: 999px;
+}
+.welcome-intro-fallback[hidden] { display: none; }
+
+.welcome-intro-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+.welcome-intro-actions .welcome-intro-back { margin-right: auto; }
+/* .btn-text sets display:inline-flex, which -- at equal specificity --
+   beats the UA stylesheet's [hidden]{display:none} once an author rule is
+   in play. Without this, the Back button never actually hides on step 1. */
+.welcome-intro-back[hidden] { display: none; }
+.welcome-intro-next,
+.welcome-intro-install-btn {
+  min-height: 44px;
+  padding: 0 1.5rem;
+}
+
+/* The recognition line: built from real signals (referrer, a real search
+   query param) -- see welcome-intro.js's personalizationLine(). Persistent
+   across all 3 steps, directly under the dots, so the "this already knows
+   something about me" feeling isn't confined to one step. */
+.welcome-intro-recognition {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.03em;
+  color: var(--brass);
+  opacity: 0.85;
+  margin: 0 0 1.1rem;
+}
+
+/* Step 2's rotating live example: a comic-burst plate (same SVG language
+   as #instrument-row above and the .instrument-burst it uses) sized down
+   for the modal, one distinct real reading at a time. */
+.welcome-intro-example {
+  position: relative;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.6rem 0 1rem;
+}
+.welcome-intro-burst {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.welcome-intro-burst path {
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  transition: fill 400ms ease, stroke 400ms ease, filter 400ms ease;
+}
+.welcome-intro-example-body {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 0.5rem;
-  width: 100%;
-  min-width: 0;
+  align-items: center;
+  text-align: center;
+  gap: 0.3rem;
+  padding: 1rem 1.5rem;
 }
-
-.install-cta,
-.install-later {
-  min-height: 44px;
-  width: 100%;
-  font-size: 15px;
+.welcome-intro-example-icon { width: 26px; height: 26px; }
+.welcome-intro-example-icon svg { width: 100%; height: 100%; }
+.welcome-intro-example-vertical {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
-
-.install-later {
+.welcome-intro-example-city {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: 1.15rem;
+  color: var(--ivory);
+  margin: 0;
+}
+.welcome-intro-example-fact {
+  font-family: var(--font-body);
+  font-size: 0.86rem;
   color: var(--sand);
-  background: none;
-  border: none;
-  cursor: pointer;
+  margin: 0;
+  max-width: 30ch;
 }
-
-.install-dismiss {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  min-width: 44px;
-  min-height: 44px;
-  font-size: 1.4rem;
-  line-height: 1;
+.welcome-intro-example-fact strong { color: var(--ivory); font-weight: 600; }
+.welcome-intro-example-empty {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
   color: var(--sand);
-  background: none;
-  border: none;
-  cursor: pointer;
+  text-align: center;
+}
+/* Restarted on every rotation by toggling this class off/on in JS
+   (welcome-intro.js's renderExample) rather than a CSS-only loop, so a
+   fresh entrance plays each time the content actually changes. */
+.welcome-intro-example.is-entering .welcome-intro-burst,
+.welcome-intro-example.is-entering .welcome-intro-example-body {
+  animation: welcome-intro-example-in 460ms ease-out;
+}
+@keyframes welcome-intro-example-in {
+  from { opacity: 0; transform: scale(0.93); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-@media (min-width: 640px) {
-  #install-banner {
-    left: 50%;
-    right: auto;
-    bottom: 20px;
-    transform: translateX(-50%);
-    width: min(640px, calc(100vw - 2rem));
-    padding: 1.25rem 1.5rem;
-    border: 1px solid var(--brass-dim);
-    border-radius: 18px;
+/* Step 3's install cue: the exact chevron path checkin-insignia's "Check
+   in" sign already uses, rotated to point at the button beside it rather
+   than reinventing a new arrow shape. */
+.welcome-intro-arrow {
+  width: 20px;
+  height: 20px;
+  color: var(--brass);
+  animation: welcome-intro-arrow-nudge 1.4s ease-in-out infinite;
+}
+.welcome-intro-arrow[hidden] { display: none; }
+@keyframes welcome-intro-arrow-nudge {
+  0%, 100% { transform: rotate(-90deg) translateX(0); opacity: 0.55; }
+  50% { transform: rotate(-90deg) translateX(4px); opacity: 1; }
+}
+
+@media (max-width: 480px) {
+  .welcome-intro-modal {
+    padding: 1.85rem 1.15rem 1.35rem;
+    border-radius: 16px;
   }
-
-  .install-inner {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto;
-    align-items: start;
-    column-gap: 1rem;
-    row-gap: 0.85rem;
-  }
-
-  .install-icon-wrap { grid-row: 1 / -1; }
-
-  .install-actions {
-    grid-column: 2;
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .install-cta { width: auto; }
-  .install-later { width: auto; }
+  .welcome-intro-example { height: 176px; }
 }
 
 /* ===== PUSH NOTIFICATION PROMPT =====
@@ -3172,9 +3497,18 @@ summary:focus:not(:focus-visible) {
   width: min(920px, 100%);
   padding: 1.5rem;
   position: relative;
-  background: linear-gradient(180deg, rgba(35, 28, 20, 0.95), rgba(15, 16, 24, 0.98));
+  background:
+    radial-gradient(ellipse 160px 110px at 22% 22%, rgba(240, 224, 200, 0.03) 0%, transparent 45%),
+    repeating-linear-gradient(45deg, transparent 0px, transparent 2px, rgba(240, 224, 200, 0.012) 2px, rgba(240, 224, 200, 0.012) 3px),
+    linear-gradient(180deg, rgba(35, 28, 20, var(--glass-opacity)), rgba(15, 16, 24, var(--glass-opacity)));
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border-radius: var(--radius);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  animation: modal-surface-in 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .constellation-dialog { animation: none; }
 }
 
 .constellation-close {
@@ -3417,14 +3751,22 @@ summary:focus:not(:focus-visible) {
 }
 
 .lang-list {
-  background: rgba(35, 28, 20, var(--glass-opacity));
+  background:
+    radial-gradient(ellipse 120px 90px at 20% 20%, rgba(240, 224, 200, 0.03) 0%, transparent 45%),
+    repeating-linear-gradient(45deg, transparent 0px, transparent 2px, rgba(240, 224, 200, 0.012) 2px, rgba(240, 224, 200, 0.012) 3px),
+    rgba(35, 28, 20, var(--glass-opacity));
   backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   padding: 2rem;
   border-radius: var(--radius);
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 0.5rem;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  animation: modal-surface-in 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .lang-list { animation: none; }
 }
 
 .lang-option {
@@ -3912,6 +4254,256 @@ small {
   text-align: center;
   color: var(--ash);
   grid-column: 1 / -1;
+}
+
+/* ---------- Pulse map ----------
+   A separate, additive section: 300 cities as quiet nodes on a stylized
+   (not cartographically precise) world silhouette, positioned by their
+   real coordinates on a standard equirectangular projection. Brightness
+   reads mood; a soft ring marks a real, freshly-arrived mood shift. See
+   pulse-map.js. */
+.pulse-map-search-row { margin: 0 0 1.25rem; }
+.pulse-map-search {
+  width: 100%; max-width: 22rem; font-size: 16px; min-height: 44px;
+  background: transparent; border: none; border-bottom: 1px solid var(--brass-dim);
+  border-radius: 0; color: var(--ivory); font-family: var(--font-body); padding: 0.5rem 0.1rem;
+}
+.pulse-map-search:focus { outline: none; border-bottom-color: var(--brass); }
+.pulse-map-search::placeholder { color: var(--ash); opacity: 0.75; }
+
+.pulse-map-frame {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  aspect-ratio: 2 / 1;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 4px;
+  background: radial-gradient(ellipse at center, rgba(30, 24, 44, 0.4), rgba(6, 6, 10, 0.9) 78%);
+}
+
+/* Real day/night glow, rasterized on a canvas from the exact solar
+   elevation formula in pulse-map.js -- an indigo dusk deepening to night,
+   a warm amber band right at the real horizon, fading to nothing in full
+   day. The blur turns the low-res grid into a soft atmospheric wash
+   rather than a blocky heatmap. */
+.pulse-map-glow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: blur(2.5px);
+  pointer-events: none;
+}
+
+/* A fixed sky of map points, each one only ever lit while real night
+   sits over it right now -- see pulse-map.js's renderStars(). */
+.pulse-map-star {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--ivory);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 900ms ease;
+}
+.pulse-map-star.is-visible {
+  animation: pulse-map-twinkle 4s ease-in-out infinite;
+  box-shadow: 0 0 3px rgba(240, 224, 200, 0.5);
+}
+@keyframes pulse-map-twinkle {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.95; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-map-star.is-visible { animation: none; opacity: 0.6; }
+}
+
+/* The one real point on Earth directly under the sun right now. */
+.pulse-map-sun {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6df 0%, var(--brass) 55%, transparent 78%);
+  box-shadow: 0 0 18px 6px rgba(240, 200, 130, 0.45);
+  pointer-events: none;
+  animation: pulse-map-sun-breathe 5s ease-in-out infinite;
+}
+@keyframes pulse-map-sun-breathe {
+  0%, 100% { opacity: 0.82; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-map-sun { animation: none; opacity: 0.9; }
+}
+
+/* Continent shapes are a deliberately soft, non-literal silhouette --
+   irregular rounded blobs positioned at real bounding boxes, not a
+   coastline dataset. The point is context for the dots, not an atlas.
+   A soft radial glow rather than a flat fill, blended into the real
+   day/night wash beneath rather than sitting on top of it as a flat
+   grey card. */
+.pulse-map-landmass {
+  position: absolute;
+  background: radial-gradient(ellipse at 35% 30%, rgba(240, 224, 200, 0.16), rgba(240, 224, 200, 0.03) 72%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* Real day/night terminator -- a computed polyline, not an image or a
+   canned animation. See pulse-map.js for the astronomical math. Sits
+   above the landmasses and below the city nodes, quiet and unobtrusive:
+   one thin line, no shading, no glow beyond a soft brass haze in the
+   same family as the node glow. */
+.pulse-map-terminator {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+.pulse-map-terminator-line,
+.pulse-map-terminator-glow {
+  fill: none;
+  stroke: var(--brass);
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.pulse-map-terminator-line {
+  stroke-width: 1;
+  opacity: 0.68;
+  stroke-dasharray: 1 2.4;
+  animation: pulse-map-terminator-flow 40s linear infinite;
+}
+.pulse-map-terminator-glow {
+  stroke-width: 5;
+  opacity: 0.16;
+  filter: blur(2px);
+}
+@keyframes pulse-map-terminator-flow {
+  to { stroke-dashoffset: -100; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-map-terminator-line { animation: none; }
+}
+
+.pulse-map-terminator-note {
+  max-width: 34rem;
+  margin: 0.85rem auto 0;
+  padding: 0 0.5rem;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--sand);
+  opacity: 0.82;
+  font-style: italic;
+}
+
+.pulse-map-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: -10px 0 0 -10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pulse-map-node-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--ivory) 0%, var(--brass) 60%, transparent 100%);
+  opacity: var(--node-glow, 0.4);
+  box-shadow: 0 0 calc(var(--node-glow, 0.4) * 11px) rgba(176, 141, 87, calc(var(--node-glow, 0.4) * 0.95));
+  transition: opacity 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+.pulse-map-node:hover .pulse-map-node-dot,
+.pulse-map-node.is-match .pulse-map-node-dot {
+  opacity: 1;
+  transform: scale(1.6);
+}
+
+/* The soft pulse: a slow, quiet ring expanding outward and fading --
+   never an electric/lightning look. Removed from the DOM once finished. */
+.pulse-map-ring {
+  position: absolute;
+  left: 0; top: 0;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid var(--brass);
+  pointer-events: none;
+  animation: pulse-map-expand 3.2s cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
+}
+@keyframes pulse-map-expand {
+  0%   { width: 6px; height: 6px; opacity: 0.55; }
+  100% { width: 64px; height: 64px; opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-map-ring { animation: none; opacity: 0; }
+}
+
+.pulse-map-popover {
+  position: absolute;
+  z-index: 5;
+  min-width: 11rem;
+  padding: 0.85rem 1rem;
+  background:
+    radial-gradient(ellipse 90px 60px at 20% 25%, rgba(240, 224, 200, 0.03) 0%, transparent 45%),
+    repeating-linear-gradient(45deg, transparent 0px, transparent 2px, rgba(240, 224, 200, 0.012) 2px, rgba(240, 224, 200, 0.012) 3px),
+    rgba(20, 16, 12, var(--glass-opacity));
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: 14px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+  font-size: 0.8rem;
+  animation: modal-surface-in 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-map-popover { animation: none; }
+}
+.pulse-map-popover-city {
+  display: block;
+  font-family: var(--font-display);
+  color: var(--ivory);
+  font-size: 1rem;
+}
+.pulse-map-popover-band {
+  display: block;
+  margin-top: 0.15rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--sand);
+}
+.pulse-map-popover-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: var(--brass);
+  text-decoration: none;
+  border-bottom: 1px solid var(--brass-dim);
+  font-size: 0.78rem;
+}
+.pulse-map-popover-link:hover { color: var(--ivory); border-bottom-color: var(--brass); }
+.pulse-map-popover-close {
+  position: absolute; top: 0.35rem; right: 0.45rem;
+  background: none; border: none; color: var(--sand);
+  font-size: 0.9rem; cursor: pointer; padding: 0.2rem;
+  min-width: 24px; min-height: 24px;
+}
+
+@media (max-width: 600px) {
+  .pulse-map-frame { aspect-ratio: 4 / 3; }
 }
 
 @media (max-width: 768px) {
@@ -4450,6 +5042,23 @@ a:hover .city-landmark-photo,
   margin-right: 0.5em;
 }
 
+/* Same register as .conditions-line -- a one-line instrument reading,
+   not a callout box -- but only ever set via JS once real stored deltas
+   exist (see city-why.js); starts [hidden] rather than :empty since the
+   template ships it with no content at all until then. */
+.why-line {
+  margin-top: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--sand);
+  letter-spacing: 0.01em;
+}
+.why-eyebrow {
+  font-variant-caps: small-caps;
+  color: var(--brass);
+  margin-right: 0.5em;
+}
+
 .vertical-nav {
   display: flex;
   gap: 1rem;
@@ -4611,6 +5220,20 @@ a:hover .city-landmark-photo,
   color: var(--sand);
   opacity: 0.6;
   white-space: nowrap;
+}
+
+/* Quiet secondary confidence readout -- smaller and more muted than the
+   label above it, never competing with the reading itself. Real value
+   already stored per row (readings.confidence); "Forming" is the honest
+   fallback when that field is null, not a guessed number. */
+.instrument-confidence {
+  display: block;
+  margin-top: 0.15rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  color: var(--sand);
+  opacity: 0.55;
 }
 
 @media (max-width: 480px) {
@@ -5328,6 +5951,526 @@ a:hover .city-landmark-photo,
   min-height: 44px;
 }
 
+/* "Is tonight the night?" -- the one filled/solid CTA on the city header,
+   deliberately heavier than the outline Follow/Share buttons above it so
+   it reads as the primary action, not a third peer button. */
+.tonight-cta-btn {
+  display: inline-block;
+  margin-top: 1.1rem;
+  padding: 0.85rem 1.85rem;
+  background: var(--brass);
+  color: var(--obsidian);
+  font-family: var(--font-body);
+  font-weight: var(--fw-semibold);
+  font-size: var(--body-size);
+  text-decoration: none;
+  border-radius: 8px;
+  min-height: 44px;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.tonight-cta-btn:hover {
+  background: var(--ivory);
+  transform: translateY(-1px);
+}
+
+/* Social proof: two honestly-scoped real numbers (see social-proof.js)
+   plus a few of the strongest existing readings, in the same restrained
+   register as the rest of the site -- no badges, no fake urgency. */
+.social-proof-section {
+  text-align: left;
+}
+
+.social-proof-stats {
+  color: var(--sand);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0.6rem 0 0;
+}
+
+.social-proof-stat-num {
+  color: var(--brass);
+  font-family: var(--font-mono);
+  font-weight: var(--fw-semibold);
+}
+
+.social-proof-readings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+
+.social-proof-reading {
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--hairline);
+}
+
+.social-proof-reading-text {
+  color: var(--ivory);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  margin: 0 0 0.4rem;
+}
+
+.social-proof-reading-city {
+  color: var(--sand);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* Pulse Gravity: onward links to cities with a similar mood right now
+   (see glotemp-pulse-gravity.js). Same restrained card language as
+   social-proof, an accent stripe per item carrying that city's own band
+   color rather than a shared brand color. */
+.pulse-gravity-section {
+  text-align: left;
+}
+
+.pulse-gravity-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.pulse-gravity-item {
+  display: block;
+  padding: 0.75rem 0.9rem 0.75rem 0.9rem;
+  border-top: 2px solid var(--pg-color, var(--brass));
+  background: var(--basalt-raised);
+  border-radius: 8px;
+  text-decoration: none;
+  transition: transform var(--transition), background var(--transition);
+}
+
+.pulse-gravity-item:hover,
+.pulse-gravity-item:focus-visible {
+  transform: translateY(-2px);
+  background: var(--basalt);
+}
+
+.pulse-gravity-name {
+  display: block;
+  color: var(--ivory);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: var(--fw-semibold);
+}
+
+.pulse-gravity-meta {
+  display: block;
+  color: var(--sand);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  margin-top: 0.3rem;
+  opacity: 0.8;
+}
+
+/* City Sell (see glotemp-city-sell.js): the second thing a first-time
+   visitor sees, right under the hero instrument. A horizontal shelf, not
+   a grid -- cards ride a gentle wave (each card's own --card-wave, set in
+   JS) instead of sitting in rows, and scroll-snaps like a filmstrip
+   rather than wrapping. Every vertical gets its own vivid accent
+   (--card-color, set per card) -- the one deliberately bright exception
+   to the desaturated brass-family instrument colors used everywhere
+   else, reserved for this one welcome moment. */
+.city-sell-section {
+  overflow: hidden;
+}
+
+.city-sell-headline {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.4vw, 38px);
+  font-weight: var(--fw-light);
+  color: var(--ivory);
+  line-height: 1.16;
+  margin: 0 0 0.5rem;
+}
+
+.city-sell-subhead {
+  font-family: var(--font-body);
+  color: var(--sand);
+  font-size: 1rem;
+  line-height: 1.55;
+  max-width: 56ch;
+  margin: 0 0 1.75rem;
+}
+
+.city-sell-shelf {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.1rem;
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-snap-type: x proximity;
+  padding: 1.6rem 0.3rem 2.2rem;
+  margin: 0 -0.3rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.city-sell-shelf::-webkit-scrollbar {
+  height: 6px;
+}
+.city-sell-shelf::-webkit-scrollbar-thumb {
+  background: var(--brass-dim);
+  border-radius: 999px;
+}
+
+.city-sell-card {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: 208px;
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.15rem 1.15rem 1.3rem;
+  border-radius: 18px;
+  text-decoration: none;
+  background:
+    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--card-color) 22%, transparent), transparent 60%),
+    var(--basalt-raised);
+  border: 1px solid color-mix(in srgb, var(--card-color) 35%, var(--hairline));
+  transform: translateY(var(--card-wave, 0px));
+  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+.city-sell-card:hover,
+.city-sell-card:focus-visible {
+  transform: translateY(calc(var(--card-wave, 0px) - 6px));
+  border-color: var(--card-color);
+  box-shadow: 0 14px 30px -14px color-mix(in srgb, var(--card-color) 55%, transparent);
+}
+
+.city-sell-icon {
+  width: 30px;
+  height: 30px;
+  color: var(--card-color);
+}
+.city-sell-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.city-sell-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--card-color);
+}
+
+.city-sell-fact {
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--sand);
+  margin: 0;
+  flex: 1;
+}
+
+.city-sell-score {
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.city-sell-score-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--card-color);
+  border-radius: inherit;
+  transition: width 0.5s ease;
+}
+
+.city-sell-card--cta {
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1px dashed var(--brass-dim);
+}
+.city-sell-card--cta:hover,
+.city-sell-card--cta:focus-visible {
+  border-color: var(--brass);
+  border-style: solid;
+  box-shadow: none;
+}
+.city-sell-cta-text {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--ivory);
+  line-height: 1.3;
+}
+.city-sell-cta-arrow {
+  font-size: 1.3rem;
+  color: var(--brass);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .city-sell-card { transition: none; }
+}
+
+/* Live Blog, homepage edition (see glotemp-live-blog-home.js): one large
+   cinematic card, not a feed to scroll -- a broadcast that changes to a
+   different random city every few seconds. A thin top progress bar
+   (.live-blog-home-progress) reads like a stories timer, giving the
+   rotation a felt rhythm instead of just changing content underfoot. */
+.live-blog-home-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 260px;
+  border-radius: 20px;
+  padding: 2.2rem 2rem 2rem;
+  background:
+    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--card-color, var(--brass)) 26%, transparent), transparent 62%),
+    var(--basalt-raised);
+  border: 1px solid color-mix(in srgb, var(--card-color, var(--brass)) 35%, var(--hairline));
+}
+
+.live-blog-home-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: var(--card-color, var(--brass));
+}
+.live-blog-home-card.is-live .live-blog-home-progress {
+  animation: liveBlogProgress 8s linear;
+}
+@keyframes liveBlogProgress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.live-blog-home-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-width: 62ch;
+}
+
+.live-blog-home-icon {
+  width: 34px;
+  height: 34px;
+  color: var(--card-color, var(--brass));
+  margin-bottom: 0.2rem;
+}
+.live-blog-home-icon svg { width: 100%; height: 100%; }
+
+.live-blog-home-city {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--card-color, var(--brass));
+  margin: 0;
+}
+.live-blog-home-country {
+  color: var(--sand);
+  text-transform: none;
+  letter-spacing: normal;
+  margin-left: 0.6em;
+  opacity: 0.75;
+}
+
+.live-blog-home-headline {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.6vw, 30px);
+  font-weight: var(--fw-light);
+  color: var(--ivory);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.live-blog-home-fact {
+  font-family: var(--font-body);
+  color: var(--sand);
+  font-size: 1rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.live-blog-home-link {
+  margin-top: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--card-color, var(--brass));
+  text-decoration: none;
+  width: fit-content;
+}
+.live-blog-home-link:hover,
+.live-blog-home-link:focus-visible {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-blog-home-progress { display: none; }
+}
+
+/* Live Blog, city edition (see glotemp-live-blog-city.js): a vertical
+   journal, not a grid -- entries thread down a single accent line, each
+   with its own vertical-colored dot and card, the way a timeline or a
+   ship's log reads rather than a dashboard. */
+.live-blog-list {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0 0 0 1.6rem;
+  position: relative;
+}
+.live-blog-list::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: var(--hairline);
+}
+
+.live-blog-entry {
+  position: relative;
+  margin-bottom: 1.4rem;
+}
+.live-blog-entry:last-child {
+  margin-bottom: 0;
+}
+
+.live-blog-entry-dot {
+  position: absolute;
+  left: -1.6rem;
+  top: 0.35rem;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--entry-color);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--entry-color) 20%, transparent);
+}
+
+.live-blog-entry-card {
+  padding: 0.9rem 1.1rem 1.05rem;
+  border-radius: 12px;
+  background: var(--basalt-raised);
+  border-left: 2px solid var(--entry-color);
+}
+
+.live-blog-entry-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--entry-color);
+  margin-bottom: 0.4rem;
+}
+.live-blog-entry-icon {
+  width: 15px;
+  height: 15px;
+}
+.live-blog-entry-icon svg { width: 100%; height: 100%; }
+
+.live-blog-entry-headline {
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  font-weight: var(--fw-semibold);
+  color: var(--ivory);
+  margin: 0 0 0.35rem;
+  line-height: 1.3;
+}
+
+.live-blog-entry-body {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--sand);
+  margin: 0;
+}
+
+/* Follow confirmation toast -- modeled on .push-prompt's fixed, bottom
+   card, but its own quieter/simpler element: a short-lived acknowledgment
+   with no action buttons, not a permission ask. */
+.follow-confirm-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%) translateY(12px);
+  z-index: 999;
+  width: min(480px, calc(100vw - 2rem));
+  padding: 1.1rem 1.25rem;
+  background: linear-gradient(180deg, var(--basalt-raised) 0%, var(--basalt) 100%);
+  border: 1px solid var(--brass-dim);
+  border-radius: 14px;
+  box-shadow: 0 -18px 44px rgba(0, 0, 0, 0.55);
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition), transform var(--transition);
+}
+
+.follow-confirm-toast.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.follow-confirm-text {
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ivory);
+  margin: 0;
+}
+
+.follow-confirm-text strong {
+  color: var(--brass);
+}
+
+.follow-confirm-close {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  color: var(--sand);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.follow-confirm-close:hover {
+  color: var(--ivory);
+}
+
+@media (max-width: 640px) {
+  .follow-confirm-toast {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: translateY(100%);
+    width: auto;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  }
+  .follow-confirm-toast.is-visible { transform: translateY(0); }
+}
+
 .city-affiliate-row {
   text-align: center;
 }
@@ -5473,12 +6616,21 @@ a:hover .city-landmark-photo,
   position: relative;
   width: 100%;
   max-width: 420px;
-  background: linear-gradient(180deg, rgba(30, 24, 17, 0.96) 0%, rgba(14, 12, 9, 0.98) 100%);
+  background:
+    radial-gradient(ellipse 140px 100px at 20% 20%, rgba(240, 224, 200, 0.03) 0%, transparent 45%),
+    repeating-linear-gradient(45deg, transparent 0px, transparent 2px, rgba(240, 224, 200, 0.012) 2px, rgba(240, 224, 200, 0.012) 3px),
+    linear-gradient(180deg, rgba(30, 24, 17, var(--glass-opacity)) 0%, rgba(10, 8, 6, var(--glass-opacity)) 100%);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border-radius: var(--radius);
   padding: 2rem 1.75rem 1.75rem;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
   max-height: calc(100vh - 2.5rem);
   overflow-y: auto;
+  animation: modal-surface-in 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .gt-auth-modal { animation: none; }
 }
 
 .gt-auth-close {
@@ -5682,6 +6834,59 @@ a:hover .city-landmark-photo,
   margin-bottom: 0.75rem;
 }
 
+/* The real reading, shown right where the composer asks a visitor to add
+   their own -- same restrained mono/brass register as the rest of the
+   instrument readouts on this site, never a loud banner. */
+.checkin-current-reading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  color: var(--sand);
+  margin-bottom: 0.6rem;
+}
+.checkin-reading-label {
+  color: var(--sand);
+  opacity: 0.75;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.74rem;
+}
+.checkin-reading-band {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.checkin-reading-score {
+  color: var(--sand);
+  opacity: 0.85;
+}
+/* A small warm aside, not a second reading -- deliberately softer than
+   the real band/score beside it. */
+.checkin-reading-flourish {
+  color: var(--brass);
+  font-style: italic;
+  opacity: 0.9;
+}
+
+.checkin-trivia-line {
+  color: var(--sand);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin-bottom: 1.1rem;
+  max-width: 60ch;
+}
+.checkin-trivia-eyebrow {
+  display: block;
+  color: var(--brass);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  margin-bottom: 0.25rem;
+}
+
 /* The rewards teaser -- a single quiet line, never a banner. Structured
    as its own class so a real backend (vouchers, raffle entries, partner
    codes) can hook in later without touching the surrounding markup. */
@@ -5724,6 +6929,18 @@ a:hover .city-landmark-photo,
   align-items: center;
   transform-origin: top center;
   animation: checkin-sign-sway 5.5s ease-in-out infinite;
+  /* Real <button> now (see glotemp-checkin.js) -- reset the UA chrome so
+     it keeps reading as the same hand-drawn sign, not a form control. */
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+.checkin-insignia-sign:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 4px;
 }
 .checkin-insignia-chain { width: 12px; height: 16px; color: var(--brass-dim); }
 .checkin-insignia-panel {
@@ -5791,9 +7008,8 @@ a:hover .city-landmark-photo,
   gap: 1rem;
 }
 .checkin-example {
-  border: 1px dashed var(--brass-dim);
+  border: 1px dashed rgba(176, 141, 87, 0.28);
   padding: 0.85rem 0.9rem;
-  opacity: 0.88;
 }
 .checkin-example-tag {
   display: block;
@@ -6261,6 +7477,12 @@ a:hover .city-landmark-photo,
   letter-spacing: 0.06em;
   color: var(--brass);
 }
+.checkin-item-campus {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  color: var(--sand);
+}
 .checkin-item-note {
   color: var(--sand);
   font-size: 0.92rem;
@@ -6445,7 +7667,7 @@ a:hover .city-landmark-photo,
   display: grid;
   grid-template-columns: minmax(280px, 40%) 1fr;
   align-items: center;
-  gap: 2rem;
+  gap: 2.75rem;
   height: 100%;
   padding: 2rem 0 1rem;
   overflow: hidden;
@@ -6585,9 +7807,9 @@ a:hover .city-landmark-photo,
   z-index: 1;
   justify-self: end;
   min-width: 0;
-  width: min(62vw, 780px);
+  width: min(66vw, 860px);
   aspect-ratio: 1;
-  margin-right: -8%;
+  margin-right: -3%;
   cursor: pointer;
   transform: scale(1);
   animation-name: hero-instrument-breathe;
@@ -6675,6 +7897,16 @@ a:hover .city-landmark-photo,
 }
 @keyframes hero-hand-spin {
   to { transform: rotate(360deg); }
+}
+/* Very subtle, slow breathe layered onto the hand's own rotation --
+   opacity only, so it never reads as a second motion competing with the
+   sweep itself. Set alongside hero-hand-spin in the same animation
+   shorthand string (glotemp-hero-instrument.js) since JS assigns
+   .style.animation as one shorthand per hand and a stylesheet-only
+   animation-name here would simply be overwritten by that assignment. */
+@keyframes hero-hand-pulse {
+  0%, 100% { opacity: 0.82; }
+  50% { opacity: 1; }
 }
 .hero-instrument-weather {
   position: absolute;
@@ -7432,7 +8664,7 @@ h1, h2, h3, h4, h5, h6,
 /* The mono quirk lives here and nowhere else. */
 .eyebrow, .stat-value, .stat-label,
 .instrument-band-name, .tonight-mode-reading, .tonight-now, .tonight-facts,
-.tonight-prov, .tonight-mode-status, .checkin-item-mood,
+.tonight-prov, .tonight-mode-status, .checkin-item-mood, .checkin-item-campus,
 .checkin-item-time, .feed-mode, .feed-intensity, .feed-time, .band-chip,
 .pagination-btn, .cities-meta-row, .ranking-basis-note, .now-showing-label,
 .spin-variant, .spin-go, .spin-aff-kind, .spin-prov, .checkin-label,
@@ -7617,6 +8849,44 @@ time, .instr-clock, .tonight-modelled {
   font-size: 0.82rem;
   color: var(--sand);
 }
+/* Quiet secondary confidence readout -- deliberately smaller and more
+   muted than the city name above it, so it never competes with the
+   reading itself. Real value derived from observations for this city
+   (see mood-confidence.js); empty until that resolves. */
+.trip-reading-confidence {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  color: var(--sand);
+  opacity: 0.55;
+}
+.trip-air-mood {
+  display: block;
+  margin-top: 0.75rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--hairline);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+.trip-air-mood-label {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--brass);
+}
+.trip-air-mood-caption {
+  display: block;
+  color: var(--sand);
+  opacity: 0.75;
+  font-size: 0.7rem;
+}
+.trip-air-mood-value {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--ivory);
+}
 @media (max-width: 700px) {
   .trip-reading { border-left: none; border-top: 1px solid var(--hairline); padding: 1.25rem 0 0; text-align: left; }
 }
@@ -7630,9 +8900,9 @@ time, .instr-clock, .tonight-modelled {
 }
 .trip-action:hover { border-color: var(--brass); color: var(--brass); }
 .trip-action svg { flex: 0 0 auto; }
-/* ===== AUTH MODAL: hairlines, not stacked boxes ===== */
-.gt-auth-modal { border-radius: 0; border: none; background: var(--obsidian); box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6); }
-.gt-auth-close { border-radius: 0; }
+/* ===== AUTH MODAL: form rows stay hairline-divided, not stacked boxes,
+   but the modal surface itself now matches the rest of the site's glass
+   treatment (see .gt-auth-modal above) rather than a flat rectangle. */
 .gt-auth-provider {
   border-radius: 0; background: transparent; color: var(--ivory);
   border: none; border-bottom: 1px solid var(--brass-dim);
@@ -9289,3 +10559,174 @@ a:active:not(.btn-neon):not(.nav-logo):not([class*="chip"]) {
   .gt-react-label { font-size: 0.545rem; letter-spacing: 0.03em; }
   .gt-reactions { gap: 0.2rem 0.4rem; }
 }
+
+/* Offers Panel (see glotemp-offers.js): "Tonight in [City]", on a city's
+   own page (every vertical) and on the vertical page it belongs to. By
+   design, this is text, not UI chrome -- no cards, no boxes, no images,
+   no price slashes, no percentages shouted. A brass hairline between
+   entries is the only division; .offers-action buttons render as plain
+   mono text links, never boxed buttons. Renders nothing (section stays
+   [hidden]) when a city has no active offers -- no empty state, no gap. */
+.offers-heading {
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  color: var(--sand);
+  margin: 0 0 1.1rem;
+}
+
+.offers-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.offers-line {
+  padding: 1rem 0;
+}
+.offers-line + .offers-line {
+  border-top: 1px solid var(--hairline);
+}
+.offers-list-rest:not([hidden]) .offers-line:first-child {
+  border-top: 1px solid var(--hairline);
+}
+
+.offers-business {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: var(--fw-semibold);
+  color: var(--ivory);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.offers-detail {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--sand);
+  margin: 0.25rem 0 0;
+  line-height: 1.5;
+}
+
+.offers-line-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.1rem;
+  margin-top: 0.6rem;
+}
+
+.offers-action {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--brass);
+  cursor: pointer;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+}
+.offers-action:hover,
+.offers-action:focus-visible {
+  text-decoration: underline;
+}
+.offers-action:disabled {
+  color: var(--sand);
+  cursor: default;
+  text-decoration: none;
+  opacity: 0.75;
+}
+
+.offers-reveal-panel,
+.offers-terms-panel {
+  margin-top: 0.7rem;
+  max-width: 56ch;
+}
+
+.offers-code {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  color: var(--brass);
+  margin: 0;
+}
+
+.offers-code-instruction {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--sand);
+  margin: 0.3rem 0 0;
+  line-height: 1.5;
+}
+
+.offers-more-detail {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--sand);
+  margin: 0 0 0.5rem;
+  line-height: 1.5;
+}
+
+.offers-terms-text {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--sand);
+  opacity: 0.9;
+  margin: 0;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.offers-more-btn {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0.9rem 0 0;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-variant-caps: small-caps;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  color: var(--brass);
+  cursor: pointer;
+  min-height: 32px;
+}
+.offers-more-btn:hover,
+.offers-more-btn:focus-visible {
+  text-decoration: underline;
+}
+
+.offers-partner-line {
+  margin: 1.3rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.03em;
+  color: var(--sand);
+  opacity: 0.85;
+}
+.offers-partner-line a {
+  color: inherit;
+  text-decoration: none;
+}
+.offers-partner-line a:hover,
+.offers-partner-line a:focus-visible {
+  text-decoration: underline;
+}
+
+/* /redeem -- the partner code-check page (see glotemp-offer-redeem.js). */
+.redeem-result {
+  margin-top: 1.2rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+}
+.redeem-result.is-valid { color: #6FCF97; }
+.redeem-result.is-used { color: var(--sand); }
+.redeem-result.is-invalid { color: #E07856; }

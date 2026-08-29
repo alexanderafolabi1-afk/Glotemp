@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#14100B" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Contributors - Glotemp Admin</title>
+
+  <link rel="manifest" href="/admin/manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Glotemp Admin" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=57" />
+  <link rel="stylesheet" href="/admin/admin-ui.css" />
+  <link rel="stylesheet" href="/admin/admin-nav.css" />
+
+  <script src="/glotemp-analytics.js" defer></script>
+  <script src="/admin-i18n.js"></script>
+  <script src="/admin/admin-charts.js" defer></script>
+  <script src="/admin/admin-core.js" defer></script>
+  <script src="/admin/admin-nav.js" defer></script>
+  <link rel="stylesheet" href="/admin/admin-space.css" />
+  <script src="/admin/admin-space.js" defer></script>
+</head>
+<body class="adm-page">
+  <header class="adm-bar" id="adm-nav-bar" data-active="contributors"></header>
+
+  <main class="page-main">
+    <section class="glass-card">
+      <div class="adm" id="adm-root">
+        <p class="adm-eyebrow">Admin</p>
+        <h1 class="adm-title">Loading.</h1>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer glass">
+    <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
+  </footer>
+
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
+  <script src="/glotemp-auth.js"></script>
+  <script src="/cookie-consent.js" defer></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var root = document.getElementById('adm-root');
+    var days = 7;
+
+    function boot() {
+      var C = window.GlotempAdminCore;
+      if (!C) { root.innerHTML = '<p class="adm-eyebrow">Admin</p><h1 class="adm-title">Could not load that.</h1>'; return; }
+
+      function renderContributors(overview, tierCounts, topContributors, signupsDaily, signupSources) {
+        var esc = C.esc, ago = C.ago, tierLabel = C.tierLabel, panel = C.panel;
+        var m = {};
+        (overview || []).forEach(function (r) { m[r.metric] = r.value; });
+        var tc = {};
+        (tierCounts || []).forEach(function (r) { tc[r.tier] = r.members; });
+        var signupSeries = (signupsDaily || []).map(function (r) { return Number(r.signups) || 0; });
+
+        var Ch = window.GlotempAdminCharts;
+        function fig(v, label, opts) { return Ch.stat(v, label, opts || {}); }
+
+        var signupRows = (signupSources || []).length
+          ? signupSources.slice(0, 10).map(function (r) {
+              return '<div class="adm-row">' +
+                '<span class="adm-row-city">' + esc(r.country || 'unknown') + '</span>' +
+                '<span class="adm-row-count">' + esc(r.path || '-') + '</span>' +
+                '<span class="adm-row-when">' + esc(ago(r.created_at)) + '</span>' +
+              '</div>';
+            }).join('')
+          : '<p class="adm-copy">No signups in this window.</p>';
+
+        var contributorRows = (topContributors || []).length
+          ? topContributors.slice(0, 8).map(function (c) {
+              return '<div class="adm-row">' +
+                '<span class="adm-row-city">' + esc(c.display_name) +
+                  '<span class="adm-key-prefix">' + esc(tierLabel(c.tier)) + '</span></span>' +
+                '<span class="adm-row-count">' + esc(c.total_checkins) + '</span>' +
+                '<span class="adm-row-when">' + esc(c.distinct_days) + ' days</span>' +
+              '</div>';
+            }).join('')
+          : '<p class="adm-copy">Nobody has reached a tier yet.</p>';
+
+        root.innerHTML =
+          C.stateHTML('Admin', 'Contributors',
+            C.rangeHTML(days) +
+            panel('p-users', 'Users', 'signups, tiers and top contributors',
+              '<div class="adm-grid">' +
+                fig((m.signed_up || 0).toLocaleString(), 'signups', { series: signupSeries }) +
+                fig((m.installs || 0).toLocaleString(), 'installs') +
+                fig((m.sessions_standalone || 0).toLocaleString(), 'home screen') +
+                fig((tc.voice || 0).toLocaleString(), 'voice') +
+                fig((tc.keeper || 0).toLocaleString(), 'keeper') +
+                fig((tc.founder || 0).toLocaleString(), 'founder') +
+              '</div>' +
+              '<p class="adm-sub">Recent signups, country and landing page</p>' + signupRows +
+              '<p class="adm-sub">Top contributors</p>' + contributorRows)
+          );
+
+        C.wireRange(root, function (d) { days = d; load(root); });
+        C.wirePanelToggles(root);
+      }
+
+      async function load(rootEl) {
+        var none = function () { return []; };
+        var results = await Promise.all([
+          C.rpc('admin_overview', { days: days }),
+          C.rpc('admin_contributor_tier_counts', {}).catch(none),
+          C.rpc('admin_top_contributors', { p_tier: null, max_rows: 20 }).catch(none),
+          C.rpc('admin_signups_daily', { days: 30 }).catch(none),
+          C.rpc('admin_signup_sources', { days: days, max_rows: 20 }).catch(none),
+        ]);
+        renderContributors.apply(null, results);
+      }
+
+      C.boot(root, load);
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+    else boot();
+  })();
+  </script>
+</body>
+</html>

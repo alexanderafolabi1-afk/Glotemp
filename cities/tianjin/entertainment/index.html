@@ -12,6 +12,13 @@
   <meta property="og:image" content="https://glo-temp.com/assets/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="canonical" href="https://glo-temp.com/cities/tianjin/entertainment/" />
+  <link rel="alternate" hreflang="en" href="https://glo-temp.com/cities/tianjin/entertainment/" />
+  <link rel="alternate" hreflang="es" href="https://glo-temp.com/cities/tianjin/entertainment/" />
+  <link rel="alternate" hreflang="fr" href="https://glo-temp.com/cities/tianjin/entertainment/" />
+  <link rel="alternate" hreflang="de" href="https://glo-temp.com/cities/tianjin/entertainment/" />
+  <link rel="alternate" hreflang="pt" href="https://glo-temp.com/cities/tianjin/entertainment/" />
+  <link rel="alternate" hreflang="ja" href="https://glo-temp.com/cities/tianjin/entertainment/" />
+  <link rel="alternate" hreflang="x-default" href="https://glo-temp.com/cities/tianjin/entertainment/" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png" />
@@ -33,7 +40,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=57" />
+  <link rel="stylesheet" href="/styles.css?v=58" />
   <script src="/glotemp-analytics.js" defer></script>
 </head>
 <body>
@@ -54,6 +61,11 @@
       
       <div class="vertical-listings" data-city="tianjin" data-vertical="entertainment"></div>
     </section>
+
+    <!-- Offers Panel: "Tonight in [City]", filtered to this vertical. See
+         glotemp-offers.js. Renders nothing at all when there are no
+         active offers for this vertical here -- no empty state, no gap. -->
+    <section class="glass-card offers-panel" id="offers-panel" aria-label="Tonight in this city" hidden></section>
 
     <section class="glass-card" style="padding:2rem; text-align:center;">
       <div class="secondary-links-row">
@@ -79,6 +91,8 @@
 
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
+  <script src="/glotemp-auth.js"></script>
+  <script src="/glotemp-offers.js" defer></script>
   <script src="/city-wiki.js" defer></script>
   <script src="/city-food-signature.js" defer></script>
   <script src="/city-worldbank.js" defer></script>

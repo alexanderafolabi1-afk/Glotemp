@@ -332,5 +332,12 @@
     `);
   }
 
-  window.GlotempFoodSignature = { render, has: (slug) => !!CITY_FOOD_SIGNATURE[slug] };
+  window.GlotempFoodSignature = {
+    render,
+    has: (slug) => !!CITY_FOOD_SIGNATURE[slug],
+    // Plain read access to the same fact render() mounts -- for callers
+    // that want the text itself rather than a DOM side effect (see
+    // glotemp-city-sell.js). Null, never invented, when a city has none.
+    text: (slug) => CITY_FOOD_SIGNATURE[slug] || null,
+  };
 })();

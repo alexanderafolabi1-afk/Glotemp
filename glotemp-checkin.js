@@ -79,6 +79,12 @@
   let offset = 0;
   let selectedMood = DEFAULT_MOOD;
   let postAnonymously = false;
+  // Student ambassador contributions: an optional tag on an ordinary
+  // check-in, nothing more. campusByWikidataId is real per-university
+  // data from city_universities (see city-campus.js / wikidata-universities)
+  // -- name-lookup only, never re-fetched or re-derived here.
+  let campusByWikidataId = new Map();
+  let selectedCampus = '';
 
   function detectCitySlug() {
     const m = window.location.pathname.match(/\/cities\/([a-z0-9-]+)\.html$/i);
@@ -167,6 +173,56 @@
     return `Could not post that: ${detail} ${diag}`;
   }
 
+  // ---------- location enforcement ----------
+  // Mandatory, not optional -- unlike GlotempVerify's post-hoc "I am here"
+  // badge (glotemp-verify.js), which is untouched and stays exactly what
+  // it was: an opt-in signal offered only after a successful post.
+  //
+  // This reuses the same city_points table and Haversine distance
+  // verify_presence already checks a posted reading against, through a
+  // new read-only RPC (check_city_presence, 20260823130000). It can't
+  // reuse verify_presence itself: that function stamps an existing
+  // observation row, and this has to run BEFORE one exists, to block the
+  // post rather than flag it after the fact.
+  //
+  // PRIVACY: the coordinates exist only inside this function's local
+  // variables and the one RPC call body. check_city_presence, like
+  // verify_presence before it, is read-only -- it returns a verdict and
+  // writes nothing. Nothing here puts lat/lon in localStorage, in the
+  // check-in's own POST body, or in any other table.
+  function getPositionForCheckin() {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) { reject({ code: 0 }); return; }
+      navigator.geolocation.getCurrentPosition(
+        (p) => resolve({ lat: p.coords.latitude, lon: p.coords.longitude }),
+        (err) => reject(err),
+        // Same reasoning as glotemp-verify.js's position(): the question
+        // is which city, not which street -- high accuracy would only
+        // drain a battery and collect more than the check needs.
+        { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 }
+      );
+    });
+  }
+
+  async function checkCityPresence(session, slug, lat, lon) {
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/check_city_presence`, {
+      method: 'POST',
+      headers: authHeaders(session),
+      body: JSON.stringify({ p_city_slug: slug, p_lat: lat, p_lon: lon }),
+    });
+    if (!resp.ok) throw new Error(`check_city_presence ${resp.status}`);
+    const rows = await resp.json();
+    return Array.isArray(rows) ? rows[0] : rows;
+  }
+
+  const LOCATION_MESSAGES = {
+    denied: (city) => `Check-ins need your location to confirm you're actually in ${city}. Location access was blocked -- allow it in your browser settings and try again.`,
+    unavailable: (city) => `Couldn't get your location. Check-ins need to confirm you're in ${city} -- try again in a moment.`,
+    bad_position: (city) => `Couldn't get your location. Check-ins need to confirm you're in ${city} -- try again in a moment.`,
+    too_far: (city) => `This check-in needs to come from ${city} itself.`,
+    city_not_mapped: () => `Location check isn't available for this city yet, so check-ins are paused here.`,
+  };
+
   function moodGlyphSVG(key, extraClass) {
     const m = MOOD_BY_KEY[key] || MOOD_BY_KEY[DEFAULT_MOOD];
     return `<svg class="checkin-mood-glyph${extraClass ? ' ' + extraClass : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${m.glyph}</svg>`;
@@ -195,23 +251,74 @@
   }
 
   // ---------- insignia ----------
+  // REAL BUG, CONFIRMED LIVE (a real visitor clicked this and got no
+  // response at all): this was built as pure decoration -- "the register
+  // of a backstreet izakaya sign rather than a UI badge" (see its CSS
+  // comment), aria-hidden and wired to nothing, with the actual sign-in
+  // trigger a plain text link below it that the arrow merely points at.
+  // But it renders as a bordered, glowing panel literally labeled "Check
+  // in" -- the single most button-shaped, most prominent thing in the
+  // composer. Every real visitor reads it as the button. It now is one:
+  // a real <button>, wired in wireComposer() to the exact same action the
+  // arrow was already pointing at.
   function insigniaHTML() {
     return `
-      <div class="checkin-insignia" aria-hidden="true">
-        <div class="checkin-insignia-sign">
+      <div class="checkin-insignia">
+        <button type="button" class="checkin-insignia-sign" id="checkin-insignia-btn" aria-label="Add a check-in for this city">
           <svg class="checkin-insignia-chain" viewBox="0 0 12 16" aria-hidden="true">
             <line x1="6" y1="0" x2="6" y2="10" stroke="currentColor" stroke-width="1.1"/>
             <circle cx="6" cy="3.4" r="1.9" fill="none" stroke="currentColor" stroke-width="1.1"/>
           </svg>
-          <div class="checkin-insignia-panel">
-            <span class="checkin-insignia-glow"></span>
+          <span class="checkin-insignia-panel">
+            <span class="checkin-insignia-glow" aria-hidden="true"></span>
             <span class="checkin-insignia-text">Check<br>in</span>
-          </div>
+          </span>
           <svg class="checkin-insignia-arrow" viewBox="0 0 16 10" aria-hidden="true">
             <path d="M2 1l6 7 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-        </div>
+        </button>
       </div>`;
+  }
+
+  // ---------- current reading + trivia ----------
+  // Real per-city mood value already used everywhere else on the site
+  // (band coloring, hover previews, share text) -- nothing new fetched
+  // or invented here, just finally shown on the city's own page next to
+  // the composer that asks a visitor to add to it.
+  //
+  // LANZAROTE_HIGH_MOOD_FLOURISH: a small, understated aside next to the
+  // real reading, shown only for Lanzarote, only when its real mood
+  // value is already at or above the "charged" band threshold (8.5, the
+  // same cutoff moodToBand() in glotemp-core.js uses) -- never replacing
+  // the real number, only sitting beside it. Hardcoded to this one city
+  // for now, per this round's brief. Future idea (not built tonight): a
+  // small city-slug -> flourish-word map, so any city crossing its own
+  // "genuinely high" mark gets its own aside the same way, instead of
+  // this single if-check.
+  const LANZAROTE_HIGH_MOOD_FLOURISH = 'properly Lanzagood';
+
+  function currentReadingAndTriviaHTML(slug, cityName) {
+    const city = (window.CITIES_DATA || []).find((c) => c.slug === slug);
+    if (!city || typeof city.mood !== 'number' || !window.GlotempCore) return '';
+    const { band, color } = window.GlotempCore.moodToBand(city.mood);
+
+    const flourish = slug === 'lanzarote' && city.mood >= 8.5
+      ? ` <span class="checkin-reading-flourish">${esc(LANZAROTE_HIGH_MOOD_FLOURISH)}</span>`
+      : '';
+
+    const readingLine = `
+      <p class="checkin-current-reading" id="checkin-current-reading">
+        <span class="checkin-reading-label">Reading right now</span>
+        <span class="checkin-reading-band" style="color:${color};">${esc(band)}</span>
+        <span class="checkin-reading-score">${city.mood.toFixed(1)}/10</span>${flourish}
+      </p>`;
+
+    const facts = (window.CITY_TRIVIA && window.CITY_TRIVIA[slug]) || [];
+    const triviaLine = facts.length
+      ? `<p class="checkin-trivia-line"><span class="checkin-trivia-eyebrow">Worth knowing about ${esc(cityName)}</span> ${esc(facts[0])}</p>`
+      : '';
+
+    return readingLine + triviaLine;
   }
 
   // ---------- composer ----------
@@ -230,6 +337,7 @@
       <div class="checkin-composer" id="checkin-composer">
         <p class="eyebrow">City reading</p>
         <h2 class="checkin-neon-title">How <span class="checkin-glow">${esc(name)}</span> feels right now</h2>
+        ${currentReadingAndTriviaHTML(citySlug, name)}
         ${insigniaHTML()}
         <div class="checkin-signedout" id="checkin-signedout">
           <p class="checkin-copy">Sign in to add a check-in. Browsing stays anonymous.</p>
@@ -243,6 +351,11 @@
           <textarea id="checkin-note" class="checkin-note" rows="3" maxlength="${NOTE_MAX}" placeholder="What does it feel like right now?"></textarea>
           <button type="button" class="checkin-emoji-toggle" id="checkin-emoji-toggle" aria-expanded="false">&#128522; Add emoji</button>
           <div class="checkin-emoji-row" id="checkin-emoji-row" hidden>${emojiButtons}</div>
+          <!-- Student ambassador tag: filled in only if this city has at
+               least one real university (city_universities). Hidden
+               until then, same convention as every other real-data-only
+               section on this site. -->
+          <div class="checkin-campus-row" id="checkin-campus-row" hidden></div>
           <div class="checkin-visibility" role="group" aria-label="Post as">
             <button type="button" class="checkin-visibility-btn" data-visibility="name" aria-pressed="true">Show my name</button>
             <button type="button" class="checkin-visibility-btn" data-visibility="anon" aria-pressed="false">Post anonymously</button>
@@ -316,6 +429,23 @@
       });
     }
 
+    // The "Check in" sign: see insigniaHTML()'s comment. Real <button> now,
+    // wired to whatever the arrow beneath it was already pointing at --
+    // sign-in when there's nothing to check in to yet, or straight to the
+    // composer when there already is.
+    const insigniaBtn = document.getElementById('checkin-insignia-btn');
+    if (insigniaBtn) {
+      insigniaBtn.addEventListener('click', async () => {
+        if (form && !form.hidden) {
+          form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (note) note.focus();
+          return;
+        }
+        const ok = await GlotempAuth.requireAuth('Sign in to add a check-in for this city.');
+        if (ok) refreshAuthState();
+      });
+    }
+
     if (signInBtn) {
       signInBtn.addEventListener('click', async () => {
         signInBtn.disabled = true;
@@ -384,12 +514,44 @@
         submitBtn.disabled = true;
         submitBtn.setAttribute('aria-busy', 'true');
         submitBtn.classList.add('is-loading');
-        status.textContent = 'Posting…';
         function endLoading() {
           submitBtn.disabled = false;
           submitBtn.removeAttribute('aria-busy');
           submitBtn.classList.remove('is-loading');
         }
+
+        // ---- location enforcement: an integrity feature, not optional ----
+        // Blocks the post outright rather than flagging it afterward --
+        // see the LOCATION ENFORCEMENT comment above checkCityPresence
+        // for how this differs from GlotempVerify's optional badge.
+        status.textContent = 'Checking your location…';
+        let geo;
+        try {
+          geo = await getPositionForCheckin();
+        } catch (geoErr) {
+          endLoading();
+          status.textContent = (geoErr && geoErr.code === 1)
+            ? LOCATION_MESSAGES.denied(cityDisplayName())
+            : LOCATION_MESSAGES.unavailable(cityDisplayName());
+          return;
+        }
+
+        let presence;
+        try {
+          presence = await checkCityPresence(session, citySlug, geo.lat, geo.lon);
+        } catch (presenceErr) {
+          endLoading();
+          status.textContent = "Couldn't verify your location right now. Try again in a moment.";
+          return;
+        }
+        if (!presence || !presence.allowed) {
+          const reason = presence && presence.reason;
+          endLoading();
+          status.textContent = (LOCATION_MESSAGES[reason] || LOCATION_MESSAGES.too_far)(cityDisplayName());
+          return;
+        }
+
+        status.textContent = 'Posting…';
         try {
           // representation rather than minimal: the new row's id is what
           // the optional verification step needs, and asking for it here
@@ -403,6 +565,7 @@
               mood: selectedMood,
               note: text,
               is_anonymous: postAnonymously,
+              campus_wikidata_id: selectedCampus || null,
             }),
           });
           if (!resp.ok) {
@@ -425,6 +588,9 @@
           status.textContent = 'Posted.';
           note.value = '';
           count.textContent = `0/${NOTE_MAX}`;
+          selectedCampus = '';
+          const campusSelect = document.getElementById('checkin-campus');
+          if (campusSelect) campusSelect.value = '';
           offset = 0;
           endLoading();
           try {
@@ -457,6 +623,38 @@
     }
   }
 
+  // ---------- student ambassador tag ----------
+  // Optional only: fetches this city's real universities (same table
+  // city-campus.js reads) and, if any exist, reveals a plain <select> in
+  // the composer. Selecting one does nothing but set selectedCampus,
+  // which rides along in the exact same POST as every other check-in
+  // field -- no new endpoint, no new table, no new moderation path.
+  async function loadCampusOptions() {
+    const row = document.getElementById('checkin-campus-row');
+    if (!row || !citySlug) return;
+    try {
+      const resp = await fetch(
+        `${SUPABASE_URL}/rest/v1/city_universities?city_slug=eq.${encodeURIComponent(citySlug)}` +
+        `&select=wikidata_id,name&order=name.asc`,
+        { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
+      );
+      if (!resp.ok) return;
+      const rows = await resp.json();
+      if (!Array.isArray(rows) || rows.length === 0) return;
+
+      campusByWikidataId = new Map(rows.map(r => [r.wikidata_id, r.name]));
+      row.innerHTML = `
+        <label class="checkin-label" for="checkin-campus">Tag to a university (optional)</label>
+        <select class="checkin-note" id="checkin-campus">
+          <option value="">Not tagged to a university</option>
+          ${rows.map(r => `<option value="${esc(r.wikidata_id)}">${esc(r.name)}</option>`).join('')}
+        </select>`;
+      row.hidden = false;
+      const select = document.getElementById('checkin-campus');
+      if (select) select.addEventListener('change', () => { selectedCampus = select.value; });
+    } catch (e) { /* stays hidden -- no real data to offer */ }
+  }
+
   function refreshAuthState() {
     const form = document.getElementById('checkin-form');
     const signedOut = document.getElementById('checkin-signedout');
@@ -480,6 +678,11 @@
     // anonymously is that nothing here identifies the account, and a tier
     // badge is exactly that kind of identifying signal.
     const reporterTier = row.is_anonymous ? null : (row.profiles && row.profiles.reporter_tier);
+    // Real name looked up from the same real table the composer's
+    // dropdown was built from -- an id campusByWikidataId doesn't
+    // recognize (map not loaded yet on this render, or the university
+    // row has since gone away) renders no chip at all, never the raw id.
+    const campusName = row.campus_wikidata_id ? campusByWikidataId.get(row.campus_wikidata_id) : null;
     return `
       <article class="checkin-item">
         <div class="checkin-item-head">
@@ -487,6 +690,7 @@
           <span class="checkin-item-name">${esc(name)}</span>
           ${reporterTier && window.GlotempReporter ? GlotempReporter.badgeHTML(reporterTier) : ''}
           <span class="checkin-item-mood">${esc(mood ? mood.label : row.mood)}</span>
+          ${campusName ? `<span class="checkin-item-campus">&#127891; ${esc(campusName)}</span>` : ''}
           ${window.GlotempVerify ? GlotempVerify.badgeHTML(row.verify_method) : ''}
           <time class="checkin-item-time" datetime="${esc(row.created_at)}">${esc(timeAgo(row.created_at))}</time>
         </div>
@@ -503,7 +707,7 @@
     try {
       const resp = await fetch(
         `${SUPABASE_URL}/rest/v1/observations?city_slug=eq.${encodeURIComponent(citySlug)}` +
-        `&select=id,mood,is_anonymous,note,created_at,verify_method,profiles(display_name,reporter_tier)` +
+        `&select=id,mood,is_anonymous,note,created_at,verify_method,campus_wikidata_id,profiles(display_name,reporter_tier)` +
         `&order=created_at.desc&offset=${offset}&limit=${PAGE_SIZE}`,
         { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
       );
@@ -587,6 +791,36 @@
     el.textContent = n === null ? 'Watchers unavailable' : `${n} ${n === 1 ? 'person is' : 'people are'} watching`;
   }
 
+  // A small, real preview of what following actually delivers -- not just
+  // "Followed!". Real value: this city's band/top-ten notifications (the
+  // same watch-email copy this page already promises above), nothing more
+  // invented. Auto-dismisses; also closable, and never blocks anything.
+  let followConfirmTimer = null;
+  function showFollowConfirm(cityName) {
+    let el = document.getElementById('follow-confirm-toast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'follow-confirm-toast';
+      el.className = 'follow-confirm-toast';
+      el.setAttribute('role', 'status');
+      el.innerHTML =
+        '<p class="follow-confirm-text"></p>' +
+        '<button type="button" class="follow-confirm-close" aria-label="Dismiss">&times;</button>';
+      document.body.appendChild(el);
+      el.querySelector('.follow-confirm-close').addEventListener('click', () => hideFollowConfirm());
+    }
+    el.querySelector('.follow-confirm-text').innerHTML =
+      `<strong>Following ${esc(cityName)}.</strong> We'll let you know when its mood shifts band, or when it enters a top ten -- nothing else, and never more than that.`;
+    el.classList.add('is-visible');
+    clearTimeout(followConfirmTimer);
+    followConfirmTimer = setTimeout(hideFollowConfirm, 6000);
+  }
+  function hideFollowConfirm() {
+    const el = document.getElementById('follow-confirm-toast');
+    if (el) el.classList.remove('is-visible');
+    clearTimeout(followConfirmTimer);
+  }
+
   function wireWatch() {
     const btn = document.getElementById('watch-city-btn');
     if (!btn) return;
@@ -634,6 +868,12 @@
             headers: Object.assign(authHeaders(session), { Prefer: 'resolution=ignore-duplicates,return=minimal' }),
             body: JSON.stringify({ user_id: user.id, city_slug: citySlug }),
           });
+          // Immediate, on-brand acknowledgment of the action just taken --
+          // separate from the push-permission ask below, which is a
+          // different question (browser notifications) and may not even
+          // show (already granted/denied). This one always shows once,
+          // right after a real follow.
+          showFollowConfirm(cityDisplayName());
           // Explicit action just taken (following this city) -- the one
           // moment this prompt is allowed to appear. Never on page load.
           if (window.GlotempPush) {
@@ -676,8 +916,13 @@
   }
 
   // ---------- mount ----------
-  function mount() {
-    citySlug = detectCitySlug();
+  // Accepts an explicit slug so a page whose city isn't fixed by its own
+  // URL (the homepage, which lets a visitor pick among many cities) can
+  // still mount this exact composer -- same sign-in gate, same location
+  // verification, same real Supabase write and moderation queue as every
+  // city page uses. See window.GlotempCheckin.mountForCity below.
+  function mount(explicitSlug) {
+    citySlug = explicitSlug || detectCitySlug();
     if (!citySlug) return;
     const cityName = cityDisplayName();
 
@@ -709,6 +954,7 @@
     wireWatch();
     loadCheckins();
     mountIntentBoard();
+    loadCampusOptions();
 
     const moreBtn = document.getElementById('checkin-more');
     if (moreBtn) moreBtn.addEventListener('click', async () => {
@@ -734,8 +980,24 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', mount);
+    // Wrapped rather than passed directly: mount() now takes an optional
+    // explicit slug (see window.GlotempCheckin.mountForCity below), and a
+    // DOM event listener would otherwise hand it the Event object itself.
+    document.addEventListener('DOMContentLoaded', () => mount());
   } else {
     mount();
   }
+
+  // Public API: lets a page whose city isn't fixed by its own URL (the
+  // homepage, which lets a visitor choose among many cities) mount this
+  // exact composer for whichever city is currently selected -- the same
+  // sign-in gate, location verification, real Supabase write and
+  // moderation queue every city page already uses, rather than a second,
+  // separate contribution path with none of that.
+  window.GlotempCheckin = {
+    mountForCity: function (slug) {
+      if (!slug) return;
+      mount(slug);
+    },
+  };
 })();

@@ -290,7 +290,7 @@
 
   async function getMyStars() {
     const rows = await rpc('get_my_stars', {});
-    return (rows && rows[0]) || { checkin_stars: 0, referral_stars: 0, total_stars: 0, referral_code: null };
+    return (rows && rows[0]) || { checkin_stars: 0, referral_stars: 0, total_stars: 0, referral_code: null, cities_checked_into: 0 };
   }
 
   async function markInstalled() {

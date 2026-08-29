@@ -1,162 +1,194 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
+// Real residential building density near each city, from OpenStreetMap's
+// free, keyless Overpass API. Server side, on a schedule.
+//
+// FIXED: the previous version parsed Overpass's response with a
+// `/Count: (\d+)/` regex, which only matches the CSV/Turbo-UI output
+// format -- the raw `/api/interpreter` endpoint used here returns XML by
+// default, so that regex never matched a single real response. Every
+// "success" silently fell back to the hardcoded default (1000), which
+// this function then reported as if real. Fixed by requesting
+// `[out:json]` explicitly and reading the real total from
+// `elements[0].tags.total`.
+//
+// Also fixed: `median_rent` and `property_appreciation` were always
+// `Math.random()`, regardless of what Overpass returned -- there is no
+// free, keyless rent index this function had any real input for. Removed
+// entirely rather than kept as a guess; only `housing_availability`
+// (residential building count nearby, real) is written now.
+//
+// COORDINATE-EXPANDABLE: this now queries every city's own real
+// city_points.lat/lon instead of a hardcoded 19-city bounding-box table,
+// same shape as wikidata-universities. A city already holding a recent
+// overpass_osm/property reading is skipped so repeated runs make forward
+// progress across the full city list instead of re-querying the same
+// cities (Overpass's public mirrors are shared infrastructure and
+// noticeably flaky -- most requests in one run will time out or fail,
+// which is why this is designed to be invoked repeatedly, not once).
 
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
+const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
-const supabase = createClient(SUPABASE_URL ?? "", SUPABASE_SERVICE_ROLE_KEY ?? "");
+const UA = "glo-temp.com/1.0 (+https://glo-temp.com; info@glo-temp.com)";
+const TIMEOUT_MS = 25000;
+const REQUEST_GAP_MS = 300;
+const RADIUS_KM = 12;
+const FULL_COVERAGE_LIMIT = 300;
+const ALREADY_COVERED_WITHIN_HOURS = 20; // shorter than a day so a stalled run's partial coverage still gets retried same-day
 
-// City-to-Coordinates for Overpass bounding box search
-const cityBounds: Record<string, { south: number; west: number; north: number; east: number }> = {
-  "tokyo": { south: 35.4, west: 139.3, north: 35.9, east: 139.9 },
-  "nyc": { south: 40.5, west: -74.3, north: 40.9, east: -73.7 },
-  "london": { south: 51.3, west: -0.3, north: 51.7, east: 0.2 },
-  "paris": { south: 48.7, west: 2.2, north: 48.9, east: 2.5 },
-  "berlin": { south: 52.3, west: 13.2, north: 52.7, east: 13.6 },
-  "dubai": { south: 24.9, west: 55.1, north: 25.3, east: 55.5 },
-  "singapore": { south: 1.2, west: 103.6, north: 1.5, east: 104.0 },
-  "hong-kong": { south: 22.2, west: 114.0, north: 22.4, east: 114.3 },
-  "toronto": { south: 43.5, west: -79.6, north: 43.8, east: -79.0 },
-  "sydney": { south: -33.9, west: 150.9, north: -33.7, east: 151.3 },
-  "bangkok": { south: 13.6, west: 100.4, north: 13.9, east: 100.6 },
-  "shanghai": { south: 31.0, west: 121.2, north: 31.4, east: 121.7 },
-  "delhi": { south: 28.4, west: 76.8, north: 29.0, east: 77.3 },
-  "mumbai": { south: 18.9, west: 72.7, north: 19.3, east: 72.9 },
-  "sao-paulo": { south: -23.7, west: -46.8, north: -23.4, east: -46.4 },
-  "mexico-city": { south: 19.2, west: -99.3, north: 19.6, east: -98.9 },
-  "cairo": { south: 29.8, west: 31.0, north: 30.2, east: 31.5 },
-  "seoul": { south: 37.4, west: 126.8, north: 37.7, east: 127.2 },
-  "medellin": { south: 6.1, west: -75.7, north: 6.4, east: -75.5 },
-  "buenos-aires": { south: -34.7, west: -58.5, north: -34.5, east: -58.3 },
-};
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
+}
 
-async function fetchPropertyData(city: string, bounds: any) {
-  const mirrors = [
-    "https://overpass-api.de/api/interpreter",
-    "https://overpass.openstreetmap.ru/api/interpreter",
-  ];
-  const timeoutMs = 25000;
+async function rest(path: string, init: RequestInit = {}) {
+  const resp = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    ...init,
+    headers: {
+      apikey: SERVICE_KEY,
+      Authorization: `Bearer ${SERVICE_KEY}`,
+      "Content-Type": "application/json",
+      ...(init.headers ?? {}),
+    },
+  });
+  if (!resp.ok) throw new Error(`rest ${path} ${resp.status} ${await resp.text()}`);
+  return resp;
+}
 
-  const query = `[bbox:${bounds.south},${bounds.west},${bounds.north},${bounds.east}];
+interface CityRow { city_slug: string; lat: number; lon: number }
+
+async function loadCities(limit: number, slugs?: string[]): Promise<CityRow[]> {
+  const filter = slugs && slugs.length ? `&city_slug=in.(${slugs.map(encodeURIComponent).join(",")})` : "";
+  const resp = await rest(`city_points?select=city_slug,lat,lon&order=city_slug.asc&limit=${limit}${filter}`);
+  return await resp.json();
+}
+
+async function loadAlreadyCovered(): Promise<Set<string>> {
+  const since = new Date(Date.now() - ALREADY_COVERED_WITHIN_HOURS * 3600000).toISOString();
+  const resp = await rest(
+    `readings?select=city_slug&vertical=eq.property&source=eq.overpass_osm&fetched_at=gte.${encodeURIComponent(since)}`,
+  );
+  const rows = (await resp.json()) as { city_slug: string }[];
+  return new Set(rows.map((r) => r.city_slug));
+}
+
+// Degrees-per-km varies with latitude for longitude, not for latitude.
+function bboxFor(lat: number, lon: number, radiusKm: number) {
+  const dLat = radiusKm / 111;
+  const dLon = radiusKm / (111 * Math.max(0.1, Math.cos((lat * Math.PI) / 180)));
+  return { south: lat - dLat, west: lon - dLon, north: lat + dLat, east: lon + dLon };
+}
+
+async function fetchResidentialCount(lat: number, lon: number): Promise<number | null> {
+  const b = bboxFor(lat, lon, RADIUS_KM);
+  const query = `[out:json][timeout:20];
     (
-      node["building"="residential"];
-      way["building"="residential"];
-      relation["building"="residential"];
+      node["building"="residential"](${b.south},${b.west},${b.north},${b.east});
+      way["building"="residential"](${b.south},${b.west},${b.north},${b.east});
+      relation["building"="residential"](${b.south},${b.west},${b.north},${b.east});
     );
     out count;`;
 
-  for (const url of mirrors) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  const mirrors = ["https://overpass-api.de/api/interpreter", "https://overpass.openstreetmap.ru/api/interpreter"];
 
+  for (const url of mirrors) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    try {
       const response = await fetch(url, {
         method: "POST",
         body: query,
         signal: controller.signal,
-        headers: { "User-Agent": "glo-temp.com/1.0 (+https://glo-temp.com)" },
+        headers: { "User-Agent": UA, "Content-Type": "text/plain" },
       });
-
       clearTimeout(timeoutId);
-
-      if (response.ok) {
-        const text = await response.text();
-        const countMatch = text.match(/Count: (\d+)/);
-        const buildingCount = countMatch ? parseInt(countMatch[1]) : 1000;
-
-        return {
-          median_rent: 400 + Math.random() * 2600,
-          property_appreciation: -5 + Math.random() * 15,
-          housing_availability: Math.min(80, Math.max(20, buildingCount / 100)),
-          confidence: Math.min(0.8, buildingCount / 5000),
-        };
+      if (!response.ok) {
+        console.warn(`[overpass-property] ${url} HTTP ${response.status}, trying next mirror`);
+        continue;
       }
-
-      console.warn(`[overpass-property] ${city}: ${url} HTTP ${response.status}, trying next mirror`);
+      const data = await response.json();
+      const total = data?.elements?.[0]?.tags?.total;
+      if (total === undefined) {
+        console.warn(`[overpass-property] no count element in response, trying next mirror`);
+        continue;
+      }
+      return parseInt(total, 10);
     } catch (error) {
-      console.warn(`[overpass-property] ${city}: mirror ${url} failed - ${error.message}`);
+      clearTimeout(timeoutId);
+      console.warn(`[overpass-property] mirror ${url} failed - ${(error as Error).message}`);
     }
   }
-
-  console.warn(`[overpass-property] ${city}: all mirrors failed, using synthetic fallback`);
-  return {
-    median_rent: 400 + Math.random() * 2600,
-    property_appreciation: -5 + Math.random() * 15,
-    housing_availability: 20 + Math.random() * 60,
-    confidence: 0.5,
-  };
+  return null;
 }
 
-async function insertReading(
-  citySlug: string,
-  metric: string,
-  value: number,
-  label: string,
-  confidence: number
-): Promise<boolean> {
-  const { error } = await supabase.from("readings").insert({
-    city_slug: citySlug,
-    vertical: "property",
-    metric,
-    value,
-    label,
-    source: "overpass_osm",
-    source_url: "https://overpass-turbo.eu",
-    confidence,
-    fetched_at: new Date().toISOString(),
-  });
-
+async function insertReading(citySlug: string, metric: string, value: number, label: string, confidence: number): Promise<boolean> {
+  const { error } = await (async () => {
+    try {
+      await rest("readings", {
+        method: "POST",
+        body: JSON.stringify([{
+          city_slug: citySlug, vertical: "property", metric, value, label,
+          source: "overpass_osm", source_url: "https://overpass-turbo.eu",
+          confidence, fetched_at: new Date().toISOString(),
+        }]),
+      });
+      return { error: null };
+    } catch (e) {
+      return { error: e };
+    }
+  })();
   if (error) {
-    console.error(`[overpass-property] insert failed for ${citySlug}/${metric}: ${error.message}`);
+    console.error(`[overpass-property] insert failed for ${citySlug}/${metric}: ${String(error)}`);
     return false;
   }
   return true;
 }
 
-Deno.serve(async (_req: Request) => {
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-    console.error("[overpass-property] Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env var");
-    return new Response(
-      JSON.stringify({ success: false, error: "Missing Supabase credentials (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY)" }),
-      { headers: { "Content-Type": "application/json" }, status: 500 }
-    );
+async function jobFetch(limitCities: number, slugs?: string[], force?: boolean) {
+  const cities = await loadCities(limitCities, slugs);
+  const covered = force ? new Set<string>() : await loadAlreadyCovered();
+  const cityErrors: { city_slug: string; detail: string }[] = [];
+  let citiesChecked = 0, citiesWithResults = 0, rowsWritten = 0;
+
+  for (const c of cities) {
+    if (covered.has(c.city_slug)) continue;
+    if (c.lat == null || c.lon == null) continue;
+    citiesChecked++;
+
+    const count = await fetchResidentialCount(c.lat, c.lon);
+    if (count === null) {
+      cityErrors.push({ city_slug: c.city_slug, detail: "all mirrors failed or timed out" });
+    } else {
+      // Real building count, real confidence proportional to how much
+      // signal Overpass actually returned -- not a guess.
+      const confidence = Math.min(0.85, Math.max(0.3, count / 3000));
+      const ok = await insertReading(c.city_slug, "housing_availability", count, "Residential buildings nearby (OSM)", confidence);
+      if (ok) { rowsWritten++; citiesWithResults++; }
+    }
+    await new Promise((r) => setTimeout(r, REQUEST_GAP_MS));
+  }
+
+  return { cities: cities.length, citiesChecked, citiesWithResults, rowsWritten, errors: cityErrors };
+}
+
+Deno.serve(async (req: Request) => {
+  const url = new URL(req.url);
+  const limit = Math.min(Math.max(Number(url.searchParams.get("limit") ?? FULL_COVERAGE_LIMIT) || FULL_COVERAGE_LIMIT, 1), FULL_COVERAGE_LIMIT);
+  const rawSlugs = url.searchParams.get("slugs");
+  const slugs = rawSlugs ? rawSlugs.split(",").map((s) => s.trim()).filter(Boolean) : undefined;
+  const force = url.searchParams.get("force") === "true";
+
+  if (!SUPABASE_URL || !SERVICE_KEY) {
+    return json({ success: false, error: "Missing Supabase credentials" }, 500);
   }
 
   try {
-    let rowsWritten = 0;
-    let citiesProcessed = 0;
-
-    for (const [city, bounds] of Object.entries(cityBounds)) {
-      const result = await fetchPropertyData(city, bounds);
-      if (!result) continue;
-
-      const results = await Promise.all([
-        insertReading(city, "median_rent", result.median_rent, "Median monthly rent (1BR)", result.confidence),
-        insertReading(city, "property_appreciation", result.property_appreciation, "Annual property appreciation %", result.confidence),
-        insertReading(city, "housing_availability", result.housing_availability, "New housing starts", result.confidence),
-      ]);
-      const successes = results.filter(Boolean).length;
-      rowsWritten += successes;
-      if (successes > 0) citiesProcessed++;
+    const result = await jobFetch(limit, slugs, force);
+    console.log(`[overpass-property]`, JSON.stringify(result));
+    if (result.citiesChecked > 0 && result.errors.length === result.citiesChecked) {
+      return json({ ...result, all_failed: true }, 502);
     }
-
-    console.log(`[overpass-property] wrote ${rowsWritten} row(s) across ${citiesProcessed} of ${Object.keys(cityBounds).length} cities`);
-
-    if (rowsWritten === 0) {
-      return new Response(
-        JSON.stringify({ success: false, error: "No rows written - all inserts failed (check Supabase credentials)", cities: 0 }),
-        { headers: { "Content-Type": "application/json" }, status: 502 }
-      );
-    }
-
-    return new Response(
-      JSON.stringify({ success: true, rows: rowsWritten, cities: citiesProcessed }),
-      { headers: { "Content-Type": "application/json" }, status: 200 }
-    );
+    return json({ success: true, ...result });
   } catch (error) {
     console.error("[overpass-property] fatal error:", error);
-    return new Response(JSON.stringify({ success: false, error: error.message }), {
-      headers: { "Content-Type": "application/json" },
-      status: 500,
-    });
+    return json({ success: false, error: (error as Error).message }, 500);
   }
 });

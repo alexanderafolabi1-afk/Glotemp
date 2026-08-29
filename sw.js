@@ -6,7 +6,7 @@
 // whole fix: the previous worker used a hand-bumped constant that nobody
 // bumped, so every deploy reused the same cache name, activate's cleanup
 // matched nothing, and the old build survived.
-const BUILD_HASH = '5e89f82c9d15';
+const BUILD_HASH = '8d021ee77c4e';
 const CACHE_NAME = `glotemp-${BUILD_HASH}`;
 
 // Only genuinely immutable things are precached. HTML never is.
@@ -133,7 +133,12 @@ self.addEventListener('message', (event) => {
 
 // Push payload is the plaintext JSON the server encrypted -- decrypted by
 // the browser itself before this handler ever runs, per the Push API.
-// Shape sent by push-send: { title, body, citySlug }.
+// Two senders share this one handler: push-send's consumer pushes
+// ({ title, body, citySlug }) and push-admin-send's admin digests
+// ({ title, body, target, tag }). `target`, when present, is an explicit
+// path and wins outright -- it exists specifically so an admin push can
+// land on /admin instead of falling through to the citySlug->city-page
+// logic built for the consumer path.
 self.addEventListener('push', (event) => {
   let data = {};
   try { data = event.data ? event.data.json() : {}; } catch (e) { /* malformed payload, fall through to defaults */ }
@@ -143,8 +148,12 @@ self.addEventListener('push', (event) => {
     body: data.body || '',
     icon: '/assets/icon-192.png',
     badge: '/assets/icon-192.png',
-    data: { citySlug: data.citySlug || null },
-    tag: data.citySlug ? `city-${data.citySlug}` : undefined,
+    data: { citySlug: data.citySlug || null, target: data.target || null },
+    // Admin digests all share one tag on purpose: a second admin push
+    // arriving before the first is read REPLACES it in the tray rather
+    // than piling up, which is the notification-tray half of the same
+    // "batch, don't spam" requirement the server-side batching covers.
+    tag: data.tag || (data.citySlug ? `city-${data.citySlug}` : undefined),
   };
 
   event.waitUntil(self.registration.showNotification(title, options));
@@ -152,8 +161,8 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const citySlug = event.notification.data && event.notification.data.citySlug;
-  const targetUrl = citySlug ? `/cities/${citySlug}.html` : '/';
+  const d = event.notification.data || {};
+  const targetUrl = d.target || (d.citySlug ? `/cities/${d.citySlug}.html` : '/');
 
   event.waitUntil((async () => {
     const clientsList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });

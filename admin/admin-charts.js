@@ -73,6 +73,18 @@
     return '<span class="adm-delta ' + cls + '">' + mark + ' ' + Math.abs(pct) + '%</span>';
   }
 
+  // Engraved instrument-panel plate: all four corners clipped at 45°
+  // rather than the burst on the public homepage or the vehicle plate on
+  // a city page -- a third, distinct shape language for this third area,
+  // sized to whatever box .adm-stat ends up (preserveAspectRatio="none",
+  // same technique as the other two). Two concentric outlines read as a
+  // machined/engraved edge rather than a filled card.
+  var STAT_PLATE = '' +
+    '<svg class="adm-stat-shape" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">' +
+      '<path class="adm-stat-outline" d="M10,0 L90,0 L100,10 L100,90 L90,100 L10,100 L0,90 L0,10 Z"></path>' +
+      '<path class="adm-stat-inset" d="M13,4 L87,4 L96,13 L96,87 L87,96 L13,96 L4,87 L4,13 Z"></path>' +
+    '</svg>';
+
   // One figure, with its trend beside it.
   function stat(value, label, opts) {
     var o = opts || {};
@@ -84,6 +96,7 @@
       if (s || d) trend = '<span class="adm-stat-trend">' + s + d + '</span>';
     }
     return '<div class="adm-stat' + (o.key ? ' is-key' : '') + '">' +
+      STAT_PLATE +
       '<span class="adm-stat-value">' + esc(value) + '</span>' +
       '<span class="adm-stat-label">' + esc(label) + '</span>' +
       trend +

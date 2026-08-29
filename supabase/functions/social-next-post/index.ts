@@ -39,15 +39,21 @@
 // reason (claim_lost_to_concurrent_call) rather than silently trying
 // another row, so a real race is visible in the response, not masked.
 //
-// The claim is released (claimed_at reset to null) by social-mark-posted
-// the moment a platform is genuinely marked posted -- so a row still
-// needing its other platform isn't blocked from being reclaimed until
-// expiry. CLAIM_EXPIRY_MINUTES exists only for the crash case: an
-// execution that claims a row and then dies before ever calling
-// social-mark-posted (Make itself crashing, a network partition, etc).
-// Without an expiry that row would be locked forever; with it, the row
-// becomes claimable again once the claim is older than
-// CLAIM_EXPIRY_MINUTES, comfortably inside the next poll cycle.
+// The claim is released ONLY by expiry -- CLAIM_EXPIRY_MINUTES, below.
+// social-mark-posted does NOT null claimed_at when it marks a platform
+// posted (real bug, confirmed live, fixed: it used to, which reopened
+// this exact claim to a concurrent execution the moment the FIRST of a
+// row's two platforms succeeded, mid-execution, well before the second
+// platform was posted -- a live-confirmed duplicate post, not a
+// hypothetical one; see social-mark-posted's header comment for the
+// full story). CLAIM_EXPIRY_MINUTES exists for the crash case: an
+// execution that claims a row and then dies before finishing both
+// platforms (Make itself crashing, a network partition, etc). Without
+// an expiry that row would be locked forever; with it, the row becomes
+// claimable again once the claim is older than CLAIM_EXPIRY_MINUTES,
+// comfortably inside the next poll cycle -- a delay that only matters
+// for that crash case, since a normal single execution never re-polls
+// mid-run and so never needs the claim released early.
 //
 // CAMPAIGN_START_DATE (env var, with a real default below)
 // social_content_queue rows are keyed by day_number (1-30), not a
@@ -94,8 +100,30 @@ const IMAGE_FETCH_URL = Deno.env.get("SOCIAL_IMAGE_FETCH_URL")
 const CARD_URL = Deno.env.get("SOCIAL_CARD_URL")
   ?? `${SUPABASE_URL}/functions/v1/social-card`;
 
+// REAL BUG, CONFIRMED LIVE (see renderAndUploadCard below): image_url
+// used to be CARD_URL itself, a Supabase Edge Function invocation URL.
+// Supabase's gateway requires an Authorization header before the
+// function handler even runs; Instagram's servers fetch image_url
+// directly with zero custom headers and never will. Every real attempt
+// got back UNAUTHORIZED_NO_AUTH_HEADER -- a JSON error body -- instead of
+// image bytes, which is exactly why Instagram rejected every post as
+// "not photo or video media" and the automation was deactivated. This
+// function now renders the card itself (server-to-server, so it can
+// carry the service role key past the gateway) and uploads the finished
+// bytes to this PUBLIC Storage bucket, then hands Make the plain public
+// object URL, which needs no headers at all -- see the
+// social_card_storage_bucket migration for why a public bucket satisfies
+// that.
+const STORAGE_BUCKET = Deno.env.get("SOCIAL_CARD_BUCKET") ?? "social-cards";
+
 const TIMEZONE = "Europe/London";
 const TIMEOUT_MS = 5000;
+// Rendering does real work the plain metadata calls above don't: a
+// Commons photo fetch plus (on a cold isolate) fetching and initialising
+// the resvg WASM rasteriser. TIMEOUT_MS is calibrated for a lightweight
+// REST/metadata call and would cut a legitimate cold-start render off
+// too early.
+const CARD_RENDER_TIMEOUT_MS = 15000;
 // Comfortably longer than this function's real worst-case runtime (one
 // REST select, one REST claim, one image-fetch bounded by its own 5s
 // timeout -- realistically under 10s total) and comfortably shorter
@@ -162,34 +190,103 @@ function minutesFromTimeString(t: string): number {
   return h * 60 + m;
 }
 
-// Returns the CARD url, which is what Make posts. social-image-fetch is
-// still called first, purely to find out whether a qualifying, licensed
-// photograph exists for this term -- so `photo_found: false` still
-// surfaces in the response the way it always did, instead of being
-// hidden behind a card URL that would render plain brand ground with no
-// explanation. Either way the URL returned is a 1080x1080 card.
-async function fetchImage(
-  term: string,
-): Promise<{ image_url: string | null; photo_found: boolean; error?: string }> {
-  const cardUrl = `${CARD_URL}?term=${encodeURIComponent(term)}`;
-  const { signal, done } = withTimeout(TIMEOUT_MS);
+// Renders the finished card (server-to-server, carrying the service role
+// key so it clears Supabase's gateway regardless of social-card's own
+// verify_jwt setting -- that gateway check was never the bug; Instagram
+// fetching the result headerless is) and uploads the bytes to the public
+// social-cards bucket, keyed by row id so a same-day retry (Facebook
+// still needed after Instagram already succeeded) re-renders and
+// overwrites the same object rather than accumulating orphaned files.
+// Returns the plain public Storage URL, or null if either step failed --
+// null is returned rather than falling back to CARD_URL itself, because
+// that fallback is exactly the URL shape Instagram can never fetch.
+async function renderAndUploadCard(term: string, rowId: string): Promise<string | null> {
+  const { signal, done } = withTimeout(CARD_RENDER_TIMEOUT_MS);
+  let png: Uint8Array;
   try {
-    const resp = await fetch(`${IMAGE_FETCH_URL}?term=${encodeURIComponent(term)}`, { signal });
+    const resp = await fetch(`${CARD_URL}?term=${encodeURIComponent(term)}`, {
+      headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` },
+      signal,
+    });
     if (!resp.ok) {
-      return { image_url: cardUrl, photo_found: false, error: `image_fetch_http_${resp.status}` };
+      console.error(`[social-next-post] card render HTTP ${resp.status} for "${term}"`);
+      return null;
     }
-    const data = await resp.json();
-    const found = !!data.image_url;
-    return {
-      image_url: cardUrl,
-      photo_found: found,
-      error: found ? undefined : (data.reason || "no_image_found"),
-    };
-  } catch {
-    return { image_url: cardUrl, photo_found: false, error: "image_fetch_exception" };
+    png = new Uint8Array(await resp.arrayBuffer());
+  } catch (e) {
+    console.error(`[social-next-post] card render failed for "${term}"`, String(e));
+    return null;
   } finally {
     done();
   }
+
+  const objectPath = `${rowId}.png`;
+  try {
+    const uploadResp = await fetch(
+      `${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${objectPath}`,
+      {
+        method: "POST",
+        headers: {
+          apikey: SERVICE_KEY,
+          Authorization: `Bearer ${SERVICE_KEY}`,
+          "Content-Type": "image/png",
+          "Cache-Control": "public, max-age=86400",
+          // A retry re-renders and overwrites the same object rather
+          // than erroring on "already exists".
+          "x-upsert": "true",
+        },
+        body: png,
+      },
+    );
+    if (!uploadResp.ok) {
+      console.error(`[social-next-post] storage upload HTTP ${uploadResp.status} for ${objectPath}`, await uploadResp.text());
+      return null;
+    }
+  } catch (e) {
+    console.error(`[social-next-post] storage upload failed for ${objectPath}`, String(e));
+    return null;
+  }
+
+  // Cache-busted: a retry overwrites the same object path, and a stale
+  // CDN-cached copy of a PREVIOUS render (or a previous failed attempt)
+  // at that same path must never be what Instagram ends up fetching.
+  return `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${objectPath}?v=${Date.now()}`;
+}
+
+// social-image-fetch is still called first, purely to find out whether a
+// qualifying, licensed photograph exists for this term -- so
+// `photo_found: false` still surfaces in the response the way it always
+// did, instead of being silently absorbed into a card that just happens
+// to render without a photo. Either way the URL returned, when non-null,
+// is a real public 1080x1080 card.
+async function fetchImage(
+  term: string,
+  rowId: string,
+): Promise<{ image_url: string | null; photo_found: boolean; error?: string }> {
+  const { signal, done } = withTimeout(TIMEOUT_MS);
+  let found = false;
+  let lookupError: string | undefined;
+  try {
+    const resp = await fetch(`${IMAGE_FETCH_URL}?term=${encodeURIComponent(term)}`, { signal });
+    if (resp.ok) {
+      const data = await resp.json();
+      found = !!data.image_url;
+      lookupError = found ? undefined : (data.reason || "no_image_found");
+    } else {
+      lookupError = `image_fetch_http_${resp.status}`;
+    }
+  } catch {
+    lookupError = "image_fetch_exception";
+  } finally {
+    done();
+  }
+
+  const imageUrl = await renderAndUploadCard(term, rowId);
+  return {
+    image_url: imageUrl,
+    photo_found: found,
+    error: imageUrl ? lookupError : "card_render_or_upload_failed",
+  };
 }
 
 // Attempts to atomically claim `id`: succeeds only if, at the moment
@@ -268,15 +365,20 @@ Deno.serve(async (req: Request) => {
     if (!claimed.image_search_term) {
       // Still a card, still square. An Instagram feed post requires an
       // image, so a row with no search term gets plain brand ground
-      // rather than nothing -- the reason is reported either way.
+      // rather than nothing -- the reason is reported either way. Still
+      // rendered and uploaded to the public bucket, same as every other
+      // row -- CARD_URL itself is never handed to Make (see
+      // renderAndUploadCard).
+      const cardImageUrl = await renderAndUploadCard("", claimed.id);
       return json({
         due: true, row_id: claimed.id, caption: claimed.caption,
-        image_url: CARD_URL, image_size: "1080x1080", photo_found: false,
-        image_error: "no_search_term", needs_instagram, needs_facebook,
+        image_url: cardImageUrl, image_size: "1080x1080", photo_found: false,
+        image_error: cardImageUrl ? "no_search_term" : "no_search_term_and_card_upload_failed",
+        needs_instagram, needs_facebook,
       });
     }
 
-    const { image_url, photo_found, error: imageError } = await fetchImage(claimed.image_search_term);
+    const { image_url, photo_found, error: imageError } = await fetchImage(claimed.image_search_term, claimed.id);
     return json({
       due: true,
       row_id: claimed.id,

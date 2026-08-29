@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#14100B" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Glotemp Admin</title>
+  <title>Overview - Glotemp Admin</title>
 
   <!-- Its own manifest, so adding this to a home screen gives it its own
        icon and opens it full screen at /admin rather than at the public
@@ -21,142 +21,21 @@
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css?v=57" />
+  <link rel="stylesheet" href="/admin/admin-ui.css" />
+  <link rel="stylesheet" href="/admin/admin-nav.css" />
 
-  <style>
-    /* Mobile first throughout. This is read on a phone before a desktop. */
-    .adm { padding: 1.5rem 0 3rem; }
-    .adm-eyebrow {
-      font-family: var(--font-mono); font-variant-caps: small-caps;
-      font-size: 0.74rem; letter-spacing: 0.1em; color: var(--sand); margin: 0 0 0.5rem;
-    }
-    .adm-title {
-      font-family: var(--font-display); font-weight: var(--fw-light);
-      font-size: clamp(1.7rem, 6vw, 2.6rem); color: var(--ivory); margin: 0 0 1.5rem; line-height: 1.15;
-    }
-    .adm-copy { color: var(--sand); line-height: 1.65; max-width: 54ch; margin: 0 0 1rem; }
-
-    /* Numbers, on hairlines. No cards. */
-    .adm-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 1.5rem 1.25rem; margin: 1.5rem 0 2.5rem;
-    }
-    .adm-stat { border-top: 1px solid var(--hairline); padding-top: 0.85rem; min-width: 0; }
-    .adm-stat-value {
-      font-family: var(--font-mono); font-size: clamp(1.6rem, 7vw, 2.2rem);
-      color: var(--ivory); font-variant-numeric: tabular-nums; line-height: 1.1; display: block;
-    }
-    .adm-stat-label {
-      font-family: var(--font-mono); font-variant-caps: small-caps; font-size: 0.72rem;
-      letter-spacing: 0.07em; color: var(--sand); margin-top: 0.3rem; display: block;
-    }
-
-    .adm-section-head {
-      display: flex; align-items: baseline; justify-content: space-between;
-      gap: 1rem; flex-wrap: wrap; margin: 2.5rem 0 1rem;
-      border-top: 1px solid var(--hairline); padding-top: 1.25rem;
-    }
-    .adm-h2 { font-family: var(--font-display); font-weight: var(--fw-light); font-size: 1.25rem; color: var(--ivory); margin: 0; }
-
-    .adm-row {
-      display: flex; align-items: baseline; gap: 1rem;
-      padding: 0.8rem 0; border-bottom: 1px solid var(--hairline);
-    }
-    .adm-row-city { font-family: var(--font-display); font-size: 1rem; color: var(--ivory); flex: 1; min-width: 0; }
-    .adm-row-count { font-family: var(--font-mono); font-size: 1rem; color: var(--ivory); font-variant-numeric: tabular-nums; }
-    .adm-row-when { font-family: var(--font-mono); font-size: 0.7rem; color: var(--sand); opacity: 0.75; white-space: nowrap; }
-
-    /* Range picker: text with a hairline under the active one. */
-    .adm-range { display: flex; gap: 1.25rem; }
-    .adm-range button {
-      background: none; border: none; border-bottom: 1px solid transparent; border-radius: 0;
-      padding: 0.4rem 0; min-height: 44px; cursor: pointer;
-      font-family: var(--font-mono); font-variant-caps: small-caps; font-size: 0.8rem;
-      letter-spacing: 0.07em; color: var(--sand);
-    }
-    .adm-range button[aria-pressed="true"] { color: var(--ivory); border-bottom-color: var(--brass); }
-
-    .adm-action {
-      display: inline-flex; align-items: center; min-height: 44px;
-      background: none; border: none; border-bottom: 1px solid var(--brass); border-radius: 0;
-      padding: 0.35rem 0; cursor: pointer; text-decoration: none;
-      font-family: var(--font-mono); font-variant-caps: small-caps;
-      font-size: 0.88rem; letter-spacing: 0.09em; color: var(--ivory);
-    }
-    .adm-action:hover { color: var(--brass); }
-    .adm-secondary {
-      display: inline-flex; align-items: center; min-height: 44px; margin-left: 1.5rem;
-      font-family: var(--font-mono); font-variant-caps: small-caps; font-size: 0.78rem;
-      letter-spacing: 0.07em; color: var(--sand); text-decoration: none;
-      border-bottom: 1px solid var(--hairline);
-    }
-    .adm-secondary:hover { color: var(--ivory); }
-
-    /* 16px minimum, or iOS zooms the page when the field takes focus. */
-    .adm-input {
-      width: 100%; max-width: 22rem; font-size: 16px; min-height: 44px;
-      background: transparent; border: none; border-bottom: 1px solid var(--brass-dim);
-      border-radius: 0; color: var(--ivory); font-family: var(--font-body); padding: 0.5rem 0;
-    }
-    .adm-input:focus { outline: none; border-bottom-color: var(--brass); }
-    .adm-label {
-      display: block; font-family: var(--font-mono); font-variant-caps: small-caps;
-      font-size: 0.74rem; letter-spacing: 0.07em; color: var(--sand); margin-bottom: 0.4rem;
-    }
-    .adm-status { font-family: var(--font-mono); font-size: 0.78rem; color: var(--sand); margin: 0.75rem 0 0; }
-    .adm-note { border-left: 2px solid var(--brass); padding-left: 0.9rem; max-width: 54ch; }
-
-    .adm-key-prefix {
-      display: block; font-family: var(--font-mono); font-size: 0.7rem;
-      color: var(--sand); opacity: 0.7; margin-top: 0.2rem;
-    }
-    .adm-row-dead { opacity: 0.45; }
-    .adm-revoke {
-      background: none; border: none; border-bottom: 1px solid var(--hairline);
-      border-radius: 0; padding: 0.35rem 0; min-height: 44px; cursor: pointer;
-      font-family: var(--font-mono); font-variant-caps: small-caps;
-      font-size: 0.74rem; letter-spacing: 0.07em; color: var(--sand);
-    }
-    .adm-revoke:hover { color: var(--ivory); border-bottom-color: var(--brass); }
-    .adm-reveal { border-left: 2px solid var(--brass); padding: 0.25rem 0 0.25rem 0.9rem; margin: 1rem 0; }
-    .adm-key {
-      display: block; font-family: var(--font-mono); font-size: 0.8rem;
-      color: var(--ivory); word-break: break-all; margin: 0.4rem 0 0.6rem;
-      /* Long enough to push the page sideways at 320px without this. */
-      max-width: 100%; overflow-wrap: anywhere;
-    }
-
-    .adm-bar {
-      display: flex; align-items: center; min-height: 56px;
-      padding: 0 1.25rem; border-bottom: 1px solid var(--hairline);
-    }
-    .adm-back {
-      display: inline-flex; align-items: center; min-height: 44px;
-      font-family: var(--font-mono); font-variant-caps: small-caps;
-      font-size: 0.82rem; letter-spacing: 0.12em;
-      color: var(--sand); text-decoration: none;
-    }
-    .adm-back:hover { color: var(--ivory); }
-
-    @media (max-width: 400px) {
-      .adm-row { flex-wrap: wrap; gap: 0.4rem 1rem; }
-      .adm-row-when { width: 100%; }
-    }
-  </style>
   <script src="/glotemp-analytics.js" defer></script>
   <script src="/admin-i18n.js"></script>
-  <link rel="stylesheet" href="/admin/admin-ui.css" />
   <script src="/admin/admin-charts.js" defer></script>
+  <script src="/admin/admin-core.js" defer></script>
+  <script src="/admin/admin-nav.js" defer></script>
   <!-- Personality layer. Purely additive: remove these two and the
-       admin is exactly the panel it was. -->
+       admin is exactly the panels it renders. -->
   <link rel="stylesheet" href="/admin/admin-space.css" />
   <script src="/admin/admin-space.js" defer></script>
 </head>
 <body class="adm-page">
-  <!-- No public site nav here. This is a private page, and the public nav
-       carries a SIGN IN button and visitor links that make no sense on it. -->
-  <header class="adm-bar">
-    <a class="adm-back" href="/">Glotemp</a>
-  </header>
+  <header class="adm-bar" id="adm-nav-bar" data-active="overview"></header>
 
   <main class="page-main">
     <section class="glass-card">
@@ -179,649 +58,88 @@
   (function () {
     'use strict';
 
-    // This page holds no secret of its own. Access is decided by the
-    // database: every function it calls refuses to run unless
-    // profiles.is_admin is true for the signed-in user. Reading this
-    // source tells an attacker nothing they can use, which is the whole
-    // difference from the PIN this replaced.
-    var SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
-    var SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
-
     var root = document.getElementById('adm-root');
     var days = 7;
 
-    function esc(s) {
-      return String(s == null ? '' : s)
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-    function render(html) { root.innerHTML = html; }
+    function boot() {
+      var C = window.GlotempAdminCore;
+      if (!C) { root.innerHTML = '<p class="adm-eyebrow">Admin</p><h1 class="adm-title">Could not load that.</h1>'; return; }
 
-    async function rpc(fn, args) {
-      var session = await GlotempAuth.getSession();
-      if (!session) throw new Error('no session');
-      var resp = await fetch(SUPABASE_URL + '/rest/v1/rpc/' + fn, {
-        method: 'POST',
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: 'Bearer ' + session.access_token,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(args || {}),
-      });
-      if (!resp.ok) throw new Error(fn + ' ' + resp.status);
-      return resp.json();
-    }
+      function renderOverview(overview, apiOverview, traffic, trafficDaily, signupsDaily, byCity,
+                               topPages, topRefs, topCountries, topDevices) {
+        var esc = C.esc, ago = C.ago, cityName = C.cityName, panel = C.panel;
+        var m = {};
+        (overview || []).forEach(function (r) { m[r.metric] = r.value; });
+        var a = {};
+        (apiOverview || []).forEach(function (r) { a[r.metric] = r.value; });
+        var tr = {};
+        (traffic || []).forEach(function (r) { tr[r.metric] = Number(r.value) || 0; });
+        var viewSeries = (trafficDaily || []).map(function (r) { return Number(r.views) || 0; });
+        var signupSeries = (signupsDaily || []).map(function (r) { return Number(r.signups) || 0; });
 
-    // Plain PostgREST table access for outreach_leads -- RLS-gated to
-    // is_admin() (see 20260820150500_admin_outreach_leads.sql), not an
-    // RPC. There is no raw-row-exposure concern here the way there is for
-    // profiles/analytics_events: this table holds no user data, only
-    // organisation names and notes the admin types in themselves, so a
-    // policy is the right amount of machinery rather than four functions.
-    async function restTable(method, path, body) {
-      var session = await GlotempAuth.getSession();
-      if (!session) throw new Error('no session');
-      var headers = {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: 'Bearer ' + session.access_token,
-        'Content-Type': 'application/json',
-      };
-      if (method !== 'GET') headers.Prefer = 'return=representation';
-      var resp = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
-        method: method,
-        headers: headers,
-        body: body ? JSON.stringify(body) : undefined,
-      });
-      if (!resp.ok) throw new Error(path + ' ' + resp.status);
-      return resp.json();
-    }
-
-    function cityName(slug) {
-      var rec = (window.CITIES_DATA || []).find(function (c) { return c.slug === slug; });
-      return rec ? rec.name : slug;
-    }
-    function ago(iso) {
-      if (!iso) return '';
-      var mins = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 60000));
-      if (mins < 60) return mins + 'm ago';
-      var h = Math.floor(mins / 60);
-      if (h < 24) return h + 'h ago';
-      return Math.floor(h / 24) + 'd ago';
-    }
-
-    // ---------- states ----------
-    function signedOut() {
-      render(
-        '<p class="adm-eyebrow">Admin</p>' +
-        '<h1 class="adm-title">Sign in to continue.</h1>' +
-        '<p class="adm-copy">Enter your email and password.</p>' +
-        '<form id="adm-signin-form">' +
-          '<label class="adm-label" for="adm-email">Email</label>' +
-          '<input class="adm-input" type="email" id="adm-email" placeholder="you@example.com" required autocomplete="email">' +
-          '<label class="adm-label" for="adm-password">Password</label>' +
-          '<input class="adm-input" type="password" id="adm-password" required autocomplete="current-password">' +
-          '<p><button class="adm-action" type="submit" id="adm-submit">Sign in</button></p>' +
-        '</form>' +
-        '<p class="adm-status" id="adm-status" role="status" aria-live="polite"></p>'
-      );
-      document.getElementById('adm-signin-form').addEventListener('submit', async function (e) {
-        e.preventDefault();
-        var email = document.getElementById('adm-email').value.trim();
-        var password = document.getElementById('adm-password').value;
-        var status = document.getElementById('adm-status');
-        var btn = document.getElementById('adm-submit');
-        if (!email || !password || btn.disabled) return;
-        status.textContent = 'Signing in...';
-        btn.disabled = true;
-        try {
-          await GlotempAuth.signInWithPassword(email, password);
-          await boot();
-        } catch (err) {
-          status.textContent = (err && err.friendly) || 'Could not sign in. Try again shortly.';
-        } finally {
-          btn.disabled = false;
+        var Ch = window.GlotempAdminCharts;
+        function fig(v, label, opts) { return Ch.stat(v, label, opts || {}); }
+        function ranked(list, opts) {
+          return Ch.ranked((list || []).map(function (r) { return { label: r.label, count: r.count }; }), opts);
         }
-      });
-    }
+        var rows = (byCity || []).length
+          ? byCity.map(function (r) {
+              return '<div class="adm-row">' +
+                '<span class="adm-row-city">' + esc(cityName(r.city_slug)) + '</span>' +
+                '<span class="adm-row-count">' + esc(r.checkins) + '</span>' +
+                '<span class="adm-row-when">' + esc(ago(r.last_at)) + '</span>' +
+              '</div>';
+            }).join('')
+          : '<p class="adm-copy">No check-ins in this window.</p>';
 
-    function notAdmin() {
-      render(
-        '<p class="adm-eyebrow">Admin</p>' +
-        '<h1 class="adm-title">This account is not an admin.</h1>' +
-        '<p style="margin-top:1.5rem"><a class="adm-action" href="/">Back to Glotemp</a>' +
-        '<a class="adm-secondary" href="#" id="adm-signout">Sign out</a></p>'
-      );
-      var out = document.getElementById('adm-signout');
-      if (out) out.addEventListener('click', function (e) {
-        e.preventDefault(); GlotempAuth.signOut(); signedOut();
-      });
-    }
+        root.innerHTML =
+          C.stateHTML('Admin', 'Overview',
+            C.rangeHTML(days) +
+            panel('p-glance', 'At a glance', null,
+              '<div class="adm-grid is-wide">' +
+                fig((tr.today || 0).toLocaleString(), 'views today', { key: true, series: viewSeries }) +
+                fig((m.checkins || 0).toLocaleString(), 'check-ins', { key: true }) +
+                fig((m.signed_up || 0).toLocaleString(), 'new accounts', { key: true, series: signupSeries }) +
+                fig((a.keys_active || 0).toLocaleString(), 'active keys', { key: true }) +
+                fig((m.cities_active || 0).toLocaleString(), 'cities active') +
+                fig((a.calls || 0).toLocaleString(), 'api calls 30d') +
+              '</div>') +
+            panel('p-traffic', 'Traffic', 'cookieless, aggregate only',
+              '<div class="adm-grid">' +
+                fig((tr.today || 0).toLocaleString(), 'today', { series: viewSeries.slice(-7), hideDelta: true }) +
+                fig((tr.week || 0).toLocaleString(), 'this week', { key: true, series: viewSeries }) +
+                fig((tr.month || 0).toLocaleString(), 'this month', { series: viewSeries, hideDelta: true }) +
+                fig((m.sessions || 0).toLocaleString(), 'sessions') +
+              '</div>' +
+              '<p class="adm-sub">Top pages</p>' + ranked(topPages, { empty: 'No page views recorded yet.' }) +
+              '<p class="adm-sub">Top referrers</p>' + ranked(topRefs, { empty: 'No referrers recorded yet.' }) +
+              '<p class="adm-sub">Top countries</p>' + ranked(topCountries, { empty: 'No countries recorded yet.' }) +
+              '<p class="adm-sub">Devices</p>' + ranked(topDevices, { limit: 3, empty: 'No devices recorded yet.' }) +
+              '<p class="adm-sub">Check-ins by city</p>' + rows)
+          );
 
-    function stat(value, label) {
-      return '<div class="adm-stat"><span class="adm-stat-value">' + esc(value) + '</span>' +
-             '<span class="adm-stat-label">' + esc(label) + '</span></div>';
-    }
-
-    var t = window.AdminI18n ? window.AdminI18n.t : function (k, f) { return f || k; };
-
-    function tierLabel(tier) {
-      if (tier === 'voice') return t('adm_tier_voice', 'Voice');
-      if (tier === 'keeper') return t('adm_tier_keeper', 'Keeper');
-      if (tier === 'founder') return t('adm_tier_founder', 'Founder');
-      return tier || '';
-    }
-
-    var LEAD_STATUSES = ['not_contacted', 'contacted', 'replied', 'closed'];
-    function leadStatusLabel(status) {
-      return t('adm_outreach_status_' + status, status);
-    }
-
-    function dashboard(overview, byCity, apiOverview, apiKeys, tierCounts, topContributors, leads,
-                       traffic, trafficDaily, topPages, topRefs, topCountries, topDevices,
-                       signupsDaily, signupSources, jobs, partners, xPosts) {
-      var m = {};
-      (overview || []).forEach(function (r) { m[r.metric] = r.value; });
-      var a = {};
-      (apiOverview || []).forEach(function (r) { a[r.metric] = r.value; });
-      var tc = {};
-      (tierCounts || []).forEach(function (r) { tc[r.tier] = r.members; });
-
-      var keyRows = (apiKeys || []).length
-        ? (apiKeys || []).map(function (k) {
-            var used = k.monthly_limit
-              ? k.calls_this_month + ' / ' + k.monthly_limit
-              : String(k.calls_this_month);
-            return '<div class="adm-row' + (k.revoked_at ? ' adm-row-dead' : '') + '">' +
-              '<span class="adm-row-city">' + esc(k.label) +
-                '<span class="adm-key-prefix">' + esc(k.key_prefix) + '...</span></span>' +
-              '<span class="adm-row-count">' + esc(used) + '</span>' +
-              '<span class="adm-row-when">' + esc(k.plan) +
-                (k.revoked_at ? ', revoked' : '') + '</span>' +
-              (k.revoked_at ? ''
-                : '<button type="button" class="adm-revoke" data-key-id="' + esc(k.id) + '">Revoke</button>') +
-            '</div>';
-          }).join('')
-        : '<p class="adm-copy">No keys issued yet.</p>';
-
-      var rows = (byCity || []).length
-        ? byCity.map(function (r) {
-            return '<div class="adm-row">' +
-              '<span class="adm-row-city">' + esc(cityName(r.city_slug)) + '</span>' +
-              '<span class="adm-row-count">' + esc(r.checkins) + '</span>' +
-              '<span class="adm-row-when">' + esc(ago(r.last_at)) + '</span>' +
-            '</div>';
-          }).join('')
-        : '<p class="adm-copy">No check-ins in this window.</p>';
-
-      var C = window.GlotempAdminCharts;
-      var tr = {};
-      (traffic || []).forEach(function (r) { tr[r.metric] = Number(r.value) || 0; });
-      var viewSeries = (trafficDaily || []).map(function (r) { return Number(r.views) || 0; });
-      var signupSeries = (signupsDaily || []).map(function (r) { return Number(r.signups) || 0; });
-
-      function fig(v, label, opts) { return C.stat(v, label, opts || {}); }
-      function ranked(list, opts) {
-        return C.ranked((list || []).map(function (r) { return { label: r.label, count: r.count }; }), opts);
-      }
-      function panel(id, heading, note, body) {
-        return '<section class="adm-panel" aria-labelledby="' + id + '">' +
-          '<div class="adm-panel-head">' +
-            '<h2 class="adm-h2" id="' + id + '">' + esc(heading) + '</h2>' +
-            (note ? '<p class="adm-panel-note">' + esc(note) + '</p>' : '') +
-          '</div>' + body +
-        '</section>';
+        C.wireRange(root, function (d) { days = d; load(root); });
+        C.wirePanelToggles(root);
       }
 
-      // Every email metric in one place, computed from the one lead list.
-      var leadList = leads || [];
-      function leadCount(st) {
-        return leadList.filter(function (l) { return l.status === st; }).length;
-      }
-      var contacted = leadCount('contacted') + leadCount('replied') + leadCount('closed');
-      var replied = leadCount('replied');
-      var replyRate = contacted ? Math.round((replied / contacted) * 100) + '%' : '-';
-
-      var partnerRows = (partners || []).length
-        ? partners.map(function (pn) {
-            var ends = pn.ends_at ? new Date(pn.ends_at) : null;
-            var daysLeft = ends ? Math.ceil((ends.getTime() - Date.now()) / 86400000) : null;
-            var state = daysLeft === null ? 'is-warn' : daysLeft < 0 ? 'is-bad' : daysLeft <= 14 ? 'is-warn' : 'is-ok';
-            var when = daysLeft === null ? 'no end date' : daysLeft < 0 ? 'expired' : daysLeft + ' days left';
-            return '<div class="adm-row">' +
-              '<span class="adm-row-city"><span class="adm-dot ' + state + '"></span>' +
-                esc(pn.name || pn.org_name || 'Partner') +
-                (pn.placement ? '<span class="adm-key-prefix">' + esc(pn.placement) + '</span>' : '') +
-              '</span>' +
-              '<span class="adm-row-when">' + esc(when) + '</span>' +
-            '</div>';
-          }).join('')
-        : '<p class="adm-copy">No active placements.</p>';
-
-      var jobRows = (jobs || []).length
-        ? jobs.map(function (j) {
-            var fails = Number(j.failures_24h) || 0;
-            var state = !j.active ? 'is-warn' : fails > 0 ? 'is-bad' : 'is-ok';
-            return '<div class="adm-row">' +
-              '<span class="adm-row-city"><span class="adm-dot ' + state + '"></span>' + esc(j.jobname) +
-                '<span class="adm-key-prefix">' + esc(j.schedule) + '</span></span>' +
-              '<span class="adm-row-count">' + (fails ? esc(fails) + ' failed' : 'ok') + '</span>' +
-              '<span class="adm-row-when">' + esc(j.last_run ? ago(j.last_run) : 'never run') + '</span>' +
-            '</div>';
-          }).join('')
-        : '<p class="adm-copy">Job history unavailable.</p>';
-
-      // X posts are read-only, pre-written copy -- shown newest-day-first
-      // isn't the point here, calendar order is, so they render in the
-      // exact day/slot order the table's own unique(day_number,
-      // slot_number) constraint already sorts them into.
-      var xList = xPosts || [];
-      var xRows = xList.length
-        ? '<div class="adm-x-list">' + xList.map(function (p, i) {
-            var meta = 'Day ' + esc(p.day_number) + ', ' + esc(p.scheduled_time) + ' · ' + esc(p.theme) +
-              (p.image_note && p.image_note !== 'No image' ? ' · ' + esc(p.image_note) : '');
-            return '<div class="adm-row adm-x-row">' +
-              '<span class="adm-row-city">' + esc(p.tweet_text) +
-                '<span class="adm-key-prefix">' + meta + '</span></span>' +
-              '<button type="button" class="adm-revoke adm-x-copy" data-x-index="' + i + '">Copy</button>' +
-            '</div>';
-          }).join('') + '</div>'
-        : '<p class="adm-copy">The calendar has not been seeded yet.</p>';
-
-      var signupRows = (signupSources || []).length
-        ? signupSources.slice(0, 10).map(function (r) {
-            return '<div class="adm-row">' +
-              '<span class="adm-row-city">' + esc(r.country || 'unknown') + '</span>' +
-              '<span class="adm-row-count">' + esc(r.path || '-') + '</span>' +
-              '<span class="adm-row-when">' + esc(ago(r.created_at)) + '</span>' +
-            '</div>';
-          }).join('')
-        : '<p class="adm-copy">No signups in this window.</p>';
-
-      render(
-        '<p class="adm-eyebrow">Admin</p>' +
-        '<h1 class="adm-title">Glotemp Admin</h1>' +
-
-        '<div class="adm-range" role="group" aria-label="Range">' +
-          [1, 7, 30].map(function (d) {
-            return '<button type="button" data-days="' + d + '" aria-pressed="' + (d === days) + '">' +
-              (d === 1 ? 'Today' : 'Last ' + d + ' days') + '</button>';
-          }).join('') +
-        '</div>' +
-
-        panel('p-glance', 'At a glance', null,
-          '<div class="adm-grid is-wide">' +
-            fig((tr.today || 0).toLocaleString(), 'views today', { key: true, series: viewSeries }) +
-            fig((m.checkins || 0).toLocaleString(), 'check-ins', { key: true }) +
-            fig((m.signed_up || 0).toLocaleString(), 'new accounts', { key: true, series: signupSeries }) +
-            fig((a.keys_active || 0).toLocaleString(), 'active keys', { key: true }) +
-            fig((m.cities_active || 0).toLocaleString(), 'cities active') +
-            fig((a.calls || 0).toLocaleString(), 'api calls 30d') +
-          '</div>') +
-
-        panel('p-users', 'Users', 'signups and where they came from',
-          '<div class="adm-grid">' +
-            fig((m.signed_up || 0).toLocaleString(), 'signups', { series: signupSeries }) +
-            fig((m.installs || 0).toLocaleString(), 'installs') +
-            fig((m.sessions_standalone || 0).toLocaleString(), 'home screen') +
-            fig((tc.voice || 0).toLocaleString(), 'voice') +
-            fig((tc.keeper || 0).toLocaleString(), 'keeper') +
-            fig((tc.founder || 0).toLocaleString(), 'founder') +
-          '</div>' +
-          '<p class="adm-sub">Recent signups, country and landing page</p>' + signupRows +
-          '<p class="adm-sub">Top contributors</p>' +
-          ((topContributors || []).length
-            ? topContributors.slice(0, 8).map(function (c) {
-                return '<div class="adm-row">' +
-                  '<span class="adm-row-city">' + esc(c.display_name) +
-                    '<span class="adm-key-prefix">' + esc(tierLabel(c.tier)) + '</span></span>' +
-                  '<span class="adm-row-count">' + esc(c.total_checkins) + '</span>' +
-                  '<span class="adm-row-when">' + esc(c.distinct_days) + ' days</span>' +
-                '</div>';
-              }).join('')
-            : '<p class="adm-copy">Nobody has reached a tier yet.</p>')) +
-
-        panel('p-traffic', 'Traffic', 'cookieless, aggregate only',
-          '<div class="adm-grid">' +
-            fig((tr.today || 0).toLocaleString(), 'today', { series: viewSeries.slice(-7), hideDelta: true }) +
-            fig((tr.week || 0).toLocaleString(), 'this week', { key: true, series: viewSeries }) +
-            fig((tr.month || 0).toLocaleString(), 'this month', { series: viewSeries, hideDelta: true }) +
-            fig((m.sessions || 0).toLocaleString(), 'sessions') +
-          '</div>' +
-          '<p class="adm-sub">Top pages</p>' + ranked(topPages, { empty: 'No page views recorded yet.' }) +
-          '<p class="adm-sub">Top referrers</p>' + ranked(topRefs, { empty: 'No referrers recorded yet.' }) +
-          '<p class="adm-sub">Top countries</p>' + ranked(topCountries, { empty: 'No countries recorded yet.' }) +
-          '<p class="adm-sub">Devices</p>' + ranked(topDevices, { limit: 3, empty: 'No devices recorded yet.' }) +
-          '<p class="adm-sub">Check-ins by city</p>' + rows) +
-
-        panel('p-outreach', 'Email outreach', 'sponsor and partner leads',
-          '<div class="adm-grid">' +
-            fig(leadList.length.toLocaleString(), 'leads') +
-            fig(contacted.toLocaleString(), 'contacted') +
-            fig(replied.toLocaleString(), 'replied', { key: true }) +
-            fig(replyRate, 'reply rate') +
-            fig(leadCount('closed').toLocaleString(), 'closed') +
-            fig(leadCount('not_contacted').toLocaleString(), 'untouched') +
-          '</div>' +
-          (leadList.length
-            ? leadList.map(function (lead) {
-                return '<div class="adm-row adm-lead-row">' +
-                  '<span class="adm-row-city">' + esc(lead.org_name) +
-                    (lead.category ? '<span class="adm-key-prefix">' + esc(lead.category) + '</span>' : '') +
-                  '</span>' +
-                  '<select class="adm-input adm-lead-status" data-lead-id="' + esc(lead.id) + '" data-prev="' + esc(lead.status) + '" style="width:auto;max-width:11rem;flex:0 0 auto">' +
-                    LEAD_STATUSES.map(function (st) {
-                      return '<option value="' + esc(st) + '"' + (st === lead.status ? ' selected' : '') + '>' + esc(leadStatusLabel(st)) + '</option>';
-                    }).join('') +
-                  '</select>' +
-                '</div>';
-              }).join('')
-            : '<p class="adm-copy">No leads yet.</p>') +
-          '<p class="adm-sub">Add a lead</p>' +
-          '<form id="adm-lead-form"><div class="adm-form-grid">' +
-            '<div class="adm-field"><label class="adm-label" for="adm-lead-org">Organisation</label>' +
-              '<input class="adm-input" type="text" id="adm-lead-org" maxlength="120" required></div>' +
-            '<div class="adm-field"><label class="adm-label" for="adm-lead-category">Category</label>' +
-              '<input class="adm-input" type="text" id="adm-lead-category" maxlength="60" placeholder="Tourism board"></div>' +
-            '<div class="adm-field"><label class="adm-label" for="adm-lead-contact-name">Contact name</label>' +
-              '<input class="adm-input" type="text" id="adm-lead-contact-name" maxlength="120"></div>' +
-            '<div class="adm-field"><label class="adm-label" for="adm-lead-contact-email">Contact email</label>' +
-              '<input class="adm-input" type="email" id="adm-lead-contact-email"></div>' +
-            '<div class="adm-field is-full"><label class="adm-label" for="adm-lead-notes">Notes</label>' +
-              '<input class="adm-input" type="text" id="adm-lead-notes" maxlength="500"></div>' +
-          '</div>' +
-          '<p><button class="adm-action" type="submit" id="adm-lead-submit">Add lead</button></p></form>' +
-          '<p class="adm-status" id="adm-lead-status-msg" role="status" aria-live="polite"></p>') +
-
-        panel('p-x-content', 'X content', 'manual, copy-paste only -- no posting API',
-          '<div class="adm-grid">' +
-            fig(xList.length.toLocaleString(), 'posts ready') +
-            fig((xList.length ? 30 : 0).toLocaleString(), 'days covered') +
-          '</div>' +
-          xRows) +
-
-        panel('p-partners', 'Partners', 'placements and expiries',
-          '<div class="adm-grid">' +
-            fig((a.paying_keys || 0).toLocaleString(), 'paying keys', { key: true }) +
-            fig(((partners || []).length).toLocaleString(), 'placements') +
-            fig((a.calls || 0).toLocaleString(), 'calls 30d') +
-            fig((a.calls_rejected || 0).toLocaleString(), 'rejected') +
-          '</div>' +
-          partnerRows +
-          '<p class="adm-sub">API keys</p>' + keyRows +
-          '<p class="adm-sub">Issue a key</p>' +
-          '<form id="adm-key-form"><div class="adm-form-grid">' +
-            '<div class="adm-field"><label class="adm-label" for="adm-key-label">Who is it for</label>' +
-              '<input class="adm-input" type="text" id="adm-key-label" maxlength="80" required placeholder="Acme Corp"></div>' +
-            '<div class="adm-field"><label class="adm-label" for="adm-key-email">Their email</label>' +
-              '<input class="adm-input" type="email" id="adm-key-email" placeholder="dev@acme.com"></div>' +
-            '<div class="adm-field is-full"><label class="adm-label" for="adm-key-plan">Plan</label>' +
-              '<select class="adm-input" id="adm-key-plan">' +
-                '<option value="free">Free, 1,000 calls</option>' +
-                '<option value="starter">Starter, 50,000 calls</option>' +
-                '<option value="growth">Growth, 500,000 calls</option>' +
-                '<option value="scale">Scale, no ceiling</option>' +
-              '</select></div>' +
-          '</div>' +
-          '<p><button class="adm-action" type="submit" id="adm-key-submit">Issue key</button></p></form>' +
-          '<p class="adm-status" id="adm-key-status" role="status" aria-live="polite"></p>' +
-          '<div id="adm-key-reveal"></div>') +
-
-        panel('p-system', 'System', 'scheduled jobs, install prompt, account',
-          jobRows +
-          '<p class="adm-sub">Install prompt</p>' +
-          '<div class="adm-grid">' +
-            fig((m.prompt_shown || 0).toLocaleString(), 'shown') +
-            fig((m.prompt_dismissed || 0).toLocaleString(), 'dismissed') +
-          '</div>' +
-          '<p class="adm-sub">Your account</p>' +
-          '<form id="adm-pw-form"><div class="adm-form-grid">' +
-            '<div class="adm-field"><label class="adm-label" for="adm-new-pw">New password</label>' +
-              '<input class="adm-input" type="password" id="adm-new-pw" required minlength="8" autocomplete="new-password"></div>' +
-            '<div class="adm-field"><label class="adm-label" for="adm-new-pw2">Repeat it</label>' +
-              '<input class="adm-input" type="password" id="adm-new-pw2" required minlength="8" autocomplete="new-password"></div>' +
-          '</div>' +
-          '<p><button class="adm-action" type="submit" id="adm-pw-submit">Change password</button>' +
-          '<a class="adm-secondary" href="#" id="adm-signout">Sign out</a></p></form>' +
-          '<p class="adm-status" id="adm-pw-status" role="status" aria-live="polite"></p>')
-      );
-
-
-      // Limits live here rather than in the database default so the plan
-      // named on screen and the ceiling actually applied are one thing.
-      var PLAN_LIMITS = { free: 1000, starter: 50000, growth: 500000, scale: null };
-
-      document.getElementById('adm-key-form').addEventListener('submit', async function (e) {
-        e.preventDefault();
-        var label = document.getElementById('adm-key-label').value.trim();
-        var email = document.getElementById('adm-key-email').value.trim();
-        var plan = document.getElementById('adm-key-plan').value;
-        var st = document.getElementById('adm-key-status');
-        var btn = document.getElementById('adm-key-submit');
-        if (!label || btn.disabled) return;
-        st.textContent = 'Issuing...';
-        if (window.GlotempAdminSpace) GlotempAdminSpace.commit(btn);
-        btn.disabled = true;
-        try {
-          var res = await rpc('admin_issue_api_key', {
-            p_label: label,
-            p_contact_email: email || null,
-            p_plan: plan,
-            p_monthly_limit: PLAN_LIMITS[plan],
-          });
-          var row = Array.isArray(res) ? res[0] : res;
-          st.textContent = '';
-          // Shown once. There is no way to recover it afterwards, so the
-          // warning is not decoration.
-          document.getElementById('adm-key-reveal').innerHTML =
-            '<div class="adm-reveal">' +
-              '<p class="adm-label">Copy this now. It cannot be shown again.</p>' +
-              '<code class="adm-key">' + esc(row.api_key) + '</code>' +
-              '<p><button type="button" class="adm-action" id="adm-key-copy">Copy</button></p>' +
-            '</div>';
-          document.getElementById('adm-key-copy').addEventListener('click', function () {
-            if (window.GlotempAdminSpace) GlotempAdminSpace.commit(this);
-            navigator.clipboard.writeText(row.api_key).then(function () {
-              document.getElementById('adm-key-copy').textContent = 'Copied';
-            }, function () {
-              document.getElementById('adm-key-copy').textContent = 'Select it by hand';
-            });
-          });
-          document.getElementById('adm-key-label').value = '';
-          document.getElementById('adm-key-email').value = '';
-          // A key issued is the admin's real revenue moment.
-          var reveal = document.querySelector('#adm-key-reveal .adm-reveal');
-          if (reveal) reveal.classList.add('is-fresh');
-          document.dispatchEvent(new CustomEvent('admin:key-issued'));
-        } catch (err) {
-          st.textContent = 'Could not issue that key.';
-        } finally {
-          btn.disabled = false;
-        }
-      });
-
-      root.querySelectorAll('.adm-revoke').forEach(function (b) {
-        b.addEventListener('click', async function () {
-          if (!window.confirm('Revoke this key? Whoever holds it stops working immediately.')) return;
-          b.disabled = true;
-          try {
-            await rpc('admin_revoke_api_key', { p_id: b.getAttribute('data-key-id') });
-            if (window.GlotempAdminSpace) GlotempAdminSpace.pulseRow(b.closest('.adm-row'), 'gold');
-            await load();
-          } catch (err) {
-            b.disabled = false;
-            document.getElementById('adm-key-status').textContent = 'Could not revoke that key.';
-          }
-        });
-      });
-
-      document.getElementById('adm-pw-form').addEventListener('submit', async function (e) {
-        e.preventDefault();
-        var a = document.getElementById('adm-new-pw').value;
-        var bb = document.getElementById('adm-new-pw2').value;
-        var st = document.getElementById('adm-pw-status');
-        var btn = document.getElementById('adm-pw-submit');
-        if (btn.disabled) return;
-        // Checked here as well as by minlength, because a paste can leave
-        // a field the browser never validated on input.
-        if (a.length < 8) { st.textContent = 'Use at least 8 characters.'; return; }
-        if (a !== bb) { st.textContent = 'Those two do not match.'; return; }
-        st.textContent = 'Saving...';
-        if (window.GlotempAdminSpace) GlotempAdminSpace.commit(btn);
-        btn.disabled = true;
-        try {
-          await GlotempAuth.updatePassword(a);
-          st.textContent = 'Password changed. Use it next time you sign in.';
-          document.getElementById('adm-new-pw').value = '';
-          document.getElementById('adm-new-pw2').value = '';
-        } catch (err) {
-          st.textContent = (err && err.friendly) || 'Could not change it.';
-        } finally {
-          btn.disabled = false;
-        }
-      });
-
-      var leadForm = document.getElementById('adm-lead-form');
-      if (leadForm) leadForm.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        var org = document.getElementById('adm-lead-org').value.trim();
-        var category = document.getElementById('adm-lead-category').value.trim();
-        var contactName = document.getElementById('adm-lead-contact-name').value.trim();
-        var contactEmail = document.getElementById('adm-lead-contact-email').value.trim();
-        var notes = document.getElementById('adm-lead-notes').value.trim();
-        var st = document.getElementById('adm-lead-status-msg');
-        var btn = document.getElementById('adm-lead-submit');
-        if (!org || btn.disabled) return;
-        st.textContent = 'Saving...';
-        btn.disabled = true;
-        try {
-          await restTable('POST', 'outreach_leads', {
-            org_name: org,
-            category: category || null,
-            contact_name: contactName || null,
-            contact_email: contactEmail || null,
-            notes: notes || null,
-          });
-          st.textContent = '';
-          await load();
-        } catch (err) {
-          st.textContent = 'Could not save that lead.';
-        } finally {
-          btn.disabled = false;
-        }
-      });
-
-      root.querySelectorAll('.adm-lead-status').forEach(function (sel) {
-        sel.addEventListener('change', async function () {
-          var id = sel.getAttribute('data-lead-id');
-          var prev = sel.getAttribute('data-prev') || sel.value;
-          sel.disabled = true;
-          try {
-            await restTable('PATCH', 'outreach_leads?id=eq.' + encodeURIComponent(id), { status: sel.value });
-            sel.setAttribute('data-prev', sel.value);
-            // Real action, real reaction: the row acknowledges the save,
-            // and a reply is a milestone the astronaut celebrates.
-            if (window.GlotempAdminSpace) {
-              var tone = sel.value === 'replied' ? 'violet'
-                       : sel.value === 'closed' ? 'gold' : 'teal';
-              GlotempAdminSpace.pulseRow(sel.closest('.adm-row'), tone);
-            }
-            document.dispatchEvent(new CustomEvent('admin:lead-status', {
-              detail: { status: sel.value },
-            }));
-          } catch (err) {
-            sel.value = prev;
-          } finally {
-            sel.disabled = false;
-          }
-        });
-      });
-
-      root.querySelectorAll('.adm-x-copy').forEach(function (b) {
-        b.addEventListener('click', function () {
-          var post = xList[Number(b.getAttribute('data-x-index'))];
-          if (!post) return;
-          if (window.GlotempAdminSpace) GlotempAdminSpace.commit(b);
-          navigator.clipboard.writeText(post.tweet_text).then(function () {
-            b.textContent = 'Copied';
-            setTimeout(function () { b.textContent = 'Copy'; }, 1500);
-          }, function () {
-            b.textContent = 'Select by hand';
-          });
-        });
-      });
-
-      root.querySelectorAll('.adm-range button').forEach(function (b) {
-        b.addEventListener('click', function () {
-          days = Number(b.getAttribute('data-days')) || 7;
-          load();
-        });
-      });
-      var out = document.getElementById('adm-signout');
-      if (out) out.addEventListener('click', function (e) {
-        e.preventDefault(); GlotempAuth.signOut(); signedOut();
-      });
-    }
-
-    function failed(msg) {
-      render(
-        '<p class="adm-eyebrow">Admin</p>' +
-        '<h1 class="adm-title">Could not load that.</h1>' +
-        '<p class="adm-copy">' + esc(msg) + '</p>' +
-        '<p><button class="adm-action" type="button" onclick="location.reload()">Try again</button></p>'
-      );
-    }
-
-    async function load() {
-      try {
-        // The API calls are allowed to fail on their own without taking
-        // the page down: on a project where the API migration has not
-        // been run yet, the rest of the dashboard still works.
-        // Each new call carries its own catch: a database that has not had
-        // the analytics migration applied yet must degrade to an empty
-        // panel, never to a dead dashboard.
+      async function load(rootEl) {
         var none = function () { return []; };
         var results = await Promise.all([
-          rpc('admin_overview', { days: days }),
-          rpc('admin_checkins_by_city', { days: days, max_rows: 12 }),
-          rpc('admin_api_overview', { days: 30 }).catch(none),
-          rpc('admin_api_keys', {}).catch(none),
-          rpc('admin_contributor_tier_counts', {}).catch(none),
-          rpc('admin_top_contributors', { p_tier: null, max_rows: 20 }).catch(none),
-          restTable('GET', 'outreach_leads?select=id,org_name,category,status,notes&order=created_at.desc').catch(none),
-          rpc('admin_traffic_totals', {}).catch(none),
-          rpc('admin_traffic_daily', { days: 30 }).catch(none),
-          rpc('admin_traffic_top', { dimension: 'path', days: days, max_rows: 8 }).catch(none),
-          rpc('admin_traffic_top', { dimension: 'referrer', days: days, max_rows: 8 }).catch(none),
-          rpc('admin_traffic_top', { dimension: 'country', days: days, max_rows: 8 }).catch(none),
-          rpc('admin_traffic_top', { dimension: 'device', days: days, max_rows: 3 }).catch(none),
-          rpc('admin_signups_daily', { days: 30 }).catch(none),
-          rpc('admin_signup_sources', { days: days, max_rows: 20 }).catch(none),
-          rpc('admin_job_health', { max_rows: 20 }).catch(none),
-          restTable('GET', 'partners?select=*&order=created_at.desc').catch(none),
-          restTable('GET', 'x_content_calendar?select=day_number,slot_number,scheduled_time,theme,tweet_text,image_note&order=day_number.asc,slot_number.asc').catch(none),
+          C.rpc('admin_overview', { days: days }),
+          C.rpc('admin_api_overview', { days: 30 }).catch(none),
+          C.rpc('admin_traffic_totals', {}).catch(none),
+          C.rpc('admin_traffic_daily', { days: 30 }).catch(none),
+          C.rpc('admin_signups_daily', { days: 30 }).catch(none),
+          C.rpc('admin_checkins_by_city', { days: days, max_rows: 12 }).catch(none),
+          C.rpc('admin_traffic_top', { dimension: 'path', days: days, max_rows: 8 }).catch(none),
+          C.rpc('admin_traffic_top', { dimension: 'referrer', days: days, max_rows: 8 }).catch(none),
+          C.rpc('admin_traffic_top', { dimension: 'country', days: days, max_rows: 8 }).catch(none),
+          C.rpc('admin_traffic_top', { dimension: 'device', days: days, max_rows: 3 }).catch(none),
         ]);
-        dashboard.apply(null, results);
-      } catch (err) {
-        // The functions raise "not authorised" for a signed-in non-admin,
-        // which PostgREST returns as a 4xx. Treat that as the answer
-        // rather than an error -- but log the real reason, because a
-        // dashboard that only says "could not be read" is impossible to
-        // diagnose from a screenshot.
-        console.error('[admin] load failed:', (err && err.stack) || err);
-        failed('The numbers could not be read. Sign out and back in, then try again.');
+        renderOverview.apply(null, results);
       }
-    }
 
-    async function boot() {
-      if (!window.GlotempAuth) { failed('Sign-in did not load.'); return; }
-      if (!GlotempAuth.isSignedIn()) { signedOut(); return; }
-      try {
-        var admin = await rpc('is_admin', {});
-        if (admin !== true) { notAdmin(); return; }
-        await load();
-      } catch (err) {
-        notAdmin();
-      }
+      C.boot(root, load);
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

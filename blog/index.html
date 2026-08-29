@@ -11,6 +11,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/blog" />
   <meta property="og:image" content="https://glo-temp.com/assets/logo.png" />
+  <meta name="twitter:image" content="https://glo-temp.com/assets/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="The Feed - Glotemp" />
   <meta name="twitter:description" content="Every signal Glotemp records across all 12 verticals, as it arrives." />
@@ -21,6 +22,13 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
   <title>Stories - Glotemp</title>
 
+  <link rel="alternate" hreflang="en" href="https://glo-temp.com/blog" />
+  <link rel="alternate" hreflang="es" href="https://glo-temp.com/blog" />
+  <link rel="alternate" hreflang="fr" href="https://glo-temp.com/blog" />
+  <link rel="alternate" hreflang="de" href="https://glo-temp.com/blog" />
+  <link rel="alternate" hreflang="pt" href="https://glo-temp.com/blog" />
+  <link rel="alternate" hreflang="ja" href="https://glo-temp.com/blog" />
+  <link rel="alternate" hreflang="x-default" href="https://glo-temp.com/blog" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -336,7 +344,6 @@
           context: story.excerpt || (story.content || '').slice(0, 140),
           timestamp: story.date,
           source: 'Glotemp Editorial',
-          sourceUrl: null,
           kind: 'story',
         };
       });
@@ -352,9 +359,36 @@
         context: obs.context,
         timestamp: obs.created_at,
         source: 'Reading',
-        sourceUrl: null,
         kind: 'checkin',
       }));
+    }
+
+    // readings.source is an internal collector identifier
+    // (github_activity, world_bank, overpass_osm, ...), never copy meant
+    // for a visitor -- and readings.source_url is that collector's bare
+    // API root (e.g. https://api.github.com), not a human-readable page,
+    // so it must never be offered as a clickable link either: visiting
+    // it directly just dumps the API's raw JSON response. Every real
+    // source name this project's edge functions write is mapped here to
+    // the human label a reader actually wants; anything unmapped falls
+    // back to a de-slugged version of the identifier rather than ever
+    // showing raw underscores.
+    const SOURCE_LABELS = {
+      github_activity: 'GitHub',
+      world_bank: 'World Bank',
+      remotive_jobs: 'Remotive',
+      hipolabs_universities: 'Hipolabs',
+      ticketmaster: 'Ticketmaster',
+      gdelt_sentiment: 'GDELT',
+      gdelt_fashion: 'GDELT',
+      overpass_osm: 'OpenStreetMap',
+      sportsdb: 'TheSportsDB',
+      transitland: 'Transitland',
+      waqi: 'World Air Quality Index',
+      seed: 'Glotemp',
+    };
+    function humanizeSource(source) {
+      return SOURCE_LABELS[source] || String(source || '').replace(/_/g, ' ');
     }
 
     function readingsAsFeedItems(rows) {
@@ -365,8 +399,7 @@
         headline: `${r.metric.replace(/_/g, ' ')}${r.value !== null && r.value !== undefined ? `: ${r.value}` : ''}`,
         context: r.label || '',
         timestamp: r.fetched_at,
-        source: r.source,
-        sourceUrl: r.source_url,
+        source: humanizeSource(r.source),
         confidence: r.confidence,
         kind: 'reading',
       }));
@@ -412,9 +445,13 @@
       const color = item.citySlug ? cityBandColor(item.citySlug) : 'var(--band-equilibrium)';
       const time = GlotempCore.getTimeAgo(new Date(item.timestamp));
       const verticalLabel = (VERTICALS.find(v => v.slug === item.vertical) || { label: item.vertical }).label;
-      const sourceHTML = item.sourceUrl
-        ? `<a href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer">${item.source}</a>`
-        : item.source;
+      // Attribution text only, never a link: a collector's source_url is
+      // its bare API root (e.g. https://api.github.com), not a page a
+      // visitor should land on -- visiting it directly just dumps that
+      // API's raw JSON response. See humanizeSource() above for why
+      // item.source is already a human label here, not the raw
+      // "github_activity"-style identifier.
+      const sourceHTML = item.source;
       const cityLink = item.citySlug ? `data-city-link="${item.citySlug}"` : '';
 
       return `

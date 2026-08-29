@@ -6,11 +6,22 @@
   <title>Cairns | Glotemp</title>
   <meta name="description" content="Live profile of Cairns across all 12 dimensions. Real-time data on mood, opportunities, economy, and city vitality.">
   <link rel="canonical" href="https://glo-temp.com/cities/cairns">
+  <link rel="alternate" hreflang="en" href="https://glo-temp.com/cities/cairns">
+  <link rel="alternate" hreflang="es" href="https://glo-temp.com/cities/cairns">
+  <link rel="alternate" hreflang="fr" href="https://glo-temp.com/cities/cairns">
+  <link rel="alternate" hreflang="de" href="https://glo-temp.com/cities/cairns">
+  <link rel="alternate" hreflang="pt" href="https://glo-temp.com/cities/cairns">
+  <link rel="alternate" hreflang="ja" href="https://glo-temp.com/cities/cairns">
+  <link rel="alternate" hreflang="x-default" href="https://glo-temp.com/cities/cairns">
   <meta property="og:title" content="Cairns | Glotemp">
   <meta property="og:description" content="Explore what Cairns is like right now across all 12 dimensions.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://glo-temp.com/cities/cairns">
-  <meta property="og:image" content="https://glo-temp.com/assets/logo.png">
+  <meta property="og:image" content="https://glo-temp.com/og/cairns.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cairns | Glotemp">
+  <meta name="twitter:description" content="Explore what Cairns is like right now across all 12 dimensions.">
+  <meta name="twitter:image" content="https://glo-temp.com/og/cairns.png">
   <meta name="theme-color" content="#06060A">
 
   <!-- Structured data, populated at build time below (in generate-city-pages.js) --
@@ -22,13 +33,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&family=Fredoka:wght@400..600&family=Baloo+2:wght@400..600&family=Quicksand:wght@400..600&family=Comfortaa:wght@400..600&family=Varela+Round&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=57">
+  <link rel="stylesheet" href="/styles.css?v=58">
   <script src="/glotemp-analytics.js" defer></script>
 </head>
 <body>
   <nav id="site-nav"></nav>
 <script src="/nav-component.js"></script>
 <script src="/footer-social.js" defer></script>
+<script src="/glotemp-pulse-gravity.js" defer></script>
+<script src="/city-flavor-data.js" defer></script>
+<script src="/glotemp-city-flavor.js" defer></script>
 
   <main class="page-content">
     <section class="city-header glass-card">
@@ -37,6 +51,7 @@
       </div>
       <div class="city-header-content">
         <p class="city-live-badge checkin-live-eyebrow live-mark">Live</p>
+        <span id="city-tier-badge" class="city-tier-badge" hidden></span>
         <h1 id="city-name"></h1>
         <p id="city-country-region"></p>
         <div class="city-meta">
@@ -45,6 +60,11 @@
           <span id="city-metro-pop"></span>
         </div>
         <p class="conditions-line" id="conditions-line" aria-live="polite"></p>
+        <!-- "Why" line: built only from stored deltas in
+             city_signal_snapshots (see city-why.js). Hidden until at
+             least two days of history exist for this city, never
+             a guess standing in for a trend that isn't there yet. -->
+        <p class="why-line" id="why-line" aria-live="polite" hidden></p>
         <div class="city-action-row">
           <button id="watch-city-btn" class="btn-neon" type="button">Follow this city</button>
           <button id="share-city-btn" class="btn-neon" type="button" style="--btn-band: var(--band-restrained);">Share</button>
@@ -60,8 +80,13 @@
       </div>
     </section>
 
+    <!-- Social proof: same honestly-scoped numbers and strongest
+         readings as the homepage, see social-proof.js. Hidden until
+         data actually resolves. -->
+    <section class="glass-card social-proof-section" id="social-proof-mount" aria-label="Real activity across Glotemp" hidden></section>
+
     <!-- City reading: given the first, most prominent placement on the
-         page -- right after the hero, before anything else.
+         page, right after the hero, before anything else.
          glotemp-checkin.js finds #city-observation-feed by id regardless
          of where it sits in the DOM, so moving it here is safe; it
          replaces this section's contents with the live composer (or,
@@ -71,6 +96,21 @@
       <p class="vertical-description">How this city feels right now.</p>
       <div id="city-observation-feed" class="vertical-content"></div>
     </section>
+
+    <!-- Live Blog: a vertical journal of real dispatches about this city
+         only, built from data the page already trusts elsewhere. See
+         glotemp-live-blog-city.js and glotemp-live-blog-data.js. Hidden
+         until populated. -->
+    <section class="glass-card live-blog-section" id="live-blog" aria-label="This city's live blog" hidden>
+      <p class="eyebrow">The living log</p>
+      <h2 id="live-blog-heading">&nbsp;</h2>
+      <ul class="live-blog-list" id="live-blog-list"></ul>
+    </section>
+
+    <!-- Offers Panel: "Tonight in [City]", every vertical. See
+         glotemp-offers.js. Renders nothing at all when this city has no
+         active offers: no empty state, no gap. -->
+    <section class="glass-card offers-panel" id="offers-panel" aria-label="Tonight in this city" hidden></section>
 
     <section class="glass-card city-affiliate-row">
       <p class="eyebrow">Plan your visit</p>
@@ -86,8 +126,8 @@
     </section>
 
     <!-- Attention layer: Wikipedia pageviews + edit-activity, fetched
-         client-side with a 5s timeout -- see city-attention.js. Hidden by
-         default; only shown once real data actually loads, so a failed
+         client-side with a 5s timeout, see city-attention.js. Hidden by
+         default; only shown once data actually loads, so a failed
          or slow fetch never leaves a stuck spinner or an empty box. -->
     <section class="glass-card city-attention-section" id="city-attention-section" style="display:none;">
       <p class="eyebrow">Attention</p>
@@ -230,7 +270,6 @@
       <div class="vertical-body">
         <p class="vertical-description">Where should you experience culture and nightlife?</p>
         <div id="entertainment-content" class="vertical-content"></div>
-        <div id="entertainment-music"></div>
         
         <div id="entertainment-context" class="vertical-context"></div>
         
@@ -344,6 +383,7 @@
   <script src="/glotemp-reactions.js"></script>
   <script src="/glotemp-checkin.js"></script>
   <script src="/city-attention.js"></script>
+  <script src="/city-why.js"></script>
   <script src="/glotemp-tonight.js"></script>
   <script src="/glotemp-features.js"></script>
   <script src="/glotemp-listings.js" defer></script>
@@ -355,14 +395,21 @@
   <script src="/glotemp-personality.js" defer></script>
   <script src="/city-wiki.js" defer></script>
   <script src="/city-header-photo.js" defer></script>
+  <script src="/seed-observations.js" defer></script>
+  <script src="/social-proof.js" defer></script>
   <script src="/city-food-signature.js" defer></script>
   <script src="/city-vertical-signature.js" defer></script>
+  <script src="/glotemp-vertical-style.js" defer></script>
+  <script src="/glotemp-live-blog-data.js" defer></script>
+  <script src="/glotemp-live-blog-city.js" defer></script>
+  <script src="/glotemp-offers.js" defer></script>
+  <script src="/city-tier.js" defer></script>
   <script src="/city-worldbank.js" defer></script>
+  <script src="/city-campus.js" defer></script>
   <script src="/city-radio-curated.js" defer></script>
   <script src="/city-radio.js" defer></script>
   <script src="/city-venues.js" defer></script>
   <script src="/city-news.js" defer></script>
-  <script src="/glotemp-music.js" defer></script>
   <script src="/city-conditions.js" defer></script>
   <script src="/verticals-accordion.js" defer></script>
   <script src="/verticals-engine.js" defer></script>
@@ -480,6 +527,8 @@
 
       if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('Cairns', 'Australia');
       if (typeof GlotempAttention !== 'undefined') GlotempAttention.loadCityAttention('cairns');
+      if (typeof GlotempWhy !== 'undefined') GlotempWhy.loadCityWhy('cairns');
+      if (typeof GlotempCityTier !== 'undefined') GlotempCityTier.loadTier('cairns');
 
       // Synchronous and static, so it's always in the DOM before any of
       // the async context loaders below append their own findings --
@@ -499,6 +548,14 @@
       }
       if (typeof GlotempWorldBank !== 'undefined') {
         contextLoaders.push(...verticalSlugs.map(v => GlotempWorldBank.loadVerticalIndicator('AU', v, 'Australia')));
+      }
+      // Real universities near this city (Wikidata, see city-campus.js).
+      // Only Education has one of these; it appends into the same
+      // #education-context mount World Bank's literacy fact uses above,
+      // so both real sources sit together rather than competing for a
+      // second element.
+      if (typeof GlotempCampus !== 'undefined') {
+        contextLoaders.push(GlotempCampus.loadCampuses('cairns'));
       }
       await Promise.all(contextLoaders);
       if (typeof GlotempWiki !== 'undefined') {
@@ -526,12 +583,6 @@
         GlotempNews.loadNews(city.slug, 'news-content');
       }
 
-      // The music layer. Reads only stored data, so this makes no
-      // third-party call and cannot slow the page down.
-      if (typeof GlotempMusic !== 'undefined' && city) {
-        GlotempMusic.mount(city.slug, city.name);
-      }
-
       // Conditions line: same treatment as Radio -- a live free-API
       // source, not a Supabase reading.
       if (typeof GlotempConditions !== 'undefined' && city) {
@@ -556,7 +607,7 @@
         const contentEl = document.getElementById(`${vertical}-content`);
         try {
           const response = await fetch(
-            `${SUPABASE_URL}/rest/v1/readings?city_slug=eq.${citySlug}&vertical=eq.${vertical}&order=fetched_at.desc&limit=50`,
+            `${SUPABASE_URL}/rest/v1/readings?city_slug=eq.${citySlug}&vertical=eq.${vertical}&source=neq.seed&order=fetched_at.desc&limit=50`,
             {
               headers: {
                 'apikey': SUPABASE_ANON_KEY,
@@ -586,6 +637,12 @@
             const max = METRIC_MAX[reading.metric] || METRIC_MAX_FALLBACK;
             const shownValue = reading.value !== null && reading.value !== undefined ? formatInstrumentValue(reading.value) : null;
             const confidenceNote = typeof reading.confidence === 'number' ? `${Math.round(reading.confidence * 100)}% confidence` : '';
+            // Quiet, secondary confidence readout -- the reading.confidence
+            // value already exists on every row (readings.confidence in the
+            // DB) and was previously only surfaced as a hover title. Never
+            // invented: a row with no confidence value shows "Forming"
+            // rather than guessing a number.
+            const confidencePct = typeof reading.confidence === 'number' ? `${Math.round(reading.confidence * 100)}%` : 'Forming';
             const ariaLabel = `${reading.label || 'Reading'}: ${shownValue !== null ? shownValue : 'n/a'}`;
             const valueClass = shownValue !== null && shownValue.length > 3 ? 'instrument-value instrument-value-compact' : 'instrument-value';
             return `
@@ -595,6 +652,7 @@
                 ${shownValue !== null ? `<span class="${valueClass}">${shownValue}</span>` : ''}
               </div>
               <span class="instrument-label">${reading.label || ''}</span>
+              <span class="instrument-confidence">${confidencePct}</span>
               <time class="instrument-time" datetime="${reading.fetched_at}">${verticals.getTimeAgo(new Date(reading.fetched_at))}</time>
             </div>
           `;
@@ -689,10 +747,10 @@
               },
               body: JSON.stringify({ city_slug: citySlug, email }),
             });
-            statusEl.textContent = "You're on the list -- we'll notify " + email + '.';
+            statusEl.textContent = "You're on the list. We'll notify " + email + '.';
             emailInput.value = '';
           } catch (e) {
-            statusEl.textContent = "Saved locally -- we'll sync this once you're back online.";
+            statusEl.textContent = "Saved locally. We'll sync this once you're back online.";
           }
           submitBtn.disabled = false;
         });

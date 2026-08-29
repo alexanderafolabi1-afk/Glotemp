@@ -221,16 +221,19 @@
       if (els.secondHand) els.secondHand.style.transform = `rotate(${(secIntoMinute / 60) * 360}deg)`;
       return;
     }
+    // Second animation in each shorthand is a very subtle, slow opacity
+    // breathe (see .hero-hand-pulse in styles.css) -- purely decorative,
+    // layered onto the same rotation without changing the clock logic.
     if (els.secondHand) {
-      els.secondHand.style.animation = 'hero-hand-spin 60s linear infinite';
+      els.secondHand.style.animation = 'hero-hand-spin 60s linear infinite, hero-hand-pulse 5s ease-in-out infinite';
       els.secondHand.style.animationDelay = `-${secIntoMinute}s`;
     }
     if (els.minuteHand) {
-      els.minuteHand.style.animation = 'hero-hand-spin 3600s linear infinite';
+      els.minuteHand.style.animation = 'hero-hand-spin 3600s linear infinite, hero-hand-pulse 5s ease-in-out infinite';
       els.minuteHand.style.animationDelay = `-${secIntoHour}s`;
     }
     if (els.hourHand) {
-      els.hourHand.style.animation = 'hero-hand-spin 43200s linear infinite';
+      els.hourHand.style.animation = 'hero-hand-spin 43200s linear infinite, hero-hand-pulse 5s ease-in-out infinite';
       els.hourHand.style.animationDelay = `-${secIntoTwelveHours}s`;
     }
   }
@@ -621,7 +624,7 @@
     const band = window.GlotempCore ? GlotempCore.moodToBand(city.mood).band : 'equilibrium';
     const lines = SPARK_LINES[band] || SPARK_LINES.equilibrium;
     const line = lines[Math.floor(Math.random() * lines.length)];
-    el.textContent = `${city.name} — ${line}`;
+    el.textContent = `${city.name}: ${line}`;
     el.classList.add('is-visible');
     clearTimeout(el._sparkTimer);
     el._sparkTimer = setTimeout(() => el.classList.remove('is-visible'), 5000);
