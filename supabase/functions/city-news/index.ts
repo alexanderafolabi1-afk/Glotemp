@@ -404,7 +404,13 @@ interface StoredItem {
   url: string;
   domain: string;
   language: string;
+  // Null unless the feed itself supplied a publish date. Never the run
+  // time, never GDELT's crawl time -- see publishedAtFromFeed below.
   published_at: string | null;
+  // NOT listed here on purpose: fetched_at. The column defaults to now()
+  // in the database and this function must never send a value for it,
+  // so that "when did we get this" is recorded by the thing doing the
+  // getting rather than by whatever clock the caller happened to hold.
   // 'local'  -- the city's own outlets and stories naming the city.
   // 'global' -- wider stories reaching that city, found by querying the
   //             city's COUNTRY rather than the city. This is a second
@@ -428,11 +434,50 @@ function json(body: unknown, status = 200) {
 }
 
 // GDELT sends "20260816T101500Z". new Date() cannot parse that directly.
+// WHY published_at IS NOW ALWAYS NULL FOR GDELT ROWS
+//
+// This used to write GDELT's `seendate` into published_at, and that is
+// the bug behind "every row lands on an exact quarter hour". seendate is
+// not a publication date: it is the moment GDELT's own crawler first saw
+// the article, and GDELT crawls in fifteen-minute windows, so every
+// value it returns is quantised to :00, :15, :30 or :45. Storing it as a
+// publication date made freshness unverifiable -- a reader, and this
+// project's own admin, could not tell a story published this morning
+// from one GDELT happened to notice this morning.
+//
+// GDELT's DOC 2.0 ArtList response has NO publication-date field at all.
+// Its documented columns are url, url_mobile, title, seendate,
+// socialimage, domain, language and sourcecountry. There is nothing here
+// to put in published_at, so nothing goes in it: null is the honest
+// value, and city_news.fetched_at (defaulted by the database, never set
+// by this function) carries recency instead. Every consumer sorts and
+// filters on coalesce(published_at, fetched_at).
+//
+// This is kept, unused by the insert path, because it is still the right
+// way to read a seendate should this function ever need one for
+// diagnostics -- and so that the next person to reach for it finds this
+// comment rather than reinventing the bug.
 function parseSeendate(s?: string): string | null {
   const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/.exec(s ?? "");
   if (!m) return null;
   const [, y, mo, d, h, mi, se] = m;
   return new Date(Date.UTC(+y, +mo - 1, +d, +h, +mi, +se)).toISOString();
+}
+
+// The feed's own publish field, and only that. GDELT ArtList has none,
+// so this returns null for every GDELT article -- which is the point.
+// A feed that does carry one (an RSS pubDate, a JSON published field)
+// can be added here, and only here, without any caller changing.
+function publishedAtFromFeed(a: GdeltArticle): string | null {
+  const raw = (a as Record<string, unknown>).publishdate
+    ?? (a as Record<string, unknown>).published
+    ?? (a as Record<string, unknown>).pubDate;
+  if (typeof raw !== "string" || !raw.trim()) return null;
+  const t = Date.parse(raw);
+  if (Number.isNaN(t)) return null;
+  // A publish date in the future is a broken feed, not a scoop.
+  if (t > Date.now() + 6 * 3600_000) return null;
+  return new Date(t).toISOString();
 }
 
 function sleep(ms: number): Promise<void> {
@@ -524,7 +569,7 @@ function distinct(
       url: a.url,
       domain: a.domain ?? "",
       language: a.language ?? "",
-      published_at: parseSeendate(a.seendate),
+      published_at: publishedAtFromFeed(a),
       scope,
     });
     if (out.length >= limit) break;
@@ -532,11 +577,30 @@ function distinct(
   return out;
 }
 
+// One "feed" is one GDELT query. Each city attempts two: local (the
+// city name) and global (its country). Both are counted, and a failure
+// of either is recorded with the reason rather than swallowed -- the
+// symptom that made this necessary was six cities out of 300 producing
+// rows while the other 294 failed silently and the run still reported
+// success.
+interface CityResult {
+  slug: string;
+  count: number;
+  feedsAttempted: number;
+  feedsSucceeded: number;
+  errors: string[];
+  error: string | null;
+}
+
 async function refreshCity(
   supabase: ReturnType<typeof createClient>,
   city: CityRef,
-): Promise<{ slug: string; count: number; error: string | null }> {
+): Promise<CityResult> {
+  const errors: string[] = [];
+  let feedsAttempted = 0;
+  let feedsSucceeded = 0;
   try {
+    feedsAttempted++;
     const articles = await fetchCityArticles(city.name);
 
     // null means GDELT did not actually answer (rate-limited, timed out,
@@ -549,8 +613,15 @@ async function refreshCity(
     // already stored untouched and try again next time this city's turn
     // comes up in the rotation.
     if (articles === null) {
-      return { slug: city.slug, count: 0, error: "gdelt_unavailable" };
+      const msg = `${city.slug}/local: gdelt_unavailable`;
+      console.error(`refreshCity ${msg}`);
+      errors.push(msg);
+      return {
+        slug: city.slug, count: 0, feedsAttempted, feedsSucceeded,
+        errors, error: "gdelt_unavailable",
+      };
     }
+    feedsSucceeded++;
 
     // Local first, and the local pass owns the dedupe sets so a wider
     // story that a local outlet already ran cannot appear twice.
@@ -564,20 +635,24 @@ async function refreshCity(
     // news alone is a complete section, so this never aborts the run and
     // never blocks the store.
     if (city.country) {
+      feedsAttempted++;
       const wider = await fetchCityArticles(city.country);
       if (wider !== null) {
+        feedsSucceeded++;
         items.push(...distinct(city.slug, wider, "global", GLOBAL_LIMIT, seenDomain, seenTitle));
       } else {
-        console.error(`refreshCity ${city.slug}: global pass unavailable (country=${city.country})`);
+        const msg = `${city.slug}/global(${city.country}): gdelt_unavailable`;
+        console.error(`refreshCity ${msg}`);
+        errors.push(msg);
       }
     }
 
-    // Replace strategy: a city that has dropped out of the 48-hour window
-    // since the last run should end up with nothing stored, which is
-    // exactly what makes the client hide the section rather than show a
-    // stale headline. Reaching here means GDELT did answer, so an empty
-    // items[] here is a genuine "nothing in the last 48 hours," not a
-    // failed call -- the one case this delete is actually meant for.
+    // Replace strategy: a city that has dropped out of the 72-hour
+    // window since the last run should end up with nothing stored, which
+    // is what makes the client hide the section rather than show a stale
+    // headline. Reaching here means GDELT did answer, so an empty items[]
+    // is a genuine "nothing in the last 72 hours", not a failed call --
+    // the one case this delete is actually meant for.
     const del = await supabase.from("city_news").delete().eq("city_slug", city.slug);
     if (del.error) throw new Error(`delete: ${del.error.message}`);
 
@@ -586,11 +661,18 @@ async function refreshCity(
       if (ins.error) throw new Error(`insert: ${ins.error.message}`);
     }
 
-    return { slug: city.slug, count: items.length, error: null };
+    return {
+      slug: city.slug, count: items.length, feedsAttempted, feedsSucceeded,
+      errors, error: null,
+    };
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     console.error(`refreshCity ${city.slug}: ${message}`);
-    return { slug: city.slug, count: 0, error: message };
+    errors.push(`${city.slug}: ${message}`);
+    return {
+      slug: city.slug, count: 0, feedsAttempted, feedsSucceeded,
+      errors, error: message,
+    };
   }
 }
 
@@ -624,6 +706,42 @@ Deno.serve(async (req: Request) => {
   const explicit = (url.searchParams.get("cities") ?? "").trim();
   let lockHeld = false;
 
+  // The run ledger. Opened before any work so that a run which dies
+  // early still leaves a row with a null finished_at -- which is what
+  // makes "the job stopped running" visible in city_news_health instead
+  // of silently looking like "no news today".
+  let runId: number | string | null = null;
+  const { data: runRow, error: runErr } = await supabase
+    .from("city_news_runs")
+    .insert({})
+    .select("id")
+    .single();
+  if (runErr) {
+    // Not fatal: a broken ledger must not stop the news being fetched.
+    // It is logged loudly because an unrecorded run is exactly the blind
+    // spot this table was added to close.
+    console.error(`city-news: could not open run row: ${runErr.message}`);
+  } else {
+    runId = (runRow as { id: number | string }).id;
+  }
+
+  // Closes the ledger exactly once, whatever path the handler leaves by.
+  let runClosed = false;
+  async function closeRun(fields: {
+    feeds_attempted: number;
+    feeds_succeeded: number;
+    rows_inserted: number;
+    error: string | null;
+  }) {
+    if (runId === null || runClosed) return;
+    runClosed = true;
+    const { error: closeErr } = await supabase
+      .from("city_news_runs")
+      .update({ finished_at: new Date().toISOString(), ...fields })
+      .eq("id", runId);
+    if (closeErr) console.error(`city-news: could not close run ${runId}: ${closeErr.message}`);
+  }
+
   try {
     let cities: CityRef[];
     let mode: string;
@@ -649,7 +767,8 @@ Deno.serve(async (req: Request) => {
         .select("batch_index");
       if (claimErr) throw new Error(`lock claim: ${claimErr.message}`);
       if (!claimed || claimed.length === 0) {
-        return json({ skipped: "locked_by_another_run" });
+        await closeRun({ feeds_attempted: 0, feeds_succeeded: 0, rows_inserted: 0, error: "locked_by_another_run" });
+        return json({ skipped: "locked_by_another_run", rows_inserted: 0 }, 409);
       }
       lockHeld = true;
 
@@ -680,7 +799,8 @@ Deno.serve(async (req: Request) => {
         .select("batch_index");
       if (claimErr) throw new Error(`lock claim: ${claimErr.message}`);
       if (!claimed || claimed.length === 0) {
-        return json({ skipped: "locked_by_another_run" });
+        await closeRun({ feeds_attempted: 0, feeds_succeeded: 0, rows_inserted: 0, error: "locked_by_another_run" });
+        return json({ skipped: "locked_by_another_run", rows_inserted: 0 }, 409);
       }
       lockHeld = true;
 
@@ -690,27 +810,69 @@ Deno.serve(async (req: Request) => {
     }
 
     if (!cities.length) {
-      return json({ mode, error: "no_matching_cities" }, 400);
+      await closeRun({ feeds_attempted: 0, feeds_succeeded: 0, rows_inserted: 0, error: "no_matching_cities" });
+      return json({ mode, rows_inserted: 0, error: "no_matching_cities" }, 400);
     }
 
     const results = await refreshBatch(supabase, cities);
     const failures = results.filter((r) => r.error);
     const succeeded = results.length - failures.length;
 
-    if (results.length > 0 && succeeded === 0) {
-      // Every city in this batch failed -- a systemic problem (GDELT
-      // fully unreachable, or the database rejecting every write), not
-      // one flaky source. Log it plainly and fail the request rather than
-      // reporting 200 with nothing actually refreshed.
-      console.error(`city-news: entire batch failed (${mode}):`, JSON.stringify(failures));
-      return json({ mode, results, error: "batch_failed" }, 502);
+    // The actual number of rows written, summed from what each city
+    // stored. This is what the response reports and what the ledger
+    // records -- not {success: true}, which is what let 294 cities fail
+    // silently while the run looked healthy.
+    const rowsInserted = results.reduce((n, r) => n + r.count, 0);
+    const feedsAttempted = results.reduce((n, r) => n + r.feedsAttempted, 0);
+    const feedsSucceeded = results.reduce((n, r) => n + r.feedsSucceeded, 0);
+
+    // Every per-feed failure, kept rather than swallowed. Truncated so
+    // one systemic outage cannot write a megabyte into the ledger.
+    const feedErrors = results.flatMap((r) => r.errors);
+    const errorText = feedErrors.length ? feedErrors.join("; ").slice(0, 4000) : null;
+
+    // Zero rows across every feed is a failure, whether or not any
+    // individual city "succeeded" by returning an empty list: a run that
+    // stores nothing has not refreshed anything, and the cron must
+    // record that rather than count it as a healthy run.
+    if (rowsInserted === 0) {
+      const detail = errorText ?? "all feeds returned zero rows";
+      console.error(`city-news: no rows inserted (${mode}): ${detail}`);
+      await closeRun({
+        feeds_attempted: feedsAttempted,
+        feeds_succeeded: feedsSucceeded,
+        rows_inserted: 0,
+        error: detail,
+      });
+      return json({
+        mode, rows_inserted: 0,
+        feeds_attempted: feedsAttempted, feeds_succeeded: feedsSucceeded,
+        refreshed: succeeded, failed: failures.length,
+        results, error: "no_rows_inserted",
+      }, 502);
     }
 
-    return json({ mode, refreshed: succeeded, failed: failures.length, results });
+    await closeRun({
+      feeds_attempted: feedsAttempted,
+      feeds_succeeded: feedsSucceeded,
+      rows_inserted: rowsInserted,
+      error: errorText,
+    });
+
+    return json({
+      mode,
+      rows_inserted: rowsInserted,
+      feeds_attempted: feedsAttempted,
+      feeds_succeeded: feedsSucceeded,
+      refreshed: succeeded,
+      failed: failures.length,
+      results,
+    });
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     console.error(`city-news: ${message}`);
-    return json({ error: message }, 500);
+    await closeRun({ feeds_attempted: 0, feeds_succeeded: 0, rows_inserted: 0, error: message });
+    return json({ rows_inserted: 0, error: message }, 500);
   } finally {
     if (lockHeld) {
       const { error: releaseErr } = await supabase

@@ -65,14 +65,25 @@
     var ctl = new AbortController();
     var timer = setTimeout(function () { ctl.abort(); }, FETCH_TIMEOUT_MS);
     try {
-      // published_at must exist AND be inside the window -- an item with
-      // no date cannot be shown to be fresh, so it is not fetched at all
-      // rather than rendered without one.
+      // Freshness is coalesce(published_at, fetched_at), not published_at
+      // alone. GDELT's ArtList carries no publication date at all, so
+      // published_at is null on every row it produces -- filtering on it
+      // would hide the entire section. fetched_at (set by the database
+      // default when the row was stored) is the fallback, and the same
+      // expression orders the list.
+      //
+      // PostgREST cannot filter on an expression, so the window is
+      // applied as "published_at is inside it OR (published_at is null
+      // AND fetched_at is inside it)", which is coalesce written out.
+      // fresh() below re-applies exactly the same rule to the rows that
+      // come back, so a query change can never silently widen it.
       var since = new Date(Date.now() - MAX_AGE_HOURS * 3600000).toISOString();
+      var window = 'or=(published_at.gte.' + since +
+        ',and(published_at.is.null,fetched_at.gte.' + since + '))';
       var qs = '?city_slug=eq.' + encodeURIComponent(citySlug) +
-        '&select=title,url,domain,published_at,scope' +
-        '&published_at=gte.' + encodeURIComponent(since) +
-        '&order=published_at.desc.nullslast' +
+        '&select=title,url,domain,published_at,fetched_at,scope' +
+        '&' + window +
+        '&order=published_at.desc.nullslast&order=fetched_at.desc.nullslast' +
         '&limit=' + encodeURIComponent(limit || SHOW);
       var resp = await fetch(SUPABASE_URL + '/rest/v1/city_news' + qs, {
         signal: ctl.signal,
@@ -134,18 +145,34 @@
   // The query above filters too; this catches a row whose date is in the
   // future (a mis-parsed seendate) and anything a changed query might
   // one day let through.
+  // coalesce(published_at, fetched_at) -- the one definition of "when",
+  // used for filtering, sorting and display, so those three can never
+  // disagree about the same row.
+  function whenOf(r) {
+    if (!r) return NaN;
+    var p = Date.parse(r.published_at);
+    if (!isNaN(p)) return p;
+    return Date.parse(r.fetched_at);
+  }
+
   function fresh(rows) {
     var floor = Date.now() - MAX_AGE_HOURS * 3600000;
     var ceiling = Date.now() + 3600000;   // an hour of clock skew
     return (rows || []).filter(function (r) {
-      var t = Date.parse(r && r.published_at);
+      var t = whenOf(r);
       return !isNaN(t) && t >= floor && t <= ceiling;
-    });
+    }).sort(function (a, b) { return whenOf(b) - whenOf(a); });
   }
 
   function itemHTML(a) {
-    var when = ago(a.published_at);
-    var date = pubDate(a.published_at);
+    var iso = !isNaN(Date.parse(a.published_at)) ? a.published_at : a.fetched_at;
+    // Labelled honestly. GDELT gives no publication date, so for those
+    // rows this is when Glotemp picked the story up -- saying "published"
+    // over a crawl timestamp is exactly the claim that made freshness
+    // unverifiable in the first place.
+    var isPublished = !isNaN(Date.parse(a.published_at));
+    var when = ago(iso);
+    var date = pubDate(iso);
     return '<li class="news-item">' +
       '<a class="news-title" href="' + esc(a.url) + '" target="_blank" rel="noopener">' +
         esc(a.title) +
@@ -154,8 +181,9 @@
         '<span class="news-source">' + esc(a.domain || '') + '</span>' +
         (a.scope === 'global'
           ? '<span class="news-scope">Wider</span>' : '') +
-        (date ? '<time class="news-date" datetime="' + esc(a.published_at) + '">' +
-          esc(date) + '</time>' : '') +
+        (date ? '<time class="news-date" datetime="' + esc(iso) + '" title="' +
+          (isPublished ? 'Published' : 'Picked up by Glotemp') + '">' +
+          (isPublished ? '' : 'Filed ') + esc(date) + '</time>' : '') +
         (when ? '<span class="news-when">' + esc(when) + '</span>' : '') +
       '</p>' +
     '</li>';

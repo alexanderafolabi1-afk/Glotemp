@@ -455,3 +455,45 @@
 @media (min-width: 600px) and (max-width: 900px) {
   .adm-page .adm-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+
+/* ---- news ingestion health ----
+   The panel exists to be glanced at, so the verdict is a sentence and a
+   colour, not a number the reader has to interpret. Red means one of the
+   two conditions the brief names: last run over 26 hours old, or a run
+   that stored zero rows. */
+.adm-news-verdict {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 var(--s3);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--adm-ink, #E9DFCD);
+}
+
+.adm-news-dot {
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.adm-news-health.is-ok .adm-news-dot {
+  background: #6FCF97;
+  box-shadow: 0 0 8px rgba(111, 207, 151, 0.55);
+}
+
+/* Not colour alone: the failing state also gets a rule down its left
+   edge and the word "Failing", so it still reads on a mono display and
+   for anyone who cannot separate the two hues. */
+.adm-news-health.is-bad {
+  border-left: 2px solid #E4736B;
+  padding-left: 0.85rem;
+}
+.adm-news-health.is-bad .adm-news-dot {
+  background: #E4736B;
+  box-shadow: 0 0 8px rgba(228, 115, 107, 0.6);
+}
+.adm-news-health.is-bad .adm-news-verdict { color: #F0A9A3; }
+
+.adm-alert { color: #F0A9A3; }

@@ -66,7 +66,7 @@
       if (!C) { root.innerHTML = '<p class="adm-eyebrow">Admin</p><h1 class="adm-title">Could not load that.</h1>'; return; }
 
       function renderOverview(overview, apiOverview, traffic, trafficDaily, signupsDaily, byCity,
-                               topPages, topRefs, topCountries, topDevices) {
+                               topPages, topRefs, topCountries, topDevices, newsHealth) {
         var esc = C.esc, ago = C.ago, cityName = C.cityName, panel = C.panel;
         var m = {};
         (overview || []).forEach(function (r) { m[r.metric] = r.value; });
@@ -79,6 +79,72 @@
 
         var Ch = window.GlotempAdminCharts;
         function fig(v, label, opts) { return Ch.stat(v, label, opts || {}); }
+
+        // ---- news ingestion health ----
+        // Reads the city_news_health view. That view was created outside
+        // this repository, so its exact column names are not knowable
+        // from here: every field is looked up through a list of
+        // plausible names and renders "unknown" rather than crashing or
+        // inventing a number if none of them is present. If a name is
+        // wrong, the panel says so visibly instead of showing a
+        // confident zero.
+        function pick(row, names) {
+          for (var i = 0; i < names.length; i++) {
+            if (row && row[names[i]] !== undefined && row[names[i]] !== null) return row[names[i]];
+          }
+          return null;
+        }
+
+        function newsHealthPanel(rows) {
+          var row = (rows && rows[0]) || null;
+          if (!row) {
+            return panel('p-news', 'News ingestion', 'city_news_health',
+              '<p class="adm-copy adm-alert">No health row returned. Either no run has been ' +
+              'recorded yet, or the city_news_health view is unreadable from here.</p>');
+          }
+
+          var lastRun = pick(row, ['last_run', 'last_run_at', 'last_finished_at', 'finished_at', 'started_at']);
+          var rowsLast = pick(row, ['rows_last_run', 'last_rows_inserted', 'rows_inserted']);
+          var cities = pick(row, ['cities_covered', 'city_count', 'cities']);
+          var newest = pick(row, ['newest_published', 'newest_published_at', 'max_published_at']);
+
+          var lastMs = lastRun ? Date.parse(lastRun) : NaN;
+          var ageH = isNaN(lastMs) ? null : (Date.now() - lastMs) / 3600000;
+
+          // Red on either condition the brief names: a run older than 26
+          // hours (a daily job that has missed its slot with two hours of
+          // slack), or a run that stored nothing.
+          var staleRun = ageH === null || ageH > 26;
+          var noRows = rowsLast === null || Number(rowsLast) === 0;
+          var bad = staleRun || noRows;
+
+          var why = [];
+          if (ageH === null) why.push('no run timestamp');
+          else if (ageH > 26) why.push('last run ' + Math.floor(ageH) + 'h ago, over the 26h limit');
+          if (rowsLast === null) why.push('no row count');
+          else if (Number(rowsLast) === 0) why.push('last run stored 0 rows');
+
+          function val(v, suffix) {
+            if (v === null || v === undefined) return 'unknown';
+            return esc(String(v)) + (suffix || '');
+          }
+
+          return panel('p-news',
+            'News ingestion',
+            bad ? 'needs attention' : 'healthy',
+            '<div class="adm-news-health' + (bad ? ' is-bad' : ' is-ok') + '">' +
+              '<p class="adm-news-verdict">' +
+                '<span class="adm-news-dot" aria-hidden="true"></span>' +
+                (bad ? 'Failing: ' + esc(why.join('; ')) : 'Running normally') +
+              '</p>' +
+              '<div class="adm-grid">' +
+                fig(lastRun ? ago(lastRun) : 'unknown', 'last run', { key: true }) +
+                fig(val(rowsLast), 'rows last run', { key: true }) +
+                fig(val(cities), 'cities covered') +
+                fig(newest ? ago(newest) : 'none', 'newest published') +
+              '</div>' +
+            '</div>');
+        }
         function ranked(list, opts) {
           return Ch.ranked((list || []).map(function (r) { return { label: r.label, count: r.count }; }), opts);
         }
@@ -115,7 +181,8 @@
               '<p class="adm-sub">Top referrers</p>' + ranked(topRefs, { empty: 'No referrers recorded yet.' }) +
               '<p class="adm-sub">Top countries</p>' + ranked(topCountries, { empty: 'No countries recorded yet.' }) +
               '<p class="adm-sub">Devices</p>' + ranked(topDevices, { limit: 3, empty: 'No devices recorded yet.' }) +
-              '<p class="adm-sub">Check-ins by city</p>' + rows)
+              '<p class="adm-sub">Check-ins by city</p>' + rows) +
+            newsHealthPanel(newsHealth)
           );
 
         C.wireRange(root, function (d) { days = d; load(root); });
@@ -135,6 +202,10 @@
           C.rpc('admin_traffic_top', { dimension: 'referrer', days: days, max_rows: 8 }).catch(none),
           C.rpc('admin_traffic_top', { dimension: 'country', days: days, max_rows: 8 }).catch(none),
           C.rpc('admin_traffic_top', { dimension: 'device', days: days, max_rows: 3 }).catch(none),
+          // The health view, read directly rather than through an RPC:
+          // it holds no user data, and a failure here must not take the
+          // rest of the dashboard down with it.
+          C.restTable('GET', 'city_news_health?select=*&limit=1').catch(none),
         ]);
         renderOverview.apply(null, results);
       }
