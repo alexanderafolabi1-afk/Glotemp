@@ -154,3 +154,11 @@ sender_name = "Glotemp"
 # and a display mode, writes a single row, and returns no data at all.
 [functions.collect]
 verify_jwt = false
+
+# Part 3, Global Audio-Stream Integration. Called directly by every
+# visitor's browser (city-soundscape.js), same reason as city-news:
+# no end-user JWT to present. The real Freesound.org API key it needs
+# lives server-side in vault (get_freesound_api_key()), never in this
+# config or in client JS.
+[functions.freesound-search]
+verify_jwt = false

@@ -294,6 +294,8 @@ function generateCityPage(city) {
       if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('${city.name}', '${city.country}');
       if (typeof GlotempAttention !== 'undefined') GlotempAttention.loadCityAttention('${city.slug}');
       if (typeof GlotempWhy !== 'undefined') GlotempWhy.loadCityWhy('${city.slug}');
+      if (typeof GlotempArchive !== 'undefined') GlotempArchive.loadCityArchive('${city.slug}');
+      if (typeof GlotempDrops !== 'undefined') GlotempDrops.loadDrops('${city.slug}');
       if (typeof GlotempCityTier !== 'undefined') GlotempCityTier.loadTier('${city.slug}');
 
       // Synchronous and static, so it's always in the DOM before any of
@@ -333,6 +335,12 @@ function generateCityPage(city) {
       // out of verticalSlugs above and loaded separately here.
       if (typeof GlotempRadio !== 'undefined' && city) {
         GlotempRadio.loadRadio(city.name, city.lat, city.lon, city.country, city.slug);
+      }
+
+      // Three additive real audio sources alongside Radio above -- see
+      // city-soundscape.js. Does not read or write anything Radio uses.
+      if (typeof GlotempSoundscape !== 'undefined' && city) {
+        GlotempSoundscape.loadSoundscape(city.slug, city.name, city.lat, city.lon);
       }
 
       // Real named places from OpenStreetMap. Same treatment as Radio:

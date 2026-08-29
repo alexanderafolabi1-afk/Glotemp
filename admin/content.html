@@ -64,7 +64,14 @@
       // pattern for the same kind of decision.
       var CITY_APP_STATUSES = ['pending', 'approved', 'rejected'];
 
-      function renderContent(xPosts, cityApplications) {
+      // Same shape again for Part 4, Hyper-Local Creator Drops: public
+      // submits at /creators, admin reviews here. Approving is still
+      // only a review decision -- a real creator_drops row (the one
+      // actually shown on a city page) is a separate manual step, same
+      // as approving a city suggestion never auto-adds the city.
+      var CREATOR_DROP_STATUSES = ['pending', 'approved', 'rejected'];
+
+      function renderContent(xPosts, cityApplications, creatorDrops) {
         var esc = C.esc, panel = C.panel;
 
         var Ch = window.GlotempAdminCharts;
@@ -103,6 +110,29 @@
             }).join('')
           : '<p class="adm-copy">No suggestions yet.</p>';
 
+        var drops = creatorDrops || [];
+        function dropCount(st) { return drops.filter(function (d) { return d.status === st; }).length; }
+        var dropRows = drops.length
+          ? drops.map(function (d) {
+              var meta = esc(d.content_type) + ' &middot; ' + esc(d.contact_email) +
+                (d.proposed_starts_at ? ' &middot; wants ' + esc(d.proposed_starts_at) + (d.proposed_ends_at ? '–' + esc(d.proposed_ends_at) : '') : '') +
+                (d.note ? ' &middot; ' + esc(d.note) : '');
+              return '<div class="adm-row adm-city-app-row">' +
+                '<span class="adm-row-city">' + esc(d.creator_name) + ' &rarr; ' + esc(d.city_as_entered) +
+                  '<span class="adm-key-prefix">' +
+                    '<a href="' + esc(d.creator_url) + '" target="_blank" rel="noopener noreferrer">creator link</a> &middot; ' +
+                    '<a href="' + esc(d.content_url) + '" target="_blank" rel="noopener noreferrer">the work</a> &middot; ' + meta +
+                  '</span>' +
+                '</span>' +
+                '<select class="adm-input adm-drop-status" data-drop-id="' + esc(d.id) + '" data-prev="' + esc(d.status) + '" style="width:auto;max-width:11rem;flex:0 0 auto">' +
+                  CREATOR_DROP_STATUSES.map(function (s) {
+                    return '<option value="' + esc(s) + '"' + (s === d.status ? ' selected' : '') + '>' + esc(s) + '</option>';
+                  }).join('') +
+                '</select>' +
+              '</div>';
+            }).join('')
+          : '<p class="adm-copy">No submissions yet.</p>';
+
         root.innerHTML =
           C.stateHTML('Admin', 'Content',
             panel('p-x-content', 'X content', 'manual, copy-paste only -- no posting API',
@@ -118,7 +148,15 @@
                 fig(cityAppCount('approved').toLocaleString(), 'approved') +
                 fig(cityAppCount('rejected').toLocaleString(), 'rejected') +
               '</div>' +
-              cityAppRows)
+              cityAppRows) +
+            panel('p-creator-drops', 'Creator drop submissions', 'real creator work proposed for a real city + window -- approving is a decision only; add the live creator_drops row by hand after',
+              '<div class="adm-grid">' +
+                fig(drops.length.toLocaleString(), 'total') +
+                fig(dropCount('pending').toLocaleString(), 'pending', { key: true }) +
+                fig(dropCount('approved').toLocaleString(), 'approved') +
+                fig(dropCount('rejected').toLocaleString(), 'rejected') +
+              '</div>' +
+              dropRows)
           );
 
         C.wirePanelToggles(root);
@@ -156,6 +194,26 @@
             }
           });
         });
+
+        root.querySelectorAll('.adm-drop-status').forEach(function (sel) {
+          sel.addEventListener('change', async function () {
+            var id = sel.getAttribute('data-drop-id');
+            var prev = sel.getAttribute('data-prev') || sel.value;
+            sel.disabled = true;
+            try {
+              await C.restTable('PATCH', 'creator_drop_submissions?id=eq.' + encodeURIComponent(id), { status: sel.value });
+              sel.setAttribute('data-prev', sel.value);
+              if (window.GlotempAdminSpace) {
+                var tone = sel.value === 'approved' ? 'gold' : sel.value === 'rejected' ? 'teal' : 'violet';
+                GlotempAdminSpace.pulseRow(sel.closest('.adm-row'), tone);
+              }
+            } catch (err) {
+              sel.value = prev;
+            } finally {
+              sel.disabled = false;
+            }
+          });
+        });
       }
 
       async function load(rootEl) {
@@ -163,6 +221,7 @@
         var results = await Promise.all([
           C.restTable('GET', 'x_content_calendar?select=day_number,slot_number,scheduled_time,theme,tweet_text,image_note&order=day_number.asc,slot_number.asc').catch(none),
           C.restTable('GET', 'city_applications?select=id,city_name,country,contact_email,note,status,created_at&order=created_at.desc').catch(none),
+          C.restTable('GET', 'creator_drop_submissions?select=id,creator_name,creator_url,city_as_entered,content_type,content_url,proposed_starts_at,proposed_ends_at,contact_email,note,status,created_at&order=created_at.desc').catch(none),
         ]);
         renderContent.apply(null, results);
       }

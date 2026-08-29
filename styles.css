@@ -5371,6 +5371,190 @@ a:hover .city-landmark-photo,
 }
 .context-fact strong { color: var(--ivory); }
 
+/* ===== Time-Traveler Archive (city-archive.js) =====
+   A real per-day scrubber over city_signal_snapshots. Section itself
+   stays hidden (see markup) until at least one real snapshot exists. */
+.city-archive-section .archive-range {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ash);
+  margin: -0.5rem 0 1rem;
+}
+.archive-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+.archive-step-btn {
+  flex: 0 0 auto;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  border: 1px solid var(--hairline);
+  background: transparent;
+  color: var(--ivory);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 200ms ease, color 200ms ease;
+}
+.archive-step-btn:hover:not(:disabled) {
+  border-color: var(--brass);
+  color: var(--brass);
+}
+.archive-step-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.archive-slider {
+  flex: 1 1 auto;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--hairline);
+  outline: none;
+}
+.archive-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--brass);
+  border: 2px solid var(--ivory);
+  cursor: pointer;
+}
+.archive-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--brass);
+  border: 2px solid var(--ivory);
+  cursor: pointer;
+}
+.archive-slider:disabled::-webkit-slider-thumb { background: var(--ash); }
+.archive-slider:disabled::-moz-range-thumb { background: var(--ash); }
+.archive-date {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  color: var(--ivory);
+  margin: 1rem 0 0.6rem;
+  text-align: center;
+}
+.archive-panel {
+  min-height: 3rem;
+}
+.archive-stat {
+  color: var(--sand);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  margin: 0 0 0.4rem;
+}
+.archive-stat strong { color: var(--ivory); }
+.archive-moods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+.archive-mood-chip {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--ivory);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+}
+.archive-deeper-list {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  color: var(--sand);
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+.archive-deeper-list strong { color: var(--ivory); }
+.archive-source { color: var(--ash); }
+.archive-empty {
+  color: var(--ash);
+  font-size: 0.88rem;
+  font-style: italic;
+}
+
+/* ===== Soundscape (city-soundscape.js) =====
+   Section itself stays hidden (see markup) until at least one of the
+   three real sources actually resolves for this city. */
+.city-soundscape-section .soundscape-block + .soundscape-block {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed var(--hairline);
+}
+.mixcloud-embed {
+  border-radius: 6px;
+  display: block;
+}
+.soundscape-more-list {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  font-size: 0.85rem;
+}
+.soundscape-more-list li { margin: 0.3rem 0; }
+.soundscape-more-list a { color: var(--sand); }
+.soundscape-more-list a:hover { color: var(--brass); }
+.soundscape-clip-name {
+  color: var(--ivory);
+  font-size: 0.95rem;
+  margin: 0.4rem 0 0.6rem;
+}
+.soundscape-audio {
+  width: 100%;
+  max-width: 420px;
+  height: 36px;
+}
+.soundscape-tags {
+  color: var(--ash);
+  font-size: 0.8rem;
+  margin: 0.5rem 0 0;
+}
+.soundscape-credit {
+  color: var(--ash);
+  font-size: 0.8rem;
+  margin: 0.3rem 0 0;
+}
+.soundscape-procedural-toggle {
+  margin-top: 0.5rem;
+}
+
+/* ===== Creator Drops (city-drops.js) =====
+   Section stays hidden (see markup) until this city has at least one
+   real, currently-active row. */
+.city-drops-section .drop-card + .drop-card {
+  margin-top: 1.1rem;
+  padding-top: 1.1rem;
+  border-top: 1px dashed var(--hairline);
+}
+.drop-title {
+  font-family: var(--font-mono);
+  font-size: 1.02rem;
+  margin: 0.4rem 0 0.4rem;
+}
+.drop-title a { color: var(--ivory); }
+.drop-title a:hover { color: var(--brass); }
+.drop-desc {
+  color: var(--sand);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  margin: 0 0 0.5rem;
+}
+.drop-credit {
+  color: var(--ash);
+  font-size: 0.82rem;
+  margin: 0;
+}
+.drop-credit a { color: var(--sand); }
+.drop-credit a:hover { color: var(--brass); }
+
 /* Vertical starter content (city-vertical-signature.js): the fallback
    shown in place of the instrument-dial grid when a vertical has no live
    readings yet. Spans the grid rather than sitting centred in one narrow
