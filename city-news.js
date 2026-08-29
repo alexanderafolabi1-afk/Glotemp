@@ -30,6 +30,12 @@
 
   var SHOW = 5;
   var FETCH_TIMEOUT_MS = 5000;
+  // Nothing older than this is shown, ever. The store is kept inside the
+  // same window by the refresh job and an hourly purge, but this filter
+  // is applied here too and independently: if both of those stall, the
+  // section goes quiet rather than showing a three-day-old headline that
+  // a reader has no way to tell from a fresh one.
+  var MAX_AGE_HOURS = 72;
 
   var SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
   var SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
@@ -59,8 +65,13 @@
     var ctl = new AbortController();
     var timer = setTimeout(function () { ctl.abort(); }, FETCH_TIMEOUT_MS);
     try {
+      // published_at must exist AND be inside the window -- an item with
+      // no date cannot be shown to be fresh, so it is not fetched at all
+      // rather than rendered without one.
+      var since = new Date(Date.now() - MAX_AGE_HOURS * 3600000).toISOString();
       var qs = '?city_slug=eq.' + encodeURIComponent(citySlug) +
-        '&select=title,url,domain,published_at' +
+        '&select=title,url,domain,published_at,scope' +
+        '&published_at=gte.' + encodeURIComponent(since) +
         '&order=published_at.desc.nullslast' +
         '&limit=' + encodeURIComponent(limit || SHOW);
       var resp = await fetch(SUPABASE_URL + '/rest/v1/city_news' + qs, {
@@ -101,14 +112,51 @@
     return out;
   }
 
+  // The publication date, written out. "3h ago" alone tells a reader how
+  // long ago something was filed but never what day it was, and this
+  // section's whole credibility rests on a reader being able to see that
+  // for themselves. Both are shown: the relative time reads faster, the
+  // date is the one that can be checked.
+  function pubDate(iso) {
+    var t = Date.parse(iso);
+    if (isNaN(t)) return '';
+    var d = new Date(t);
+    try {
+      return d.toLocaleDateString(document.documentElement.lang || 'en', {
+        day: 'numeric', month: 'short', year: 'numeric',
+      });
+    } catch (e) {
+      return d.toISOString().slice(0, 10);
+    }
+  }
+
+  // Second enforcement of the same horizon, on rows already returned.
+  // The query above filters too; this catches a row whose date is in the
+  // future (a mis-parsed seendate) and anything a changed query might
+  // one day let through.
+  function fresh(rows) {
+    var floor = Date.now() - MAX_AGE_HOURS * 3600000;
+    var ceiling = Date.now() + 3600000;   // an hour of clock skew
+    return (rows || []).filter(function (r) {
+      var t = Date.parse(r && r.published_at);
+      return !isNaN(t) && t >= floor && t <= ceiling;
+    });
+  }
+
   function itemHTML(a) {
+    var when = ago(a.published_at);
+    var date = pubDate(a.published_at);
     return '<li class="news-item">' +
       '<a class="news-title" href="' + esc(a.url) + '" target="_blank" rel="noopener">' +
         esc(a.title) +
       '</a>' +
       '<p class="news-meta">' +
         '<span class="news-source">' + esc(a.domain || '') + '</span>' +
-        (ago(a.published_at) ? '<span class="news-when">' + esc(ago(a.published_at)) + '</span>' : '') +
+        (a.scope === 'global'
+          ? '<span class="news-scope">Wider</span>' : '') +
+        (date ? '<time class="news-date" datetime="' + esc(a.published_at) + '">' +
+          esc(date) + '</time>' : '') +
+        (when ? '<span class="news-when">' + esc(when) + '</span>' : '') +
       '</p>' +
     '</li>';
   }
@@ -146,7 +194,7 @@
     showSection(container);
     container.innerHTML = '<p class="news-status">Reading the local press&hellip;</p>';
 
-    var rows = await fetchNews(citySlug, SHOW);
+    var rows = fresh(await fetchNews(citySlug, SHOW));
     var items = distinct(rows, SHOW);
 
     if (!items.length) {
@@ -162,7 +210,7 @@
   // folded into its own card rather than the full <ul> loadNews renders.
   async function fetchHeadlines(citySlug, limit) {
     if (!citySlug) return [];
-    var rows = await fetchNews(citySlug, limit || 1);
+    var rows = fresh(await fetchNews(citySlug, limit || 1));
     return distinct(rows, limit || 1);
   }
 

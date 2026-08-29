@@ -492,10 +492,35 @@
   }
 
   function signOut() {
+    const session = readSession();
+
+    // Local state goes first and unconditionally, so a failed or slow
+    // network call can never leave someone still signed in on the
+    // device in front of them.
     writeSession(null);
     cachedProfile = null;
     try { localStorage.removeItem(PROFILE_KEY); } catch (e) { /* non-fatal */ }
     document.dispatchEvent(new CustomEvent('glotemp:auth-changed', { detail: { signedIn: false } }));
+
+    // Then revoke server-side. Clearing localStorage alone leaves the
+    // refresh token live until it expires on its own, so "signed out"
+    // would have been true only on this device -- the same token
+    // restored from a backup, or still held by another context, could
+    // go on minting access tokens. GoTrue's logout endpoint revokes it
+    // properly. Best-effort and unawaited: the local sign-out above has
+    // already happened and must not be held up by this.
+    if (session && session.access_token) {
+      try {
+        fetch(`${SUPABASE_URL}/auth/v1/logout?scope=global`, {
+          method: 'POST',
+          keepalive: true,
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        }).catch(() => { /* already signed out locally */ });
+      } catch (e) { /* already signed out locally */ }
+    }
   }
 
   // ---------- modal ----------
@@ -662,16 +687,25 @@
     await consumeRedirect();
     if (isSignedIn()) {
       const profile = await fetchProfile();
+
+      // Announce a resolved signed-in state on every load, not only
+      // after an OAuth return, and NOT only when a profile came back.
+      // Other modules (the check-in composer, the nav account control)
+      // mount synchronously on DOMContentLoaded, before this async
+      // profile fetch settles, so without this event they stay stuck
+      // rendering a signed-out state for a signed-in user.
+      //
+      // This used to sit in the `else` branch, so a signed-in visitor
+      // with no profile row yet -- every brand-new account arriving
+      // from a magic link -- got the profile modal and no event, and
+      // every other surface on the page went on believing they were
+      // signed out. Being signed in is a fact about the session; it
+      // does not become less true because a profile row is missing.
+      document.dispatchEvent(new CustomEvent('glotemp:auth-changed', { detail: { signedIn: true } }));
+
       if (!profile) {
         openModal('Tell us who you are so your readings have a name.', 'profile');
       } else {
-        // Announce a resolved signed-in state on every load, not only
-        // after an OAuth return. Other modules (the check-in composer)
-        // mount synchronously on DOMContentLoaded, before this async
-        // profile fetch settles, so without this event they would stay
-        // stuck rendering their signed-out state for an already
-        // signed-in user.
-        document.dispatchEvent(new CustomEvent('glotemp:auth-changed', { detail: { signedIn: true } }));
         // Covers a signed-in returning visitor with an existing profile
         // who has a pending referral code stored from this visit --
         // saveProfile() covers the brand-new sign-up case above it.

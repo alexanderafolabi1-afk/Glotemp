@@ -655,18 +655,52 @@
     } catch (e) { /* stays hidden -- no real data to offer */ }
   }
 
+  // THE SIGNED-IN TEST IS THE SESSION, AND ONLY THE SESSION.
+  //
+  // This used to read:
+  //   GlotempAuth.isSignedIn() && !!GlotempAuth.getCachedProfile()
+  // which is the bug behind "I signed in from the emailed link and it
+  // asked me to sign in again". A profile is not a session. Three
+  // separate, ordinary situations produce a valid session with no
+  // cached profile, and every one of them showed the visitor a sign-in
+  // panel they had already satisfied:
+  //
+  //   1. A brand-new account. The magic link lands, the session is
+  //      real, and no profiles row exists yet -- fetchProfile() then
+  //      correctly clears the cache, and this turned that into "sign
+  //      in".
+  //   2. A returning visitor on a new device or after clearing site
+  //      data. The session restores from localStorage, but the profile
+  //      cache starts empty.
+  //   3. A race on EVERY page load, even for a fully onboarded user:
+  //      mount() calls this synchronously while fetchProfile() is still
+  //      in flight, so the first paint said "sign in" to someone who
+  //      was signed in.
+  //
+  // Reactions (glotemp-reactions.js) and the daily check-in already
+  // gate on the session alone, which is why those three surfaces
+  // disagreed with each other. They now agree.
+  //
+  // A signed-in visitor with no profile yet needs to finish their
+  // profile, not sign in again -- glotemp-auth.js already owns that
+  // modal, so the composer stays visible and asks for the one thing
+  // that is actually missing.
   function refreshAuthState() {
     const form = document.getElementById('checkin-form');
     const signedOut = document.getElementById('checkin-signedout');
     if (!form || !signedOut) return;
-    const signedIn = window.GlotempAuth && GlotempAuth.isSignedIn() && !!GlotempAuth.getCachedProfile();
+    const signedIn = !!(window.GlotempAuth && GlotempAuth.isSignedIn());
     form.hidden = !signedIn;
     signedOut.hidden = signedIn;
 
     if (signedIn) {
       const profile = GlotempAuth.getCachedProfile();
       const nameBtn = document.querySelector('.checkin-visibility-btn[data-visibility="name"]');
-      if (nameBtn && profile) nameBtn.textContent = `Show my name (${profile.display_name})`;
+      if (nameBtn) {
+        nameBtn.textContent = (profile && profile.display_name)
+          ? `Show my name (${profile.display_name})`
+          : 'Show my name';
+      }
     }
   }
 
