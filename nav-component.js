@@ -101,6 +101,16 @@
           '<a class="nav-account-link" href="/account/">My saved offers</a>' +
           '<button type="button" class="nav-account-signout" id="nav-account-signout' + idSuffix + '">Sign out</button>' +
         '</div>' +
+        // A SIGN OUT control in the nav bar itself, not only inside a
+        // dropdown a visitor has to discover. Signed out it is hidden
+        // and the button beside it reads "Sign in", so the bar always
+        // shows exactly one of the two states -- which is what a
+        // visitor who has just signed in from a magic link needs to
+        // see to believe it worked. The dropdown keeps the account
+        // name, saved offers and invite link; nothing was removed to
+        // make room for this.
+        '<button type="button" class="nav-signout-top" id="nav-signout-top' + idSuffix + '"' +
+          (signedIn ? '' : ' hidden') + '>Sign out</button>' +
       '</div>'
     );
   }
@@ -172,6 +182,8 @@
       var menu = document.getElementById('nav-account-menu' + idSuffix);
       if (btn) btn.textContent = signedIn ? (accountLabel() || 'Account') : 'Sign in';
       if (menu && !signedIn) { menu.hidden = true; if (btn) btn.setAttribute('aria-expanded', 'false'); }
+      var top = document.getElementById('nav-signout-top' + idSuffix);
+      if (top) top.hidden = !signedIn;
     });
   }
 
@@ -192,6 +204,13 @@
       btn.setAttribute('aria-expanded', open ? 'false' : 'true');
       if (!open) loadAccountStars(idSuffix);
     });
+    var topSignout = document.getElementById('nav-signout-top' + idSuffix);
+    if (topSignout) {
+      topSignout.addEventListener('click', function () {
+        if (window.GlotempAuth) window.GlotempAuth.signOut();
+      });
+    }
+
     signoutBtn.addEventListener('click', function () {
       if (window.GlotempAuth) window.GlotempAuth.signOut();
       menu.hidden = true;

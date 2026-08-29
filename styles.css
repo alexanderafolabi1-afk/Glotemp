@@ -1404,6 +1404,33 @@ body.scroll-reveals-enabled section.revealed {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* The nav bar's own SIGN OUT, beside the account button rather than
+   buried in its dropdown. Same pill as .nav-account-btn so the two read
+   as one control pair; [hidden] is declared because the rules below set
+   display and would otherwise beat the UA stylesheet's
+   [hidden]{display:none} and leave it visible when signed out. */
+.nav-signout-top[hidden] { display: none !important; }
+.nav-signout-top {
+  margin-left: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--brass-dim);
+  background: transparent;
+  color: var(--sand);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-variant-caps: small-caps;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 44px;
+}
+.nav-signout-top:hover,
+.nav-signout-top:focus-visible { color: var(--ivory); border-color: var(--brass); }
+
+/* In the mobile panel the controls stack, so it goes full width under
+   the account button rather than trying to share a row with it. */
+.nav-panel .nav-signout-top { width: 100%; margin: 0.4rem 0 0; }
+
 .nav-account-btn:hover,
 .nav-account-btn[aria-expanded="true"] {
   color: var(--ivory);
@@ -2170,6 +2197,24 @@ summary:focus:not(:focus-visible) {
   font-size: 0.68rem;
   color: var(--sand);
   opacity: 0.8;
+}
+
+/* The publication date carries the section's credibility, so it is the
+   one piece of meta that does not fade back with the rest. */
+.news-date {
+  color: var(--ivory);
+  opacity: 0.95;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Marks an item found by the wider, country-level query rather than the
+   city's own outlets -- so "why is this story here" is answered on the
+   item itself instead of being left to the reader to work out. */
+.news-scope {
+  font-variant-caps: small-caps;
+  letter-spacing: 0.08em;
+  color: var(--brass);
+  opacity: 0.9;
 }
 
 .news-status {
