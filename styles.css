@@ -6585,12 +6585,18 @@ a:hover .city-landmark-photo,
   padding: 1.15rem 1.15rem 1.3rem;
   border-radius: 18px;
   text-decoration: none;
-  /* Indigo well glowing with this card's own accent, no border -- the
-     colour itself defines the edge, softening outward rather than
+  /* The resonance-field photo itself (same choice as .pulse-gravity-item
+     and .ranking-item -- this is the same "per-category fact card" family
+     as those two), zoomed in the same way those two are so the photo's
+     own baked-in city labels (Istanbul, Sofia, Vientiane, Quito) fall
+     outside the crop instead of bleeding through behind this card's own
+     real city name. Glows with this card's own accent on top, no border
+     -- the colour itself defines the edge, softening outward rather than
      stopping at a line. */
   background:
-    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--card-color) 26%, transparent), transparent 62%),
-    var(--instrument-surface-bg);
+    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--card-color) 30%, transparent), transparent 62%),
+    linear-gradient(rgba(5, 3, 12, 0.55), rgba(5, 3, 12, 0.75)),
+    url('/assets/mood-resonance-field.png') center / 240% auto no-repeat;
   box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.55), 0 0 0 rgba(0, 0, 0, 0);
   transform: translateY(var(--card-wave, 0px));
   transition: transform var(--transition), box-shadow var(--transition);
@@ -6684,11 +6690,14 @@ a:hover .city-landmark-photo,
   min-height: 260px;
   border-radius: 18px;
   padding: 2.2rem 2rem 2rem;
-  /* Indigo well glowing with this entry's own accent colour, no border --
-     rather than a solid warm-basalt fill with a hard edge. */
+  /* The astrolabe photo (vertical-instrument-panel.png) -- this is a
+     single large broadcast panel, not a grid item, so it takes the same
+     photo as the open vertical-body panels rather than the per-category
+     resonance-field crop -- glowing with this entry's own accent colour
+     on top, no border. */
   background:
     radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--card-color, var(--brass)) 28%, transparent), transparent 64%),
-    var(--instrument-surface-bg);
+    var(--instrument-photo-vertical);
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6), 0 0 50px -10px color-mix(in srgb, var(--card-color, var(--brass)) 45%, transparent);
 }
 
@@ -6982,16 +6991,20 @@ a:hover .city-landmark-photo,
 }
 
 /* ===== Shared city hover-preview tooltip ===== */
+/* The onboarding-instrument photo -- this is a small floating panel,
+   same family as the two modals, so it takes the same photo. No border:
+   the old solid band-colour underline is replaced by that colour as a
+   glow instead. */
 .city-hover-preview {
   position: absolute;
   z-index: 3000;
-  background: var(--instrument-surface-bg);
-  border-bottom: 2px solid var(--band-equilibrium);
+  background: var(--instrument-photo-modal);
+  border: none;
   border-radius: 10px;
   padding: 0.6rem 0.9rem;
   font-size: 0.85rem;
   color: var(--ivory);
-  box-shadow: var(--instrument-surface-edge), 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--instrument-surface-edge), 0 0 16px -4px var(--band-equilibrium), 0 8px 24px rgba(0, 0, 0, 0.5);
   opacity: 0;
   pointer-events: none;
   transform: translateY(-4px);
