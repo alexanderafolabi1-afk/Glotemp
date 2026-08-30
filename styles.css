@@ -2346,24 +2346,32 @@ summary:focus:not(:focus-visible) {
    render tree -- no open/close JS required for the motion itself. */
 .welcome-intro-modal {
   position: relative;
+  isolation: isolate;
   width: 100%;
   max-width: 440px;
-  /* A cut of the same near-black indigo-violet atmosphere as
-     vertical-instrument-panel.png's background, not a card sitting on
-     top of the page -- no frame, no border, no rivets. Its only edge
-     cue is a single worn-bronze hairline (--instrument-ring, drawn as
-     an inset box-shadow, not a border) faint enough to almost
-     disappear, plus an outward violet diffusion so the panel dissolves
-     into the page instead of being cut out by a hard line -- the
-     volumetric-glow read from all three references. */
+  /* The panel has no shape of its own -- its background is a genuinely
+     blurred duplicate (::before, below), not this element's own flat
+     fill. A CSS filter:blur() is the only technique that softens a
+     rounded-rect's outline UNIFORMLY around its whole perimeter,
+     corners included (a radial-gradient mask can't: a single ellipse
+     can't pass through both a rectangle's side-midpoints and its
+     corners at once). That's why scroll-clipping moved to the overlay
+     below -- the blur has to be free to bleed past this element's own
+     box, which overflow:hidden/auto here would have cut off. */
   padding: 2.25rem 1.85rem 1.75rem;
-  background: var(--instrument-surface-bg);
-  border-radius: 20px !important;
-  box-shadow: var(--instrument-surface-edge);
-  max-height: calc(100vh - 2.5rem);
-  overflow-y: auto;
   color: var(--ivory);
   animation: modal-surface-in 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.welcome-intro-modal::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -26px;
+  border-radius: 34px !important;
+  background: var(--instrument-surface-bg);
+  box-shadow: var(--instrument-surface-edge);
+  filter: blur(16px);
+  pointer-events: none;
 }
 @keyframes modal-surface-in {
   from { opacity: 0; transform: scale(0.96) translateY(6px); }
@@ -2464,17 +2472,17 @@ summary:focus:not(:focus-visible) {
   width: 100%;
   margin-top: 0.5rem;
   padding: 0.85rem 1.1rem;
-  background: rgba(176, 141, 87, 0.08);
-  border: 1px solid var(--brass-dim);
+  background: rgba(154, 115, 255, 0.1);
+  border: none;
   border-radius: 999px;
   color: var(--ivory);
   font-family: var(--font-body);
   font-size: 0.92rem;
   text-align: left;
   cursor: pointer;
-  transition: border-color var(--transition), background var(--transition);
+  transition: background var(--transition);
 }
-.welcome-intro-radio:hover:not(:disabled) { border-color: var(--brass); background: rgba(176, 141, 87, 0.14); }
+.welcome-intro-radio:hover:not(:disabled) { background: rgba(154, 115, 255, 0.18); }
 .welcome-intro-radio:disabled { cursor: default; opacity: 0.65; }
 .welcome-intro-radio-icon { flex: none; color: var(--brass); font-size: 0.75rem; }
 .welcome-intro-radio-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -2491,8 +2499,8 @@ summary:focus:not(:focus-visible) {
   color: var(--ivory);
   margin: 0.5rem 0 0;
   padding: 0.85rem 1.1rem;
-  background: rgba(176, 141, 87, 0.08);
-  border: 1px solid var(--brass-dim);
+  background: rgba(154, 115, 255, 0.1);
+  border: none;
   border-radius: 999px;
 }
 .welcome-intro-fallback[hidden] { display: none; }
@@ -6953,16 +6961,24 @@ a:hover .city-landmark-photo,
 
 .gt-auth-modal {
   position: relative;
+  isolation: isolate;
   width: 100%;
   max-width: 420px;
-  /* Same borderless indigo-violet well as .welcome-intro-modal. */
+  /* Same genuinely-blurred background as .welcome-intro-modal -- see
+     that rule's comment. Scroll-clipping lives on the overlay instead. */
   padding: 2rem 1.75rem 1.75rem;
-  background: var(--instrument-surface-bg);
-  border-radius: 20px !important;
-  box-shadow: var(--instrument-surface-edge);
-  max-height: calc(100vh - 2.5rem);
-  overflow-y: auto;
   animation: modal-surface-in 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.gt-auth-modal::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -26px;
+  border-radius: 34px !important;
+  background: var(--instrument-surface-bg);
+  box-shadow: var(--instrument-surface-edge);
+  filter: blur(16px);
+  pointer-events: none;
 }
 @media (prefers-reduced-motion: reduce) {
   .gt-auth-modal { animation: none; }
@@ -10009,16 +10025,17 @@ body > section {
   --instrument-surface-bg:
     radial-gradient(ellipse 90% 55% at 50% 8%, var(--instrument-smoke) 0%, transparent 60%),
     radial-gradient(ellipse at 50% 35%, var(--instrument-void) 0%, var(--instrument-void-deep) 78%);
-  /* Edge treatment for an elevated surface: NOT a frame. A single
-     worn-bronze hairline, dim enough to almost disappear into the dark,
-     plus a soft outward diffusion so the panel's edge dissolves into
-     the page rather than being cut out by a hard border -- the "soft
-     volumetric" edge read from all three photos. */
+  /* Edge treatment for an elevated surface: NO line at all, traced or
+     otherwise -- every earlier version of this still drew a complete,
+     uniform outline around a geometric rounded-rect, which reads as a
+     UI card no matter how thin or dim its colour is. Definition comes
+     entirely from an inner falloff into black plus a wide, soft outward
+     bloom that fades over ~100px with no discernible edge -- the panel
+     dissolves into the page rather than being cut out by anything. */
   --instrument-surface-edge:
-    inset 0 0 0 1px var(--instrument-ring),
-    inset 0 0 50px rgba(0, 0, 0, 0.8),
-    0 0 70px rgba(76, 47, 158, 0.22),
-    0 30px 70px rgba(0, 0, 0, 0.65);
+    inset 0 0 60px rgba(0, 0, 0, 0.85),
+    0 0 90px 10px rgba(84, 52, 168, 0.28),
+    0 0 200px 40px rgba(20, 12, 50, 0.5);
 }
 
 /* Aesthetic enhancement - safe to remove
