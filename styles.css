@@ -2348,26 +2348,18 @@ summary:focus:not(:focus-visible) {
   position: relative;
   width: 100%;
   max-width: 440px;
-  /* Engraved-ring instrument panel: an indigo-black well with a violet
-     smoke glow, set inside a riveted aged-brass case -- see
-     mood-resonance-field.png's housing and vertical-instrument-panel.png's
-     atmosphere. The case and the well are two background layers on this
-     SAME element (not a stacked pseudo-element -- z-index:-1 pseudo
-     layering was tried here and rendered inconsistently across engines),
-     separated by background-clip: the brass paints the full border-box,
-     the indigo well paints only the padding-box inside a 9px transparent
-     border, so the brass shows only as the ring around it. */
-  border: 9px solid transparent;
+  /* A cut of the same near-black indigo-violet atmosphere as
+     vertical-instrument-panel.png's background, not a card sitting on
+     top of the page -- no frame, no border, no rivets. Its only edge
+     cue is a single worn-bronze hairline (--instrument-ring, drawn as
+     an inset box-shadow, not a border) faint enough to almost
+     disappear, plus an outward violet diffusion so the panel dissolves
+     into the page instead of being cut out by a hard line -- the
+     volumetric-glow read from all three references. */
   padding: 2.25rem 1.85rem 1.75rem;
-  background:
-    var(--instrument-surface-bg) padding-box,
-    radial-gradient(circle 3.5px at 17px 17px, #2a1c0c 55%, transparent 58%) border-box,
-    radial-gradient(circle 3.5px at calc(100% - 17px) 17px, #2a1c0c 55%, transparent 58%) border-box,
-    radial-gradient(circle 3.5px at 17px calc(100% - 17px), #2a1c0c 55%, transparent 58%) border-box,
-    radial-gradient(circle 3.5px at calc(100% - 17px) calc(100% - 17px), #2a1c0c 55%, transparent 58%) border-box,
-    var(--instrument-brass-frame) border-box;
-  border-radius: 25px !important;
-  box-shadow: var(--instrument-frame-shadow), var(--instrument-surface-ring), 0 24px 64px rgba(0, 0, 0, 0.6);
+  background: var(--instrument-surface-bg);
+  border-radius: 20px !important;
+  box-shadow: var(--instrument-surface-edge);
   max-height: calc(100vh - 2.5rem);
   overflow-y: auto;
   color: var(--ivory);
@@ -5213,7 +5205,7 @@ a:hover .city-landmark-photo,
 }
 .vertical-summary::-webkit-details-marker { display: none; }
 .vertical-summary::marker { content: ''; }
-.vertical-summary:hover { background: rgba(176, 141, 87, 0.08); }
+.vertical-summary:hover { background: radial-gradient(ellipse 70% 100% at 0% 50%, var(--instrument-smoke) 0%, transparent 70%); }
 .vertical-summary::after {
   content: '+';
   flex: none;
@@ -5236,8 +5228,16 @@ a:hover .city-landmark-photo,
 .vertical-section[open] > .vertical-summary::after {
   transform: rotate(45deg);
 }
+/* An open section reads as a lit instrument panel, not a plain expanded
+   list -- the same near-black indigo-violet well as the modals, without
+   its own edge (it sits inside the section's existing hairline divider,
+   so a second border here would double up into a "card in a card"). */
+.vertical-section[open] > .vertical-body {
+  position: relative;
+  background: var(--instrument-surface-bg);
+}
 .vertical-body {
-  padding: 0 1.5rem 1.5rem;
+  padding: 1.25rem 1.5rem 1.5rem;
 }
 
 .vertical-description {
@@ -6346,35 +6346,36 @@ a:hover .city-landmark-photo,
   margin-top: 1rem;
 }
 
+/* No card, no border -- a soft-edged well of the void colour that a
+   beam of the city's own accent glows into from the top, the same
+   wave-tapering-to-a-point read as mood-resonance-field.png applied to
+   a per-city colour instead of the shared violet/teal. Definition comes
+   from the glow and the void's contrast against the page, never a line. */
 .pulse-gravity-item {
   position: relative;
   display: block;
   padding: 0.9rem 1rem 0.8rem;
   background: var(--instrument-void);
-  border-radius: 6px;
+  border-radius: 10px;
   text-decoration: none;
   overflow: hidden;
   transition: transform var(--transition), box-shadow var(--transition);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pg-color, var(--brass)) 45%, var(--instrument-ring));
+  box-shadow: 0 12px 30px -16px rgba(0, 0, 0, 0.7);
 }
-/* A vivid beam of that city's own colour entering from the top edge,
-   the wave-band read from mood-resonance-field.png applied to a
-   per-city accent instead of the shared brass tone. */
 .pulse-gravity-item::before {
   content: '';
   position: absolute;
-  inset: -25% -15% auto -15%;
-  height: 75%;
-  background: radial-gradient(65% 100% at 50% 0%, color-mix(in srgb, var(--pg-color, var(--brass)) 85%, transparent) 0%, transparent 78%);
-  filter: blur(9px);
-  opacity: 0.85;
+  inset: -30% -20% auto -20%;
+  height: 80%;
+  background: radial-gradient(65% 100% at 50% 0%, color-mix(in srgb, var(--pg-color, var(--brass)) 80%, transparent) 0%, transparent 78%);
+  filter: blur(13px);
+  opacity: 0.7;
   pointer-events: none;
 }
 
 .pulse-gravity-item:hover,
 .pulse-gravity-item:focus-visible {
   transform: translateY(-2px);
-  box-shadow: inset 0 0 0 1px var(--pg-color, var(--brass));
 }
 .pulse-gravity-item:hover::before,
 .pulse-gravity-item:focus-visible::before {
@@ -6460,20 +6461,21 @@ a:hover .city-landmark-photo,
   padding: 1.15rem 1.15rem 1.3rem;
   border-radius: 18px;
   text-decoration: none;
-  /* Engraved-ring indigo well tinted by this card's own accent, in
-     place of the old solid basalt fill + full border. */
+  /* Indigo well glowing with this card's own accent, no border -- the
+     colour itself defines the edge, softening outward rather than
+     stopping at a line. */
   background:
-    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--card-color) 20%, transparent), transparent 60%),
+    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--card-color) 26%, transparent), transparent 62%),
     var(--instrument-surface-bg);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--card-color) 45%, var(--instrument-ring)), inset 0 0 18px rgba(0, 0, 0, 0.55);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.55), 0 0 0 rgba(0, 0, 0, 0);
   transform: translateY(var(--card-wave, 0px));
-  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+  transition: transform var(--transition), box-shadow var(--transition);
 }
 
 .city-sell-card:hover,
 .city-sell-card:focus-visible {
   transform: translateY(calc(var(--card-wave, 0px) - 6px));
-  box-shadow: inset 0 0 0 1px var(--card-color), inset 0 0 18px rgba(0, 0, 0, 0.55), 0 14px 30px -14px color-mix(in srgb, var(--card-color) 55%, transparent);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.55), 0 0 40px -6px color-mix(in srgb, var(--card-color) 60%, transparent), 0 14px 30px -14px color-mix(in srgb, var(--card-color) 55%, transparent);
 }
 
 .city-sell-icon {
@@ -6558,12 +6560,12 @@ a:hover .city-landmark-photo,
   min-height: 260px;
   border-radius: 18px;
   padding: 2.2rem 2rem 2rem;
-  /* Engraved-ring indigo well, tinted by this entry's own accent colour
-     rather than a solid warm-basalt fill. */
+  /* Indigo well glowing with this entry's own accent colour, no border --
+     rather than a solid warm-basalt fill with a hard edge. */
   background:
-    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--card-color, var(--brass)) 22%, transparent), transparent 62%),
+    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--card-color, var(--brass)) 28%, transparent), transparent 64%),
     var(--instrument-surface-bg);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--card-color, var(--brass)) 45%, var(--instrument-ring)), inset 0 0 24px rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6), 0 0 50px -10px color-mix(in srgb, var(--card-color, var(--brass)) 45%, transparent);
 }
 
 .live-blog-home-progress {
@@ -6865,7 +6867,7 @@ a:hover .city-landmark-photo,
   padding: 0.6rem 0.9rem;
   font-size: 0.85rem;
   color: var(--ivory);
-  box-shadow: var(--instrument-surface-ring), 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--instrument-surface-edge), 0 8px 24px rgba(0, 0, 0, 0.5);
   opacity: 0;
   pointer-events: none;
   transform: translateY(-4px);
@@ -6953,20 +6955,11 @@ a:hover .city-landmark-photo,
   position: relative;
   width: 100%;
   max-width: 420px;
-  /* Same riveted aged-brass case as .welcome-intro-modal, drawn as two
-     background-clip layers on this element rather than a z-index:-1
-     pseudo-element -- see that rule's comment for why. */
-  border: 9px solid transparent;
+  /* Same borderless indigo-violet well as .welcome-intro-modal. */
   padding: 2rem 1.75rem 1.75rem;
-  background:
-    var(--instrument-surface-bg) padding-box,
-    radial-gradient(circle 3.5px at 17px 17px, #2a1c0c 55%, transparent 58%) border-box,
-    radial-gradient(circle 3.5px at calc(100% - 17px) 17px, #2a1c0c 55%, transparent 58%) border-box,
-    radial-gradient(circle 3.5px at 17px calc(100% - 17px), #2a1c0c 55%, transparent 58%) border-box,
-    radial-gradient(circle 3.5px at calc(100% - 17px) calc(100% - 17px), #2a1c0c 55%, transparent 58%) border-box,
-    var(--instrument-brass-frame) border-box;
-  border-radius: 25px !important;
-  box-shadow: var(--instrument-frame-shadow), var(--instrument-surface-ring), 0 24px 64px rgba(0, 0, 0, 0.6);
+  background: var(--instrument-surface-bg);
+  border-radius: 20px !important;
+  box-shadow: var(--instrument-surface-edge);
   max-height: calc(100vh - 2.5rem);
   overflow-y: auto;
   animation: modal-surface-in 320ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -9984,34 +9977,48 @@ body > section {
    existing --violet/--ion accent tokens as the glow palette rather than
    inventing new hex values. */
 :root {
-  --instrument-void: #0a0716;
-  --instrument-void-deep: #020108;
-  --instrument-smoke: rgba(110, 70, 200, 0.4);           /* the purple haze in vertical-instrument-panel.png */
-  --instrument-glow-violet: rgba(154, 115, 255, 0.6);    /* --violet, pushed brighter+more opaque for the wave-bands */
-  --instrument-glow-teal: rgba(70, 226, 214, 0.55);      /* --ion, same treatment */
-  --instrument-glow-green: rgba(90, 212, 140, 0.5);      /* third band colour, from onboarding-instrument-modal.png */
-  --instrument-ring: rgba(216, 180, 116, 0.95);          /* brighter, more saturated brass, for engraved rings */
+  /* Re-grounded directly in the three reference photos, not in an
+     abstracted "brand palette": all three are 90%+ near-black
+     indigo-violet, with brass appearing only as a DARK, matte, aged
+     metal (worn bronze, patina, catches a faint highlight -- never a
+     bright polished gold gradient) and colour appearing only as the
+     volumetric glow bands themselves. Every token below maps to a
+     specific, named detail in one of the three files. */
+  --instrument-void: #08050f;                             /* the near-black ground in all three */
+  --instrument-void-deep: #020103;
+  --instrument-smoke: rgba(102, 66, 189, 0.38);            /* the purple haze rising in vertical-instrument-panel.png */
+  --instrument-glow-violet: rgba(154, 115, 255, 0.6);      /* the wave-bands in mood-resonance-field.png */
+  --instrument-glow-teal: rgba(70, 226, 214, 0.55);        /* the teal/blue bands in onboarding-instrument-modal.png */
+  --instrument-glow-green: rgba(90, 212, 140, 0.5);        /* the green band, same image */
 
-  /* Reusable surface: replaces a solid/gradient card fill with an
-     engraved-ring indigo panel -- a near-black well with a violet smoke
-     glow lifted toward the top edge (matching the astrolabe photo's
-     lighting), never a hard rectangular border. */
+  /* Dark, worn bronze -- the astrolabe's own metal in
+     vertical-instrument-panel.png and the dial ring in
+     onboarding-instrument-modal.png. Used only as thin hairlines and
+     fine engraved ticks, at low opacity, never as a filled bright
+     gradient -- the metal in the photos only ever catches a dim
+     highlight, it does not glow or shine. */
+  --instrument-metal: #5c4a2e;
+  --instrument-metal-dim: rgba(92, 74, 46, 0.55);
+  --instrument-ring: rgba(140, 112, 68, 0.5);              /* a worn-bronze hairline, not bright brass */
+  --instrument-tick: rgba(176, 141, 87, 0.4);              /* fine engraved tick marks on a dial rim */
+
+  /* Reusable surface: a near-black indigo-violet well with the smoke
+     haze lifted toward the top edge, matching the astrolabe photo's
+     lighting -- no card fill, no frame, the darkness itself is the
+     material. */
   --instrument-surface-bg:
     radial-gradient(ellipse 90% 55% at 50% 8%, var(--instrument-smoke) 0%, transparent 60%),
     radial-gradient(ellipse at 50% 35%, var(--instrument-void) 0%, var(--instrument-void-deep) 78%);
-  --instrument-surface-ring: inset 0 0 0 1px var(--instrument-ring), inset 0 0 36px rgba(0, 0, 0, 0.75);
-
-  /* Aged-brass instrument frame: a metal bezel drawn as a background
-     gradient (never an image file) with a bevelled highlight/shadow pair,
-     used on a ::before sized slightly larger than its parent so it reads
-     as a housing the parent surface sits inside of -- see the rounded
-     brass case in mood-resonance-field.png. */
-  --instrument-brass-frame: linear-gradient(155deg, #f2dba3 0%, #c99a52 18%, #7a5326 40%, #4a3016 50%, #7a5326 60%, #c99a52 82%, #f2dba3 100%);
-  --instrument-frame-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.65),
-    inset 0 1px 1px rgba(255, 245, 220, 0.5),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.6),
-    0 20px 60px rgba(0, 0, 0, 0.6);
+  /* Edge treatment for an elevated surface: NOT a frame. A single
+     worn-bronze hairline, dim enough to almost disappear into the dark,
+     plus a soft outward diffusion so the panel's edge dissolves into
+     the page rather than being cut out by a hard border -- the "soft
+     volumetric" edge read from all three photos. */
+  --instrument-surface-edge:
+    inset 0 0 0 1px var(--instrument-ring),
+    inset 0 0 50px rgba(0, 0, 0, 0.8),
+    0 0 70px rgba(76, 47, 158, 0.22),
+    0 30px 70px rgba(0, 0, 0, 0.65);
 }
 
 /* Aesthetic enhancement - safe to remove
