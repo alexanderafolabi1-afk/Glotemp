@@ -5158,33 +5158,138 @@ a:hover .city-landmark-photo,
   margin-right: 0.5em;
 }
 
+/* The verticals quick-nav as a single instrument: a horizontal aged-brass
+   rail (the actual photo, assets/verticals-instrument-strip.png, cropped
+   to its own rail band so the engraved 0-100 scale is the real
+   photographed metal, not a CSS approximation) with each vertical rising
+   off it as its own glowing glass tube -- see that file. The container's
+   own background is the same photo cropped to its upper, tube-free
+   atmosphere/skyline band, so the whole strip reads as one continuous
+   indigo-violet instrument rather than a bar of nav links. Every tube is
+   drawn on the existing .vertical-link anchors via ::before/::after --
+   no new elements, so click targets, hrefs, data-vertical attributes,
+   the JS-inserted "Tonight" link, and the .active scroll-spy class all
+   keep working exactly as before. */
 .vertical-nav {
+  position: relative;
   display: flex;
-  gap: 1rem;
+  align-items: flex-end;
+  gap: 1.5rem;
   margin-bottom: 2rem;
-  padding: 1rem;
+  padding: 2.5rem 1.75rem 1.25rem;
   overflow-x: auto;
+  overflow-y: hidden;
   scroll-snap-type: x mandatory;
+  border-top: none;
+  background:
+    linear-gradient(rgba(4, 2, 10, 0.74), rgba(4, 2, 10, 0.88)),
+    url('/assets/verticals-instrument-strip.png') center top / cover no-repeat,
+    var(--instrument-void);
+}
+/* The rail: the same photo, cropped to its own bottom band -- on an
+   element this short and wide, background-size:cover scales to fill the
+   width, so only a thin horizontal sliver of the source shows; anchoring
+   it to the bottom pulls that sliver from the photo's actual brass rail
+   and engraved scale, not the tubes above it. */
+.vertical-nav::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 30px;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.2)),
+    url('/assets/verticals-instrument-strip.png') center 79% / cover no-repeat;
+  pointer-events: none;
 }
 
 .vertical-link {
-  padding: 0.7rem 1.5rem 0.55rem;
+  position: relative;
+  display: block;
+  padding: 0 0.9rem 26px;
+  height: 96px;
   border: none;
-  border-bottom: 1px solid rgba(79, 216, 232, 0.3);
   border-radius: 0;
   text-decoration: none;
-  color: var(--ivory);
-  transition: all 300ms;
+  color: var(--sand);
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: 0.85rem;
+  letter-spacing: 0.01em;
+  transition: color 300ms ease;
   white-space: nowrap;
   scroll-snap-align: start;
   flex-shrink: 0;
+  z-index: 1;
+}
+/* The glowing tube, rising from the rail -- a glass-cylinder read built
+   from three layered gradients: a bright cap highlight, a vertical core
+   line (the "light column"), and the base colour fading toward its own
+   shadow at the bottom, all in this vertical's own --tube-colour (set
+   per data-vertical below, matching the eight hues in the reference
+   photo; the remaining verticals extend that same palette). */
+.vertical-link::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  width: 26px;
+  height: 52px;
+  border-radius: 13px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, transparent 26%),
+    linear-gradient(90deg, transparent 32%, rgba(255, 255, 255, 0.4) 49%, transparent 64%),
+    linear-gradient(180deg, var(--tube-colour, var(--ion)) 0%, color-mix(in srgb, var(--tube-colour, var(--ion)) 55%, black) 100%);
+  box-shadow: 0 0 16px 1px var(--tube-colour, var(--ion)), inset 0 0 8px rgba(0, 0, 0, 0.45);
+  opacity: 0.55;
+  transition: opacity 300ms ease, box-shadow 300ms ease;
+  pointer-events: none;
+}
+/* The pivot: a small worn-brass rivet where the tube meets the rail. */
+.vertical-link::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 17px;
+  transform: translateX(-50%);
+  width: 7px;
+  height: 7px;
+  border-radius: 50% !important;
+  background: radial-gradient(circle at 35% 30%, #e8cf9a, var(--instrument-metal) 70%);
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
 }
 
 .vertical-link:hover,
 .vertical-link.active {
-  border-color: var(--band-equilibrium);
-  background: rgba(240, 224, 200, 0.1);
+  color: var(--ivory);
 }
+.vertical-link:hover::before,
+.vertical-link.active::before {
+  opacity: 1;
+  box-shadow: 0 0 26px 3px var(--tube-colour, var(--ion)), inset 0 0 8px rgba(0, 0, 0, 0.35);
+}
+
+/* One hue per vertical, read from verticals-instrument-strip.png's own
+   eight tubes; the four verticals it doesn't depict (fashion, food,
+   health, transport) plus the JS-inserted radio/tonight entries extend
+   the same palette rather than reusing a photographed hue verbatim. */
+.vertical-link[data-vertical="pulse"] { --tube-colour: #2FD9C4; }
+.vertical-link[data-vertical="tech"] { --tube-colour: #4F8CFF; }
+.vertical-link[data-vertical="finance"] { --tube-colour: #2ECC71; }
+.vertical-link[data-vertical="work"] { --tube-colour: #FFA53D; }
+.vertical-link[data-vertical="property"] { --tube-colour: #F5C542; }
+.vertical-link[data-vertical="education"] { --tube-colour: #9B6BFF; }
+.vertical-link[data-vertical="sport"] { --tube-colour: #FF5C5C; }
+.vertical-link[data-vertical="entertainment"] { --tube-colour: #D66BE0; }
+.vertical-link[data-vertical="fashion"] { --tube-colour: #FF8FC4; }
+.vertical-link[data-vertical="food"] { --tube-colour: #FFD166; }
+.vertical-link[data-vertical="health"] { --tube-colour: #4FE0B0; }
+.vertical-link[data-vertical="transport"] { --tube-colour: #4FC3F7; }
+.vertical-link[data-vertical="radio"] { --tube-colour: #8B6BF5; }
+.vertical-link[data-vertical="tonight"] { --tube-colour: #6B5CE0; }
 
 .vertical-section {
   padding: 0;
@@ -9497,9 +9602,16 @@ main > *,
    own dashed full border -- that border IS the "this is a sample, not a
    real check-in" signal, so it is deliberately excluded here. */
 .checkin-mood-btn, .checkin-visibility-btn, .band-chip,
-.pagination-btn, .vertical-link {
+.pagination-btn {
   border: none;
   border-bottom: 1px solid var(--brass-dim);
+  border-radius: 0;
+}
+/* .vertical-link carries its own instrument-tube design (see its rule
+   above) -- no hairline border of any kind, so it's excluded from the
+   shared sweep above. */
+.vertical-link {
+  border: none;
   border-radius: 0;
 }
 
