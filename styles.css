@@ -2368,7 +2368,7 @@ summary:focus:not(:focus-visible) {
   z-index: -1;
   inset: -26px;
   border-radius: 34px !important;
-  background: var(--instrument-surface-bg);
+  background: var(--instrument-photo-modal);
   box-shadow: var(--instrument-surface-edge);
   filter: blur(16px);
   pointer-events: none;
@@ -4919,7 +4919,8 @@ button:hover:not(:focus-visible) {
   inset: -6px 0;
   background:
     radial-gradient(70% 160% at 8% 50%, var(--instrument-glow-violet) 0%, transparent 68%),
-    radial-gradient(45% 120% at 38% 35%, var(--instrument-glow-teal) 0%, transparent 62%);
+    radial-gradient(45% 120% at 38% 35%, var(--instrument-glow-teal) 0%, transparent 62%),
+    url('/assets/mood-resonance-field.png') center / 260% auto no-repeat;
   filter: blur(11px);
   opacity: 0.55;
   transition: opacity 300ms ease;
@@ -5237,12 +5238,15 @@ a:hover .city-landmark-photo,
   transform: rotate(45deg);
 }
 /* An open section reads as a lit instrument panel, not a plain expanded
-   list -- the same near-black indigo-violet well as the modals, without
-   its own edge (it sits inside the section's existing hairline divider,
-   so a second border here would double up into a "card in a card"). */
+   list -- the astrolabe photo itself as the background (biased toward
+   its lower two-thirds via background-position so the photo's own
+   headline text stays out of frame; only the dial/base and its purple
+   atmosphere show), without its own edge (it sits inside the section's
+   existing hairline divider, so a second border here would double up
+   into a "card in a card"). */
 .vertical-section[open] > .vertical-body {
   position: relative;
-  background: var(--instrument-surface-bg);
+  background: var(--instrument-photo-vertical);
 }
 .vertical-body {
   padding: 1.25rem 1.5rem 1.5rem;
@@ -6359,11 +6363,18 @@ a:hover .city-landmark-photo,
    wave-tapering-to-a-point read as mood-resonance-field.png applied to
    a per-city colour instead of the shared violet/teal. Definition comes
    from the glow and the void's contrast against the page, never a line. */
+/* The resonance-field photo itself, zoomed in (220% width) so its own
+   ornate frame border falls outside the crop and only the wave-band
+   interior shows -- each item's own accent colour still glows in on top
+   via the ::before beam below. */
 .pulse-gravity-item {
   position: relative;
   display: block;
   padding: 0.9rem 1rem 0.8rem;
-  background: var(--instrument-void);
+  background:
+    linear-gradient(rgba(5, 3, 12, 0.5), rgba(5, 3, 12, 0.68)),
+    url('/assets/mood-resonance-field.png') center / 220% auto no-repeat,
+    var(--instrument-void);
   border-radius: 10px;
   text-decoration: none;
   overflow: hidden;
@@ -6975,7 +6986,7 @@ a:hover .city-landmark-photo,
   z-index: -1;
   inset: -26px;
   border-radius: 34px !important;
-  background: var(--instrument-surface-bg);
+  background: var(--instrument-photo-modal);
   box-shadow: var(--instrument-surface-edge);
   filter: blur(16px);
   pointer-events: none;
@@ -10017,6 +10028,23 @@ body > section {
   --instrument-metal-dim: rgba(92, 74, 46, 0.55);
   --instrument-ring: rgba(140, 112, 68, 0.5);              /* a worn-bronze hairline, not bright brass */
   --instrument-tick: rgba(176, 141, 87, 0.4);              /* fine engraved tick marks on a dial rim */
+
+  /* The three reference photos themselves, used as real backgrounds
+     (not just a design reference) -- a dark overlay wash sits on top of
+     each so real UI text stays legible over whatever the photo's own
+     baked-in demo text/numbers are doing, and the elements that use
+     these already run filter:blur() or sit far from view, which softens
+     that baked-in text into pure atmosphere rather than competing
+     content. One photo per named component, matched to it by filename. */
+  --instrument-photo-modal:
+    linear-gradient(rgba(5, 3, 12, 0.6), rgba(5, 3, 12, 0.8)),
+    url('/assets/onboarding-instrument-modal.png') center / cover no-repeat;
+  --instrument-photo-vertical:
+    linear-gradient(rgba(5, 3, 12, 0.68), rgba(5, 3, 12, 0.82)),
+    url('/assets/vertical-instrument-panel.png') center 78% / cover no-repeat;
+  --instrument-photo-mood:
+    linear-gradient(rgba(5, 3, 12, 0.55), rgba(5, 3, 12, 0.75)),
+    url('/assets/mood-resonance-field.png') center / cover no-repeat;
 
   /* Reusable surface: a near-black indigo-violet well with the smoke
      haze lifted toward the top edge, matching the astrolabe photo's
