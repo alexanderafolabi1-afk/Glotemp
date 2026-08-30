@@ -100,6 +100,28 @@ function classifyLicence(raw, version) {
   return null;
 }
 
+// A result matching only because the CITY NAME happens to appear
+// somewhere in a photo's metadata -- most commonly a prolific
+// contributor's own stated home city in their Author field -- is not a
+// photo OF that city. Real bug found by actually running this script:
+// Dubai's stored images turned out to be the Golden Temple in Amritsar,
+// India, because a Commons uploader based "in Dubai, united arab
+// emirates" had photographed it; Miami got a Cincinnati skyline, Sydney
+// got Brisbane, Istanbul got Moscow and Bhutan. Both fetchers already
+// return the candidate's own file/media title, so require the city name
+// to actually appear there -- the one field that reliably describes the
+// photo's real subject -- before it is ever downloaded.
+function titleMentionsCity(title, cityName) {
+  if (!title || !cityName) return false;
+  const norm = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const t = norm(title);
+  const name = norm(cityName);
+  if (!name) return false;
+  // Multi-word city names ("New York", "Hong Kong"): require every word
+  // to appear, not just one -- "New" alone matches far too much.
+  return name.split(' ').every((word) => word.length < 3 || t.includes(word));
+}
+
 function cleanCreator(raw) {
   // Commons' Artist field is HTML (often an <a> to a user page).
   const text = String(raw || '')
@@ -170,6 +192,10 @@ async function fromOpenverse(city) {
     const source = r.foreign_landing_url || r.url;
     if (!licence || !creator || !source || !r.url) continue;
     if ((r.width || 0) && r.width < MIN_WIDTH) continue;
+    // Openverse's own `q` is a loose relevance search across title, tags
+    // and description -- it can match on the city name appearing
+    // anywhere, not the photo's actual subject. Require it in the title.
+    if (!titleMentionsCity(r.title, city.name)) continue;
     items.push({ remote: r.url, licence, creator, sourceUrl: source, title: r.title || null });
   }
   return { items, note: `openverse ${data.results.length} raw / ${items.length} usable` };
@@ -182,7 +208,13 @@ async function fromCommons(city) {
     format: 'json',
     formatversion: '2',
     generator: 'search',
-    gsrsearch: `"${city.name}" (landmark OR skyline OR "old town" OR cathedral OR temple OR bridge OR square)`,
+    // intitle: restricts to files whose own title contains the city name
+    // -- a bare gsrsearch keyword (the previous query) matches anywhere
+    // in the page, including an unrelated uploader's own stated home
+    // city, which is exactly how Dubai ended up with Amritsar photos.
+    // titleMentionsCity() below is the second, independent check on the
+    // same field once results come back.
+    gsrsearch: `intitle:"${city.name}" (landmark OR skyline OR "old town" OR cathedral OR temple OR bridge OR square)`,
     gsrnamespace: '6',
     gsrlimit: '30',
     prop: 'imageinfo',
@@ -209,6 +241,7 @@ async function fromCommons(city) {
     );
     const creator = cleanCreator(meta.Artist && meta.Artist.value);
     if (!licence || !creator) continue;
+    if (!titleMentionsCity(p.title, city.name)) continue;
     items.push({
       remote: info.thumburl || info.url,
       licence,
@@ -254,7 +287,14 @@ async function run() {
     const { pool, notes } = await collect(city);
     const stored = [];
 
-    if (!DRY) fs.mkdirSync(path.join(OUT_DIR, city.slug), { recursive: true });
+    // Clear any files a previous run left for this city before writing --
+    // otherwise a city that used to get 4 images and now only qualifies
+    // for 2 (e.g. after tightening titleMentionsCity() above) keeps
+    // stale 3.jpg/4.jpg on disk forever, orphaned from the manifest.
+    if (!DRY) {
+      fs.rmSync(path.join(OUT_DIR, city.slug), { recursive: true, force: true });
+      fs.mkdirSync(path.join(OUT_DIR, city.slug), { recursive: true });
+    }
 
     for (const item of pool) {
       if (stored.length >= PER_CITY) break;
