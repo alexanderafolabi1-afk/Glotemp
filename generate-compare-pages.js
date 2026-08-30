@@ -92,14 +92,29 @@ function pageHTML(a, b) {
     .compare-side p { color: var(--sand); font-size: 0.85rem; }
     .compare-vs { font-family: var(--font-mono); color: var(--sand); font-size: 0.9rem; }
     .compare-metric-row {
+      position: relative;
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       gap: 1rem;
       align-items: center;
       padding: 0.9rem 1.5rem;
       border-bottom: 1px solid var(--hairline);
+      overflow: hidden;
     }
     .compare-metric-row:last-child { border-bottom: none; }
+    /* Translucent light-band, radiating from the centre toward whichever
+       side is winning -- see mood-resonance-field.png. */
+    .compare-metric-row::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 100% at 50% 50%, rgba(139, 107, 245, 0.14) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 300ms ease;
+      pointer-events: none;
+    }
+    .compare-metric-row:hover::before { opacity: 1; }
+    .compare-metric-row > * { position: relative; }
     .compare-metric-label {
       grid-column: 1 / -1;
       font-family: var(--font-mono);

@@ -1784,8 +1784,9 @@ summary:focus:not(:focus-visible) {
 }
 
 .elsewhere-chip {
+  position: relative;
   min-height: 44px;
-  padding: 0.35rem 0;
+  padding: 0.35rem 0 0.35rem 0.85rem;
   background: none;
   border: none;
   border-bottom: 1px solid var(--hairline);
@@ -1795,7 +1796,21 @@ summary:focus:not(:focus-visible) {
   font-size: 0.9rem;
   color: var(--sand);
 }
+/* A small gold pin mark, same arrow-pin language mood-resonance-field.png
+   uses at the end of each light-band, rather than a plain text button. */
+.elsewhere-chip::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  transform: translateY(-50%) rotate(45deg);
+  background: var(--brass-dim);
+  transition: background var(--transition);
+}
 .elsewhere-chip:hover { color: var(--ivory); border-bottom-color: var(--brass); }
+.elsewhere-chip:hover::before { background: var(--brass); }
 
 /* The drawn chips turn over one at a time (glotemp-elsewhere.js). A fade
    through, not a slide -- the row must not move or reflow while someone
@@ -1818,7 +1833,9 @@ summary:focus:not(:focus-visible) {
   background: linear-gradient(180deg, rgba(245, 162, 90, 0.07) 0%, transparent 60%);
 }
 .elsewhere-panel-night {
-  background: linear-gradient(180deg, rgba(107, 168, 245, 0.09) 0%, transparent 60%);
+  /* Dimmed instrument-violet (this sits over a live city photo, so it
+     stays a tint, not a wash). */
+  background: linear-gradient(180deg, rgba(139, 107, 245, 0.12) 0%, transparent 60%);
 }
 
 /* Every city is photographed (glotemp-elsewhere.js), so every panel
@@ -2066,7 +2083,7 @@ summary:focus:not(:focus-visible) {
   width: 100%;
   height: 100%;
 }
-.tier-plate-outline { fill: rgba(176, 141, 87, 0.05); stroke: var(--brass-dim); stroke-width: 1.4; }
+.tier-plate-outline { fill: rgba(11, 8, 24, 0.4); stroke: var(--brass-dim); stroke-width: 1.4; }
 .tier-plate-inset { fill: none; stroke: var(--hairline); stroke-width: 0.8; }
 .tier-plate-rivet { fill: var(--brass-dim); }
 .tier-plate-content {
@@ -2126,7 +2143,7 @@ summary:focus:not(:focus-visible) {
 .city-tier-badge-verified { color: var(--brass); }
 .city-tier-badge-verified .tier-plate-outline { stroke: var(--brass-dim); }
 .city-tier-badge-anchor { color: var(--ivory); }
-.city-tier-badge-anchor .tier-plate-outline { stroke: var(--brass); }
+.city-tier-badge-anchor .tier-plate-outline { stroke: var(--brass); filter: drop-shadow(0 0 4px var(--instrument-glow-violet)); }
 .city-tier-badge-anchor .tier-plate-rivet { fill: var(--brass); }
 
 /* Fuller standalone panel -- the daily check-in "done" card today. */
@@ -2331,17 +2348,15 @@ summary:focus:not(:focus-visible) {
   position: relative;
   width: 100%;
   max-width: 440px;
-  background:
-    radial-gradient(ellipse 140px 100px at 18% 20%, rgba(240, 224, 200, 0.03) 0%, transparent 45%),
-    radial-gradient(ellipse 120px 90px at 78% 65%, rgba(240, 224, 200, 0.026) 0%, transparent 45%),
-    repeating-linear-gradient(45deg, transparent 0px, transparent 2px, rgba(240, 224, 200, 0.012) 2px, rgba(240, 224, 200, 0.012) 3px),
-    repeating-linear-gradient(-45deg, transparent 0px, transparent 2px, rgba(240, 224, 200, 0.01) 2px, rgba(240, 224, 200, 0.01) 3px),
-    linear-gradient(180deg, rgba(30, 24, 17, var(--glass-opacity)) 0%, rgba(10, 8, 6, var(--glass-opacity)) 100%);
+  /* Engraved-ring instrument panel: an indigo-black well instead of the
+     old brown glass fill, framed by a thin brass ring rather than a
+     solid rectangular border -- see onboarding-instrument-modal.png. */
+  background: var(--instrument-surface-bg);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
-  border-radius: var(--radius);
+  border-radius: 18px;
   padding: 2.25rem 1.85rem 1.75rem;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--instrument-surface-ring), 0 24px 64px rgba(0, 0, 0, 0.6);
   max-height: calc(100vh - 2.5rem);
   overflow-y: auto;
   color: var(--ivory);
@@ -2386,15 +2401,23 @@ summary:focus:not(:focus-visible) {
   gap: 0.4rem;
   margin: 0 0 1.5rem;
 }
+/* Small gold instrument ticks rather than progress dots -- same
+   diamond ornamental mark used as the divider under a headline in
+   vertical-instrument-panel.png, not a UI-chrome circle. */
 .welcome-intro-dot {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: 1px;
+  transform: rotate(45deg);
   background: var(--brass-dim);
   opacity: 0.5;
   transition: opacity var(--transition), background var(--transition);
 }
-.welcome-intro-dot.is-active { background: var(--brass); opacity: 1; }
+.welcome-intro-dot.is-active {
+  background: var(--brass);
+  opacity: 1;
+  box-shadow: 0 0 6px var(--instrument-glow-violet);
+}
 
 .welcome-intro-eyebrow {
   font-family: var(--font-mono);
@@ -2596,7 +2619,7 @@ summary:focus:not(:focus-visible) {
 @media (max-width: 480px) {
   .welcome-intro-modal {
     padding: 1.85rem 1.15rem 1.35rem;
-    border-radius: 16px;
+    border-radius: 14px;
   }
   .welcome-intro-example { height: 176px; }
 }
@@ -3016,7 +3039,7 @@ summary:focus:not(:focus-visible) {
 
 .blog-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25), 0 0 20px var(--instrument-glow-violet);
 }
 
 /* Blog card uses card-media instead of emoji */
@@ -4165,14 +4188,14 @@ small {
   padding: 1.5rem 0;
   text-align: center;
   background: transparent;
-  border-bottom: 1px solid rgba(45, 95, 159, 0.2);
+  border-bottom: 1px solid var(--hairline);
   border-radius: 0;
   transition: all 0.3s ease;
 }
 
 .stat-card:hover {
-  border-color: rgba(45, 95, 159, 0.2);
-  background: linear-gradient(135deg, rgba(45, 95, 159, 0.08), rgba(240, 224, 200, 0.04));
+  border-color: var(--brass-dim);
+  background: linear-gradient(135deg, var(--instrument-glow-violet), rgba(240, 224, 200, 0.04));
 }
 
 .stat-card .stat-label {
@@ -4862,6 +4885,7 @@ button:hover:not(:focus-visible) {
 /* A league table as a stacked list divided by a single rule, not a
    bordered card per row. */
 .ranking-item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -4873,6 +4897,21 @@ button:hover:not(:focus-visible) {
   transition: border-color 300ms, padding-left 300ms;
 }
 .ranking-item:first-child { border-top: none; }
+
+/* Translucent light-band behind the row -- a pseudo-element, not a
+   background, since .ranking-item's own background is force-flattened
+   sitewide (see "NO REMAINING BOXES" below). Same wavy-glow-tapering-to
+   -a-marker read as mood-resonance-field.png. */
+.ranking-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, var(--instrument-glow-violet) 45%, transparent 85%);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+.ranking-item:hover::before { opacity: 1; }
 
 .ranking-item:hover {
   border-color: var(--brass);
@@ -5172,7 +5211,13 @@ a:hover .city-landmark-photo,
   font-family: var(--font-mono);
   font-size: 1.3rem;
   color: var(--brass);
-  transition: transform 200ms ease;
+  /* A thin gold instrument mark, not a plain UI glyph -- a faint glow
+     behind it, like a tick catching light off the dial. */
+  text-shadow: 0 0 6px var(--instrument-glow-violet);
+  transition: transform 200ms ease, text-shadow 200ms ease;
+}
+.vertical-summary:hover::after {
+  text-shadow: 0 0 10px var(--instrument-glow-violet);
 }
 .vertical-section[open] > .vertical-summary::after {
   transform: rotate(45deg);
@@ -5225,6 +5270,25 @@ a:hover .city-landmark-photo,
   position: relative;
   width: 84px;
   height: 84px;
+}
+
+/* A soft indigo-violet halo behind the brass-ring gauge face, giving it
+   the same "instrument glowing from within" depth as
+   vertical-instrument-panel.png -- purely decorative, sits at z-index:-1
+   so it never intercepts the dial's own click/hover target. */
+.instrument-dial::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--instrument-glow-violet) 0%, transparent 68%);
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+.instrument:hover .instrument-dial::before,
+.instrument:focus-within .instrument-dial::before {
+  opacity: 1;
 }
 
 .instrument-dial svg {
@@ -6271,7 +6335,7 @@ a:hover .city-landmark-photo,
   display: block;
   padding: 0.75rem 0.9rem 0.75rem 0.9rem;
   border-top: 2px solid var(--pg-color, var(--brass));
-  background: var(--basalt-raised);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--pg-color, var(--brass)) 14%, transparent) 0%, transparent 70%);
   border-radius: 8px;
   text-decoration: none;
   transition: transform var(--transition), background var(--transition);
@@ -6280,7 +6344,7 @@ a:hover .city-landmark-photo,
 .pulse-gravity-item:hover,
 .pulse-gravity-item:focus-visible {
   transform: translateY(-2px);
-  background: var(--basalt);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--pg-color, var(--brass)) 22%, transparent) 0%, transparent 75%);
 }
 
 .pulse-gravity-name {
@@ -6362,10 +6426,12 @@ a:hover .city-landmark-photo,
   padding: 1.15rem 1.15rem 1.3rem;
   border-radius: 18px;
   text-decoration: none;
+  /* Engraved-ring indigo well tinted by this card's own accent, in
+     place of the old solid basalt fill + full border. */
   background:
-    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--card-color) 22%, transparent), transparent 60%),
-    var(--basalt-raised);
-  border: 1px solid color-mix(in srgb, var(--card-color) 35%, var(--hairline));
+    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--card-color) 20%, transparent), transparent 60%),
+    var(--instrument-surface-bg);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--card-color) 45%, var(--instrument-ring)), inset 0 0 18px rgba(0, 0, 0, 0.55);
   transform: translateY(var(--card-wave, 0px));
   transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
 }
@@ -6373,8 +6439,7 @@ a:hover .city-landmark-photo,
 .city-sell-card:hover,
 .city-sell-card:focus-visible {
   transform: translateY(calc(var(--card-wave, 0px) - 6px));
-  border-color: var(--card-color);
-  box-shadow: 0 14px 30px -14px color-mix(in srgb, var(--card-color) 55%, transparent);
+  box-shadow: inset 0 0 0 1px var(--card-color), inset 0 0 18px rgba(0, 0, 0, 0.55), 0 14px 30px -14px color-mix(in srgb, var(--card-color) 55%, transparent);
 }
 
 .city-sell-icon {
@@ -6457,12 +6522,14 @@ a:hover .city-landmark-photo,
   position: relative;
   overflow: hidden;
   min-height: 260px;
-  border-radius: 20px;
+  border-radius: 18px;
   padding: 2.2rem 2rem 2rem;
+  /* Engraved-ring indigo well, tinted by this entry's own accent colour
+     rather than a solid warm-basalt fill. */
   background:
-    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--card-color, var(--brass)) 26%, transparent), transparent 62%),
-    var(--basalt-raised);
-  border: 1px solid color-mix(in srgb, var(--card-color, var(--brass)) 35%, var(--hairline));
+    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--card-color, var(--brass)) 22%, transparent), transparent 62%),
+    var(--instrument-surface-bg);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--card-color, var(--brass)) 45%, var(--instrument-ring)), inset 0 0 24px rgba(0, 0, 0, 0.6);
 }
 
 .live-blog-home-progress {
@@ -6574,21 +6641,28 @@ a:hover .city-landmark-photo,
   margin-bottom: 0;
 }
 
+/* A small brass pin mark, not a timeline dot -- same arrow-pin language
+   mood-resonance-field.png uses to point from a light-band at its label. */
 .live-blog-entry-dot {
   position: absolute;
   left: -1.6rem;
   top: 0.35rem;
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 1px;
+  transform: rotate(45deg);
   background: var(--entry-color);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--entry-color) 20%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--entry-color) 55%, transparent);
 }
 
+/* Translucent light-band instead of a solid filled card: a soft
+   horizontal glow wash behind the text, no fill, no rounded box --
+   see mood-resonance-field.png. */
 .live-blog-entry-card {
+  position: relative;
   padding: 0.9rem 1.1rem 1.05rem;
-  border-radius: 12px;
-  background: var(--basalt-raised);
+  border-radius: 0;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--entry-color) 16%, transparent) 0%, transparent 75%);
   border-left: 2px solid var(--entry-color);
 }
 
@@ -6751,13 +6825,13 @@ a:hover .city-landmark-photo,
 .city-hover-preview {
   position: absolute;
   z-index: 3000;
-  background: var(--basalt-raised);
+  background: var(--instrument-surface-bg);
   border-bottom: 2px solid var(--band-equilibrium);
   border-radius: 10px;
   padding: 0.6rem 0.9rem;
   font-size: 0.85rem;
   color: var(--ivory);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  box-shadow: var(--instrument-surface-ring), 0 8px 24px rgba(0, 0, 0, 0.5);
   opacity: 0;
   pointer-events: none;
   transform: translateY(-4px);
@@ -6845,15 +6919,14 @@ a:hover .city-landmark-photo,
   position: relative;
   width: 100%;
   max-width: 420px;
-  background:
-    radial-gradient(ellipse 140px 100px at 20% 20%, rgba(240, 224, 200, 0.03) 0%, transparent 45%),
-    repeating-linear-gradient(45deg, transparent 0px, transparent 2px, rgba(240, 224, 200, 0.012) 2px, rgba(240, 224, 200, 0.012) 3px),
-    linear-gradient(180deg, rgba(30, 24, 17, var(--glass-opacity)) 0%, rgba(10, 8, 6, var(--glass-opacity)) 100%);
+  /* Same engraved-ring instrument panel as .welcome-intro-modal --
+     shared by sign-in, "set up your profile" and the nomination form. */
+  background: var(--instrument-surface-bg);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
-  border-radius: var(--radius);
+  border-radius: 18px;
   padding: 2rem 1.75rem 1.75rem;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--instrument-surface-ring), 0 24px 64px rgba(0, 0, 0, 0.6);
   max-height: calc(100vh - 2.5rem);
   overflow-y: auto;
   animation: modal-surface-in 320ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -8046,6 +8119,22 @@ a:hover .city-landmark-photo,
   animation-iteration-count: infinite;
   animation-duration: var(--hero-breathe-period, 6s);
   touch-action: none;
+}
+
+/* A wide, faint indigo-violet atmosphere behind the whole housing --
+   the same glowing-from-within read as vertical-instrument-panel.png's
+   astrolabe. Purely decorative and non-interactive: sits behind every
+   existing layer (base art, mood glow, weather FX, hand) at z-index:-1
+   within .hero-instrument's own stacking context, so none of those are
+   touched. */
+.hero-instrument::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -8%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--instrument-glow-violet) 0%, transparent 65%);
+  pointer-events: none;
 }
 /* --hero-tilt-x/y are updated every frame by the pointer-parallax rAF
    loop in glotemp-hero-instrument.js -- referencing them inside the
@@ -9845,6 +9934,27 @@ body > section {
   --dur-press: 70ms;
 
   --touch-min: 44px;
+}
+
+/* Aesthetic enhancement - safe to remove
+   Instrument surfaces. A deep indigo-black atmosphere for ELEVATED
+   surfaces only (modals, dial housings, list-row glow bands) -- the
+   page ground stays --obsidian, which the mood-tint and weather-ambience
+   systems key off sitewide, so this never touches that. Reuses the
+   existing --violet/--ion accent tokens as the glow palette rather than
+   inventing new hex values. */
+:root {
+  --instrument-void: #0B0818;
+  --instrument-void-deep: #060412;
+  --instrument-glow-violet: rgba(139, 107, 245, 0.35);   /* --violet at 35% */
+  --instrument-glow-teal: rgba(79, 216, 232, 0.28);      /* --ion at 28% */
+  --instrument-ring: rgba(176, 141, 87, 0.55);           /* brighter brass, for engraved rings */
+
+  /* Reusable surface: replaces a solid/gradient card fill with an
+     engraved-ring indigo panel -- radial dark well + a thin inset brass
+     ring + a soft inner shadow, never a hard rectangular border. */
+  --instrument-surface-bg: radial-gradient(ellipse at 50% 30%, var(--instrument-void) 0%, var(--instrument-void-deep) 70%);
+  --instrument-surface-ring: inset 0 0 0 1px var(--instrument-ring), inset 0 0 24px rgba(0, 0, 0, 0.6);
 }
 
 /* Aesthetic enhancement - safe to remove
