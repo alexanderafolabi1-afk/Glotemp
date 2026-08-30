@@ -46,36 +46,49 @@
 
   <main class="page-content">
     <section class="city-header glass-card">
-      <div class="city-header-photo" id="city-header-photo" aria-hidden="true">
-        <img id="city-header-photo-img" alt="" decoding="async">
-      </div>
-      <div class="city-header-content">
-        <p class="city-live-badge checkin-live-eyebrow live-mark">Live</p>
-        <span id="city-tier-badge" class="city-tier-badge" hidden></span>
-        <h1 id="city-name"></h1>
-        <p id="city-country-region"></p>
-        <div class="city-meta">
-          <span id="city-timezone"></span>
-          <span id="city-penetration"></span>
-          <span id="city-metro-pop"></span>
-        </div>
-        <p class="conditions-line" id="conditions-line" aria-live="polite"></p>
-        <!-- "Why" line: built only from stored deltas in
-             city_signal_snapshots (see city-why.js). Hidden until at
-             least two days of history exist for this city, never
-             a guess standing in for a trend that isn't there yet. -->
-        <p class="why-line" id="why-line" aria-live="polite" hidden></p>
-        <div class="city-action-row">
-          <button id="watch-city-btn" class="btn-neon" type="button">Follow this city</button>
-          <button id="share-city-btn" class="btn-neon" type="button" style="--btn-band: var(--band-restrained);">Share</button>
-        </div>
-        <div id="watch-email-panel" class="watch-email-panel" style="display:none;">
-          <label for="watch-email-input">Get notified when this city changes band or enters a top ten.</label>
-          <div class="watch-email-row">
-            <input type="email" id="watch-email-input" placeholder="you@example.com" required>
-            <button id="watch-email-submit" class="btn-neon" type="button">Notify me</button>
+      <div class="city-header-grid">
+        <div class="city-header-content">
+          <p class="city-live-badge checkin-live-eyebrow live-mark">Live</p>
+          <span id="city-tier-badge" class="city-tier-badge" hidden></span>
+          <h1 id="city-name"></h1>
+          <p id="city-country-region"></p>
+          <div class="city-band-score">
+            <div class="city-band-score-labels">
+              <span class="gt-eyebrow">Band</span>
+              <span id="city-band-word" class="city-band-word"></span>
+            </div>
+            <div class="city-score-readout">
+              <span id="city-score-value" class="city-score-value"></span><span class="city-score-max">/10</span>
+            </div>
           </div>
-          <p id="watch-email-status" class="inline-feedback"></p>
+          <div id="city-gauge-mount" class="city-gauge-mount" aria-hidden="true"></div>
+          <p class="city-tagline">How this city feels right now.</p>
+          <div class="city-meta">
+            <span id="city-timezone"></span>
+            <span id="city-penetration"></span>
+            <span id="city-metro-pop"></span>
+          </div>
+          <p class="conditions-line" id="conditions-line" aria-live="polite"></p>
+          <!-- "Why" line: built only from stored deltas in
+               city_signal_snapshots (see city-why.js). Hidden until at
+               least two days of history exist for this city, never
+               a guess standing in for a trend that isn't there yet. -->
+          <p class="why-line" id="why-line" aria-live="polite" hidden></p>
+          <div class="city-action-row">
+            <button id="watch-city-btn" class="btn-neon" type="button">Follow this city</button>
+            <button id="share-city-btn" class="btn-neon" type="button" style="--btn-band: var(--band-restrained);">Share</button>
+          </div>
+          <div id="watch-email-panel" class="watch-email-panel" style="display:none;">
+            <label for="watch-email-input">Get notified when this city changes band or enters a top ten.</label>
+            <div class="watch-email-row">
+              <input type="email" id="watch-email-input" placeholder="you@example.com" required>
+              <button id="watch-email-submit" class="btn-neon" type="button">Notify me</button>
+            </div>
+            <p id="watch-email-status" class="inline-feedback"></p>
+          </div>
+        </div>
+        <div class="city-header-photo" id="city-header-photo" aria-hidden="true">
+          <img id="city-header-photo-img" alt="" decoding="async">
         </div>
       </div>
     </section>
@@ -438,7 +451,9 @@
   <script src="/city-trivia-data.js" defer></script>
   <script src="/glotemp-personality.js" defer></script>
   <script src="/city-wiki.js" defer></script>
+  <script src="/city-media-photo.js" defer></script>
   <script src="/city-header-photo.js" defer></script>
+  <script src="/glotemp-gauge.js" defer></script>
   <script src="/seed-observations.js" defer></script>
   <script src="/social-proof.js" defer></script>
   <script src="/city-food-signature.js" defer></script>
@@ -555,7 +570,18 @@
         document.getElementById('city-timezone').textContent = `📍 ${city.timezone}`;
         document.getElementById('city-penetration').textContent = `📡 ${(city.penetration * 100).toFixed(0)}% online`;
         document.getElementById('city-metro-pop').textContent = `👥 ${city.metro_pop.toLocaleString()} metro`;
-        if (typeof GlotempCore !== 'undefined') GlotempCore.applyMoodBackground(city.mood);
+        if (typeof GlotempCore !== 'undefined') {
+          GlotempCore.applyMoodBackground(city.mood);
+          const band = GlotempCore.moodToBand(city.mood);
+          const bandWordEl = document.getElementById('city-band-word');
+          if (bandWordEl) { bandWordEl.textContent = band.band; bandWordEl.style.color = band.color; }
+          const scoreEl = document.getElementById('city-score-value');
+          if (scoreEl) { scoreEl.textContent = city.mood.toFixed(1); scoreEl.style.color = band.color; }
+        }
+        const gaugeMount = document.getElementById('city-gauge-mount');
+        if (gaugeMount && typeof GlotempGauge !== 'undefined') {
+          gaugeMount.innerHTML = GlotempGauge.renderSVG(city.mood, { ariaLabel: `${city.name} reading ${city.mood.toFixed(1)} out of 10` });
+        }
       }
 
       const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];
@@ -566,7 +592,7 @@
       // loadCityWiki below actually wins the race is the only network
       // call; the other reuses its cached promise.
       if (typeof GlotempHeaderPhoto !== 'undefined' && city) {
-        GlotempHeaderPhoto.loadHeaderPhoto(city.name, city.country);
+        GlotempHeaderPhoto.loadHeaderPhoto(city.name, city.country, city.slug);
       }
 
       if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('Nassau', 'Bahamas');

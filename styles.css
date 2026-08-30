@@ -5068,9 +5068,132 @@ button:hover:not(:focus-visible) {
   );
 }
 
+/* Attribution for /city-media/ photos -- required for CC BY, shown for
+   CC0/Public domain too since the credit itself is free. Absent when
+   the photo came from the landmark or Wikipedia tiers instead (those
+   render nothing here; renderCredit() clears any stale line first). */
+.city-header-photo-credit {
+  position: absolute;
+  z-index: 2;
+  right: 0.75rem;
+  bottom: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.02em;
+  color: rgba(233, 226, 213, 0.65);
+  text-decoration: none;
+  max-width: calc(100% - 1.5rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.city-header-photo-credit:hover { color: var(--ivory); }
+
+.city-header-grid {
+  position: relative;
+  z-index: 1;
+}
+
 .city-header-content {
   position: relative;
   z-index: 1;
+}
+
+/* Band + score readout -- "BAND / WARM" and "7.8 /10" side by side, the
+   same instrument-reading register as .conditions-line/.why-line but
+   sized up as the header's own headline stat. */
+.city-band-score {
+  display: flex;
+  align-items: baseline;
+  gap: 1.75rem;
+  margin-top: 1.1rem;
+}
+.city-band-score-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.gt-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.city-band-word {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sand);
+}
+.city-score-readout {
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-variant-numeric: tabular-nums;
+  color: var(--ivory);
+  line-height: 1;
+}
+.city-score-value { font-size: clamp(2.6rem, 5vw, 3.6rem); }
+.city-score-max { font-size: 1.2rem; color: var(--sand); margin-left: 0.15em; }
+
+.city-tagline {
+  margin-top: 1.1rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--sand);
+}
+
+/* The gauge itself: sized by its own wrapper, needle rotation driven by
+   the CSS custom property glotemp-gauge.js sets per-instance so both
+   this header copy and the homepage showcase's copy animate the same
+   quiet way. Snaps instantly under reduced motion instead of sweeping. */
+.city-gauge-mount { width: 128px; margin-top: 1.3rem; }
+.gt-gauge { width: 100%; height: auto; overflow: visible; }
+.gt-gauge-face { fill: #F0E0C8; }
+.gt-gauge-ring { fill: none; stroke: var(--brass); stroke-width: 1.5; }
+.gt-gauge-label {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  fill: var(--brass-dim);
+}
+.gt-gauge-pivot { fill: var(--brass); }
+.gt-gauge-needle {
+  transform: rotate(var(--gauge-deg, 0deg));
+  transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.gt-gauge-needle line {
+  stroke: var(--band-warm);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--band-warm) 60%, transparent));
+}
+@media (prefers-reduced-motion: reduce) {
+  .gt-gauge-needle { transition: none; }
+}
+
+/* Desktop: the two-column layout from the city-page reference -- a
+   clean side-by-side photo, no text scrimmed over it (all copy already
+   lives in the left column on solid ground). Below this width the
+   photo stays the existing full-bleed-behind-content treatment, which
+   is the mobile reference's own look, not a fallback. */
+@media (min-width: 900px) {
+  .city-header-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 42%);
+    gap: 2.5rem;
+    align-items: stretch;
+  }
+  .city-header-photo {
+    position: relative;
+    inset: auto;
+    border-radius: 14px;
+    min-height: 380px;
+  }
+  .city-header-photo::after {
+    background: linear-gradient(180deg, rgba(20, 16, 11, 0) 60%, rgba(20, 16, 11, 0.35) 100%);
+  }
 }
 
 .city-header-content h1 {
@@ -9435,11 +9558,87 @@ time, .instr-clock, .tonight-modelled {
 .section-heading { margin-bottom: 1.5rem; }
 
 /* Daily Pulse -> showcase rotator */
-.showcase { padding: 0.5rem 0 0; min-height: 132px; }
-.showcase-city { font-family: var(--font-display); font-size: clamp(26px, 3.4vw, 40px); font-weight: var(--fw-light); line-height: 1.1; display: flex; align-items: center; gap: 0.5rem; }
+/* Showcase card: same overlay-photo pattern as .city-header (photo
+   absolute behind, scrim, content on top) so the rotating homepage card
+   and the city page share one visual language, not two competing
+   photo treatments. */
+.showcase {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 14px;
+  min-height: clamp(340px, 42vw, 440px);
+  padding: 1.6rem 1.5rem 1.5rem;
+  display: flex;
+}
+.showcase-photo { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.showcase-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; opacity: 0; transition: opacity 700ms ease; }
+.showcase-photo.is-loaded img { opacity: 1; }
+.showcase-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(20, 16, 11, 0.15) 0%, rgba(20, 16, 11, 0.55) 55%, rgba(20, 16, 11, 0.92) 100%);
+}
+.showcase-photo-credit {
+  position: absolute;
+  z-index: 2;
+  right: 0.75rem;
+  bottom: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.02em;
+  color: rgba(233, 226, 213, 0.65);
+  text-decoration: none;
+  max-width: calc(100% - 1.5rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.showcase-photo-credit:hover { color: var(--ivory); }
+.showcase-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+}
+.showcase-city { font-family: var(--font-display); font-size: clamp(26px, 3.4vw, 40px); font-weight: var(--fw-light); line-height: 1.1; display: flex; align-items: center; gap: 0.5rem; color: var(--ivory); }
 .showcase-line { color: var(--sand); font-size: 1rem; margin-top: 0.5rem; min-height: 1.6em; max-width: 46ch; }
-.showcase-open { display: inline-block; margin-top: 0.9rem; min-height: 44px; color: var(--ivory); text-decoration: none; border-bottom: 1px solid var(--brass-dim); padding-bottom: 3px; }
+.showcase-stat-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-top: 0.9rem; }
+.showcase-band-score { display: flex; align-items: baseline; gap: 0.6rem; }
+.showcase-band-score .city-band-word { font-size: 0.8rem; }
+.showcase-score { font-family: var(--font-display); font-weight: var(--fw-light); font-variant-numeric: tabular-nums; font-size: 1.5rem; color: var(--ivory); }
+.showcase-gauge-mount { width: 72px; flex: none; }
+.showcase-time { margin-top: 0.6rem; font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.04em; color: var(--sand); }
+.showcase-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--sand);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  min-height: 32px;
+  transition: color 200ms ease;
+}
+.showcase-radio:hover { color: var(--ivory); }
+.showcase-radio.is-live { color: var(--band-warm); }
+.showcase-radio-icon { font-size: 1rem; }
+.showcase-open { display: inline-block; margin-top: 0.9rem; min-height: 44px; color: var(--ivory); text-decoration: none; border-bottom: 1px solid var(--brass-dim); padding-bottom: 3px; align-self: flex-start; }
 .showcase-open:hover { color: var(--brass); border-color: var(--brass); }
+@media (min-width: 700px) {
+  .showcase-photo::after {
+    background: linear-gradient(90deg, rgba(20, 16, 11, 0.94) 0%, rgba(20, 16, 11, 0.75) 38%, rgba(20, 16, 11, 0.1) 72%);
+  }
+  .showcase-body { max-width: 60%; }
+}
 
 /* Live ticker sheds its panel too. */
 .live-ticker { border: none !important; border-top: 1px solid var(--hairline) !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; padding: 1rem 0 !important; }
@@ -9460,12 +9659,10 @@ time, .instr-clock, .tonight-modelled {
 .stat-card { background: transparent !important; border: none !important; border-top: 1px solid var(--hairline) !important; border-radius: 0 !important; padding: 1rem 0 !important; }
 .coverage-grid { gap: 0 2rem !important; }
 
-/* Re-reserve the boxes that fill from JS after the shrink pass. Values
-   are the measured rendered heights at each breakpoint; without these,
-   the spin shell and the showcase rotator fill in and push the page,
-   which is exactly the CLS the shrink reintroduced. */
-.showcase { min-height: 147px; }
-@media (max-width: 900px) { .showcase { min-height: 132px; } }
+/* Re-reserve the box the spin shell fills from JS after the shrink pass
+   (measured rendered height), so it doesn't push the page on load --
+   the showcase rotator now reserves its own height directly (see
+   .showcase above), sized to its photo, not to pre-photo text alone. */
 
 /* ===== SPIN: CUT THE SECTION HEIGHT =====
    The shrink pass above still left the spin instrument as tall as the
