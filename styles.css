@@ -2348,15 +2348,26 @@ summary:focus:not(:focus-visible) {
   position: relative;
   width: 100%;
   max-width: 440px;
-  /* Engraved-ring instrument panel: an indigo-black well instead of the
-     old brown glass fill, framed by a thin brass ring rather than a
-     solid rectangular border -- see onboarding-instrument-modal.png. */
-  background: var(--instrument-surface-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border-radius: 18px;
+  /* Engraved-ring instrument panel: an indigo-black well with a violet
+     smoke glow, set inside a riveted aged-brass case -- see
+     mood-resonance-field.png's housing and vertical-instrument-panel.png's
+     atmosphere. The case and the well are two background layers on this
+     SAME element (not a stacked pseudo-element -- z-index:-1 pseudo
+     layering was tried here and rendered inconsistently across engines),
+     separated by background-clip: the brass paints the full border-box,
+     the indigo well paints only the padding-box inside a 9px transparent
+     border, so the brass shows only as the ring around it. */
+  border: 9px solid transparent;
   padding: 2.25rem 1.85rem 1.75rem;
-  box-shadow: var(--instrument-surface-ring), 0 24px 64px rgba(0, 0, 0, 0.6);
+  background:
+    var(--instrument-surface-bg) padding-box,
+    radial-gradient(circle 3.5px at 17px 17px, #2a1c0c 55%, transparent 58%) border-box,
+    radial-gradient(circle 3.5px at calc(100% - 17px) 17px, #2a1c0c 55%, transparent 58%) border-box,
+    radial-gradient(circle 3.5px at 17px calc(100% - 17px), #2a1c0c 55%, transparent 58%) border-box,
+    radial-gradient(circle 3.5px at calc(100% - 17px) calc(100% - 17px), #2a1c0c 55%, transparent 58%) border-box,
+    var(--instrument-brass-frame) border-box;
+  border-radius: 25px !important;
+  box-shadow: var(--instrument-frame-shadow), var(--instrument-surface-ring), 0 24px 64px rgba(0, 0, 0, 0.6);
   max-height: calc(100vh - 2.5rem);
   overflow-y: auto;
   color: var(--ivory);
@@ -4905,9 +4916,12 @@ button:hover:not(:focus-visible) {
 .ranking-item::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent 0%, var(--instrument-glow-violet) 45%, transparent 85%);
-  opacity: 0;
+  inset: -6px 0;
+  background:
+    radial-gradient(70% 160% at 8% 50%, var(--instrument-glow-violet) 0%, transparent 68%),
+    radial-gradient(45% 120% at 38% 35%, var(--instrument-glow-teal) 0%, transparent 62%);
+  filter: blur(11px);
+  opacity: 0.55;
   transition: opacity 300ms ease;
   pointer-events: none;
 }
@@ -5280,10 +5294,11 @@ a:hover .city-landmark-photo,
   content: '';
   position: absolute;
   z-index: -1;
-  inset: -10px;
+  inset: -14px;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--instrument-glow-violet) 0%, transparent 68%);
-  opacity: 0;
+  background: radial-gradient(circle, var(--instrument-glow-violet) 0%, transparent 70%);
+  filter: blur(2px);
+  opacity: 0.55;
   transition: opacity 400ms ease;
 }
 .instrument:hover .instrument-dial::before,
@@ -6332,19 +6347,38 @@ a:hover .city-landmark-photo,
 }
 
 .pulse-gravity-item {
+  position: relative;
   display: block;
-  padding: 0.75rem 0.9rem 0.75rem 0.9rem;
-  border-top: 2px solid var(--pg-color, var(--brass));
-  background: linear-gradient(180deg, color-mix(in srgb, var(--pg-color, var(--brass)) 14%, transparent) 0%, transparent 70%);
-  border-radius: 8px;
+  padding: 0.9rem 1rem 0.8rem;
+  background: var(--instrument-void);
+  border-radius: 6px;
   text-decoration: none;
-  transition: transform var(--transition), background var(--transition);
+  overflow: hidden;
+  transition: transform var(--transition), box-shadow var(--transition);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pg-color, var(--brass)) 45%, var(--instrument-ring));
+}
+/* A vivid beam of that city's own colour entering from the top edge,
+   the wave-band read from mood-resonance-field.png applied to a
+   per-city accent instead of the shared brass tone. */
+.pulse-gravity-item::before {
+  content: '';
+  position: absolute;
+  inset: -25% -15% auto -15%;
+  height: 75%;
+  background: radial-gradient(65% 100% at 50% 0%, color-mix(in srgb, var(--pg-color, var(--brass)) 85%, transparent) 0%, transparent 78%);
+  filter: blur(9px);
+  opacity: 0.85;
+  pointer-events: none;
 }
 
 .pulse-gravity-item:hover,
 .pulse-gravity-item:focus-visible {
   transform: translateY(-2px);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--pg-color, var(--brass)) 22%, transparent) 0%, transparent 75%);
+  box-shadow: inset 0 0 0 1px var(--pg-color, var(--brass));
+}
+.pulse-gravity-item:hover::before,
+.pulse-gravity-item:focus-visible::before {
+  opacity: 1;
 }
 
 .pulse-gravity-name {
@@ -6919,14 +6953,20 @@ a:hover .city-landmark-photo,
   position: relative;
   width: 100%;
   max-width: 420px;
-  /* Same engraved-ring instrument panel as .welcome-intro-modal --
-     shared by sign-in, "set up your profile" and the nomination form. */
-  background: var(--instrument-surface-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border-radius: 18px;
+  /* Same riveted aged-brass case as .welcome-intro-modal, drawn as two
+     background-clip layers on this element rather than a z-index:-1
+     pseudo-element -- see that rule's comment for why. */
+  border: 9px solid transparent;
   padding: 2rem 1.75rem 1.75rem;
-  box-shadow: var(--instrument-surface-ring), 0 24px 64px rgba(0, 0, 0, 0.6);
+  background:
+    var(--instrument-surface-bg) padding-box,
+    radial-gradient(circle 3.5px at 17px 17px, #2a1c0c 55%, transparent 58%) border-box,
+    radial-gradient(circle 3.5px at calc(100% - 17px) 17px, #2a1c0c 55%, transparent 58%) border-box,
+    radial-gradient(circle 3.5px at 17px calc(100% - 17px), #2a1c0c 55%, transparent 58%) border-box,
+    radial-gradient(circle 3.5px at calc(100% - 17px) calc(100% - 17px), #2a1c0c 55%, transparent 58%) border-box,
+    var(--instrument-brass-frame) border-box;
+  border-radius: 25px !important;
+  box-shadow: var(--instrument-frame-shadow), var(--instrument-surface-ring), 0 24px 64px rgba(0, 0, 0, 0.6);
   max-height: calc(100vh - 2.5rem);
   overflow-y: auto;
   animation: modal-surface-in 320ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -9944,17 +9984,34 @@ body > section {
    existing --violet/--ion accent tokens as the glow palette rather than
    inventing new hex values. */
 :root {
-  --instrument-void: #0B0818;
-  --instrument-void-deep: #060412;
-  --instrument-glow-violet: rgba(139, 107, 245, 0.35);   /* --violet at 35% */
-  --instrument-glow-teal: rgba(79, 216, 232, 0.28);      /* --ion at 28% */
-  --instrument-ring: rgba(176, 141, 87, 0.55);           /* brighter brass, for engraved rings */
+  --instrument-void: #0a0716;
+  --instrument-void-deep: #020108;
+  --instrument-smoke: rgba(110, 70, 200, 0.4);           /* the purple haze in vertical-instrument-panel.png */
+  --instrument-glow-violet: rgba(154, 115, 255, 0.6);    /* --violet, pushed brighter+more opaque for the wave-bands */
+  --instrument-glow-teal: rgba(70, 226, 214, 0.55);      /* --ion, same treatment */
+  --instrument-glow-green: rgba(90, 212, 140, 0.5);      /* third band colour, from onboarding-instrument-modal.png */
+  --instrument-ring: rgba(216, 180, 116, 0.95);          /* brighter, more saturated brass, for engraved rings */
 
   /* Reusable surface: replaces a solid/gradient card fill with an
-     engraved-ring indigo panel -- radial dark well + a thin inset brass
-     ring + a soft inner shadow, never a hard rectangular border. */
-  --instrument-surface-bg: radial-gradient(ellipse at 50% 30%, var(--instrument-void) 0%, var(--instrument-void-deep) 70%);
-  --instrument-surface-ring: inset 0 0 0 1px var(--instrument-ring), inset 0 0 24px rgba(0, 0, 0, 0.6);
+     engraved-ring indigo panel -- a near-black well with a violet smoke
+     glow lifted toward the top edge (matching the astrolabe photo's
+     lighting), never a hard rectangular border. */
+  --instrument-surface-bg:
+    radial-gradient(ellipse 90% 55% at 50% 8%, var(--instrument-smoke) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 35%, var(--instrument-void) 0%, var(--instrument-void-deep) 78%);
+  --instrument-surface-ring: inset 0 0 0 1px var(--instrument-ring), inset 0 0 36px rgba(0, 0, 0, 0.75);
+
+  /* Aged-brass instrument frame: a metal bezel drawn as a background
+     gradient (never an image file) with a bevelled highlight/shadow pair,
+     used on a ::before sized slightly larger than its parent so it reads
+     as a housing the parent surface sits inside of -- see the rounded
+     brass case in mood-resonance-field.png. */
+  --instrument-brass-frame: linear-gradient(155deg, #f2dba3 0%, #c99a52 18%, #7a5326 40%, #4a3016 50%, #7a5326 60%, #c99a52 82%, #f2dba3 100%);
+  --instrument-frame-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.65),
+    inset 0 1px 1px rgba(255, 245, 220, 0.5),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6),
+    0 20px 60px rgba(0, 0, 0, 0.6);
 }
 
 /* Aesthetic enhancement - safe to remove
@@ -10198,17 +10255,25 @@ a:active:not(.btn-neon):not(.nav-logo):not([class*="chip"]) {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 78%;
-  height: 78%;
+  width: 128%;
+  height: 128%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(circle,
-    rgba(245, 162, 90, 0.20) 0%,
-    rgba(245, 162, 90, 0.08) 42%,
-    rgba(245, 162, 90, 0) 70%);
-  opacity: 0.85;
+  /* Warm brass rim-light close to the housing, over a wide indigo-violet
+     smoke wash further out -- the astrolabe-in-purple-haze atmosphere
+     from vertical-instrument-panel.png. */
+  background:
+    radial-gradient(circle,
+      rgba(245, 162, 90, 0.22) 0%,
+      rgba(245, 162, 90, 0.09) 30%,
+      rgba(245, 162, 90, 0) 46%),
+    radial-gradient(circle,
+      var(--instrument-glow-violet) 0%,
+      rgba(110, 70, 200, 0.16) 40%,
+      transparent 72%);
+  opacity: 0.9;
   transition: opacity var(--dur-mid) var(--ease-out),
               transform var(--dur-mid) var(--ease-out);
 }

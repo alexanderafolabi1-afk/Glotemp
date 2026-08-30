@@ -71,9 +71,10 @@
     .compare-metric-row::before {
       content: '';
       position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 60% 100% at 50% 50%, rgba(139, 107, 245, 0.14) 0%, transparent 70%);
-      opacity: 0;
+      inset: -8px 0;
+      background: radial-gradient(ellipse 65% 220% at 50% 50%, rgba(154, 115, 255, 0.6) 0%, rgba(70, 226, 214, 0.28) 55%, transparent 78%);
+      filter: blur(12px);
+      opacity: 0.5;
       transition: opacity 300ms ease;
       pointer-events: none;
     }
