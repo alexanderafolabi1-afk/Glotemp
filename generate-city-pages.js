@@ -277,7 +277,18 @@ function generateCityPage(city) {
         document.getElementById('city-timezone').textContent = \`📍 \${city.timezone}\`;
         document.getElementById('city-penetration').textContent = \`📡 \${(city.penetration * 100).toFixed(0)}% online\`;
         document.getElementById('city-metro-pop').textContent = \`👥 \${city.metro_pop.toLocaleString()} metro\`;
-        if (typeof GlotempCore !== 'undefined') GlotempCore.applyMoodBackground(city.mood);
+        if (typeof GlotempCore !== 'undefined') {
+          GlotempCore.applyMoodBackground(city.mood);
+          const band = GlotempCore.moodToBand(city.mood);
+          const bandWordEl = document.getElementById('city-band-word');
+          if (bandWordEl) { bandWordEl.textContent = band.band; bandWordEl.style.color = band.color; }
+          const scoreEl = document.getElementById('city-score-value');
+          if (scoreEl) { scoreEl.textContent = city.mood.toFixed(1); scoreEl.style.color = band.color; }
+        }
+        const gaugeMount = document.getElementById('city-gauge-mount');
+        if (gaugeMount && typeof GlotempGauge !== 'undefined') {
+          gaugeMount.innerHTML = GlotempGauge.renderSVG(city.mood, { ariaLabel: \`\${city.name} reading \${city.mood.toFixed(1)} out of 10\` });
+        }
       }
 
       const verticalSlugs = ['pulse', 'tech', 'finance', 'work', 'property', 'education', 'sport', 'entertainment', 'fashion', 'food', 'health', 'transport'];

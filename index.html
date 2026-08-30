@@ -394,13 +394,33 @@
       </div>
     </section>
 
-    <!-- Daily Pulse: city showcase rotator. Default city is Helsinki. -->
+    <!-- Daily Pulse: city showcase rotator. Default city is Helsinki.
+         See glotemp-showcase.js for the photo/gauge/radio wiring. -->
     <section class="glass-card" id="daily-story">
       <p class="eyebrow" data-i18n="daily_story">Daily pulse</p>
       <div id="showcase" class="showcase">
-        <h2 class="showcase-city" id="showcase-city">Helsinki</h2>
-        <p class="showcase-line" id="showcase-line">&nbsp;</p>
-        <a class="showcase-open" id="showcase-open" href="/cities/helsinki.html">Open Helsinki &rarr;</a>
+        <div class="showcase-photo" id="showcase-photo" aria-hidden="true">
+          <img id="showcase-photo-img" alt="" decoding="async">
+        </div>
+        <div class="showcase-body">
+          <h2 class="showcase-city" id="showcase-city">Helsinki</h2>
+          <p class="showcase-line" id="showcase-line">&nbsp;</p>
+          <div class="showcase-stat-row">
+            <div class="showcase-band-score">
+              <span class="gt-eyebrow">Band</span>
+              <span id="showcase-band-word" class="city-band-word"></span>
+              <span id="showcase-score" class="showcase-score"></span>
+            </div>
+            <div id="showcase-gauge-mount" class="showcase-gauge-mount" aria-hidden="true"></div>
+          </div>
+          <p class="showcase-time" id="showcase-time"></p>
+          <button type="button" class="showcase-radio" id="showcase-radio-toggle" aria-pressed="false">
+            <span class="showcase-radio-icon" aria-hidden="true">&#128266;</span>
+            <span class="showcase-radio-label" id="showcase-radio-label">Tune in</span>
+          </button>
+          <audio id="showcase-radio-audio" preload="none"></audio>
+          <a class="showcase-open" id="showcase-open" href="/cities/helsinki.html">Open Helsinki &rarr;</a>
+        </div>
       </div>
     </section>
 
@@ -593,6 +613,8 @@
   <script src="/mood-confidence.js" defer></script>
   <script src="/pulse-map.js" defer></script>
   <script src="/social-proof.js" defer></script>
+  <script src="/city-wiki.js" defer></script>
+  <script src="/glotemp-gauge.js" defer></script>
   <script src="/glotemp-showcase.js" defer></script>
   <script src="/glotemp-spin.js" defer></script>
   <script src="/city-spotlight.js" defer></script>
