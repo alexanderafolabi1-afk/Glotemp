@@ -6,6 +6,33 @@
 // breakdown per Glotemp vertical, so this renders once per city page.
 (function () {
   const API_BASE = 'https://en.wikipedia.org/api/rest_v1/page/summary/';
+  // ACTION_API is declared once, further down in this same closure,
+  // where loadVerticalContext's extracts lookup already uses it.
+
+  // Second-tier image lookup, same free/keyless Wikipedia source as
+  // fetchSummary above -- just a different endpoint (MediaWiki's own
+  // action API rather than the REST summary one). Used only when the
+  // summary's own `thumbnail` field comes back empty: a smaller article
+  // can still have a real representative image (pageimages' own
+  // heuristic looks beyond the infobox), and `redirects=1` catches
+  // alternate/former names the plain summary lookup above missed.
+  // `origin=*` is the documented client-side CORS workaround for this
+  // endpoint (it isn't CORS-enabled by default the way the REST API is).
+  async function fetchPageImage(title) {
+    if (!title) return null;
+    try {
+      const url = `${ACTION_API}?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=1200&titles=${encodeURIComponent(title)}`;
+      const resp = await fetch(url);
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      const pages = data && data.query && data.query.pages;
+      if (!pages) return null;
+      const page = Object.values(pages)[0];
+      return (page && page.thumbnail && page.thumbnail.source) || null;
+    } catch (e) {
+      return null;
+    }
+  }
 
   async function fetchSummary(title) {
     const resp = await fetch(API_BASE + encodeURIComponent(title), {
@@ -249,11 +276,33 @@
   // caller (this or the "About this city" panel) runs first is the only
   // one that ever hits the network; the other just reads the resolved
   // value. Used by city-header-photo.js to reuse the exact same image.
+  const pageImageCache = new Map();
+  function fetchPageImageCached(title) {
+    if (!title) return Promise.resolve(null);
+    if (pageImageCache.has(title)) return pageImageCache.get(title);
+    const promise = fetchPageImage(title);
+    pageImageCache.set(title, promise);
+    return promise;
+  }
+
   async function getCityImageUrl(cityName, country) {
     if (!cityName) return null;
     try {
       const data = await getSummaryCached(cityName, country);
-      return (data && data.thumbnail && data.thumbnail.source) || null;
+      if (data && data.thumbnail && data.thumbnail.source) return data.thumbnail.source;
+      // Summary resolved (or didn't) with no thumbnail -- try the more
+      // forgiving pageimages endpoint before giving up. Prefer the title
+      // Wikipedia itself resolved to (follows redirects/disambiguation
+      // already), then the plain city name, then "City, Country".
+      const resolvedTitle = data && data.title;
+      let img = await fetchPageImageCached(resolvedTitle || cityName);
+      if (!img && resolvedTitle && resolvedTitle !== cityName) {
+        img = await fetchPageImageCached(cityName);
+      }
+      if (!img && country) {
+        img = await fetchPageImageCached(`${cityName}, ${country}`);
+      }
+      return img || null;
     } catch (e) {
       return null;
     }

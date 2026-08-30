@@ -52,17 +52,55 @@
     }
   }
 
+  function renderPhotoCredit(wrap, photo) {
+    const existing = wrap.querySelector('.showcase-photo-credit');
+    if (existing) existing.remove();
+    if (!photo || !photo.creator) return;
+    const a = document.createElement('a');
+    a.className = 'showcase-photo-credit';
+    a.href = photo.sourceUrl || '#';
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = `Photo: ${photo.creator}${photo.licence ? ` (${photo.licence})` : ''}`;
+    wrap.appendChild(a);
+  }
+
+  // Same priority chain as the city header (see city-header-photo.js):
+  // /city-media/'s pre-fetched, licence-checked photos first (same-origin,
+  // no third-party network dependency), then the 24 hand-verified
+  // landmarks, then the two-tier Wikipedia lookup. One shared image
+  // strategy, not a second one invented for this card.
   function paintPhoto(city) {
     const wrap = document.getElementById('showcase-photo');
     const img = document.getElementById('showcase-photo-img');
     if (!wrap || !img) return;
     wrap.classList.remove('is-loaded');
-    if (typeof GlotempWiki === 'undefined' || !GlotempWiki.getCityImageUrl) return;
     const myGen = ++photoGen;
-    GlotempWiki.getCityImageUrl(city.name, city.country).then((url) => {
+
+    function apply(url, credit) {
       if (!url || myGen !== photoGen) return; // no photo, or we've since rotated on
       img.addEventListener('load', () => { if (myGen === photoGen) wrap.classList.add('is-loaded'); }, { once: true });
       img.src = url;
+      renderPhotoCredit(wrap, credit);
+    }
+
+    const mediaPromise = (typeof GlotempCityMedia !== 'undefined' && GlotempCityMedia.getPhoto)
+      ? GlotempCityMedia.getPhoto(city.slug)
+      : Promise.resolve(null);
+
+    mediaPromise.then((photo) => {
+      if (myGen !== photoGen) return;
+      if (photo && photo.url) return apply(photo.url, photo);
+
+      const landmarkPromise = (typeof GlotempLandmarkPhotos !== 'undefined' && GlotempLandmarkPhotos.hasPhoto(city.slug))
+        ? GlotempLandmarkPhotos.getPhotoUrl(city.slug)
+        : Promise.resolve(null);
+      return landmarkPromise.then((landmarkUrl) => {
+        if (myGen !== photoGen) return;
+        if (landmarkUrl) return apply(landmarkUrl, null);
+        if (typeof GlotempWiki === 'undefined' || !GlotempWiki.getCityImageUrl) return;
+        return GlotempWiki.getCityImageUrl(city.name, city.country).then((url) => apply(url, null));
+      });
     }).catch(() => {});
   }
 

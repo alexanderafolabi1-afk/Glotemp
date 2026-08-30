@@ -299,7 +299,7 @@ function generateCityPage(city) {
       // loadCityWiki below actually wins the race is the only network
       // call; the other reuses its cached promise.
       if (typeof GlotempHeaderPhoto !== 'undefined' && city) {
-        GlotempHeaderPhoto.loadHeaderPhoto(city.name, city.country);
+        GlotempHeaderPhoto.loadHeaderPhoto(city.name, city.country, city.slug);
       }
 
       if (typeof GlotempWiki !== 'undefined') GlotempWiki.loadCityWiki('${city.name}', '${city.country}');

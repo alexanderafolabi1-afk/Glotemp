@@ -5068,6 +5068,27 @@ button:hover:not(:focus-visible) {
   );
 }
 
+/* Attribution for /city-media/ photos -- required for CC BY, shown for
+   CC0/Public domain too since the credit itself is free. Absent when
+   the photo came from the landmark or Wikipedia tiers instead (those
+   render nothing here; renderCredit() clears any stale line first). */
+.city-header-photo-credit {
+  position: absolute;
+  z-index: 2;
+  right: 0.75rem;
+  bottom: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.02em;
+  color: rgba(233, 226, 213, 0.65);
+  text-decoration: none;
+  max-width: calc(100% - 1.5rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.city-header-photo-credit:hover { color: var(--ivory); }
+
 .city-header-grid {
   position: relative;
   z-index: 1;
@@ -9559,6 +9580,22 @@ time, .instr-clock, .tonight-modelled {
   inset: 0;
   background: linear-gradient(180deg, rgba(20, 16, 11, 0.15) 0%, rgba(20, 16, 11, 0.55) 55%, rgba(20, 16, 11, 0.92) 100%);
 }
+.showcase-photo-credit {
+  position: absolute;
+  z-index: 2;
+  right: 0.75rem;
+  bottom: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.02em;
+  color: rgba(233, 226, 213, 0.65);
+  text-decoration: none;
+  max-width: calc(100% - 1.5rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.showcase-photo-credit:hover { color: var(--ivory); }
 .showcase-body {
   position: relative;
   z-index: 1;
