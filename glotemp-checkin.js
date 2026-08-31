@@ -250,34 +250,120 @@
       </div>`;
   }
 
-  // ---------- insignia ----------
-  // REAL BUG, CONFIRMED LIVE (a real visitor clicked this and got no
-  // response at all): this was built as pure decoration -- "the register
-  // of a backstreet izakaya sign rather than a UI badge" (see its CSS
-  // comment), aria-hidden and wired to nothing, with the actual sign-in
-  // trigger a plain text link below it that the arrow merely points at.
-  // But it renders as a bordered, glowing panel literally labeled "Check
-  // in" -- the single most button-shaped, most prominent thing in the
-  // composer. Every real visitor reads it as the button. It now is one:
-  // a real <button>, wired in wireComposer() to the exact same action the
-  // arrow was already pointing at.
-  function insigniaHTML() {
+  // ---------- check-in module ----------
+  // Formerly a hanging "Check in" sign; replaced with the brass instrument
+  // plate the user uploaded (/assets/check-in-module.jpg -- referenced
+  // only via <img src>, never edited or regenerated, per CLAUDE.md's
+  // standing assets rule). Still exactly the same real <button>, wired in
+  // wireComposer() to the exact same gated action (scroll-to-form, or the
+  // sign-in prompt) -- only the visual and the click flourish changed.
+  function checkinModuleHTML() {
     return `
-      <div class="checkin-insignia">
-        <button type="button" class="checkin-insignia-sign" id="checkin-insignia-btn" aria-label="Add a check-in for this city">
-          <svg class="checkin-insignia-chain" viewBox="0 0 12 16" aria-hidden="true">
-            <line x1="6" y1="0" x2="6" y2="10" stroke="currentColor" stroke-width="1.1"/>
-            <circle cx="6" cy="3.4" r="1.9" fill="none" stroke="currentColor" stroke-width="1.1"/>
-          </svg>
-          <span class="checkin-insignia-panel">
-            <span class="checkin-insignia-glow" aria-hidden="true"></span>
-            <span class="checkin-insignia-text">Check<br>in</span>
-          </span>
-          <svg class="checkin-insignia-arrow" viewBox="0 0 16 10" aria-hidden="true">
+      <div class="checkin-module-wrap">
+        <button type="button" class="checkin-module" id="checkin-module-btn" aria-label="Add a check-in for this city">
+          <span class="checkin-module-glow" aria-hidden="true"></span>
+          <img class="checkin-module-plate" src="/assets/check-in-module.jpg" alt="" aria-hidden="true">
+          <span class="checkin-module-label">CHECK&nbsp;IN</span>
+          <svg class="checkin-module-arrow" viewBox="0 0 16 10" aria-hidden="true">
             <path d="M2 1l6 7 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
       </div>`;
+  }
+
+  // ---------- soft journey chime (synthesized, no audio asset) ----------
+  // Reuses the exact opt-in sound preference glotemp-hero-instrument.js
+  // already exposes through its speaker toggle -- one shared "instrument
+  // sound" setting for the whole site, muted by default, rather than a
+  // second competing toggle nobody asked for.
+  const SOUND_KEY = 'glotemp-hero-sound';
+  function journeySoundEnabled() {
+    try { return localStorage.getItem(SOUND_KEY) === '1'; } catch (e) { return false; }
+  }
+  let journeyAudioCtx = null;
+  function getJourneyAudioCtx() {
+    if (journeyAudioCtx) return journeyAudioCtx;
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return null;
+    journeyAudioCtx = new Ctx();
+    return journeyAudioCtx;
+  }
+  function playJourneyChime() {
+    if (!journeySoundEnabled()) return;
+    const ctx = getJourneyAudioCtx();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+    // A soft two-note rising chime, sine-wave and brief -- the register
+    // of a instrument bell, not a UI beep.
+    [[392, 0], [523.25, 0.18]].forEach(([freq, delay]) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + delay);
+      gain.gain.setValueAtTime(0, now + delay);
+      gain.gain.linearRampToValueAtTime(0.05, now + delay + 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.0008, now + delay + 0.9);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now + delay);
+      osc.stop(now + delay + 1);
+    });
+  }
+
+  // ---------- atmospheric journey overlay ----------
+  // A short, decorative flourish that plays on every check-in module
+  // click -- never a substitute for the real gated action underneath it,
+  // only a delay in front of it (see wireComposer()'s module handler).
+  // Three CSS-only themes, chosen at random per click; no new images,
+  // nothing under /assets/.
+  const JOURNEY_THEMES = [
+    { key: 'train', glyph: '\u{1F682}', verb: 'Riding the night line into' },
+    { key: 'yacht', glyph: '\u{1F6E5}️', verb: 'Crossing calm water toward' },
+    { key: 'aircraft', glyph: '✈️', verb: 'Descending over' },
+  ];
+  let journeyEl = null;
+  function getJourneyEl() {
+    if (journeyEl) return journeyEl;
+    journeyEl = document.createElement('div');
+    journeyEl.className = 'checkin-journey';
+    journeyEl.setAttribute('aria-hidden', 'true');
+    journeyEl.hidden = true;
+    journeyEl.innerHTML = `
+      <div class="checkin-journey-scene">
+        <div class="checkin-journey-streaks"><span></span><span></span><span></span><span></span><span></span></div>
+        <p class="checkin-journey-caption"></p>
+      </div>`;
+    document.body.appendChild(journeyEl);
+    return journeyEl;
+  }
+  function runJourney(cityName) {
+    return new Promise((resolve) => {
+      const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const el = getJourneyEl();
+      const scene = el.querySelector('.checkin-journey-scene');
+      const caption = el.querySelector('.checkin-journey-caption');
+      const theme = JOURNEY_THEMES[Math.floor(Math.random() * JOURNEY_THEMES.length)];
+      scene.className = `checkin-journey-scene checkin-journey-theme-${theme.key}`;
+      caption.textContent = `${theme.glyph} ${theme.verb} ${cityName}…`;
+      el.hidden = false;
+      requestAnimationFrame(() => el.classList.add('is-visible'));
+      playJourneyChime();
+      const duration = reduced ? 550 : 3400;
+      setTimeout(() => {
+        el.classList.remove('is-visible');
+        setTimeout(() => { el.hidden = true; resolve(); }, 380);
+      }, duration);
+    });
+  }
+  // Fired once the real Supabase write actually succeeds (see the
+  // form-submit handler below) -- a brief warm pulse on the module, not a
+  // second copy of the journey animation, and never faked ahead of the
+  // real post.
+  function runConfirmedPulse() {
+    const btn = document.getElementById('checkin-module-btn');
+    if (!btn) return;
+    btn.classList.add('is-confirmed');
+    setTimeout(() => btn.classList.remove('is-confirmed'), 1600);
   }
 
   // ---------- current reading + trivia ----------
@@ -338,7 +424,7 @@
         <p class="eyebrow">City reading</p>
         <h2 class="checkin-neon-title">How <span class="checkin-glow">${esc(name)}</span> feels right now</h2>
         ${currentReadingAndTriviaHTML(citySlug, name)}
-        ${insigniaHTML()}
+        ${checkinModuleHTML()}
         <div class="checkin-signedout" id="checkin-signedout">
           <p class="checkin-copy">Sign in to add a check-in. Browsing stays anonymous.</p>
           <button class="btn-neon checkin-neon-btn" type="button" id="checkin-signin-btn">Sign in</button>
@@ -429,13 +515,21 @@
       });
     }
 
-    // The "Check in" sign: see insigniaHTML()'s comment. Real <button> now,
-    // wired to whatever the arrow beneath it was already pointing at --
-    // sign-in when there's nothing to check in to yet, or straight to the
-    // composer when there already is.
-    const insigniaBtn = document.getElementById('checkin-insignia-btn');
-    if (insigniaBtn) {
-      insigniaBtn.addEventListener('click', async () => {
+    // The check-in module: see checkinModuleHTML()'s comment. Real
+    // <button>, wired to the exact same gated action as before -- sign-in
+    // when there's nothing to check in to yet, or straight to the composer
+    // when there already is -- just preceded by the click flourish
+    // (intensified glow + a short atmospheric journey) the visual brief
+    // asked for. The flourish never blocks or replaces the real action;
+    // it only runs in front of it.
+    const moduleBtn = document.getElementById('checkin-module-btn');
+    if (moduleBtn) {
+      moduleBtn.addEventListener('click', async () => {
+        if (moduleBtn.classList.contains('is-active')) return;
+        moduleBtn.classList.add('is-active');
+        await runJourney(cityDisplayName());
+        moduleBtn.classList.remove('is-active');
+
         if (form && !form.hidden) {
           form.scrollIntoView({ behavior: 'smooth', block: 'center' });
           if (note) note.focus();
@@ -586,6 +680,7 @@
           // from here on is presentation, and a failure in it must never
           // be reported back to the poster as "could not post that".
           status.textContent = 'Posted.';
+          runConfirmedPulse();
           note.value = '';
           count.textContent = `0/${NOTE_MAX}`;
           selectedCampus = '';

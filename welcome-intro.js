@@ -14,9 +14,9 @@
 // Visually: the modal is the same glass surface used across the rest of
 // the site. Step 2's rotating example sits inside the exact comic-burst
 // SVG shape the homepage Instrument Room uses, and step 3 carries the
-// same chevron arrow checkin-insignia's "Check in" sign already uses,
-// rotated to point at the install button, one shape family, not a
-// separate one.
+// same chevron arrow the check-in module's arrow already uses
+// (.checkin-module-arrow), rotated to point at the install button, one
+// shape family, not a separate one.
 (function () {
   'use strict';
 
