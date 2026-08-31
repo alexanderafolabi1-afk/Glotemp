@@ -261,21 +261,31 @@
   // composer. Every real visitor reads it as the button. It now is one:
   // a real <button>, wired in wireComposer() to the exact same action the
   // arrow was already pointing at.
+  // The check-in module: the uploaded relic at /assets/check-in-module.jpg.
+  //
+  // The button keeps its id (#checkin-insignia-btn) and its aria-label, so
+  // the click handler further down this file, and everything that reaches
+  // the composer through it, is untouched. Only what the button LOOKS like
+  // changed.
+  //
+  // "CHECK IN" is typeset here, not part of the artwork -- the asset
+  // carries a compass rose, gears and a vacuum tube, and no lettering at
+  // all. It sits below the plate as an etched brass line between two
+  // hairlines.
+  //
+  // The plate is cropped and blended in CSS (see .checkin-module in
+  // styles.css) rather than here; this markup only names the parts.
   function insigniaHTML() {
     return `
       <div class="checkin-insignia">
-        <button type="button" class="checkin-insignia-sign" id="checkin-insignia-btn" aria-label="Add a check-in for this city">
-          <svg class="checkin-insignia-chain" viewBox="0 0 12 16" aria-hidden="true">
-            <line x1="6" y1="0" x2="6" y2="10" stroke="currentColor" stroke-width="1.1"/>
-            <circle cx="6" cy="3.4" r="1.9" fill="none" stroke="currentColor" stroke-width="1.1"/>
-          </svg>
-          <span class="checkin-insignia-panel">
-            <span class="checkin-insignia-glow" aria-hidden="true"></span>
-            <span class="checkin-insignia-text">Check<br>in</span>
+        <button type="button" class="checkin-insignia-sign checkin-module" id="checkin-insignia-btn" aria-label="Add a check-in for this city">
+          <span class="checkin-module-plate" aria-hidden="true">
+            <img class="checkin-module-img" src="/assets/check-in-module.jpg" alt=""
+                 width="896" height="1195" loading="lazy" decoding="async">
           </span>
-          <svg class="checkin-insignia-arrow" viewBox="0 0 16 10" aria-hidden="true">
-            <path d="M2 1l6 7 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="checkin-module-label" aria-hidden="true">
+            <i></i><span>Check in</span><i></i>
+          </span>
         </button>
       </div>`;
   }

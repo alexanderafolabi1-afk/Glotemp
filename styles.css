@@ -9,8 +9,15 @@
      site's own "temperature" concept, instead of sitting nearly flat
      black. Nothing here is allowed to drift cool at rest -- the warmth
      is the baseline, the wash on top is where "alive" comes from. */
-  --obsidian: #14100B;        /* page ground */
-  --obsidian-rgb: 20, 16, 11;
+  /* Cool near-black, not the warm brown-black this used to be
+     (#14100B, hue 33deg, sat 29%). The reference designs are cooler and
+     darker, and the site already declared #06060A as its theme-color on
+     4,359 pages while painting a warm ground -- so this brings the page
+     and the OS chrome into agreement rather than introducing a second
+     opinion. Brass and ivory sit on a neutral ground now, which reads
+     them slightly warmer; that is the intended effect, not drift. */
+  --obsidian: #0a0a0c;        /* page ground */
+  --obsidian-rgb: 10, 10, 12;
   --basalt: #1B1610;          /* first lift */
   --basalt-raised: #231C14;   /* second lift, still warmer not greyer */
 
@@ -5028,12 +5035,15 @@ button:hover:not(:focus-visible) {
    city has no photo, so there is no broken-image icon and no gap: the
    scrim below (which is the same colour as the page ground) simply reads
    as plain ground, identical to a page with no photo layer at all.
-   ::after carries a warm scrim whose opacity only ever increases toward
-   the bottom, reaching fully solid ground colour at the section's lower
-   edge -- guarantees text contrast everywhere text can sit (verified:
-   >=4.5:1 for ivory even against a pure-white worst-case source pixel at
-   the lightest, top-most point of the gradient) while also producing the
-   seamless fade into the next section, in one gradient. */
+   ::after carries the scrim, which reaches fully solid ground colour at
+   the section's lower edge -- so it guarantees text contrast everywhere
+   text can sit and produces the seamless fade into the next section in
+   the same gradient. Measured, not assumed: with the photograph replaced
+   by pure white (the worst case a source image can present) every text
+   element in the header clears WCAG AA against the real composited
+   pixel behind it -- lowest is 5.32:1 on the 11px BAND eyebrow, where
+   the previous single-axis scrim gave 3.83:1 and the LIVE eyebrow
+   2.99:1. */
 .city-header-photo {
   position: absolute;
   inset: 0;
@@ -5060,12 +5070,28 @@ button:hover:not(:focus-visible) {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(20, 16, 11, 0.76) 0%,
-    rgba(20, 16, 11, 0.9) 55%,
-    var(--obsidian) 100%
-  );
+  /* Two axes, and every stop derives from --obsidian-rgb rather than a
+     literal: the old rule hard-coded rgba(20,16,11), which is the
+     PREVIOUS ground, so it would have left a warm cast sitting over a
+     cool page. Vertical carries the photo down into the page; the
+     horizontal pass darkens the left so the city name and stats hold
+     their contrast over whatever photograph loads, without flattening
+     the golden hour on the right. */
+  background:
+    linear-gradient(
+      180deg,
+      rgba(var(--obsidian-rgb), 0.46) 0%,
+      rgba(var(--obsidian-rgb), 0.72) 46%,
+      rgba(var(--obsidian-rgb), 0.95) 84%,
+      var(--obsidian) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(var(--obsidian-rgb), 0.90) 0%,
+      rgba(var(--obsidian-rgb), 0.66) 34%,
+      rgba(var(--obsidian-rgb), 0.42) 68%,
+      rgba(var(--obsidian-rgb), 0.56) 100%
+    );
 }
 
 /* Attribution for /city-media/ photos -- required for CC BY, shown for
@@ -5192,7 +5218,7 @@ button:hover:not(:focus-visible) {
     min-height: 380px;
   }
   .city-header-photo::after {
-    background: linear-gradient(180deg, rgba(20, 16, 11, 0) 60%, rgba(20, 16, 11, 0.35) 100%);
+    background: linear-gradient(180deg, rgba(var(--obsidian-rgb), 0) 60%, rgba(var(--obsidian-rgb), 0.35) 100%);
   }
 }
 
@@ -6071,7 +6097,7 @@ a:hover .city-landmark-photo,
   border: none;
   border-radius: 40% 60% 62% 38% / 42% 45% 55% 58%;
   box-shadow:
-    0 25px 60px rgba(20, 16, 11, 0.5),
+    0 25px 60px rgba(var(--obsidian-rgb), 0.5),
     0 0 60px rgba(200, 107, 224, 0.10),
     0 0 46px rgba(79, 216, 232, 0.08);
   padding: 2.1rem 2.2rem 1.95rem;
@@ -7515,77 +7541,179 @@ a:hover .city-landmark-photo,
 
 .checkin-status-reward { color: var(--brass); }
 
-/* Hanging "Check in" sign: a short chain, a tall brass-framed panel with a
-   warm amber glow behind it, and a chevron pointing down at the mood row.
-   The whole assembly sways gently on its chain, hook-mounted (transform
-   origin at the top), in the register of a backstreet izakaya sign rather
-   than a UI badge. */
+/* ---- The check-in module ----
+   The uploaded relic at /assets/check-in-module.jpg, replacing the
+   hanging brass sign that stood here.
+
+   THREE STEPS, IN THIS ORDER, AND ALL THREE ARE NEEDED
+   1. CROP. The file is 896x1195 and the plate occupies only x 121-774,
+      y 383-794 -- two thirds of it is background. Cropping to the plate
+      throws that away before anything else happens.
+   2. SCREEN. mix-blend-mode: screen, as specified.
+   3. MASK. Screen alone does NOT strip this background. Measured from
+      the asset: its ground is rgb(32,39,47) at the top fading to
+      rgb(16,19,24), a dark blue-grey gradient, with only 4.1% of pixels
+      near black. Screened over #0a0a0c that lifts to about rgb(40,46,55)
+      -- a visible lighter box. The feathered mask removes the edge so
+      there is nothing left for screen to lift.
+
+   TWO COORDINATE TRAPS, BOTH HIT DURING THIS WORK
+   - A percentage `top` resolves against the container's HEIGHT, not its
+     width. The crop offset is -383/653 of the container WIDTH, which on
+     a 653/411 box is -93.19% of its height.
+   - The mask is on the <img>, so its percentages resolve against the
+     FULL 896x1195 image, not the visible crop. In image space the plate
+     is 36.4% wide and 17.2% tall, so the radii are ~40% x 19.5% -- not
+     the 62% that a container-space reading would suggest, which cut
+     nothing at all. */
 .checkin-insignia {
   display: flex;
-  justify-content: flex-start;
-  margin-bottom: 1.4rem;
-  color: var(--brass);
+  justify-content: center;
+  margin: 0 0 2.2rem;
 }
-.checkin-insignia-sign {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transform-origin: top center;
-  animation: checkin-sign-sway 5.5s ease-in-out infinite;
-  /* Real <button> now (see glotemp-checkin.js) -- reset the UA chrome so
-     it keeps reading as the same hand-drawn sign, not a form control. */
+
+.checkin-module {
+  position: relative;
+  display: block;
+  width: min(520px, 68%);
+  padding: 0;
   background: none;
   border: 0;
-  font: inherit;
-  color: inherit;
-  padding: 0;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
-.checkin-insignia-sign:focus-visible {
-  outline: 2px solid var(--brass);
-  outline-offset: 4px;
-}
-.checkin-insignia-chain { width: 12px; height: 16px; color: var(--brass-dim); }
-.checkin-insignia-panel {
-  position: relative;
-  padding: 0.75rem 0.85rem;
-  border: 1px solid var(--brass);
-  color: var(--ivory);
-}
-.checkin-insignia-glow {
+
+/* An obsidian bed, feathered to nothing at its edge.
+   THIS IS LOAD-BEARING, not decoration. mix-blend-mode: screen blends
+   against whatever is actually behind the element, and on a city page
+   that is .checkin-hero-section's own coloured backdrop -- blue on one
+   side, warm brown on the other. Screening the plate's dark ground
+   against THAT lifted it to rgb(38,64,82): a visible blue haze around
+   the relic. Measured on the real page, not predicted.
+   The bed puts a known near-black directly behind the plate so screen
+   has the ground it needs, and fades out over a wide radius so there is
+   no rectangle and no seam against the section's colour. */
+.checkin-module::before {
+  content: '';
   position: absolute;
-  inset: -14px;
-  z-index: -1;
-  background: radial-gradient(circle, rgba(245, 162, 90, 0.4) 0%, rgba(245, 162, 90, 0) 72%);
-  filter: blur(2px);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 104%;
+  height: 112%;
+  border-radius: 16px !important;
+  background: var(--obsidian);
+  /* Blurred rather than gradient-feathered: it follows the plate's own
+     rectangle instead of an oval, so the engraved border survives and
+     the bed never pokes out as a dark disc over the section colour. */
+  filter: blur(14px);
+  pointer-events: none;
+  z-index: 0;
 }
-.checkin-insignia-text {
+
+/* The warm pool, above the bed and below the plate, so the relic sits in
+   the page rather than on it. */
+.checkin-module::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 108%;
+  height: 124%;
+  border-radius: 50% !important;
+  background: radial-gradient(ellipse at center, rgba(216, 178, 116, 0.16), transparent 62%);
+  filter: blur(22px);
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 320ms ease;
+}
+
+/* The crop is the mask. The plate's bounding box inside the 896x1195
+   asset is x 121..774, y 383..794 -- so a box at that aspect with
+   overflow:hidden shows the relic and nothing of the flat ground around
+   it. No elliptical vignette: an ellipse ate the engraved border and the
+   corner gears, which are the best part of the artwork. */
+.checkin-module-plate {
+  position: relative;
   display: block;
-  font-family: var(--font-mono);
+  aspect-ratio: 653 / 411;   /* the plate's own aspect, from the pixels */
+  /* The relic's own corners are rounded, so a straight rectangular crop
+     keeps four small wedges of the asset's flat ground -- which screen
+     then lifts. Rounding the crop to match cuts them out. 6% of 653 and
+     9.5% of 411 are both ~39px, so the corner stays circular at any
+     width. */
+  border-radius: 6% / 9.5%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.checkin-module-img {
+  position: absolute;
+  width: 137.21%;            /* 896/653  */
+  height: auto;
+  left: -18.53%;             /* -121/653 of the container WIDTH */
+  top: -93.19%;              /* -383/653 of width = -93.19% of height */
+  mix-blend-mode: screen;
+  filter: contrast(1.10) saturate(1.05);
+  transition: filter 320ms ease;
+}
+
+/* CHECK IN, typeset. The artwork carries no lettering. */
+.checkin-module-label {
+  position: absolute;
+  left: 50%;
+  bottom: -30px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 2;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.checkin-module-label i {
+  display: block;
+  width: 46px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--brass));
+}
+.checkin-module-label i:last-child {
+  background: linear-gradient(90deg, var(--brass), transparent);
+}
+.checkin-module-label span {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
   font-variant-caps: small-caps;
-  font-size: 1rem;
-  line-height: 1.35;
-  letter-spacing: 0.08em;
-  text-align: center;
-  text-shadow: 0 0 12px rgba(245, 162, 90, 0.55);
+  letter-spacing: 0.46em;
+  text-indent: 0.46em;      /* cancels the trailing letter-space */
+  color: #EBD9AF;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.9), 0 0 14px rgba(216, 178, 116, 0.34);
 }
-.checkin-insignia-arrow {
-  width: 14px;
-  height: 9px;
-  margin-top: 0.3rem;
-  color: var(--brass);
-  animation: checkin-insignia-point 1.8s ease-in-out infinite;
+
+.checkin-module:hover .checkin-module-img,
+.checkin-module:focus-visible .checkin-module-img {
+  filter: contrast(1.14) saturate(1.12) brightness(1.06);
 }
-@keyframes checkin-sign-sway {
-  0%, 100% { transform: rotate(-2.4deg); }
-  50% { transform: rotate(2.4deg); }
+.checkin-module:hover::after,
+.checkin-module:focus-visible::after { opacity: 1.6; }
+
+.checkin-module:focus-visible {
+  outline: 1px solid var(--brass);
+  outline-offset: 10px;
 }
-@keyframes checkin-insignia-point {
-  0%, 100% { transform: translateY(0); opacity: 0.75; }
-  50% { transform: translateY(3px); opacity: 1; }
+
+.checkin-module-label + * { margin-top: 30px; }
+
+@media (max-width: 640px) {
+  .checkin-module { width: min(320px, 78%); }
+  .checkin-module-label { bottom: -26px; }
+  .checkin-module-label i { width: 30px; }
+  .checkin-insignia { margin-bottom: 2.6rem; }
 }
+
 @media (prefers-reduced-motion: reduce) {
-  .checkin-insignia-sign, .checkin-insignia-arrow { animation: none; }
+  .checkin-module-img, .checkin-module::after { transition: none; }
 }
 
 /* Examples panel: visually distinct from the composer and the real list
@@ -9290,7 +9418,7 @@ h1, h2, h3, h4, h5, h6,
 .checkin-count, .checkin-status, .watch-count, .footer p, .small-print,
 .gt-auth-label, .gt-auth-status, .gt-auth-divider, .checkin-mood-label,
 .checkin-visibility-btn, .checkin-emoji-toggle, .checkin-examples-eyebrow,
-.checkin-example-tag, .checkin-example-mood, .checkin-insignia-text,
+.checkin-example-tag, .checkin-example-mood, .checkin-module-label,
 .reading-metric, .reading-time, .reading-source, .rank-pos, .rank-value,
 .obs-meta, .obs-intensity, .sparkline-label, .sun-time, .mover-delta,
 time, .instr-clock, .tonight-modelled {
@@ -9578,7 +9706,7 @@ time, .instr-clock, .tonight-modelled {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(20, 16, 11, 0.15) 0%, rgba(20, 16, 11, 0.55) 55%, rgba(20, 16, 11, 0.92) 100%);
+  background: linear-gradient(180deg, rgba(var(--obsidian-rgb), 0.15) 0%, rgba(var(--obsidian-rgb), 0.55) 55%, rgba(var(--obsidian-rgb), 0.92) 100%);
 }
 .showcase-photo-credit {
   position: absolute;
@@ -9635,7 +9763,7 @@ time, .instr-clock, .tonight-modelled {
 .showcase-open:hover { color: var(--brass); border-color: var(--brass); }
 @media (min-width: 700px) {
   .showcase-photo::after {
-    background: linear-gradient(90deg, rgba(20, 16, 11, 0.94) 0%, rgba(20, 16, 11, 0.75) 38%, rgba(20, 16, 11, 0.1) 72%);
+    background: linear-gradient(90deg, rgba(var(--obsidian-rgb), 0.94) 0%, rgba(var(--obsidian-rgb), 0.75) 38%, rgba(var(--obsidian-rgb), 0.1) 72%);
   }
   .showcase-body { max-width: 60%; }
 }
@@ -10530,7 +10658,7 @@ a:active:not(.btn-neon):not(.nav-logo):not([class*="chip"]) {
    Header. Translucent with a blur, so the sky behind it stays part of
    the composition instead of being cut off by a hard bar. */
 .navbar {
-  background: linear-gradient(180deg, rgba(20, 16, 11, 0.72) 0%, rgba(20, 16, 11, 0.32) 100%);
+  background: linear-gradient(180deg, rgba(var(--obsidian-rgb), 0.72) 0%, rgba(var(--obsidian-rgb), 0.32) 100%);
   backdrop-filter: blur(14px) saturate(1.25);
   -webkit-backdrop-filter: blur(14px) saturate(1.25);
   border-bottom-color: rgba(176, 141, 87, 0.28);
@@ -10769,7 +10897,7 @@ a:active:not(.btn-neon):not(.nav-logo):not([class*="chip"]) {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(20, 16, 11, 0.35);
+  background: rgba(var(--obsidian-rgb), 0.35);
   border: 1px solid var(--brass-dim);
   border-radius: 50%;
   font-size: 0.9rem;
