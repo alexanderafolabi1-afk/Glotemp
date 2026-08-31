@@ -14,7 +14,7 @@
 //   2. A short list of real content pages that had no OG block at all
 //      (og:title present is NOT required here -- these are hand-picked
 //      because they lack og:title too) gets a minimal one, image
-//      pointing at the sitewide fallback card (og/home.png) since none
+//      pointing at the sitewide fallback card (og/wheel.jpg) since none
 //      of these have a bespoke card of their own.
 //
 // Deliberately does not touch: admin/*, 404.html, auth/confirm,
@@ -90,9 +90,9 @@ for (const full of files) {
       html.match(/<meta property="og:description" content="[^"]*"\s*\/?>\n/);
     if (anchorMatch) {
       const insert =
-        `  <meta property="og:image" content="https://glo-temp.com/og/home.png"${selfClose ? ' /' : ''}>\n` +
+        `  <meta property="og:image" content="https://glo-temp.com/og/wheel.jpg"${selfClose ? ' /' : ''}>\n` +
         (hasTwitterCard ? '' : `  <meta name="twitter:card" content="summary_large_image"${selfClose ? ' /' : ''}>\n`) +
-        `  <meta name="twitter:image" content="https://glo-temp.com/og/home.png"${selfClose ? ' /' : ''}>\n`;
+        `  <meta name="twitter:image" content="https://glo-temp.com/og/wheel.jpg"${selfClose ? ' /' : ''}>\n`;
       html = html.replace(anchorMatch[0], anchorMatch[0] + insert);
       if (html !== before) pass1++;
     } else {
@@ -118,11 +118,11 @@ for (const full of files) {
         `  <meta property="og:description" content="${desc}"${selfClose ? ' /' : ''}>\n` +
         `  <meta property="og:type" content="website"${selfClose ? ' /' : ''}>\n` +
         `  <meta property="og:url" content="${url}"${selfClose ? ' /' : ''}>\n` +
-        `  <meta property="og:image" content="https://glo-temp.com/og/home.png"${selfClose ? ' /' : ''}>\n` +
+        `  <meta property="og:image" content="https://glo-temp.com/og/wheel.jpg"${selfClose ? ' /' : ''}>\n` +
         `  <meta name="twitter:card" content="summary_large_image"${selfClose ? ' /' : ''}>\n` +
         `  <meta name="twitter:title" content="${title}"${selfClose ? ' /' : ''}>\n` +
         `  <meta name="twitter:description" content="${desc}"${selfClose ? ' /' : ''}>\n` +
-        `  <meta name="twitter:image" content="https://glo-temp.com/og/home.png"${selfClose ? ' /' : ''}>\n`;
+        `  <meta name="twitter:image" content="https://glo-temp.com/og/wheel.jpg"${selfClose ? ' /' : ''}>\n`;
       const descTag = html.match(/<meta name="description" content="[^"]*"\s*\/?>\n/);
       if (descTag) {
         html = html.replace(descTag[0], descTag[0] + block);
