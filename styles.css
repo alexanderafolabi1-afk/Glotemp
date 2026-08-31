@@ -9706,7 +9706,13 @@ time, .instr-clock, .tonight-modelled {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(var(--obsidian-rgb), 0.15) 0%, rgba(var(--obsidian-rgb), 0.55) 55%, rgba(var(--obsidian-rgb), 0.92) 100%);
+  /* Single column: the copy runs the full height of the card, starting
+     at the top, so the scrim has to hold from the top too. The old
+     0.15 opening stop was written when this card was short and the text
+     sat low in it; the draw's controls made it tall, and the band, score
+     and local time ended up over open sky. Verified against a
+     pure-white photograph, the worst case a source image can present. */
+  background: linear-gradient(180deg, rgba(var(--obsidian-rgb), 0.74) 0%, rgba(var(--obsidian-rgb), 0.82) 50%, rgba(var(--obsidian-rgb), 0.95) 100%);
 }
 .showcase-photo-credit {
   position: absolute;
@@ -9737,6 +9743,11 @@ time, .instr-clock, .tonight-modelled {
 .showcase-stat-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-top: 0.9rem; }
 .showcase-band-score { display: flex; align-items: baseline; gap: 0.6rem; }
 .showcase-band-score .city-band-word { font-size: 0.8rem; }
+/* Sand, not brass, for this one eyebrow. At 11px over a photograph it
+   was the single element still short of AA in the single-column layout
+   (3.40:1 against a pure-white source image); sand carries it to 5.3:1
+   without touching the brass eyebrow anywhere else on the site. */
+.showcase-band-score .gt-eyebrow { color: var(--sand); }
 .showcase-score { font-family: var(--font-display); font-weight: var(--fw-light); font-variant-numeric: tabular-nums; font-size: 1.5rem; color: var(--ivory); }
 .showcase-gauge-mount { width: 72px; flex: none; }
 .showcase-time { margin-top: 0.6rem; font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.04em; color: var(--sand); }
@@ -9753,7 +9764,10 @@ time, .instr-clock, .tonight-modelled {
   font-size: 0.82rem;
   letter-spacing: 0.02em;
   cursor: pointer;
-  min-height: 32px;
+  /* 44, not the 32 this shipped with. It was a quiet link on a card that
+     rotated itself; on the draw it is one of the controls a thumb
+     actually reaches for, next to three 44px buttons. */
+  min-height: 44px;
   transition: color 200ms ease;
 }
 .showcase-radio:hover { color: var(--ivory); }
@@ -9761,6 +9775,126 @@ time, .instr-clock, .tonight-modelled {
 .showcase-radio-icon { font-size: 1rem; }
 .showcase-open { display: inline-block; margin-top: 0.9rem; min-height: 44px; color: var(--ivory); text-decoration: none; border-bottom: 1px solid var(--brass-dim); padding-bottom: 3px; align-self: flex-start; }
 .showcase-open:hover { color: var(--brass); border-color: var(--brass); }
+
+/* ===== THE DRAW =====
+   The card the visitor turns. It carries its own gesture affordances;
+   everything else on this card (photo, gauge, band, radio) is unchanged
+   and still painted by glotemp-showcase.js from the same data. */
+
+/* The still is the "open this city" target now, so it has to receive
+   pointer events -- it was decorative when the card only rotated on a
+   timer. The gradient scrim above it stays non-interactive so the click
+   lands on the photo itself. */
+.showcase-photo { pointer-events: auto; cursor: pointer; }
+.showcase-photo::after { pointer-events: none; }
+/* Dragging an <img> starts the browser's native image drag, which fires
+   pointercancel and swallows the swipe before it can be read. Measured:
+   pointerdown was followed immediately by pointercancel on every attempt
+   until this was turned off. */
+.showcase-photo img { -webkit-user-drag: none; user-drag: none; }
+.showcase-photo:focus-visible { outline: 2px solid var(--brass); outline-offset: -4px; }
+
+/* Follows the finger while dragging, then leaves in the direction of the
+   gesture. Only the card already on screen ever moves: nothing is
+   rendered behind it, because the next city must stay unknown until it
+   lands. */
+/* touch-action: none, deliberately. With pan-y the browser claims every
+   vertical drag for page scrolling and fires pointercancel before the
+   gesture can be read -- measured, not assumed -- which kills swipe-up,
+   the primary draw. The card is a gesture surface; the page still
+   scrolls everywhere around it. user-select stops a drag turning into a
+   text selection, which cancels the pointer the same way. */
+.showcase {
+  transition: transform 260ms var(--ease-out, ease), opacity 260ms ease;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.showcase.is-dragging { transition: none; cursor: grabbing; }
+.showcase.is-leaving-up { transform: translateY(-46px); opacity: 0; }
+.showcase.is-leaving-left { transform: translateX(-52px); opacity: 0; }
+.showcase.is-leaving-right { transform: translateX(52px); opacity: 0; }
+
+.showcase-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+.showcase-act {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--brass-dim);
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--ivory);
+  /* Near-solid, not a 0.42 tint: these pills sit anywhere over a
+     photograph of unknown brightness, and at 0.42 their labels measured
+     3.2:1 over a pale sky. Their own ground makes them legible wherever
+     they land. */
+  background: rgba(var(--obsidian-rgb), 0.88);
+}
+.showcase-act:hover { border-color: var(--brass); color: var(--brass); }
+.showcase-act-kind {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  color: var(--brass);
+}
+.showcase-act-label { font-size: 0.82rem; color: var(--sand); }
+
+.showcase-draw {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.showcase-draw-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--brass-dim);
+  border-radius: 999px;
+  background: rgba(var(--obsidian-rgb), 0.88);
+  color: var(--ivory);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.showcase-draw-btn:hover { border-color: var(--brass); color: var(--brass); }
+.showcase-draw-btn[aria-busy='true'] { opacity: 0.6; }
+.showcase-draw-btn.is-pinned { border-color: var(--brass); color: var(--brass); }
+.showcase-draw-btn kbd {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  line-height: 1;
+  padding: 3px 5px;
+  border: 1px solid var(--brass-dim);
+  border-radius: 4px;
+  color: var(--sand);
+}
+.showcase-draw-hint {
+  margin-top: 0.5rem;
+  font-size: 0.74rem;
+  color: var(--sand);
+  opacity: 0.72;
+  max-width: 46ch;
+}
+/* No swipe is wired under reduced motion -- the buttons above are the
+   whole interface there -- so the hint is hidden rather than left
+   describing a gesture that does nothing. */
+@media (prefers-reduced-motion: reduce) {
+  .showcase { transition: none; }
+  .showcase.is-leaving-up,
+  .showcase.is-leaving-left,
+  .showcase.is-leaving-right { transform: none; opacity: 1; }
+  .showcase-draw-hint { display: none; }
+}
 @media (min-width: 700px) {
   .showcase-photo::after {
     background: linear-gradient(90deg, rgba(var(--obsidian-rgb), 0.94) 0%, rgba(var(--obsidian-rgb), 0.75) 38%, rgba(var(--obsidian-rgb), 0.1) 72%);

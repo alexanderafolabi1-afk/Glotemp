@@ -811,13 +811,18 @@
     }
   }
 
-  async function isWatching() {
+  // Takes an explicit slug so the homepage draw (glotemp-showcase.js) can
+  // ask about a city that isn't this page's own. Defaults to citySlug, so
+  // every existing call site is unchanged.
+  async function isWatching(slug) {
+    const target = slug || citySlug;
+    if (!target) return false;
     const session = await GlotempAuth.getSession();
     const user = GlotempAuth.getUser();
     if (!session || !user) return false;
     try {
       const resp = await fetch(
-        `${SUPABASE_URL}/rest/v1/city_watchers?city_slug=eq.${encodeURIComponent(citySlug)}&user_id=eq.${user.id}&select=id`,
+        `${SUPABASE_URL}/rest/v1/city_watchers?city_slug=eq.${encodeURIComponent(target)}&user_id=eq.${user.id}&select=id`,
         { headers: authHeaders(session) }
       );
       if (!resp.ok) return false;
@@ -826,6 +831,55 @@
     } catch (e) {
       return false;
     }
+  }
+
+  // The follow itself, lifted out of the button handler so there is ONE
+  // implementation of "follow a city" on this site rather than a second
+  // one written for the homepage: same city_watchers row, same auth gate,
+  // same confirmation toast, same push prompt. wireWatch() below calls
+  // this, and so does the homepage draw via the public API at the bottom
+  // of this file.
+  async function toggleFollow(slug, displayName) {
+    const target = slug || citySlug;
+    if (!target) return { ok: false, following: false };
+    const ok = await GlotempAuth.requireAuth('Sign in to follow this city.');
+    if (!ok) return { ok: false, following: false };
+    const session = await GlotempAuth.getSession();
+    const user = GlotempAuth.getUser();
+    if (!session || !user) return { ok: false, following: false };
+
+    const name = displayName || (
+      (window.CITIES_DATA || []).find(c => c.slug === target) || {}
+    ).name || 'this city';
+    const already = await isWatching(target);
+    try {
+      if (already) {
+        await fetch(
+          `${SUPABASE_URL}/rest/v1/city_watchers?city_slug=eq.${encodeURIComponent(target)}&user_id=eq.${user.id}`,
+          { method: 'DELETE', headers: authHeaders(session) }
+        );
+      } else {
+        await fetch(`${SUPABASE_URL}/rest/v1/city_watchers`, {
+          method: 'POST',
+          headers: Object.assign(authHeaders(session), { Prefer: 'resolution=ignore-duplicates,return=minimal' }),
+          body: JSON.stringify({ user_id: user.id, city_slug: target }),
+        });
+        // Immediate, on-brand acknowledgment of the action just taken --
+        // separate from the push-permission ask below, which is a
+        // different question (browser notifications) and may not even
+        // show (already granted/denied). This one always shows once,
+        // right after a real follow.
+        showFollowConfirm(name);
+        // Explicit action just taken (following this city) -- the one
+        // moment this prompt is allowed to appear. Never on page load.
+        if (window.GlotempPush) {
+          GlotempPush.promptAfterFollow(target, name, session, user);
+        }
+      }
+    } catch (e) {
+      return { ok: false, following: already };
+    }
+    return { ok: true, following: !already };
   }
 
   async function renderWatchCount() {
@@ -888,43 +942,14 @@
     refreshLabel();
 
     fresh.addEventListener('click', async () => {
-      const ok = await GlotempAuth.requireAuth('Sign in to follow this city.');
-      if (!ok) return;
-      const session = await GlotempAuth.getSession();
-      const user = GlotempAuth.getUser();
-      if (!session || !user) return;
       // disabled + aria-busy immediately, before the network call --
       // .is-loading (styles.css) is what actually paints the busy state;
       // disabled alone is what stops a second tap firing a second request.
       fresh.disabled = true;
       fresh.setAttribute('aria-busy', 'true');
       fresh.classList.add('is-loading');
-      const watching = await isWatching();
-      try {
-        if (watching) {
-          await fetch(
-            `${SUPABASE_URL}/rest/v1/city_watchers?city_slug=eq.${encodeURIComponent(citySlug)}&user_id=eq.${user.id}`,
-            { method: 'DELETE', headers: authHeaders(session) }
-          );
-        } else {
-          await fetch(`${SUPABASE_URL}/rest/v1/city_watchers`, {
-            method: 'POST',
-            headers: Object.assign(authHeaders(session), { Prefer: 'resolution=ignore-duplicates,return=minimal' }),
-            body: JSON.stringify({ user_id: user.id, city_slug: citySlug }),
-          });
-          // Immediate, on-brand acknowledgment of the action just taken --
-          // separate from the push-permission ask below, which is a
-          // different question (browser notifications) and may not even
-          // show (already granted/denied). This one always shows once,
-          // right after a real follow.
-          showFollowConfirm(cityDisplayName());
-          // Explicit action just taken (following this city) -- the one
-          // moment this prompt is allowed to appear. Never on page load.
-          if (window.GlotempPush) {
-            GlotempPush.promptAfterFollow(citySlug, cityDisplayName(), session, user);
-          }
-        }
-      } catch (e) { /* surfaced by the label refresh below */ }
+      // Failure is surfaced by the label refresh below.
+      await toggleFollow(citySlug, cityDisplayName());
       await refreshLabel();
       fresh.disabled = false;
       fresh.removeAttribute('aria-busy');
@@ -1042,6 +1067,16 @@
     mountForCity: function (slug) {
       if (!slug) return;
       mount(slug);
+    },
+    // The follow used by the "Follow this city" button on every city
+    // page, exposed for the homepage draw (glotemp-showcase.js) so a pin
+    // gesture there writes the same city_watchers row through the same
+    // auth gate -- not a parallel implementation that could drift.
+    followCity: function (slug, displayName) {
+      return toggleFollow(slug, displayName);
+    },
+    isFollowingCity: function (slug) {
+      return isWatching(slug);
     },
   };
 })();

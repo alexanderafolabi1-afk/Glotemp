@@ -78,7 +78,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=59" />
+  <link rel="stylesheet" href="/styles.css?v=60" />
   <link rel="stylesheet" href="/daily-checkin.css" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
@@ -429,7 +429,35 @@
             <span class="showcase-radio-label" id="showcase-radio-label">Tune in</span>
           </button>
           <audio id="showcase-radio-audio" preload="none"></audio>
+
+          <!-- A room / a flight / a table. Hidden by default and only
+               unhidden by glotemp-showcase.js when the drawn city's band
+               is warm or charged -- the markup ships hidden so a slow
+               script can never flash an offer on a quiet city. -->
+          <div class="showcase-actions" id="showcase-actions" hidden>
+            <a class="showcase-act" id="showcase-act-room" target="_blank" rel="noopener noreferrer sponsored">
+              <span class="showcase-act-kind">A room</span><span class="showcase-act-label"></span></a>
+            <a class="showcase-act" id="showcase-act-flight" target="_blank" rel="noopener noreferrer sponsored">
+              <span class="showcase-act-kind">A flight</span><span class="showcase-act-label"></span></a>
+            <a class="showcase-act" id="showcase-act-table" target="_blank" rel="noopener noreferrer sponsored">
+              <span class="showcase-act-kind">A table</span><span class="showcase-act-label"></span></a>
+          </div>
+
           <a class="showcase-open" id="showcase-open" href="/cities/helsinki.html">Open Helsinki &rarr;</a>
+
+          <!-- The draw. These three buttons are always present: they are
+               the whole interface under prefers-reduced-motion, and the
+               keyboard/pointer equivalents of the swipes otherwise. -->
+          <div class="showcase-draw" id="showcase-draw">
+            <button type="button" class="showcase-draw-btn" id="showcase-next">
+              Draw another <kbd>J</kbd></button>
+            <button type="button" class="showcase-draw-btn" id="showcase-pin" aria-pressed="false">
+              Follow <kbd>K</kbd></button>
+            <button type="button" class="showcase-draw-btn" id="showcase-skip">
+              Skip <kbd>L</kbd></button>
+          </div>
+          <p class="showcase-draw-hint">Swipe up to draw again, right to follow, left to skip. Tap the photo to open the city.</p>
+          <p class="sr-only" id="showcase-draw-status" role="status" aria-live="polite"></p>
         </div>
       </div>
     </section>
