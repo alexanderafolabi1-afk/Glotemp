@@ -2619,9 +2619,9 @@ summary:focus:not(:focus-visible) {
   to { opacity: 1; transform: scale(1); }
 }
 
-/* Step 3's install cue: the exact chevron path checkin-insignia's "Check
-   in" sign already uses, rotated to point at the button beside it rather
-   than reinventing a new arrow shape. */
+/* Step 3's install cue: the exact chevron path the check-in module's
+   arrow already uses (.checkin-module-arrow), rotated to point at the
+   button beside it rather than reinventing a new arrow shape. */
 .welcome-intro-arrow {
   width: 20px;
   height: 20px;
@@ -7541,179 +7541,228 @@ a:hover .city-landmark-photo,
 
 .checkin-status-reward { color: var(--brass); }
 
-/* ---- The check-in module ----
-   The uploaded relic at /assets/check-in-module.jpg, replacing the
-   hanging brass sign that stood here.
-
-   THREE STEPS, IN THIS ORDER, AND ALL THREE ARE NEEDED
-   1. CROP. The file is 896x1195 and the plate occupies only x 121-774,
-      y 383-794 -- two thirds of it is background. Cropping to the plate
-      throws that away before anything else happens.
-   2. SCREEN. mix-blend-mode: screen, as specified.
-   3. MASK. Screen alone does NOT strip this background. Measured from
-      the asset: its ground is rgb(32,39,47) at the top fading to
-      rgb(16,19,24), a dark blue-grey gradient, with only 4.1% of pixels
-      near black. Screened over #0a0a0c that lifts to about rgb(40,46,55)
-      -- a visible lighter box. The feathered mask removes the edge so
-      there is nothing left for screen to lift.
-
-   TWO COORDINATE TRAPS, BOTH HIT DURING THIS WORK
-   - A percentage `top` resolves against the container's HEIGHT, not its
-     width. The crop offset is -383/653 of the container WIDTH, which on
-     a 653/411 box is -93.19% of its height.
-   - The mask is on the <img>, so its percentages resolve against the
-     FULL 896x1195 image, not the visible crop. In image space the plate
-     is 36.4% wide and 17.2% tall, so the radii are ~40% x 19.5% -- not
-     the 62% that a container-space reading would suggest, which cut
-     nothing at all. */
-.checkin-insignia {
+/* Brass check-in module: a wall-mounted instrument plate rather than a
+   hanging sign -- the uploaded /assets/check-in-module.jpg artwork
+   (referenced only via <img src>, never edited or regenerated -- see
+   CLAUDE.md's standing assets rule), an aged brass relic with a central
+   glowing tube and engraved compass/gear detail, "CHECK IN" etched into
+   the lower brass band. The plate's own background isn't pure black, so
+   mix-blend-mode: screen alone leaves a faint rectangular vignette; a
+   contrast/brightness filter pushes it to true black so screen actually
+   erases it, and a radial mask-image fades the image's own rectangular
+   bounds so no hard edge survives either -- the dark JPG ground dissolves
+   into the page rather than sitting in a visible box. */
+.checkin-module-wrap {
   display: flex;
-  justify-content: center;
-  margin: 0 0 2.2rem;
+  justify-content: flex-start;
+  margin-bottom: 1.4rem;
 }
-
 .checkin-module {
   position: relative;
   display: block;
-  width: min(520px, 68%);
-  padding: 0;
+  width: 168px;
+  height: 224px;
   background: none;
   border: 0;
+  padding: 0;
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+  transform-origin: center 18%;
+  animation: checkin-module-sway 6s ease-in-out infinite;
 }
-
-/* An obsidian bed, feathered to nothing at its edge.
-   THIS IS LOAD-BEARING, not decoration. mix-blend-mode: screen blends
-   against whatever is actually behind the element, and on a city page
-   that is .checkin-hero-section's own coloured backdrop -- blue on one
-   side, warm brown on the other. Screening the plate's dark ground
-   against THAT lifted it to rgb(38,64,82): a visible blue haze around
-   the relic. Measured on the real page, not predicted.
-   The bed puts a known near-black directly behind the plate so screen
-   has the ground it needs, and fades out over a wide radius so there is
-   no rectangle and no seam against the section's colour. */
-.checkin-module::before {
-  content: '';
+.checkin-module:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 4px;
+}
+.checkin-module-glow {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 104%;
-  height: 112%;
-  border-radius: 16px !important;
-  background: var(--obsidian);
-  /* Blurred rather than gradient-feathered: it follows the plate's own
-     rectangle instead of an oval, so the engraved border survives and
-     the bed never pokes out as a dark disc over the section colour. */
-  filter: blur(14px);
-  pointer-events: none;
-  z-index: 0;
+  inset: -30px;
+  z-index: -1;
+  background: radial-gradient(circle at 50% 46%, rgba(245, 189, 108, 0.55) 0%, rgba(245, 162, 90, 0.22) 42%, rgba(245, 162, 90, 0) 72%);
+  filter: blur(6px);
+  transition: opacity 400ms ease, background 400ms ease;
 }
-
-/* The warm pool, above the bed and below the plate, so the relic sits in
-   the page rather than on it. */
-.checkin-module::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 108%;
-  height: 124%;
-  border-radius: 50% !important;
-  background: radial-gradient(ellipse at center, rgba(216, 178, 116, 0.16), transparent 62%);
-  filter: blur(22px);
-  pointer-events: none;
-  z-index: 0;
-  transition: opacity 320ms ease;
-}
-
-/* The crop is the mask. The plate's bounding box inside the 896x1195
-   asset is x 121..774, y 383..794 -- so a box at that aspect with
-   overflow:hidden shows the relic and nothing of the flat ground around
-   it. No elliptical vignette: an ellipse ate the engraved border and the
-   corner gears, which are the best part of the artwork. */
 .checkin-module-plate {
   position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   display: block;
-  aspect-ratio: 653 / 411;   /* the plate's own aspect, from the pixels */
-  /* The relic's own corners are rounded, so a straight rectangular crop
-     keeps four small wedges of the asset's flat ground -- which screen
-     then lifts. Rounding the crop to match cuts them out. 6% of 653 and
-     9.5% of 411 are both ~39px, so the corner stays circular at any
-     width. */
-  border-radius: 6% / 9.5%;
-  overflow: hidden;
-  z-index: 1;
-}
-
-.checkin-module-img {
-  position: absolute;
-  width: 137.21%;            /* 896/653  */
-  height: auto;
-  left: -18.53%;             /* -121/653 of the container WIDTH */
-  top: -93.19%;              /* -383/653 of width = -93.19% of height */
   mix-blend-mode: screen;
-  filter: contrast(1.10) saturate(1.05);
-  transition: filter 320ms ease;
+  filter: contrast(1.5) brightness(1.05) drop-shadow(0 6px 18px rgba(0, 0, 0, 0.55));
+  -webkit-mask-image: radial-gradient(ellipse 62% 58% at 50% 46%, #000 55%, transparent 88%);
+  mask-image: radial-gradient(ellipse 62% 58% at 50% 46%, #000 55%, transparent 88%);
+  transition: transform 400ms ease, filter 400ms ease;
 }
-
-/* CHECK IN, typeset. The artwork carries no lettering. */
 .checkin-module-label {
   position: absolute;
   left: 50%;
-  bottom: -30px;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  z-index: 2;
-  pointer-events: none;
+  top: 58.5%;
+  transform: translate(-50%, -50%);
+  font-variant-caps: normal;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  color: rgba(58, 42, 20, 0.88);
+  text-shadow:
+    0 1px 0 rgba(255, 224, 170, 0.5),
+    0 -1px 1px rgba(0, 0, 0, 0.65);
   white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
 }
-.checkin-module-label i {
-  display: block;
-  width: 46px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--brass));
-}
-.checkin-module-label i:last-child {
-  background: linear-gradient(90deg, var(--brass), transparent);
-}
-.checkin-module-label span {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.75rem;
-  font-variant-caps: small-caps;
-  letter-spacing: 0.46em;
-  text-indent: 0.46em;      /* cancels the trailing letter-space */
-  color: #EBD9AF;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.9), 0 0 14px rgba(216, 178, 116, 0.34);
+.checkin-module-arrow {
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 9px;
+  color: var(--brass);
+  animation: checkin-module-point 1.8s ease-in-out infinite;
 }
 
-.checkin-module:hover .checkin-module-img,
-.checkin-module:focus-visible .checkin-module-img {
-  filter: contrast(1.14) saturate(1.12) brightness(1.06);
+/* Click state: "intensifies the golden light and moves the mechanism" --
+   held for the duration of the atmospheric journey overlay below, then
+   released by wireComposer()'s module click handler. */
+.checkin-module.is-active {
+  animation-play-state: paused;
 }
-.checkin-module:hover::after,
-.checkin-module:focus-visible::after { opacity: 1.6; }
-
-.checkin-module:focus-visible {
-  outline: 1px solid var(--brass);
-  outline-offset: 10px;
+.checkin-module.is-active .checkin-module-glow {
+  background: radial-gradient(circle at 50% 46%, rgba(255, 214, 140, 0.9) 0%, rgba(245, 189, 108, 0.55) 46%, rgba(245, 162, 90, 0) 78%);
+  filter: blur(10px);
+}
+.checkin-module.is-active .checkin-module-plate {
+  transform: scale(1.045) rotate(-0.6deg);
+  filter: contrast(1.6) brightness(1.18) drop-shadow(0 10px 26px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 26px rgba(255, 200, 120, 0.6));
+}
+.checkin-module.is-active .checkin-module-label {
+  color: rgba(255, 235, 200, 0.95);
+  text-shadow: 0 0 8px rgba(255, 200, 120, 0.85), 0 1px 0 rgba(255, 224, 170, 0.6);
 }
 
-.checkin-module-label + * { margin-top: 30px; }
+/* Confirmed state: fired once the real Supabase write succeeds (see
+   runConfirmedPulse() in glotemp-checkin.js) -- a brief warm-to-green
+   pulse, not a second copy of the journey animation, and never played
+   ahead of the real post actually landing. */
+.checkin-module.is-confirmed .checkin-module-glow {
+  background: radial-gradient(circle at 50% 46%, rgba(180, 255, 190, 0.55) 0%, rgba(245, 189, 108, 0.35) 48%, rgba(245, 162, 90, 0) 78%);
+  filter: blur(10px);
+  animation: checkin-module-confirm-pulse 1.6s ease-out;
+}
 
-@media (max-width: 640px) {
-  .checkin-module { width: min(320px, 78%); }
-  .checkin-module-label { bottom: -26px; }
-  .checkin-module-label i { width: 30px; }
-  .checkin-insignia { margin-bottom: 2.6rem; }
+@keyframes checkin-module-sway {
+  0%, 100% { transform: rotate(-1.1deg); }
+  50% { transform: rotate(1.1deg); }
+}
+@keyframes checkin-module-point {
+  0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.75; }
+  50% { transform: translateX(-50%) translateY(3px); opacity: 1; }
+}
+@keyframes checkin-module-confirm-pulse {
+  0% { opacity: 0.4; }
+  30% { opacity: 1; }
+  100% { opacity: 0.55; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .checkin-module-img, .checkin-module::after { transition: none; }
+  .checkin-module, .checkin-module-arrow { animation: none; }
+  .checkin-module.is-confirmed .checkin-module-glow { animation: none; }
+}
+
+/* ---------- atmospheric journey overlay ----------
+   A short (~3.4s; ~0.5s under reduced motion) full-screen flourish that
+   plays on every check-in module click, before the real gated action
+   underneath it (scroll-to-form, or the sign-in prompt) runs -- see
+   wireComposer(). Three CSS-only themes (train / yacht / aircraft),
+   chosen at random per click by runJourney() in glotemp-checkin.js; no
+   new images, nothing under /assets/. */
+.checkin-journey {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 50% 50%, rgba(20, 16, 11, 0.88) 0%, rgba(11, 8, 6, 0.97) 78%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 380ms ease;
+}
+.checkin-journey.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.checkin-journey-scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 14vh;
+}
+.checkin-journey-streaks {
+  position: absolute;
+  inset: 0;
+}
+.checkin-journey-streaks span {
+  position: absolute;
+  left: -20%;
+  width: 140%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(176, 141, 87, 0) 0%, rgba(245, 189, 108, 0.65) 45%, rgba(176, 141, 87, 0) 100%);
+  animation: checkin-journey-streak-move 1.9s linear infinite;
+}
+.checkin-journey-streaks span:nth-child(1) { top: 22%; animation-delay: 0s; opacity: 0.7; }
+.checkin-journey-streaks span:nth-child(2) { top: 38%; animation-delay: 0.3s; opacity: 0.5; }
+.checkin-journey-streaks span:nth-child(3) { top: 54%; animation-delay: 0.6s; opacity: 0.8; }
+.checkin-journey-streaks span:nth-child(4) { top: 68%; animation-delay: 0.15s; opacity: 0.45; }
+.checkin-journey-streaks span:nth-child(5) { top: 80%; animation-delay: 0.45s; opacity: 0.6; }
+@keyframes checkin-journey-streak-move {
+  0% { transform: translateX(-8%); }
+  100% { transform: translateX(8%); }
+}
+/* Train: level, tight streaks -- rail-tie rhythm. */
+.checkin-journey-theme-train .checkin-journey-streaks span {
+  height: 2px;
+  animation-duration: 0.9s;
+}
+/* Yacht: fewer, softer, gently rocking streaks -- a horizon line. */
+.checkin-journey-theme-yacht .checkin-journey-streaks span {
+  animation-duration: 3.2s;
+  background: linear-gradient(90deg, rgba(79, 216, 232, 0) 0%, rgba(176, 141, 87, 0.5) 50%, rgba(79, 216, 232, 0) 100%);
+}
+.checkin-journey-theme-yacht .checkin-journey-scene {
+  animation: checkin-journey-rock 3.6s ease-in-out infinite;
+}
+/* Aircraft: fast, steep diagonal streaks. */
+.checkin-journey-theme-aircraft .checkin-journey-streaks span {
+  animation-duration: 0.6s;
+  transform: rotate(-8deg);
+}
+@keyframes checkin-journey-rock {
+  0%, 100% { transform: rotate(-0.6deg); }
+  50% { transform: rotate(0.6deg); }
+}
+.checkin-journey-caption {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: clamp(18px, 3.4vw, 26px);
+  color: var(--ivory);
+  text-shadow: 0 0 18px rgba(176, 141, 87, 0.55), 0 0 42px rgba(176, 141, 87, 0.22);
+  text-align: center;
+  padding: 0 1.5rem;
+  animation: checkin-glow-breathe 4.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .checkin-journey-streaks span,
+  .checkin-journey-theme-yacht .checkin-journey-scene,
+  .checkin-journey-caption {
+    animation: none;
+  }
 }
 
 /* Examples panel: visually distinct from the composer and the real list
