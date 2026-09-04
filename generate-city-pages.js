@@ -129,17 +129,35 @@ function generateVerticalSections(city) {
   `).join('\n');
 }
 
+// Mood bands, same thresholds as generate-city-share-cards.js. Keep the
+// two in sync if the bands ever change.
+const MOOD_BANDS = [
+  { min: 8.5, band: 'charged' },
+  { min: 7.0, band: 'warm' },
+  { min: 5.0, band: 'equilibrium' },
+  { min: 3.0, band: 'restrained' },
+  { min: -Infinity, band: 'low' },
+];
+const moodBand = (mood) => MOOD_BANDS.find((b) => mood >= b.min).band;
+
 function generateCityPage(city) {
   const title = `${city.name} | Glotemp`;
   const desc = `Live profile of ${city.name} across all 12 dimensions. Real-time data on mood, opportunities, economy, and city vitality.`;
-  const ogDesc = `Explore what ${city.name} is like right now across all 12 dimensions.`;
+  const ogDesc = `How this city feels right now.`;
   const canonical = `https://glo-temp.com/cities/${city.slug}`;
-  // Per-city share card (see generate-city-share-cards.js +
-  // rasterize-share-cards.js) -- a PNG stat card carrying this city's own
-  // name and live mood/band, instead of the one generic logo every city
-  // page used to share alike. PNG, not SVG: X/Twitter's card crawler
-  // does not render SVG for og:image / twitter:image.
-  const ogImage = `https://glo-temp.com/og/${city.slug}.png`;
+  // The share card's own title -- city, band and score, the same three
+  // values the card image itself carries. Kept separate from <title>,
+  // which stays "<City> | Glotemp" for search results and browser tabs.
+  const cardTitle = `${city.name} · ${moodBand(city.mood)} — ${city.mood} / 10`;
+  // Share image: this city's own photograph when one is stored under
+  // /city-media/<slug>/ (266 of them are), since a real photo of the
+  // place is what earns a click on X. Cities with no stored photo fall
+  // back to the homepage instrument card -- never to the old og/home.png
+  // gold slogan plate, which nothing points at any more.
+  const cityPhoto = path.join(__dirname, 'city-media', city.slug, '1.jpg');
+  const ogImage = fs.existsSync(cityPhoto)
+    ? `https://glo-temp.com/city-media/${city.slug}/1.jpg`
+    : `https://glo-temp.com/og/wheel.jpg`;
 
   // schema.org City, not TouristAttraction -- this page covers Tech,
   // Finance, Work and nine other verticals, not just visiting. Only
@@ -160,6 +178,7 @@ function generateCityPage(city) {
 
   let html = template
     .replace(/__CITY_TITLE__/g, escHtml(title))
+    .replace(/__CITY_CARD_TITLE__/g, escHtml(cardTitle))
     .replace(/__CITY_DESC__/g, escHtml(desc))
     .replace(/__CITY_OG_DESC__/g, escHtml(ogDesc))
     .replace(/__CITY_CANONICAL__/g, escHtml(canonical))

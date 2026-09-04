@@ -6,15 +6,25 @@
   <meta name="theme-color" content="#06060A" />
   <meta name="description" content="Glotemp: the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
   <meta name="keywords" content="city mood, travel intelligence, urban energy, real-time city data, location intelligence, collective mood" />
-  <meta property="og:title" content="Glotemp: Live City Pulse" />
-  <meta property="og:description" content="Glotemp: the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
+  <!-- Share card: the homepage instrument (og/wheel.jpg, generated from
+       /assets/instrument-base.png by generate-og-wheel-card.js), not the
+       old og/home.png gold plate. og:title carries the Daily Pulse city,
+       band and score when one is known at build time; nothing here can
+       read the live value, because the pulse is computed client-side and
+       X/Facebook crawlers do not run the page's JS -- so this is the
+       agreed fallback rather than a stale reading presented as current. -->
+  <meta property="og:title" content="Glotemp · Live City Pulse" />
+  <meta property="og:description" content="How this city feels right now." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glo-temp.com/" />
-  <meta property="og:image" content="https://glo-temp.com/og/home.png" />
+  <meta property="og:image" content="https://glo-temp.com/og/wheel.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Glotemp: Live City Pulse" />
-  <meta name="twitter:description" content="Glotemp: the world's first real-time mood infrastructure for cities. Discover the collective energy of any city before you travel." />
-  <meta name="twitter:image" content="https://glo-temp.com/og/home.png" />
+  <meta name="twitter:site" content="@Glotempo" />
+  <meta name="twitter:title" content="Glotemp · Live City Pulse" />
+  <meta name="twitter:description" content="How this city feels right now." />
+  <meta name="twitter:image" content="https://glo-temp.com/og/wheel.jpg" />
   <link rel="canonical" href="https://glo-temp.com/" />
   <link rel="manifest" href="/manifest.json" />
 
@@ -68,7 +78,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 
   <!-- Version must be bumped on CSS-affecting deploys -->
-  <link rel="stylesheet" href="/styles.css?v=59" />
+  <link rel="stylesheet" href="/styles.css?v=60" />
   <link rel="stylesheet" href="/daily-checkin.css" />
 
   <script src="https://cdn.jsdelivr.net/npm/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous" defer></script>
@@ -419,7 +429,35 @@
             <span class="showcase-radio-label" id="showcase-radio-label">Tune in</span>
           </button>
           <audio id="showcase-radio-audio" preload="none"></audio>
+
+          <!-- A room / a flight / a table. Hidden by default and only
+               unhidden by glotemp-showcase.js when the drawn city's band
+               is warm or charged -- the markup ships hidden so a slow
+               script can never flash an offer on a quiet city. -->
+          <div class="showcase-actions" id="showcase-actions" hidden>
+            <a class="showcase-act" id="showcase-act-room" target="_blank" rel="noopener noreferrer sponsored">
+              <span class="showcase-act-kind">A room</span><span class="showcase-act-label"></span></a>
+            <a class="showcase-act" id="showcase-act-flight" target="_blank" rel="noopener noreferrer sponsored">
+              <span class="showcase-act-kind">A flight</span><span class="showcase-act-label"></span></a>
+            <a class="showcase-act" id="showcase-act-table" target="_blank" rel="noopener noreferrer sponsored">
+              <span class="showcase-act-kind">A table</span><span class="showcase-act-label"></span></a>
+          </div>
+
           <a class="showcase-open" id="showcase-open" href="/cities/helsinki.html">Open Helsinki &rarr;</a>
+
+          <!-- The draw. These three buttons are always present: they are
+               the whole interface under prefers-reduced-motion, and the
+               keyboard/pointer equivalents of the swipes otherwise. -->
+          <div class="showcase-draw" id="showcase-draw">
+            <button type="button" class="showcase-draw-btn" id="showcase-next">
+              Draw another <kbd>J</kbd></button>
+            <button type="button" class="showcase-draw-btn" id="showcase-pin" aria-pressed="false">
+              Follow <kbd>K</kbd></button>
+            <button type="button" class="showcase-draw-btn" id="showcase-skip">
+              Skip <kbd>L</kbd></button>
+          </div>
+          <p class="showcase-draw-hint">Swipe up to draw again, right to follow, left to skip. Tap the photo to open the city.</p>
+          <p class="sr-only" id="showcase-draw-status" role="status" aria-live="polite"></p>
         </div>
       </div>
     </section>
