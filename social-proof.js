@@ -121,9 +121,12 @@
 
     var statsHTML = '';
     var count = await fetchReadingsCount();
-    if (count != null || countries != null) {
+    // A count of exactly 0 is not a usable public number -- treat it the
+    // same as null/failed rather than printing "0 readings collected".
+    var hasCount = typeof count === 'number' && count > 0;
+    if (hasCount || countries != null) {
       var parts = [];
-      if (count != null) parts.push('<span class="social-proof-stat-num">' + count.toLocaleString() + '</span> readings collected so far');
+      if (hasCount) parts.push('<span class="social-proof-stat-num">' + count.toLocaleString() + '</span> readings collected so far');
       if (countries != null) parts.push('cities tracked across <span class="social-proof-stat-num">' + countries + '</span> countries');
       if (parts.length) {
         statsHTML = '<p class="social-proof-stats">' + parts.join(', ') + '.</p>';
