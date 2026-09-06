@@ -62,6 +62,12 @@
       <div class="vertical-listings" data-city="prague" data-vertical="food"></div>
     </section>
 
+    <!-- On the table: a quiet, optional 0-3 name list for real food
+           operators in this city. See slots-render.js / partners/slots.json.
+           Renders nothing at all when this city has no entries for this
+           slot -- no empty state, no zero, no "be the first". -->
+      <section class="glass-card slot-panel" id="slot-food" data-city="prague" data-slot="food" hidden></section>
+
     <!-- Offers Panel: "Tonight in [City]", filtered to this vertical. See
          glotemp-offers.js. Renders nothing at all when there are no
          active offers for this vertical here -- no empty state, no gap. -->
@@ -101,6 +107,7 @@
   <script src="/city-sports-data.js" defer></script>
   <script src="/glotemp-sports.js" defer></script>
   <script src="/glotemp-credits.js" defer></script>
+  <script src="/slots-render.js" defer></script>
   <script>
     // SUPABASE_URL / SUPABASE_ANON_KEY come from verticals-engine.js
     // (deferred, but resolved by the time DOMContentLoaded fires below) --
