@@ -92,6 +92,16 @@ verify_jwt = false
 [functions.social-image-fetch]
 verify_jwt = false
 
+# The solemn/current-events path (Part 3): same key shown by default in
+# the Supabase dashboard, same reason as social-next-post/
+# social-mark-posted above -- called by Make with an anon key, never a
+# real end-user JWT.
+[functions.solemn-next-post]
+verify_jwt = false
+
+[functions.solemn-mark-posted]
+verify_jwt = false
+
 # ===== AUTH =====
 # These settings are the fix for confirmation links pointing at
 # http://localhost:3000. GoTrue falls back to site_url whenever the caller
