@@ -34,10 +34,10 @@ function pageHTML(v) {
   <meta property="og:title" content="${v.label} Rankings - Glotemp" />
   <meta property="og:description" content="${v.desc}" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://glo-temp.com/rankings/${v.slug}" />
+  <meta property="og:url" content="https://glo-temp.com/rankings/${v.slug}/" />
   <meta property="og:image" content="https://glo-temp.com/assets/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="canonical" href="https://glo-temp.com/rankings/${v.slug}" />
+  <link rel="canonical" href="https://glo-temp.com/rankings/${v.slug}/" />
   <link rel="alternate" hreflang="en" href="https://glo-temp.com/rankings/${v.slug}" />
   <link rel="alternate" hreflang="es" href="https://glo-temp.com/rankings/${v.slug}" />
   <link rel="alternate" hreflang="fr" href="https://glo-temp.com/rankings/${v.slug}" />
