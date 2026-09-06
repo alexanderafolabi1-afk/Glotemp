@@ -32,6 +32,31 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css?v=57" />
 
+  <style>
+    /* Same list component /about uses for its own short, hairline-divided
+       answers -- reused here rather than invented fresh, so the two pages
+       read as one voice. */
+    .about-list {
+      padding: 0 0 0.5rem;
+      margin: 0;
+      list-style: none;
+    }
+    .about-list li {
+      border-top: 1px solid var(--hairline);
+      padding: 1.1rem 0;
+      color: var(--sand);
+      line-height: 1.7;
+      max-width: 60ch;
+    }
+    .about-list strong {
+      display: block;
+      color: var(--ivory);
+      font-family: var(--font-display);
+      font-weight: var(--fw-light);
+      font-size: 1.15rem;
+      margin-bottom: 0.3rem;
+    }
+  </style>
   <script src="/glotemp-analytics.js" defer></script>
 </head>
 <body>
@@ -43,10 +68,45 @@
     <section class="glass-card page-header">
       <p class="eyebrow">For local businesses</p>
       <h1>Offer something to a city</h1>
-      <p class="section-copy" style="color:var(--sand); max-width:64ch;">Hotels, restaurants, bars, clubs, cabs, cinemas, gyms, tours. Give Glotemp users in your city something to unlock and redeem. No app to install, no dashboard to learn. Every enquiry is read by a person before anything goes live.</p>
+      <p class="section-copy" style="color:var(--sand); max-width:64ch;">Glotemp is an instrument. It reads how a city feels right now &mdash; the mood, the hour, the radio, whether tonight is worth it &mdash; and keeps reading, city after city, day after day.</p>
+      <p class="section-copy" style="color:var(--sand); max-width:64ch;">Partnering means putting your offer inside a reading that already exists. Hotels, restaurants, bars, clubs, cabs, cinemas, gyms, tours: give the person already looking at your city something to unlock and redeem. No app to install, no dashboard to learn. Every enquiry is read by a person before anything goes live.</p>
     </section>
 
     <section class="glass-card">
+      <p class="eyebrow">Who this fits</p>
+      <h2 style="margin-top:0;">Wherever your business sits, a vertical already reads it.</h2>
+      <ul class="about-list">
+        <li>
+          <strong>Hotels and tours</strong>
+          Pulse, and what tonight looks like. Someone deciding where to stay or what to book is already checking both.
+        </li>
+        <li>
+          <strong>Restaurants</strong>
+          <a href="/rankings/food" class="contact-link">Food</a> &mdash; the vertical built for exactly this question: where to eat, and what it is like right now.
+        </li>
+        <li>
+          <strong>Bars, clubs, cinemas</strong>
+          <a href="/rankings/entertainment" class="contact-link">Entertainment</a> &mdash; the reading that decides whether tonight is worth leaving the house for.
+        </li>
+        <li>
+          <strong>Cabs</strong>
+          Transport. The read on getting around a city, at the moment someone is deciding whether to.
+        </li>
+        <li>
+          <strong>Gyms</strong>
+          Sport. One of the same twelve verticals, read the same way in every city.
+        </li>
+        <li>
+          <strong>Tourism boards, and cities changing what they are known for</strong>
+          <a href="/movers" class="contact-link">Movers</a>, and the city&rsquo;s own reading. A city that is changing wants that change seen &mdash; this is where it shows first.
+        </li>
+      </ul>
+      <p class="small-print"><a href="/verticals" class="contact-link">See all twelve verticals</a></p>
+    </section>
+
+    <section class="glass-card">
+      <p class="eyebrow">How it works</p>
+      <p class="section-copy" style="color:var(--sand); max-width:64ch;">No app, no dashboard. Fill this in and a person reads it &mdash; the same path every partner here uses. If it is a fit, they will be in touch.</p>
       <form id="partner-lead-form" class="observation-form">
         <div class="form-grid">
           <label>
@@ -78,6 +138,7 @@
           <p id="partner-feedback" class="inline-feedback" role="status" aria-live="polite"></p>
         </div>
       </form>
+      <p class="small-print">Prefer email? <a href="mailto:marketing@glo-temp.com?subject=Partnering%20with%20Glotemp" class="contact-link">marketing@glo-temp.com</a></p>
     </section>
   </main>
 
