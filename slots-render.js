@@ -18,11 +18,14 @@
   }
 
   function entryHTML(entry) {
-    var name = entry.url
-      ? '<a href="' + esc(entry.url) + '" target="_blank" rel="noopener noreferrer" class="contact-link">' + esc(entry.name) + '</a>'
+    // Only http(s): an operator-supplied URL could hold anything, including
+    // javascript:. Matches city-venues.js's safeSite pattern exactly.
+    var safeUrl = entry.url && /^https?:\/\//i.test(entry.url) ? entry.url : '';
+    var name = safeUrl
+      ? '<a href="' + esc(safeUrl) + '" target="_blank" rel="noopener noreferrer" class="contact-link">' + esc(entry.name) + '</a>'
       : esc(entry.name);
     var kind = entry.kind && KIND_LABEL[entry.kind] ? ' &middot; ' + KIND_LABEL[entry.kind] : '';
-    return '<li><strong>' + name + '</strong>' + esc(entry.line || '') + kind + '</li>';
+    return '<li><strong>' + name + '</strong> ' + esc(entry.line || '') + kind + '</li>';
   }
 
   var slotsPromise = null;
