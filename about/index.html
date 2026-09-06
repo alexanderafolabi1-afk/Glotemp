@@ -46,32 +46,6 @@
   <link rel="stylesheet" href="/styles.css?v=57" />
 
   <style>
-    .proof-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      padding: 1.5rem;
-    }
-    @media (max-width: 768px) {
-      .proof-stats-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    .proof-stat {
-      text-align: center;
-      padding: 1.2rem 0.5rem;
-    }
-    .proof-stat-value {
-      font-family: var(--font-mono);
-      font-size: 2.4rem;
-      color: var(--band-equilibrium);
-      font-variant-numeric: tabular-nums;
-    }
-    .proof-stat-label {
-      color: var(--sand);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-top: 0.4rem;
-    }
     .instrument-mini {
       display: flex;
       align-items: center;
@@ -149,25 +123,26 @@
       <p class="about-lede">Glotemp reads that, city by city, and keeps reading it. You get the answer before you book.</p>
     </section>
 
-    <section class="glass-card" style="padding:0; overflow:hidden;">
-      <div class="proof-stats-grid" id="proof-stats">
-        <div class="proof-stat">
-          <div class="proof-stat-value count-up" data-target="300" id="stat-cities">0</div>
-          <div class="proof-stat-label">Cities</div>
-        </div>
-        <div class="proof-stat">
-          <div class="proof-stat-value count-up" data-target="0" id="stat-countries">0</div>
-          <div class="proof-stat-label">Countries</div>
-        </div>
-        <div class="proof-stat">
-          <div class="proof-stat-value count-up" data-target="12" id="stat-verticals">0</div>
-          <div class="proof-stat-label">Verticals</div>
-        </div>
-        <div class="proof-stat">
-          <div class="proof-stat-value count-up" data-target="0" id="stat-readings">0</div>
-          <div class="proof-stat-label">Readings</div>
-        </div>
-      </div>
+    <section class="glass-card">
+      <ul class="about-list">
+        <li>
+          <strong>The register</strong>
+          Cities on the map, already being read.
+        </li>
+        <li>
+          <strong>Twelve verticals</strong>
+          The same twelve lenses on every city. Pulse, tech, finance, work, property, education, sport, entertainment, fashion, food, health, transport.
+        </li>
+        <li>
+          <strong>The instrument</strong>
+          This one is live. Pin a city and watch it settle. The same instrument every city page carries.
+        </li>
+        <li>
+          <strong>The method</strong>
+          How a reading is made lives on its own page. The face of the product is the reading, not the kitchen.
+        </li>
+      </ul>
+      <p class="small-print"><a href="/partners" class="contact-link">Partner with this instrument</a> &middot; <a href="/methodology" class="contact-link">How the instrument reads</a></p>
     </section>
 
     <section class="glass-card" style="padding:0; overflow:hidden;">
@@ -232,25 +207,6 @@
   <script src="/cities-data.js"></script>
   <script src="/glotemp-core.js"></script>
   <script>
-    // var, not const: tempo-economy.js (loaded below) also declares
-    // these; var redeclaration across scripts is a safe no-op.
-    var SUPABASE_URL = SUPABASE_URL || 'https://hnysztednzqfzbmiqqgl.supabase.co';
-    var SUPABASE_ANON_KEY = SUPABASE_ANON_KEY || 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
-
-    function countUp(el, target, duration) {
-      const start = 0;
-      const startTime = performance.now();
-      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (prefersReduced) { el.textContent = target.toLocaleString(); return; }
-      function tick(now) {
-        const progress = Math.min(1, (now - startTime) / duration);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        el.textContent = Math.round(start + (target - start) * eased).toLocaleString();
-        if (progress < 1) requestAnimationFrame(tick);
-      }
-      requestAnimationFrame(tick);
-    }
-
     function renderMiniInstrument() {
       const slug = GlotempCore.getPinnedCity();
       const city = slug && window.CITIES_DATA.find(c => c.slug === slug);
@@ -262,35 +218,7 @@
       document.getElementById('mini-city-label').textContent = `${city.name} · ${city.mood.toFixed(1)} / 10`;
     }
 
-    async function loadLiveStats() {
-      const countries = new Set(window.CITIES_DATA.map(c => c.country)).size;
-      countUp(document.getElementById('stat-cities'), window.CITIES_DATA.length, 900);
-      countUp(document.getElementById('stat-countries'), countries, 900);
-      countUp(document.getElementById('stat-verticals'), 12, 900);
-
-      try {
-        const countResp = await fetch(`${SUPABASE_URL}/rest/v1/readings?select=id`, {
-          headers: {
-            apikey: SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            Prefer: 'count=exact',
-            Range: '0-0',
-          },
-        });
-        const range = countResp.headers.get('content-range'); // "0-0/12345"
-        const total = range ? parseInt(range.split('/')[1], 10) : null;
-        if (total !== null && !Number.isNaN(total)) {
-          countUp(document.getElementById('stat-readings'), total, 1200);
-        } else {
-          document.getElementById('stat-readings').textContent = '-';
-        }
-      } catch (e) {
-        document.getElementById('stat-readings').textContent = '-';
-      }
-    }
-
     renderMiniInstrument();
-    loadLiveStats();
     document.addEventListener('glotemp:city-pinned', renderMiniInstrument);
 
     const lang = localStorage.getItem('glotemp-lang') || 'en';
