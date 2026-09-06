@@ -971,7 +971,19 @@
     const el = document.getElementById('watch-count');
     if (!el) return;
     const n = await watcherCount();
-    el.textContent = n === null ? 'Watchers unavailable' : `${n} ${n === 1 ? 'person is' : 'people are'} watching`;
+    // A count of exactly 0 is not a public number -- hide the line rather
+    // than print "0 people are watching". Only a real, positive count or
+    // the existing "unavailable" state get shown.
+    if (typeof n === 'number' && n > 0) {
+      el.hidden = false;
+      el.textContent = `${n} ${n === 1 ? 'person is' : 'people are'} watching`;
+    } else if (n === null) {
+      el.hidden = false;
+      el.textContent = 'Watchers unavailable';
+    } else {
+      el.hidden = true;
+      el.textContent = '';
+    }
   }
 
   // A small, real preview of what following actually delivers -- not just
