@@ -62,6 +62,11 @@
       
     </section>
 
+    <!-- Staying here: same quiet slot as "On the table," standing in for
+           a tonight vertical that doesn't exist -- see slots-render.js /
+           partners/slots.json. -->
+      <section class="glass-card slot-panel" id="slot-tonight" data-city="auckland" data-slot="tonight" hidden></section>
+
     <!-- Offers Panel: "Tonight in [City]", filtered to this vertical. See
          glotemp-offers.js. Renders nothing at all when there are no
          active offers for this vertical here -- no empty state, no gap. -->
@@ -101,6 +106,7 @@
   <script src="/city-sports-data.js" defer></script>
   <script src="/glotemp-sports.js" defer></script>
   <script src="/glotemp-credits.js" defer></script>
+  <script src="/slots-render.js" defer></script>
   <script>
     // SUPABASE_URL / SUPABASE_ANON_KEY come from verticals-engine.js
     // (deferred, but resolved by the time DOMContentLoaded fires below) --
