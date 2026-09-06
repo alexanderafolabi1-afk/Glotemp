@@ -131,6 +131,12 @@ const CARD_RENDER_TIMEOUT_MS = 15000;
 // always reclaimable by the very next scheduled poll, never stuck for
 // a whole extra cycle.
 const CLAIM_EXPIRY_MINUTES = 10;
+// Matches social_content_queue's own day_number CHECK constraint (widened
+// 2026-09-06 alongside the growth-engine content extension). Rows only
+// exist through day 40 today -- days 41-90 are schema-ready, real runway
+// for the next content pass, not yet authored. Raising this number alone
+// does nothing without matching rows actually being inserted.
+const CAMPAIGN_WINDOW_DAYS = 90;
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -326,7 +332,7 @@ Deno.serve(async (req: Request) => {
     const todayMs = Date.parse(`${dateStr}T00:00:00Z`);
     const dayNumber = Math.floor((todayMs - startMs) / 86_400_000) + 1;
 
-    if (dayNumber < 1 || dayNumber > 30) {
+    if (dayNumber < 1 || dayNumber > CAMPAIGN_WINDOW_DAYS) {
       return json({ due: false, reason: "outside_campaign_window", day_number: dayNumber });
     }
 
