@@ -426,6 +426,30 @@ body.ambient-night::before   { filter: hue-rotate(calc(var(--wash-hue) + var(--w
   line-height: 1.5;
 }
 
+/* Short, hairline-divided answer list -- about.html and partners.html
+   both use this for a handful of "strong label + one line" items. Was
+   duplicated inline on each page; lives here once now. */
+.about-list {
+  padding: 0 0 0.5rem;
+  margin: 0;
+  list-style: none;
+}
+.about-list li {
+  border-top: 1px solid var(--hairline);
+  padding: 1.1rem 0;
+  color: var(--sand);
+  line-height: 1.7;
+  max-width: 60ch;
+}
+.about-list strong {
+  display: block;
+  color: var(--ivory);
+  font-family: var(--font-display);
+  font-weight: var(--fw-light);
+  font-size: 1.15rem;
+  margin-bottom: 0.3rem;
+}
+
 /* ===== PAGE HEADER PATTERN ===== */
 .page-header {
   padding: 2.5rem;
