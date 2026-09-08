@@ -98,6 +98,18 @@ function pageHTML(city, v) {
       ${LISTINGS_VERTICALS.has(v.slug) ? `<div class="vertical-listings" data-city="${city.slug}" data-vertical="${v.slug}"></div>` : ''}
     </section>
 
+    ${v.slug === 'food' ?
+      `<!-- On the table: a quiet, optional 0-3 name list for real food
+           operators in this city. See slots-render.js / partners/slots.json.
+           Renders nothing at all when this city has no entries for this
+           slot -- no empty state, no zero, no "be the first". -->
+      <section class="glass-card slot-panel" id="slot-food" data-city="${city.slug}" data-slot="food" hidden></section>
+` : v.slug === 'pulse' ?
+      `<!-- Staying here: same quiet slot as "On the table," standing in for
+           a tonight vertical that doesn't exist -- see slots-render.js /
+           partners/slots.json. -->
+      <section class="glass-card slot-panel" id="slot-tonight" data-city="${city.slug}" data-slot="tonight" hidden></section>
+` : ''}
     <!-- Offers Panel: "Tonight in [City]", filtered to this vertical. See
          glotemp-offers.js. Renders nothing at all when there are no
          active offers for this vertical here -- no empty state, no gap. -->
@@ -137,6 +149,7 @@ function pageHTML(city, v) {
   <script src="/city-sports-data.js" defer></script>
   <script src="/glotemp-sports.js" defer></script>
   <script src="/glotemp-credits.js" defer></script>
+  ${(v.slug === 'food' || v.slug === 'pulse') ? '<script src="/slots-render.js" defer></script>' : ''}
   <script>
     // SUPABASE_URL / SUPABASE_ANON_KEY come from verticals-engine.js
     // (deferred, but resolved by the time DOMContentLoaded fires below) --
@@ -305,13 +318,20 @@ function pageHTML(city, v) {
 `;
 }
 
+// Optional scoped run: ONLY_VERTICALS=food,pulse node generate-city-vertical-pages.js
+// regenerates just those verticals' output instead of all 12 -- used to
+// ship a template change (like the slot panels above) without touching
+// every other vertical's already-committed pages.
+const onlyVerticals = process.env.ONLY_VERTICALS ? process.env.ONLY_VERTICALS.split(',').map(s => s.trim()) : null;
+const targetVerticals = onlyVerticals ? VERTICALS.filter(v => onlyVerticals.includes(v.slug)) : VERTICALS;
+
 let count = 0;
 cities.forEach(city => {
-  VERTICALS.forEach(v => {
+  targetVerticals.forEach(v => {
     const dir = path.join(__dirname, 'cities', city.slug, v.slug);
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'index.html'), pageHTML(city, v));
     count++;
   });
 });
-console.log(`✅ Generated ${count} city x vertical pages (${cities.length} cities x ${VERTICALS.length} verticals)`);
+console.log(`✅ Generated ${count} city x vertical pages (${cities.length} cities x ${targetVerticals.length} verticals)`);

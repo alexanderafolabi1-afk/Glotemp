@@ -15,7 +15,7 @@ if (typeof translations !== 'undefined') {
       tech_description: "Should I build or work here?",
       finance_description: "Should I invest or trade here?",
       verticals_title: "Verticals",
-      verticals_subtitle: "Live rankings across every dimension.",
+      verticals_subtitle: "Twelve named lenses on every city: pulse, tech, finance, work, property, education, sport, entertainment, fashion, food, health, transport. Each one carries its own rankings.",
       glotemp_logo: "Glotemp",
       ranking_note: "Rankings require a minimum sample size to publish.",
       show_details: "Show Details",
