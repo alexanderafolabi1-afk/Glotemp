@@ -15,6 +15,7 @@
     { key: 'contributors', label: 'Contributors', href: '/admin/contributors.html' },
     { key: 'outreach', label: 'Outreach', href: '/admin/outreach.html' },
     { key: 'content', label: 'Content', href: '/admin/content.html' },
+    { key: 'living-echo', label: 'Living Echo', href: '/admin/living-echo.html' },
     { key: 'settings', label: 'Settings', href: '/admin/settings.html' },
   ];
 
@@ -24,6 +25,7 @@
     if (path.indexOf('/admin/contributors') === 0) return 'contributors';
     if (path.indexOf('/admin/outreach') === 0) return 'outreach';
     if (path.indexOf('/admin/content') === 0) return 'content';
+    if (path.indexOf('/admin/living-echo') === 0) return 'living-echo';
     if (path.indexOf('/admin/settings') === 0) return 'settings';
     return '';
   }

@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#14100B" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Living Echo - Glotemp Admin</title>
+
+  <link rel="manifest" href="/admin/manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Glotemp Admin" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://hnysztednzqfzbmiqqgl.supabase.co" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1&family=Manrope:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=58" />
+  <link rel="stylesheet" href="/admin/admin-ui.css" />
+  <link rel="stylesheet" href="/admin/admin-nav.css" />
+
+  <script src="/glotemp-analytics.js" defer></script>
+  <script src="/admin-i18n.js"></script>
+  <script src="/admin/admin-charts.js" defer></script>
+  <script src="/admin/admin-core.js" defer></script>
+  <script src="/admin/admin-nav.js" defer></script>
+  <link rel="stylesheet" href="/admin/admin-space.css" />
+  <script src="/admin/admin-space.js" defer></script>
+
+  <style>
+    /* ── Living Echo page-local styles ───────────────────────────────── */
+
+    /* Status badge */
+    .le-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-mono, monospace);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.65rem;
+      border-radius: 2px;
+    }
+    .le-badge.is-active  { border: 1px solid rgba(127,217,154,0.4); color: #7fd99a; }
+    .le-badge.is-paused  { border: 1px solid rgba(242,155,155,0.4); color: #f29b9b; }
+    .le-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .le-badge.is-active::before { animation: le-pulse 2s infinite; }
+    @keyframes le-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    /* Global control row */
+    .le-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+      padding: var(--s3) 0 var(--s4);
+      border-bottom: var(--rule);
+      margin-bottom: var(--s4);
+    }
+    .le-controls-label {
+      font-family: var(--font-mono, monospace);
+      font-size: 0.78rem;
+      color: rgba(244,241,234,0.55);
+      letter-spacing: 0.04em;
+    }
+    .le-toggle {
+      background: transparent;
+      border: 1px solid var(--hairline);
+      color: var(--ink-primary, #f4f1ea);
+      font-family: var(--font-body, Manrope, sans-serif);
+      font-size: 0.82rem;
+      padding: 0.4rem 1rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .le-toggle:hover { border-color: var(--brass, #B08D57); color: var(--brass, #B08D57); }
+    .le-toggle.is-danger { border-color: rgba(242,155,155,0.4); color: #f29b9b; }
+    .le-toggle.is-danger:hover { border-color: #f29b9b; }
+    .le-toggle.is-resume { border-color: rgba(127,217,154,0.4); color: #7fd99a; }
+    .le-toggle.is-resume:hover { border-color: #7fd99a; }
+
+    /* Auto-fade slider */
+    .le-fade-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .le-fade-row input[type="range"] {
+      -webkit-appearance: none;
+      width: 160px;
+      height: 4px;
+      background: rgba(176,141,87,0.25);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    .le-fade-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--brass, #B08D57);
+    }
+    #le-fade-val {
+      font-family: var(--font-mono, monospace);
+      font-size: 0.8rem;
+      color: var(--adm-brass-text, #D4AC71);
+      min-width: 2.5rem;
+    }
+
+    /* City density table */
+    .le-city-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    .le-city-table th {
+      font-family: var(--font-mono, monospace);
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(244,241,234,0.45);
+      text-align: left;
+      padding: 0 0.5rem var(--s2);
+      border-bottom: var(--rule);
+      white-space: nowrap;
+    }
+    .le-city-table td {
+      padding: var(--s2) 0.5rem;
+      border-bottom: 1px solid rgba(176,141,87,0.06);
+      color: rgba(244,241,234,0.8);
+      vertical-align: middle;
+    }
+    .le-city-table tr:last-child td { border-bottom: none; }
+    .le-city-table .le-city-name { font-weight: 500; color: #f4f1ea; }
+    .le-density-bar-wrap {
+      width: 80px;
+      height: 4px;
+      background: rgba(176,141,87,0.15);
+      border-radius: 2px;
+      overflow: hidden;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 0.4rem;
+    }
+    .le-density-bar {
+      height: 100%;
+      background: var(--brass, #B08D57);
+      border-radius: 2px;
+      transition: width 0.4s;
+    }
+    .le-density-bar.is-full { background: #7fd99a; }
+    .le-pill {
+      display: inline-block;
+      font-family: var(--font-mono, monospace);
+      font-size: 0.68rem;
+      letter-spacing: 0.04em;
+      padding: 0.1rem 0.45rem;
+      border-radius: 2px;
+    }
+    .le-pill.tier1 { background: rgba(212,172,113,0.15); color: var(--adm-brass-text, #D4AC71); }
+    .le-pill.tier2 { background: rgba(244,241,234,0.08); color: rgba(244,241,234,0.55); }
+    .le-pill.tier3 { background: transparent; color: rgba(244,241,234,0.35); border: 1px solid rgba(244,241,234,0.12); }
+    .le-status-dot {
+      display: inline-block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      margin-right: 0.35rem;
+      vertical-align: middle;
+    }
+    .le-status-dot.active { background: #7fd99a; }
+    .le-status-dot.paused { background: #f29b9b; }
+
+    /* Table controls */
+    .le-table-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: var(--s3);
+      align-items: center;
+    }
+    .le-search {
+      background: rgba(244,241,234,0.04);
+      border: 1px solid var(--hairline);
+      color: #f4f1ea;
+      font-family: var(--font-mono, monospace);
+      font-size: 0.78rem;
+      padding: 0.38rem 0.75rem;
+      width: 200px;
+      outline: none;
+    }
+    .le-search::placeholder { color: rgba(244,241,234,0.3); }
+    .le-search:focus { border-color: rgba(176,141,87,0.5); }
+    .le-filter-btn {
+      background: transparent;
+      border: 1px solid var(--hairline);
+      color: rgba(244,241,234,0.6);
+      font-family: var(--font-mono, monospace);
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.38rem 0.7rem;
+      cursor: pointer;
+    }
+    .le-filter-btn.active, .le-filter-btn:hover {
+      border-color: var(--brass, #B08D57);
+      color: var(--adm-brass-text, #D4AC71);
+    }
+
+    /* Activity stream */
+    .le-stream {
+      max-height: 420px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(176,141,87,0.3) transparent;
+    }
+    .le-stream-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 0.6rem;
+      align-items: start;
+      padding: var(--s2) 0;
+      border-bottom: 1px solid rgba(176,141,87,0.06);
+      font-size: 0.8rem;
+    }
+    .le-stream-item:last-child { border-bottom: none; }
+    .le-stream-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--brass, #B08D57);
+      margin-top: 0.35rem;
+      flex-shrink: 0;
+    }
+    .le-stream-body { line-height: 1.45; }
+    .le-stream-city {
+      font-family: var(--font-mono, monospace);
+      font-size: 0.72rem;
+      color: var(--adm-brass-text, #D4AC71);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 0.15rem;
+    }
+    .le-stream-ctx { color: rgba(244,241,234,0.7); }
+    .le-stream-time {
+      font-family: var(--font-mono, monospace);
+      font-size: 0.68rem;
+      color: rgba(244,241,234,0.35);
+      white-space: nowrap;
+    }
+    .le-stream-empty { color: rgba(244,241,234,0.4); font-size: 0.85rem; padding: var(--s3) 0; }
+
+    /* Boost button */
+    .le-boost {
+      background: transparent;
+      border: 1px solid rgba(212,172,113,0.3);
+      color: var(--adm-brass-text, #D4AC71);
+      font-family: var(--font-mono, monospace);
+      font-size: 0.68rem;
+      letter-spacing: 0.05em;
+      padding: 0.22rem 0.55rem;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+    .le-boost:hover { border-color: var(--adm-brass-text, #D4AC71); }
+    .le-boost:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Pause city button */
+    .le-pause-city {
+      background: transparent;
+      border: 1px solid rgba(242,155,155,0.25);
+      color: rgba(242,155,155,0.7);
+      font-family: var(--font-mono, monospace);
+      font-size: 0.68rem;
+      padding: 0.22rem 0.55rem;
+      cursor: pointer;
+    }
+    .le-pause-city:hover { border-color: rgba(242,155,155,0.6); color: #f29b9b; }
+    .le-pause-city:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Overflow table wrapper */
+    .le-table-wrap { overflow-x: auto; }
+
+    /* Refresh indicator */
+    .le-refreshing { color: rgba(176,141,87,0.6); font-size: 0.75rem; font-family: var(--font-mono, monospace); }
+
+    /* Manual trigger button */
+    .le-run-btn {
+      background: transparent;
+      border: 1px solid rgba(127,217,154,0.35);
+      color: #7fd99a;
+      font-family: var(--font-mono, monospace);
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.45rem 1.2rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .le-run-btn:hover { border-color: #7fd99a; }
+    .le-run-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  </style>
+</head>
+<body class="adm-page">
+  <header class="adm-bar" id="adm-nav-bar" data-active="living-echo"></header>
+
+  <main class="page-main">
+    <section class="glass-card">
+      <div class="adm" id="adm-root">
+        <p class="adm-eyebrow">Admin</p>
+        <h1 class="adm-title">Loading.</h1>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer glass">
+    <p class="small-print">Glotemp is a product of RenviaIT Ltd, registered in England.</p>
+  </footer>
+
+  <script src="/cities-data.js"></script>
+  <script src="/glotemp-core.js"></script>
+  <script src="/glotemp-auth.js"></script>
+  <script src="/cookie-consent.js" defer></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var root = document.getElementById('adm-root');
+
+    /* ── Small utilities ─────────────────────────────────────────────── */
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function ago(ts) {
+      if (!ts) return '—';
+      var d = new Date(ts), now = Date.now();
+      var diff = Math.floor((now - d.getTime()) / 1000);
+      if (diff < 60) return diff + 's ago';
+      if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+      if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+      return Math.floor(diff / 86400) + 'd ago';
+    }
+
+    function cityLabel(slug) {
+      if (window.CITIES_DATA) {
+        var c = CITIES_DATA.find(function (x) { return x.slug === slug; });
+        if (c) return c.name;
+      }
+      return slug.replace(/-/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+    }
+
+    /* ── API calls ───────────────────────────────────────────────────── */
+    var SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
+    var SUPABASE_ANON = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
+
+    async function rpc(fn, args) {
+      var session = await GlotempAuth.getSession();
+      if (!session) throw new Error('no session');
+      var resp = await fetch(SUPABASE_URL + '/rest/v1/rpc/' + fn, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_ANON,
+          Authorization: 'Bearer ' + session.access_token,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(args || {}),
+      });
+      if (!resp.ok) {
+        var t = await resp.text().catch(function () { return ''; });
+        throw new Error(fn + ' ' + resp.status + ': ' + t.slice(0, 120));
+      }
+      return resp.json();
+    }
+
+    async function invokeFn(fnName, body) {
+      var session = await GlotempAuth.getSession();
+      if (!session) throw new Error('no session');
+      var resp = await fetch(SUPABASE_URL + '/functions/v1/' + fnName, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_ANON,
+          Authorization: 'Bearer ' + session.access_token,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body || {}),
+      });
+      if (!resp.ok) {
+        var t = await resp.text().catch(function () { return ''; });
+        throw new Error(fnName + ' ' + resp.status + ': ' + t.slice(0, 120));
+      }
+      return resp.json();
+    }
+
+    /* ── State ───────────────────────────────────────────────────────── */
+    var state = {
+      overview: null,
+      cities: [],
+      stream: [],
+      isPaused: false,
+      autofade: 15,
+      filterTier: 'all',
+      filterStatus: 'all',
+      searchQuery: '',
+      streamInterval: null,
+    };
+
+    /* ── Render helpers ──────────────────────────────────────────────── */
+    function renderHealthMetrics() {
+      var o = state.overview || [];
+      var m = {};
+      o.forEach(function (r) { m[r.metric] = Number(r.value) || 0; });
+
+      var paused = m.system_paused === 1;
+      state.isPaused = paused;
+
+      var Ch = window.GlotempAdminCharts;
+      function stat(v, label, opts) { return Ch ? Ch.stat(v, label, opts || {}) : '<div>' + v + ' ' + label + '</div>'; }
+
+      return '<div class="adm-grid is-wide">' +
+        stat((m.total_synthetic || 0).toLocaleString(), 'synthetic comments', { key: true }) +
+        stat((m.total_organic || 0).toLocaleString(), 'organic comments', {}) +
+        stat((m.cities_at_threshold || 0).toLocaleString(), 'cities ≥25 comments', {}) +
+        '</div>';
+    }
+
+    function renderControls() {
+      var paused = state.isPaused;
+      var badge = paused
+        ? '<span class="le-badge is-paused">Paused</span>'
+        : '<span class="le-badge is-active">Running</span>';
+
+      return '<div class="le-controls">' +
+        '<span class="le-controls-label">System state</span>' +
+        badge +
+        (paused
+          ? '<button class="le-toggle is-resume" id="le-global-resume">Resume generation</button>'
+          : '<button class="le-toggle is-danger" id="le-global-pause">Emergency pause</button>'
+        ) +
+        '<button class="le-run-btn" id="le-manual-run">▶ Run now</button>' +
+        '<div class="le-fade-row">' +
+          '<span class="le-controls-label">Auto-fade at</span>' +
+          '<input type="range" id="le-fade-slider" min="0" max="50" value="' + esc(state.autofade) + '" />' +
+          '<span id="le-fade-val">' + esc(state.autofade) + ' organic</span>' +
+        '</div>' +
+      '</div>';
+    }
+
+    function renderCityTable() {
+      var cities = state.cities || [];
+
+      // Filter
+      var filtered = cities.filter(function (c) {
+        if (state.filterTier !== 'all' && c.tier !== state.filterTier) return false;
+        if (state.filterStatus !== 'all' && c.status !== state.filterStatus) return false;
+        if (state.searchQuery) {
+          var label = cityLabel(c.city_id).toLowerCase();
+          if (label.indexOf(state.searchQuery.toLowerCase()) === -1) return false;
+        }
+        return true;
+      });
+
+      var controls =
+        '<div class="le-table-controls">' +
+          '<input class="le-search" id="le-search" type="text" placeholder="Search city…" value="' + esc(state.searchQuery) + '" />' +
+          '<button class="le-filter-btn' + (state.filterTier === 'all' ? ' active' : '') + '" data-tier="all">All tiers</button>' +
+          '<button class="le-filter-btn' + (state.filterTier === 'tier1' ? ' active' : '') + '" data-tier="tier1">Tier 1</button>' +
+          '<button class="le-filter-btn' + (state.filterTier === 'tier2' ? ' active' : '') + '" data-tier="tier2">Tier 2</button>' +
+          '<button class="le-filter-btn' + (state.filterTier === 'tier3' ? ' active' : '') + '" data-tier="tier3">Tier 3</button>' +
+          '<button class="le-filter-btn' + (state.filterStatus === 'active' ? ' active' : '') + '" data-status="active">Active</button>' +
+          '<button class="le-filter-btn' + (state.filterStatus === 'paused' ? ' active' : '') + '" data-status="paused">Paused</button>' +
+        '</div>';
+
+      if (!filtered.length) {
+        return controls + '<p class="adm-copy">No cities match the current filter.</p>';
+      }
+
+      var rows = filtered.map(function (c) {
+        var pct = c.target_count > 0
+          ? Math.min(100, Math.round((c.current_count / c.target_count) * 100))
+          : 0;
+        var barClass = pct >= 100 ? 'le-density-bar is-full' : 'le-density-bar';
+        var total = Number(c.synthetic_ct || 0) + Number(c.organic_ct || 0);
+        var synth = Number(c.synthetic_ct || 0);
+        var organic = Number(c.organic_ct || 0);
+        var synPct = total > 0 ? Math.round((synth / total) * 100) : 0;
+
+        return '<tr>' +
+          '<td class="le-city-name">' + esc(cityLabel(c.city_id)) + '</td>' +
+          '<td>' +
+            '<span class="le-density-bar-wrap"><span class="' + barClass + '" style="width:' + pct + '%"></span></span>' +
+            '<span style="font-family:var(--font-mono,monospace);font-size:0.72rem;color:rgba(244,241,234,0.5)">' +
+              esc(c.current_count) + '/' + esc(c.target_count) +
+            '</span>' +
+          '</td>' +
+          '<td><span style="font-family:var(--font-mono,monospace);font-size:0.72rem">' +
+            '<span style="color:#7fd99a">' + esc(synth) + ' syn</span>' +
+            ' / <span style="color:rgba(244,241,234,0.55)">' + esc(organic) + ' org</span>' +
+            ' <span style="color:rgba(244,241,234,0.3)">(' + synPct + '%)</span>' +
+          '</span></td>' +
+          '<td><span class="le-pill ' + esc(c.tier || 'tier3') + '">' + esc(c.tier || 'tier3') + '</span></td>' +
+          '<td><span class="le-status-dot ' + esc(c.status) + '"></span>' +
+            '<span style="font-size:0.75rem;color:rgba(244,241,234,0.5)">' + esc(c.status) + '</span>' +
+          '</td>' +
+          '<td style="color:rgba(244,241,234,0.4);font-family:var(--font-mono,monospace);font-size:0.72rem">' +
+            esc(ago(c.last_run_at)) +
+          '</td>' +
+          '<td>' +
+            '<button class="le-boost" data-city="' + esc(c.city_id) + '">+Boost</button> ' +
+            '<button class="le-pause-city" data-city="' + esc(c.city_id) + '" data-current-status="' + esc(c.status) + '">' +
+              (c.status === 'active' ? 'Pause' : 'Resume') +
+            '</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+
+      return controls +
+        '<div class="le-table-wrap"><table class="le-city-table">' +
+          '<thead><tr>' +
+            '<th>City</th><th>Density</th><th>Synthetic / Organic</th>' +
+            '<th>Tier</th><th>Status</th><th>Last run</th><th>Actions</th>' +
+          '</tr></thead>' +
+          '<tbody>' + rows + '</tbody>' +
+        '</table></div>';
+    }
+
+    function renderStream() {
+      var items = state.stream || [];
+      if (!items.length) {
+        return '<p class="le-stream-empty">No activity yet. The engine will populate this as comments are generated.</p>';
+      }
+      return '<div class="le-stream">' +
+        items.map(function (e) {
+          return '<div class="le-stream-item">' +
+            '<div class="le-stream-dot"></div>' +
+            '<div class="le-stream-body">' +
+              '<div class="le-stream-city">' + esc(cityLabel(e.city_id)) + '</div>' +
+              '<div class="le-stream-ctx">' +
+                esc(e.persona_name) +
+                ' <span style="color:rgba(244,241,234,0.4)">·</span> ' +
+                esc(e.persona_archetype) +
+                (e.context ? ' <span style="color:rgba(244,241,234,0.35)">· ' + esc(e.context) + '</span>' : '') +
+              '</div>' +
+            '</div>' +
+            '<div class="le-stream-time">' + esc(ago(e.created_at)) + '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>';
+    }
+
+    /* ── Full page render ────────────────────────────────────────────── */
+    function C() { return window.GlotempAdminCore; }
+
+    function renderPage() {
+      var c = C();
+      if (!c) { root.innerHTML = '<p class="adm-eyebrow">Admin</p><h1 class="adm-title">Could not load.</h1>'; return; }
+
+      root.innerHTML = c.stateHTML('Admin', 'Living Echo',
+        /* health metrics */
+        c.panel('le-health', 'Global health', null, renderHealthMetrics()) +
+        /* controls */
+        c.panel('le-ctrl', 'System controls', null, renderControls()) +
+        /* city table */
+        c.panel('le-cities', 'City density', null, renderCityTable()) +
+        /* activity stream */
+        c.panel('le-stream-panel', 'Live activity stream',
+          '<span id="le-stream-refresh" class="le-refreshing"></span>',
+          renderStream()
+        )
+      );
+
+      wireControls();
+      wireTable();
+    }
+
+    /* ── Wire interactive controls ───────────────────────────────────── */
+    function wireControls() {
+      // Global pause / resume
+      var pauseBtn  = document.getElementById('le-global-pause');
+      var resumeBtn = document.getElementById('le-global-resume');
+      var runBtn    = document.getElementById('le-manual-run');
+
+      if (pauseBtn) {
+        pauseBtn.addEventListener('click', function () {
+          if (!confirm('Pause the Living Echo generation engine globally?')) return;
+          pauseBtn.disabled = true;
+          rpc('admin_living_echo_set_pause', { p_paused: true })
+            .then(function () { state.isPaused = true; loadAndRender(); })
+            .catch(function (e) { alert('Error: ' + e.message); pauseBtn.disabled = false; });
+        });
+      }
+      if (resumeBtn) {
+        resumeBtn.addEventListener('click', function () {
+          resumeBtn.disabled = true;
+          rpc('admin_living_echo_set_pause', { p_paused: false })
+            .then(function () { state.isPaused = false; loadAndRender(); })
+            .catch(function (e) { alert('Error: ' + e.message); resumeBtn.disabled = false; });
+        });
+      }
+
+      // Manual trigger
+      if (runBtn) {
+        runBtn.addEventListener('click', function () {
+          runBtn.disabled = true;
+          runBtn.textContent = '⏳ Running…';
+          invokeFn('living-echo', {})
+            .then(function (r) {
+              runBtn.textContent = '✓ Generated ' + (r.generated || 0);
+              setTimeout(function () { runBtn.disabled = false; runBtn.textContent = '▶ Run now'; loadAndRender(); }, 2500);
+            })
+            .catch(function (e) {
+              runBtn.textContent = '✗ Error';
+              setTimeout(function () { runBtn.disabled = false; runBtn.textContent = '▶ Run now'; }, 2000);
+              console.error(e);
+            });
+        });
+      }
+
+      // Auto-fade slider
+      var slider   = document.getElementById('le-fade-slider');
+      var fadeVal  = document.getElementById('le-fade-val');
+      var fadeTimer;
+      if (slider) {
+        slider.addEventListener('input', function () {
+          var v = parseInt(slider.value, 10);
+          if (fadeVal) fadeVal.textContent = v + ' organic';
+          clearTimeout(fadeTimer);
+          fadeTimer = setTimeout(function () {
+            rpc('admin_living_echo_set_autofade', { p_threshold: v })
+              .then(function () { state.autofade = v; })
+              .catch(function (e) { console.error('set_autofade:', e); });
+          }, 800);
+        });
+      }
+    }
+
+    function wireTable() {
+      // Search
+      var search = document.getElementById('le-search');
+      if (search) {
+        search.addEventListener('input', function () {
+          state.searchQuery = search.value;
+          var tablePanel = document.getElementById('le-cities');
+          if (tablePanel) tablePanel.querySelector('.adm-panel-body').innerHTML = renderCityTable();
+          wireTable();
+        });
+      }
+
+      // Tier / status filter buttons
+      document.querySelectorAll('[data-tier]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          state.filterTier = btn.getAttribute('data-tier');
+          var tablePanel = document.getElementById('le-cities');
+          if (tablePanel) tablePanel.querySelector('.adm-panel-body').innerHTML = renderCityTable();
+          wireTable();
+        });
+      });
+      document.querySelectorAll('[data-status]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var v = btn.getAttribute('data-status');
+          state.filterStatus = (state.filterStatus === v) ? 'all' : v;
+          var tablePanel = document.getElementById('le-cities');
+          if (tablePanel) tablePanel.querySelector('.adm-panel-body').innerHTML = renderCityTable();
+          wireTable();
+        });
+      });
+
+      // Boost buttons
+      document.querySelectorAll('.le-boost').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var cityId = btn.getAttribute('data-city');
+          btn.disabled = true;
+          rpc('admin_living_echo_boost_city', { p_city_id: cityId, p_extra: 10 })
+            .then(function () { btn.textContent = '✓'; setTimeout(function () { loadAndRender(); }, 800); })
+            .catch(function (e) { btn.disabled = false; alert('Boost failed: ' + e.message); });
+        });
+      });
+
+      // Pause/resume city buttons
+      document.querySelectorAll('.le-pause-city').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var cityId   = btn.getAttribute('data-city');
+          var curStatus = btn.getAttribute('data-current-status');
+          var newStatus = curStatus === 'active' ? 'paused' : 'active';
+          btn.disabled = true;
+          rpc('admin_living_echo_set_city_status', { p_city_id: cityId, p_status: newStatus })
+            .then(function () { loadAndRender(); })
+            .catch(function (e) { btn.disabled = false; alert('Status change failed: ' + e.message); });
+        });
+      });
+    }
+
+    /* ── Data loading ────────────────────────────────────────────────── */
+    function loadAndRender() {
+      return Promise.all([
+        rpc('admin_living_echo_overview', {}),
+        rpc('admin_living_echo_cities', { p_limit: 200, p_offset: 0 }),
+        rpc('admin_living_echo_stream', { p_limit: 50 }),
+      ]).then(function (results) {
+        state.overview = results[0] || [];
+        state.cities   = results[1] || [];
+        state.stream   = results[2] || [];
+
+        // Sync autofade from overview RPC (would need dedicated field; for
+        // now read from DOM if slider exists).
+        renderPage();
+      }).catch(function (err) {
+        root.innerHTML =
+          '<p class="adm-eyebrow">Admin</p>' +
+          '<h1 class="adm-title">Living Echo</h1>' +
+          '<p class="adm-copy" style="color:#f29b9b">Failed to load: ' + esc(err.message) + '</p>';
+      });
+    }
+
+    /* ── Boot ────────────────────────────────────────────────────────── */
+    function boot() {
+      var c = C();
+      if (!c) { root.innerHTML = '<p class="adm-eyebrow">Admin</p><h1 class="adm-title">Could not load that.</h1>'; return; }
+      loadAndRender().then(function () {
+        // Refresh stream every 30 seconds.
+        state.streamInterval = setInterval(function () {
+          rpc('admin_living_echo_stream', { p_limit: 50 }).then(function (s) {
+            state.stream = s || [];
+            var streamPanel = document.getElementById('le-stream-panel');
+            if (streamPanel) streamPanel.querySelector('.adm-panel-body').innerHTML = renderStream();
+            var ref = document.getElementById('le-stream-refresh');
+            if (ref) { ref.textContent = 'refreshed ' + ago(new Date().toISOString()); }
+          }).catch(function () {});
+        }, 30000);
+      });
+    }
+
+    // Wait for all deferred scripts.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () { setTimeout(boot, 50); });
+    } else {
+      setTimeout(boot, 50);
+    }
+  }());
+  </script>
+</body>
+</html>
