@@ -13,7 +13,7 @@
 //   Banned: "vibrant tapestry", "nestled in", "must-visit destination",
 //           "gem of a city", "hidden gem", "bustling metropolis"
 //   Required: typos, lowercase starts, natural slang
-//   Mix: 60% Resident / 40% Tourist per city
+//   Mix: 60% Resident / 40% Tourist enforced across the full batch
 //   Timing: Gaussian-jittered created_at so the 12-min cron cadence is
 //           invisible in the timestamp distribution
 
@@ -44,7 +44,7 @@ interface CityState {
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, content-type",
+  "Access-Control-Allow-Headers": "authorization, content-type, apikey",
   "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
 };
 
@@ -96,13 +96,15 @@ function isActiveHour(h: number): boolean {
   return h < 5 ? Math.random() < 0.2 : true;
 }
 
-function estimateSentiment(text: string): number {
+// Maps sentiment score to valid observations.mood enum values
+function estimateMood(text: string): "charged" | "steady" | "low" {
   const pos = ["great","amazing","love","perfect","excellent","fantastic","good","nice","enjoy","beautiful"];
   const neg = ["awful","terrible","hate","horrible","bad","worst","delay","backed up","broken","problem"];
   const t = text.toLowerCase();
   const p = pos.filter(w => t.includes(w)).length;
   const n = neg.filter(w => t.includes(w)).length;
-  return p + n === 0 ? 0.1 : Math.max(-1, Math.min(1, (p - n) * 0.3));
+  const score = p + n === 0 ? 0 : Math.max(-1, Math.min(1, (p - n) * 0.3));
+  return score > 0.2 ? "charged" : score < -0.2 ? "low" : "steady";
 }
 
 // ── Template fallback (no API key) ───────────────────────────────────
@@ -220,6 +222,18 @@ Deno.serve(async (req: Request) => {
 
   const sb = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
 
+  // Admin check: cron calls have no Authorization header; browser calls do.
+  // When an Authorization header is present, verify the caller is an admin.
+  const authHeader = req.headers.get("authorization");
+  if (authHeader) {
+    const token = authHeader.replace(/^Bearer\s+/i, "");
+    const { data: { user }, error: authErr } = await sb.auth.getUser(token);
+    if (authErr || !user) return json({ error: "unauthorized" }, 401);
+    const { data: profile } = await sb
+      .from("profiles").select("is_admin").eq("user_id", user.id).single();
+    if (!profile?.is_admin) return json({ error: "forbidden" }, 403);
+  }
+
   // 1. Global pause check
   const { data: gs, error: gsErr } = await sb
     .from("living_echo_global_state").select("is_paused,auto_fade_threshold").eq("id", 1).single();
@@ -234,61 +248,87 @@ Deno.serve(async (req: Request) => {
   const residents = personas.filter((p: Persona) => p.archetype === "Resident");
   const tourists  = personas.filter((p: Persona) => p.archetype === "Tourist");
 
-  // 3. Pick cities that still need work
-  const { data: cityStates, error: csErr } = await sb
+  // 3. Pick cities that still need work — fetch more than needed, sort by completion
+  //    ratio so cities furthest below their individual target come first.
+  const { data: rawCities, error: csErr } = await sb
     .from("city_generation_state")
     .select("city_id,target_count,current_count,tier")
     .eq("status", "active")
-    .order("current_count", { ascending: true })
-    .limit(BATCH_SIZE * 3);
+    .limit(BATCH_SIZE * 6);
 
-  if (csErr || !cityStates?.length) return json({ status: "no_cities", generated: 0 });
+  if (csErr || !rawCities?.length) return json({ status: "no_cities", generated: 0 });
 
   const autofade = gs.auto_fade_threshold ?? 15;
-  const needsWork = (cityStates as CityState[])
+
+  // Sort by completion ratio ascending (lowest ratio = most behind = first)
+  const sorted = (rawCities as CityState[])
     .filter(c => c.current_count < c.target_count)
+    .sort((a, b) =>
+      (a.current_count / a.target_count) - (b.current_count / b.target_count)
+    )
     .slice(0, BATCH_SIZE);
 
-  if (!needsWork.length) return json({ status: "all_satisfied", generated: 0 });
+  if (!sorted.length) return json({ status: "all_satisfied", generated: 0 });
 
-  // 4. Generate
+  // 4. Pre-allocate 60/40 Resident/Tourist mix across all slots in this batch.
+  //    This enforces the ratio exactly rather than relying on per-slot coin flips.
+  const totalSlots = sorted.length * COMMENTS_PER_CITY;
+  const residentCount = Math.round(totalSlots * 0.6);
+  const slotTypes: ("Resident" | "Tourist")[] = [
+    ...Array(residentCount).fill("Resident"),
+    ...Array(totalSlots - residentCount).fill("Tourist"),
+  ];
+  for (let i = slotTypes.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [slotTypes[i], slotTypes[j]] = [slotTypes[j], slotTypes[i]];
+  }
+  let slotIdx = 0;
+
+  // 5. Generate
   let totalGenerated = 0;
 
-  for (const cs of needsWork) {
+  for (const cs of sorted) {
     const { city_id } = cs;
     const cityName = CITY_NAMES[city_id] ?? city_id.replace(/-/g, " ");
     const localHour = estimateLocalHour(city_id);
-    if (!isActiveHour(localHour)) continue;
+    if (!isActiveHour(localHour)) { slotIdx += COMMENTS_PER_CITY; continue; }
 
-    // Auto-fade: skip if organic engagement already exceeds threshold
-    const { count: organicCount } = await sb
+    // Auto-fade: skip if organic engagement already exceeds threshold.
+    // On query error, skip the city (fail-closed).
+    const { count: organicCount, error: ocErr } = await sb
       .from("observations")
       .select("*", { count: "exact", head: true })
       .eq("city_slug", city_id)
       .or("is_synthetic.is.null,is_synthetic.eq.false");
-    if ((organicCount ?? 0) >= autofade) continue;
+    if (ocErr) {
+      console.error(`living-echo: organic count failed for ${city_id}:`, ocErr.message);
+      slotIdx += COMMENTS_PER_CITY;
+      continue;
+    }
+    if ((organicCount ?? 0) >= autofade) { slotIdx += COMMENTS_PER_CITY; continue; }
+
+    let successCount = 0;
 
     for (let i = 0; i < COMMENTS_PER_CITY; i++) {
-      const useRes = Math.random() < 0.6;
-      const pool   = useRes && residents.length ? residents : tourists;
+      const archetype = slotTypes[slotIdx++] ?? "Resident";
+      const pool = archetype === "Resident" ? residents : tourists;
       const persona: Persona = pool[Math.floor(Math.random() * pool.length)];
 
       const text = await generateComment(cityName, city_id, persona, localHour);
       if (!text) continue;
 
-      const sentiment = estimateSentiment(text);
+      const mood      = estimateMood(text);
       const jitter    = gaussianJitterMs();
       const createdAt = new Date(Date.now() + jitter).toISOString();
 
-      // Insert into observations (the real comments table)
+      // Insert into observations (user_id intentionally omitted — nullable for synthetic rows)
       const { data: inserted, error: insErr } = await sb
         .from("observations")
         .insert({
           city_slug:         city_id,
-          mode:              persona.archetype === "Resident" ? "local" : "visitor",
           intensity:         Math.floor(Math.random() * 4) + 5,
           note:              text,
-          mood:              sentiment > 0.2 ? "positive" : sentiment < -0.2 ? "negative" : "neutral",
+          mood,
           is_anonymous:      true,
           moderation_status: "visible",
           is_synthetic:      true,
@@ -298,7 +338,10 @@ Deno.serve(async (req: Request) => {
         .select("id")
         .single();
 
-      if (insErr) { console.error(`living-echo: insert fail ${city_id}:`, insErr.message); continue; }
+      if (insErr) {
+        console.error(`living-echo: insert fail ${city_id}:`, insErr.message);
+        continue;
+      }
 
       // Activity log
       await sb.from("living_echo_log").insert({
@@ -308,15 +351,19 @@ Deno.serve(async (req: Request) => {
         context: `${persona.archetype} · ${persona.name} · hour=${localHour}`,
       });
 
-      totalGenerated++;
+      successCount++;
     }
 
-    // Advance counter
-    const newCount = Math.min(cs.current_count + COMMENTS_PER_CITY, cs.target_count);
-    await sb.from("city_generation_state")
-      .update({ current_count: newCount, last_run_at: new Date().toISOString() })
-      .eq("city_id", city_id);
+    // Advance counter only by the number of successful inserts
+    if (successCount > 0) {
+      const newCount = Math.min(cs.current_count + successCount, cs.target_count);
+      await sb.from("city_generation_state")
+        .update({ current_count: newCount, last_run_at: new Date().toISOString() })
+        .eq("city_id", city_id);
+    }
+
+    totalGenerated += successCount;
   }
 
-  return json({ status: "ok", generated: totalGenerated, batch: needsWork.length });
+  return json({ status: "ok", generated: totalGenerated, batch: sorted.length });
 });
