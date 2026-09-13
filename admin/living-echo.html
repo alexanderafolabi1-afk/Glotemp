@@ -421,6 +421,8 @@
 
       var paused = m.system_paused === 1;
       state.isPaused = paused;
+      // Hydrate autofade from server so the slider matches the stored value
+      if ('auto_fade_threshold' in m) state.autofade = m.auto_fade_threshold;
 
       var Ch = window.GlotempAdminCharts;
       function stat(v, label, opts) { return Ch ? Ch.stat(v, label, opts || {}) : '<div>' + v + ' ' + label + '</div>'; }
@@ -448,7 +450,7 @@
         '<button class="le-run-btn" id="le-manual-run">▶ Run now</button>' +
         '<div class="le-fade-row">' +
           '<span class="le-controls-label">Auto-fade at</span>' +
-          '<input type="range" id="le-fade-slider" min="0" max="50" value="' + esc(state.autofade) + '" />' +
+          '<input type="range" id="le-fade-slider" aria-label="Auto-fade threshold" min="0" max="50" value="' + esc(state.autofade) + '" />' +
           '<span id="le-fade-val">' + esc(state.autofade) + ' organic</span>' +
         '</div>' +
       '</div>';
@@ -724,17 +726,20 @@
     function boot() {
       var c = C();
       if (!c) { root.innerHTML = '<p class="adm-eyebrow">Admin</p><h1 class="adm-title">Could not load that.</h1>'; return; }
-      loadAndRender().then(function () {
-        // Refresh stream every 30 seconds.
-        state.streamInterval = setInterval(function () {
-          rpc('admin_living_echo_stream', { p_limit: 50 }).then(function (s) {
-            state.stream = s || [];
-            var streamPanel = document.getElementById('le-stream-panel');
-            if (streamPanel) streamPanel.querySelector('.adm-panel-body').innerHTML = renderStream();
-            var ref = document.getElementById('le-stream-refresh');
-            if (ref) { ref.textContent = 'refreshed ' + ago(new Date().toISOString()); }
-          }).catch(function () {});
-        }, 30000);
+      // Routes through the shared admin gate (session check + is_admin() guard)
+      c.boot(root, function () {
+        loadAndRender().then(function () {
+          // Refresh stream every 30 seconds.
+          state.streamInterval = setInterval(function () {
+            rpc('admin_living_echo_stream', { p_limit: 50 }).then(function (s) {
+              state.stream = s || [];
+              var streamPanel = document.getElementById('le-stream-panel');
+              if (streamPanel) streamPanel.querySelector('.adm-panel-body').innerHTML = renderStream();
+              var ref = document.getElementById('le-stream-refresh');
+              if (ref) { ref.textContent = 'refreshed ' + ago(new Date().toISOString()); }
+            }).catch(function () {});
+          }, 30000);
+        });
       });
     }
 
