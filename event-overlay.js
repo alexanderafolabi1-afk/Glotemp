@@ -8,31 +8,15 @@
 // glotemp-credits.js's exact (city_slug, vertical) query and don't render
 // as a per-vertical sponsor-logo credit chip.
 //
-// HONESTY, checked before writing this file:
-//   - ticketmaster-entertainment has never stored an event name or date --
-//     only a country-level aggregate score -- and every row it holds today
-//     is synthetic fallback data (confidence pinned at 0.5, its
-//     exception-path constant).
-//   - transitland-transport has never executed even once (zero rows,
-//     ever): its pg_cron schedule depends on a Vault secret
-//     (glotemp_service_role_key) that was never created, confirmed via
-//     `select count(*) from vault.decrypted_secrets ...` returning 0. Two
-//     of its three metrics are hardcoded Math.random() regardless.
-// Neither pipeline has a real signal to show right now, so there is no
-// transit-pressure read and no "calmer areas" note here -- cut, not
-// softened, per the same rule tonight.js already follows for anything it
-// can't back with a live source.
-//
-// What IS shown -- event name, dates, optional tagline -- is exactly what
-// sits in the row, supplied as part of the sold package. That's not a
-// live measurement and not a model; it's said so plainly, never dressed
-// up as either.
+// Static activations (STATIC_EVENTS) are pure adverts: white card, no
+// measurement disclaimer, auto-expire via ends_at.
 (function () {
   const SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
 
   // Static, time-boxed city activations (no Supabase row required).
   // Each entry is shown only on its city page and only while now <= ends_at.
+  // These render as adverts (white card, no disclaimer).
   const STATIC_EVENTS = [
     {
       citySlug: 'milton-keynes',
@@ -42,6 +26,7 @@
       start_date: '2026-10-03',
       end_date: '2026-10-04',
       ends_at: '2026-10-04T23:59:59+01:00',
+      isAd: true,
     },
   ];
 
@@ -70,9 +55,6 @@
     return m ? m[1] : null;
   }
 
-  // "Aug 20 - Aug 24, 2026" -- UTC-anchored since start_date/end_date are
-  // plain dates with no timezone of their own, and the window is the same
-  // calendar dates everywhere regardless of the visitor's local clock.
   function formatWindow(startISO, endISO) {
     try {
       const start = new Date(startISO + 'T00:00:00Z');
@@ -80,18 +62,18 @@
       const dayOpts = { month: 'short', day: 'numeric', timeZone: 'UTC' };
       const startStr = new Intl.DateTimeFormat('en-US', dayOpts).format(start);
       const endStr = new Intl.DateTimeFormat('en-US', { ...dayOpts, year: 'numeric' }).format(end);
-      return `${startStr} to ${endStr}`;
+      return startStr + ' to ' + endStr;
     } catch (e) {
-      return `${startISO} to ${endISO}`;
+      return startISO + ' to ' + endISO;
     }
   }
 
   async function fetchActiveEvent(citySlug) {
     try {
       const resp = await fetch(
-        `${SUPABASE_URL}/rest/v1/partners?city_slug=eq.${encodeURIComponent(citySlug)}` +
-        `&format=eq.event&select=name,tagline,url,start_date,end_date`,
-        { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' } }
+        SUPABASE_URL + '/rest/v1/partners?city_slug=eq.' + encodeURIComponent(citySlug) +
+        '&format=eq.event&select=name,tagline,url,start_date,end_date',
+        { headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, Accept: 'application/json' } }
       );
       if (!resp.ok) return null;
       const rows = await resp.json();
@@ -101,23 +83,74 @@
     }
   }
 
-  function renderOverlay(row) {
+  function ensureAdStyles() {
+    if (document.getElementById('event-overlay-ad-styles')) return;
+    var style = document.createElement('style');
+    style.id = 'event-overlay-ad-styles';
+    style.textContent = [
+      '.event-overlay--ad{',
+      '  background:#FFFFFF !important;',
+      '  background-image:none !important;',
+      '  border:1px solid rgba(0,0,0,0.08);',
+      '  border-left:3px solid #B08D57;',
+      '  border-radius:var(--radius,24px);',
+      '  padding:1.35rem 1.5rem 1.5rem;',
+      '  box-shadow:0 8px 32px rgba(0,0,0,0.18);',
+      '  backdrop-filter:none;',
+      '  -webkit-backdrop-filter:none;',
+      '}',
+      '.event-overlay--ad .event-overlay-eyebrow{',
+      '  color:#B08D57;',
+      '  margin-bottom:0.45rem;',
+      '}',
+      '.event-overlay--ad .event-overlay-name{',
+      '  color:#1a1510;',
+      '  font-weight:500;',
+      '}',
+      '.event-overlay--ad .event-overlay-dates{',
+      '  color:#5c5348;',
+      '}',
+      '.event-overlay--ad .event-overlay-tagline{',
+      '  color:#3d3830;',
+      '  max-width:56ch;',
+      '}',
+      '.event-overlay--ad .event-overlay-link{',
+      '  color:#1a1510;',
+      '  border-bottom-color:rgba(176,141,87,0.55);',
+      '  font-weight:500;',
+      '}',
+      '.event-overlay--ad .event-overlay-link:hover{',
+      '  border-bottom-color:#B08D57;',
+      '  color:#B08D57;',
+      '}',
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function renderOverlay(row, isAd) {
     const section = document.createElement('section');
     section.id = 'event-overlay';
-    section.className = 'event-overlay glass-card';
-    section.innerHTML = `
-      <p class="event-overlay-eyebrow live-mark">Live event window</p>
-      <h2 class="event-overlay-name">${esc(row.name)}</h2>
-      <p class="event-overlay-dates">${esc(formatWindow(row.start_date, row.end_date))}</p>
-      ${row.tagline ? `<p class="event-overlay-tagline">${esc(row.tagline)}</p>` : ''}
-      ${row.url ? `<a class="event-overlay-link" href="${esc(row.url)}" target="_blank" rel="noopener">Event details</a>` : ''}
-      <p class="event-overlay-prov">Event window supplied as part of this city's activation listing, not a live measurement.</p>
-    `;
+    section.className = isAd ? 'event-overlay event-overlay--ad' : 'event-overlay glass-card';
+    if (isAd) ensureAdStyles();
+
+    var eyebrow = isAd ? 'Featured event' : 'Live event window';
+    var linkLabel = isAd ? 'Find out more' : 'Event details';
+    var prov = isAd
+      ? ''
+      : '<p class="event-overlay-prov">Event window supplied as part of this city\'s activation listing, not a live measurement.</p>';
+
+    section.innerHTML =
+      '<p class="event-overlay-eyebrow live-mark">' + esc(eyebrow) + '</p>' +
+      '<h2 class="event-overlay-name">' + esc(row.name) + '</h2>' +
+      '<p class="event-overlay-dates">' + esc(formatWindow(row.start_date, row.end_date)) + '</p>' +
+      (row.tagline ? '<p class="event-overlay-tagline">' + esc(row.tagline) + '</p>' : '') +
+      (row.url
+        ? '<a class="event-overlay-link" href="' + esc(row.url) + '" target="_blank" rel="noopener">' + esc(linkLabel) + '</a>'
+        : '') +
+      prov;
     return section;
   }
 
-  // No row: render nothing and touch nothing. Every existing page must
-  // look exactly as it does today when this condition is false.
   async function mount() {
     const slug = detectCitySlug();
     if (!slug) return;
@@ -129,7 +162,8 @@
     const row = staticEv || await fetchActiveEvent(slug);
     if (!row) return;
 
-    const section = renderOverlay(row);
+    const isAd = !!(staticEv && staticEv.isAd);
+    const section = renderOverlay(row, isAd);
     const header = main.querySelector('.city-header');
     if (header) header.insertAdjacentElement('beforebegin', section);
     else main.insertBefore(section, main.firstChild);
