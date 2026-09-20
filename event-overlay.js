@@ -31,6 +31,32 @@
   const SUPABASE_URL = 'https://hnysztednzqfzbmiqqgl.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_AV3IDw0gfEnwf4ZSTYQPRQ_tzDogHi_';
 
+  // Static, time-boxed city activations (no Supabase row required).
+  // Each entry is shown only on its city page and only while now <= ends_at.
+  const STATIC_EVENTS = [
+    {
+      citySlug: 'milton-keynes',
+      name: 'Fashion Weekend AW26',
+      tagline: 'Over 40 brands on the catwalk, exclusive fashion & beauty pop-ups, style talks and masterclasses. Free entry — no tickets needed. Middleton Hall · centre:mk · 11am–5pm.',
+      url: 'https://www.centremk.com/whats-on/events/fashion-weekend-aw26/',
+      start_date: '2026-10-03',
+      end_date: '2026-10-04',
+      ends_at: '2026-10-04T23:59:59+01:00',
+    },
+  ];
+
+  function activeStaticEvent(citySlug) {
+    const now = Date.now();
+    for (const ev of STATIC_EVENTS) {
+      if (ev.citySlug !== citySlug) continue;
+      try {
+        if (now > new Date(ev.ends_at).getTime()) continue;
+      } catch (e) { continue; }
+      return ev;
+    }
+    return null;
+  }
+
   function esc(s) {
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -38,7 +64,9 @@
   }
 
   function detectCitySlug() {
-    const m = window.location.pathname.match(/\/cities\/([a-z0-9-]+)\.html$/i);
+    let m = window.location.pathname.match(/\/cities\/([a-z0-9-]+)\.html$/i);
+    if (m) return m[1];
+    m = window.location.pathname.match(/\/cities\/([a-z0-9-]+)\/?$/i);
     return m ? m[1] : null;
   }
 
@@ -97,7 +125,8 @@
     if (!main) return;
     if (document.getElementById('event-overlay')) return;
 
-    const row = await fetchActiveEvent(slug);
+    const staticEv = activeStaticEvent(slug);
+    const row = staticEv || await fetchActiveEvent(slug);
     if (!row) return;
 
     const section = renderOverlay(row);
