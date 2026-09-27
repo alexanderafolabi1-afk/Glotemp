@@ -109,34 +109,13 @@ Each scenario uses a different dimensional weighting. Each result includes a sco
 
 ## The Contributor Economy
 
-|Rank       |Threshold   |Benefits                                                 |
-|-----------|------------|---------------------------------------------------------|
-|Luminary   |1,000+ Stars|Max revenue share · Exclusive city access · 3× multiplier|
-|Vanguard   |500+ Stars  |Enhanced share · Priority data · 2× multiplier           |
-|Pathfinder |200+ Stars  |Pool participation · Multi-city tracking                 |
-|Explorer II|50+ Stars   |Community pool entry · Leaderboard                       |
-|Explorer I |0+ Stars    |Base check-ins · City heat contribution                  |
-
-**5% of all sponsor revenue** is distributed monthly to contributors, proportional to Stars earned. This is public, transparent, and visible in the app.
-
------
-
-## Revenue Streams
-
-1. **City Sponsorships** - $500–$5,000+/mo per city
-1. **Pulse Data API** - $99–$2,499/mo tiered SaaS
-1. **Premium Contributor Tier** - $9.99/mo subscription
-1. **Trip Intelligence Reports** - $4.99–$19.99 per report
-
------
-
-## Market Size
-
-|       |                                                           |
-|-------|-----------------------------------------------------------|
-|**TAM**|$180B - location intelligence, social listening, city data |
-|**SAM**|$22B - experiential marketing, city sponsorships, mood APIs|
-|**SOM**|$420M - conservative 5-year capture, 50+ cities            |
+|Rank       |Threshold   |Benefits                                                       |
+|-----------|------------|----------------------------------------------------------------|
+|Luminary   |1,000+ Stars|Founder profile badge · Exclusive city access · 3× multiplier   |
+|Vanguard   |500+ Stars  |Featured reporter spot · Priority data · 2× multiplier          |
+|Pathfinder |200+ Stars  |Early access to new city features · Multi-city tracking         |
+|Explorer II|50+ Stars   |Profile badge · Leaderboard status                              |
+|Explorer I |0+ Stars    |Base check-ins · City heat contribution                         |
 
 -----
 
@@ -152,22 +131,14 @@ Each scenario uses a different dimensional weighting. Each result includes a sco
 
 ```
 index.html          - Main app interface
-about.html          - Brand manifesto
-investors.html      - Investor deck
-styles.css          - Full design system (Syne + DM Sans)
+about/index.html    - Brand manifesto
+styles.css          - Full design system (Fraunces + Manrope + IBM Plex Mono)
 app.js              - Core engine (pulse, trip, check-in, contributor)
-app-ui-patch.js     - UI render overrides for new design system
-sw.js               - Service worker
+cities-data.js      - The city register
+glotemp-core.js     - Shared band logic used across every page
+sw.js               - Service worker (generated from sw.js.template)
 manifest.json       - PWA manifest
 ```
-
-### Integrations
-
-- **Phase 1** (Live): In-browser pulse simulation + human check-ins
-- **Phase 2**: Real API integrations (OpenWeather, News APIs, Ticketmaster, etc.)
-- **Phase 3**: Supabase backend for persistent cross-device profiles + leaderboards
-- **Phase 4**: Stripe billing for API subscriptions + premium tier
-- **Phase 5**: Native mobile apps (React Native)
 
 -----
 
@@ -183,15 +154,11 @@ Sponsor activates city → Star boosts drive check-ins → deeper data → spons
 
 ### Loop 3: Contributor Flywheel
 
-Contributor earns Stars → rank unlocks rewards → income → recruits network ↺
+Contributor earns Stars → rank unlocks perks and status → recruits network ↺
 
 -----
 
 ## Contact
-
-**Seed round open.**
-
-Decks, data-rooms, and founder calls available on request.
 
 📧 [info@glo-temp.com](mailto:info@glo-temp.com)
 

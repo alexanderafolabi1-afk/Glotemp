@@ -31,3 +31,6 @@ jobs:
 
       - name: Admin-leak check
         run: node check-no-admin-leak.js
+
+      - name: Funding-language check
+        run: node check-no-funding-language.js

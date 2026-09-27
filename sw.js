@@ -62,8 +62,8 @@ self.addEventListener('fetch', (event) => {
   // copy is only ever an offline fallback.
   //
   // The previous worker decided "is this HTML?" from a hardcoded list of
-  // paths (/, *.html, /about, /explore, /blog, /admin, /privacy, /terms,
-  // /investors). Every route added since -- /feed, /gem, /methodology,
+  // paths (/, *.html, /about, /explore, /blog, /admin, /privacy, /terms).
+  // Every route added since -- /feed, /gem, /methodology,
   // /movers, /cities, /verticals, /rankings, /compare -- missed that list
   // and fell through to the CACHE-FIRST branch at the bottom of the file,
   // which is precisely "serve stale HTML, forever". request.mode tells us

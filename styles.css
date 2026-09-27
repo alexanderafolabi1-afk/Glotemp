@@ -8233,7 +8233,7 @@ a:hover .city-landmark-photo,
   .hf-pref-row { flex-direction: column; gap: 0.6rem; align-items: flex-start; }
 }
 
-/* ===== INVESTOR PAGE: REVENUE PATHS ===== */
+/* ===== PRIVATE PAGE: LIST STYLES ===== */
 .revenue-paths-list {
   list-style: none;
   margin: 0.75rem 0 0;
