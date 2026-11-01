@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-01T04:20:21.620Z",
+ "generated": "2026-11-01T11:09:34.081Z",
  "width": 1000,
  "cities": {
   "tokyo": {
@@ -133,28 +133,28 @@
    "name": "Cairo",
    "images": [
     {
-     "src": "/city-media/cairo/1.jpg",
+     "src": "/city-media/cairo/1.png",
+     "creator": "Hammerschmidt, Wilhelm Wilhelm Hammerschmidt",
+     "licence": "Public domain",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cairo-_Panorama,_No._1_(SM_stf981).png"
+    },
+    {
+     "src": "/city-media/cairo/2.jpg",
      "creator": "David from Washington, DC",
      "licence": "CC BY 2.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Cairo_(22264696).jpg"
     },
     {
-     "src": "/city-media/cairo/2.jpg",
+     "src": "/city-media/cairo/3.jpg",
      "creator": "Vyacheslav Argenberg",
      "licence": "CC BY 4.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cairo_skyline,_Nile_River,_Egypt.jpg"
     },
     {
-     "src": "/city-media/cairo/3.jpg",
+     "src": "/city-media/cairo/4.jpg",
      "creator": "Vyacheslav Argenberg",
      "licence": "CC BY 4.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cairo_skyline,_Panoramic_view,_Egypt.jpg"
-    },
-    {
-     "src": "/city-media/cairo/4.jpg",
-     "creator": "Nabbegat",
-     "licence": "CC BY 4.0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Armenian_Catholic_Cathedral_in_Cairo.jpg"
     }
    ]
   },
@@ -181,9 +181,9 @@
     },
     {
      "src": "/city-media/mumbai/4.jpg",
-     "creator": "Creater903a",
-     "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Skyline_of_Mumbai_from_sea_link.jpg"
+     "creator": "Vidur Malhotra",
+     "licence": "Public domain",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mumbai_Skyline_Wide.jpg"
     }
    ]
   },
@@ -233,15 +233,15 @@
     },
     {
      "src": "/city-media/osaka/3.jpg",
-     "creator": "Flickr user: Joop Amsterdam, Netherlands https://www.flickr.com/people/joopdorresteijn/",
+     "creator": "Dick Thomas Johnson from Tokyo, Japan",
      "licence": "CC BY 2.0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Neon_signs_Osaka_Japan.jpg"
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Aerial_view_of_Osaka_2019-04-12.jpg"
     },
     {
      "src": "/city-media/osaka/4.jpg",
      "creator": "Dick Thomas Johnson from Tokyo, Japan",
      "licence": "CC BY 2.0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Aerial_view_of_Osaka_2019-04-12.jpg"
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Aerial_view_of_Osaka_Castle_and_surrounding_areas.jpg"
     }
    ]
   },
@@ -279,61 +279,26 @@
     }
    ]
   },
-  "paris": {
-   "name": "Paris",
-   "images": [
-    {
-     "src": "/city-media/paris/1.jpg",
-     "creator": "Charles Méryon",
-     "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Apse_of_Notre-Dame,_Paris_MET_DP813394.jpg"
-    },
-    {
-     "src": "/city-media/paris/2.jpg",
-     "creator": "Charles Méryon",
-     "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Apse_of_Notre-Dame,_Paris_MET_DP813398.jpg"
-    },
-    {
-     "src": "/city-media/paris/3.jpg",
-     "creator": "Charles Méryon",
-     "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Apse_of_Notre-Dame,_Paris_MET_DP813397.jpg"
-    },
-    {
-     "src": "/city-media/paris/4.jpg",
-     "creator": "Charles Méryon",
-     "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Apse_of_Notre-Dame,_Paris_MET_DP813395.jpg"
-    }
-   ]
-  },
   "toronto": {
    "name": "Toronto",
    "images": [
     {
      "src": "/city-media/toronto/1.jpg",
-     "creator": "Unknown author Unknown author",
-     "licence": "Public domain",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Proposed_Victoria_Square_Toronto.JPG"
-    },
-    {
-     "src": "/city-media/toronto/2.jpg",
      "creator": "Chester from Toronto, Canada",
      "licence": "CC BY 2.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Toronto_skyline_near_St_James_Cathedral_(33326362208).jpg"
     },
     {
-     "src": "/city-media/toronto/3.jpg",
+     "src": "/city-media/toronto/2.jpg",
      "creator": "kyle tsui from Washington, DC, USA",
      "licence": "CC BY 2.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Toronto_Skyline_(55247716).jpg"
     },
     {
-     "src": "/city-media/toronto/4.jpg",
-     "creator": "Juan Davila",
-     "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Skyline_of_Toronto_unsplash.jpg"
+     "src": "/city-media/toronto/3.jpg",
+     "creator": "Russell Sutherland",
+     "licence": "Public domain",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Sunrise_of_the_Toronto_CBD_from_the_Leaside_Bridge.jpg"
     }
    ]
   },
@@ -342,27 +307,27 @@
    "images": [
     {
      "src": "/city-media/sydney/1.jpg",
-     "creator": "Kennethc",
-     "licence": "Public domain",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:St_Andrew%27s_Cathedral_School_Sydney_Square.jpg"
-    },
-    {
-     "src": "/city-media/sydney/2.jpg",
      "creator": "Robert Montgomery",
      "licence": "CC BY 2.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:St_Andrew%27s_Cathedral_Square,_Sydney.jpg"
     },
     {
-     "src": "/city-media/sydney/3.jpg",
+     "src": "/city-media/sydney/2.jpg",
      "creator": "Bernard Spragg. NZ from Christchurch, New Zealand",
      "licence": "CC0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Darling_Harbour_Sydney._(27744203123).jpg"
     },
     {
-     "src": "/city-media/sydney/4.jpg",
+     "src": "/city-media/sydney/3.jpg",
      "creator": "Jorge Láscar from Melbourne, Australia",
      "licence": "CC BY 2.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Sydney_as_seen_from_the_Sydney_Harbour_Bridge_(16448539798).jpg"
+    },
+    {
+     "src": "/city-media/sydney/4.jpg",
+     "creator": "Bernard Spragg. NZ from Christchurch, New Zealand",
+     "licence": "CC0",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Sydney_Skyline_from_Darling_Harbour._(21301509972).jpg"
     }
    ]
   },
@@ -377,21 +342,21 @@
     },
     {
      "src": "/city-media/berlin/2.jpg",
-     "creator": "Bleppo",
-     "licence": "Public domain",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Berlin_Skyline_voll.jpg"
-    },
-    {
-     "src": "/city-media/berlin/3.jpg",
      "creator": "Tony Webster from Berlin, Germany",
      "licence": "CC BY 2.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Berlin_Skyline_from_Berliner_Dom_Deutschland_(19386183345).jpg"
     },
     {
-     "src": "/city-media/berlin/4.jpg",
+     "src": "/city-media/berlin/3.jpg",
      "creator": "Gustav Kalhammer / Wiener Werkstätte",
      "licence": "CC0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Berlin-_Cathedral_(Der_Dom)_MET_DP845537.jpg"
+    },
+    {
+     "src": "/city-media/berlin/4.jpg",
+     "creator": "André Böttger",
+     "licence": "CC BY 3.0",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Berlin_Cathedral_(217425477).jpeg"
     }
    ]
   },
@@ -563,9 +528,9 @@
     },
     {
      "src": "/city-media/medellin/4.jpg",
-     "creator": "G. Artístico de J. Obando",
+     "creator": "Francisco Mejía",
      "licence": "Public domain",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Catedral_de_Medell%C3%ADn_-_Invitados_inauguraci%C3%B3n.jpeg"
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Tarjeta_postal_Catedral_de_Medell%C3%ADn_-_1.jpeg"
     }
    ]
   },
@@ -637,21 +602,9 @@
     },
     {
      "src": "/city-media/lima/2.jpg",
-     "creator": "Eugenio Courret",
-     "licence": "Public domain",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lima._The_public_square,_Municipality,_and_tower_of_St._Domingo_LCCN2006679711.jpg"
-    },
-    {
-     "src": "/city-media/lima/3.jpg",
-     "creator": "Miscellaneous Items in High Demand, PPOC, Library of Congress",
-     "licence": "Public domain",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lima._the_public_square._(Peru._low_aerial_view)_LCCN2006679752.jpg"
-    },
-    {
-     "src": "/city-media/lima/4.jpg",
-     "creator": "Alcide d'Orbigny",
-     "licence": "Public domain",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Bridge_of_Lima,_Ladies_of_Lima_1842_Boilly_and_Eyri%C3%A8s.jpg"
+     "creator": "Grandmaster Huon",
+     "licence": "CC0",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:High_rise_condos_of_Lima_02.jpg"
     }
    ]
   },
@@ -881,24 +834,6 @@
      "src": "/city-media/montreal/1.jpg",
      "creator": "J. G. Parks",
      "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:1870s,_Place_d%27Armes,_Montreal,_Qc,_Canada_01.jpg"
-    },
-    {
-     "src": "/city-media/montreal/2.jpg",
-     "creator": "J. G. Parks",
-     "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:1870s,_Place_d%27Armes,_Montreal,_Qc,_Canada_02.jpg"
-    },
-    {
-     "src": "/city-media/montreal/3.jpg",
-     "creator": "J. G. Parks",
-     "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:1870s,_Place_d%27Armes,_Montreal,_Qc,_Canada_04.jpg"
-    },
-    {
-     "src": "/city-media/montreal/4.jpg",
-     "creator": "J. G. Parks",
-     "licence": "CC0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:1870s,_Place_d%27Armes,_Montreal,_Qc,_Canada_06.jpg"
     }
    ]
@@ -911,12 +846,6 @@
      "creator": "Viephoto Studio",
      "licence": "CC BY 3.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Painted_Ladies_and_San_Francisco_skyline,_night,_March_2015_(145593201).jpg"
-    },
-    {
-     "src": "/city-media/san-francisco/2.jpg",
-     "creator": "Kylelovesyou",
-     "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Light_on_the_Portsmouth_Square_pedestrian_bridge_in_San_Francisco.jpg"
     }
    ]
   },
@@ -930,22 +859,22 @@
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Nebel_Voyage_42_Guadalajara.jpg"
     },
     {
-     "src": "/city-media/guadalajara/2.jpg",
-     "creator": "Daniel Tapatío",
-     "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Landmark_Guadalajara.jpg"
+     "src": "/city-media/guadalajara/2.png",
+     "creator": "Pier Maria Baldi",
+     "licence": "Public domain",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Pier_Maria_Baldi_(1668)_Guadalajara.png"
     },
     {
-     "src": "/city-media/guadalajara/3.jpg",
-     "creator": "Logue 0019",
-     "licence": "CC BY 4.0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Catedral_metropolitana_de_Guadalajara_o_catedral_Bas%C3%ADlica_de_la_Asunci%C3%B3n_de_Mar%C3%ADa_Sant%C3%ADsima.jpg"
+     "src": "/city-media/guadalajara/3.png",
+     "creator": "Johann Friedrich Leonart",
+     "licence": "Public domain",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Juan_Francisco_Leonardo_(1687)_Mapa_del_arzobispado_de_Toledo._Guadalajara.png"
     },
     {
      "src": "/city-media/guadalajara/4.jpg",
-     "creator": "Logue 0019",
-     "licence": "CC BY 4.0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Catedral_metropolitana_de_Guadalajara.jpg"
+     "creator": "Daniel Tapatío",
+     "licence": "CC0",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Landmark_Guadalajara.jpg"
     }
    ]
   },
@@ -994,27 +923,27 @@
    "images": [
     {
      "src": "/city-media/washington-dc/1.jpg",
+     "creator": "U.S. National Park Service, Historic American Building Survey. John McWilliams, photographer.",
+     "licence": "Public domain",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Banneker_Park_-_Washington_DC_-_facing_east.jpg"
+    },
+    {
+     "src": "/city-media/washington-dc/2.jpg",
      "creator": "Shubert Ciencia",
      "licence": "CC BY 2.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:National_Cathedral_(Washington_DC).jpg"
     },
     {
-     "src": "/city-media/washington-dc/2.jpg",
+     "src": "/city-media/washington-dc/3.jpg",
      "creator": "Yoichi Okamoto",
      "licence": "Public domain",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:ROOSEVELT_BRIDGE,_ONE_OF_SIX_CROSSING_THE_POTOMAC_FROM_WASHINGTON,_DC_TO_VIRGINIA._THE_WASHINGTON_CATHEDRAL_IS_ON_THE..._-_NARA_-_546581.jpg"
     },
     {
-     "src": "/city-media/washington-dc/3.jpg",
-     "creator": "Eric T Gunther",
-     "licence": "CC BY 3.0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cathedral_Heights_Washington_DC_2021.jpg"
-    },
-    {
      "src": "/city-media/washington-dc/4.jpg",
-     "creator": "Familydestinationsguide.com Images",
-     "licence": "CC BY 2.0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Washington_DC_Skyline_Illustration.jpg"
+     "creator": "Yoichi Okamoto",
+     "licence": "Public domain",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:EVENING_TRAFFIC-JAM_FROM_WASHINGTON,_DC_TO_VIRGINIA_ON_MEMORIAL_BRIDGE._LEE%27S_MANSION_ON_HORIZON_-_NARA_-_546591.jpg"
     }
    ]
   },
@@ -1081,27 +1010,27 @@
    "images": [
     {
      "src": "/city-media/dallas/1.jpg",
-     "creator": "Johnson & Rogers",
-     "licence": "Public domain",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Dallas_skyline_1912c.jpg"
-    },
-    {
-     "src": "/city-media/dallas/2.jpg",
      "creator": "Photo: Andreas Praefcke",
      "licence": "CC BY 3.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Dallas_skyline_and_suburbs.jpg"
     },
     {
-     "src": "/city-media/dallas/3.jpg",
+     "src": "/city-media/dallas/2.jpg",
      "creator": "Tj Campbell",
      "licence": "CC BY 3.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Dallas_Skyline_(116045101).jpeg"
     },
     {
-     "src": "/city-media/dallas/4.jpg",
+     "src": "/city-media/dallas/3.jpg",
      "creator": "airbus777",
      "licence": "CC BY 2.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Dallas_skyline_and_streetcar_-_Feb_8,_2017.jpg"
+    },
+    {
+     "src": "/city-media/dallas/4.jpg",
+     "creator": "DronePhotographer",
+     "licence": "CC0",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Radha_Krishna_Temple_of_Dallas.jpg"
     }
    ]
   },
@@ -1118,19 +1047,19 @@
      "src": "/city-media/minneapolis/2.jpg",
      "creator": "Tony Webster from Portland, Oregon, United States",
      "licence": "CC BY 2.0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Minneapolis_Skyline_(019-366)_(2204874807).jpg"
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Minneapolis_Skyline_and_Stone_Arch_(15188008214).jpg"
     },
     {
      "src": "/city-media/minneapolis/3.jpg",
      "creator": "Tony Webster from Portland, Oregon, United States",
      "licence": "CC BY 2.0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Minneapolis_Skyline_and_Stone_Arch_(15188008214).jpg"
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Minneapolis_Skyline_and_Stone_Arch_(15809540302).jpg"
     },
     {
      "src": "/city-media/minneapolis/4.jpg",
      "creator": "Tony Webster from Portland, Oregon, United States",
      "licence": "CC BY 2.0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Minneapolis_Skyline_and_Stone_Arch_(15809540302).jpg"
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Minneapolis_Skyline_and_Stone_Arch_(15188008944).jpg"
     }
    ]
   },
@@ -1139,27 +1068,27 @@
    "images": [
     {
      "src": "/city-media/denver/1.jpg",
-     "creator": "refractor",
-     "licence": "CC BY 2.0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Denver_Skyline_at_Sunset.jpg"
-    },
-    {
-     "src": "/city-media/denver/2.jpg",
      "creator": "Alex Gray",
      "licence": "CC BY 3.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Denver_Skyline_(147779451).jpeg"
     },
     {
-     "src": "/city-media/denver/3.jpg",
+     "src": "/city-media/denver/2.jpg",
      "creator": "DimiTalen",
      "licence": "CC0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Looking_down_Bassett_Circle_from_Denver_Millennium_Bridge_towards_Commons_Park,_Denver,_2009.jpg"
     },
     {
-     "src": "/city-media/denver/4.jpg",
+     "src": "/city-media/denver/3.jpg",
      "creator": "Sharon Mollerus",
      "licence": "CC BY 2.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Presentation_Stained_Glass_Window,_The_Cathedral_Basilica_of_the_Immaculate_Conception,_Denver.jpg"
+    },
+    {
+     "src": "/city-media/denver/4.jpg",
+     "creator": "Apw250",
+     "licence": "CC BY 4.0",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Landmark_Preservation_Commission_sign,_Emerson_School,_Denver,_CO.jpg"
     }
    ]
   },
@@ -1187,7 +1116,7 @@
      "src": "/city-media/san-diego/2.jpg",
      "creator": "Catedrales e Iglesias/Cathedrals and Churches from Puebla de los Ángeles, Mexico",
      "licence": "CC BY 2.0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ex_Convento_Franciscano_San_Diego_de_Alcal%C3%A1,Cuautla,Morelos,M%C3%A9xico_(9676957858).jpg"
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ex_Convento_Franciscano_San_Diego_de_Alcal%C3%A1,Cuautla,Morelos,M%C3%A9xico_(9676958624).jpg"
     },
     {
      "src": "/city-media/san-diego/3.jpg",
@@ -1336,35 +1265,6 @@
     }
    ]
   },
-  "warsaw": {
-   "name": "Warsaw",
-   "images": [
-    {
-     "src": "/city-media/warsaw/1.jpg",
-     "creator": "Anonymous Unknown author",
-     "licence": "Public domain",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:A._Nevsky_Cathedral_in_Warsaw_(Aerial).jpg"
-    },
-    {
-     "src": "/city-media/warsaw/2.jpg",
-     "creator": "Wizzard",
-     "licence": "Public domain",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Warsaw_Easter_2008_097.jpg"
-    },
-    {
-     "src": "/city-media/warsaw/3.jpg",
-     "creator": "Simon Jowett (Flikr)",
-     "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:A_Warsaw_skyline_at_dusk_3345h5u5.jpg"
-    },
-    {
-     "src": "/city-media/warsaw/4.jpg",
-     "creator": "Неизвестен",
-     "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mazowiecka_Street_with_a_view_of_the_Alexander_Nevsky_Cathedral,_Warsaw.jpg"
-    }
-   ]
-  },
   "stockholm": {
    "name": "Stockholm",
    "images": [
@@ -1382,15 +1282,15 @@
     },
     {
      "src": "/city-media/stockholm/3.jpg",
-     "creator": "Michael Cavén",
-     "licence": "CC BY 2.0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Stockholm_Castle_and_crown.jpg"
-    },
-    {
-     "src": "/city-media/stockholm/4.jpg",
      "creator": "Tony Webster from Portland, Oregon, United States",
      "licence": "CC BY 2.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Stockholm_Skyline_(15189547020).jpg"
+    },
+    {
+     "src": "/city-media/stockholm/4.jpg",
+     "creator": "Michelle Maria",
+     "licence": "CC BY 3.0",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Stockholm,_Sweden_-_panoramio_(34).jpg"
     }
    ]
   },
@@ -1405,18 +1305,12 @@
     },
     {
      "src": "/city-media/vienna/2.jpg",
-     "creator": "Jebulon",
-     "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Theseustempel_Volksgarten_Vienna.jpg"
-    },
-    {
-     "src": "/city-media/vienna/3.jpg",
      "creator": "Alois Auer",
      "licence": "CC0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:-View_of_the_rooftops_and_cathedral_of_Vienna-_MET_DP112649.jpg"
     },
     {
-     "src": "/city-media/vienna/4.jpg",
+     "src": "/city-media/vienna/3.jpg",
      "creator": "Ross Williams",
      "licence": "CC BY 4.0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Interior_hall,_St._Stephen%27s_Cathedral,_Vienna.jpg"
@@ -1705,6 +1599,23 @@
     }
    ]
   },
+  "hamburg": {
+   "name": "Hamburg",
+   "images": [
+    {
+     "src": "/city-media/hamburg/1.jpg",
+     "creator": "Andrew Milligan sumo",
+     "licence": "CC BY 2.0",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Nikolaifleet,_HafenCity,_Hamburg_(48854701806).jpg"
+    },
+    {
+     "src": "/city-media/hamburg/2.jpg",
+     "creator": "NutzerAusBerlin",
+     "licence": "CC0",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Hamburg_20260815_Bahnstrecke_Wanne-Eickel%E2%80%93Hamburg.jpg"
+    }
+   ]
+  },
   "seville": {
    "name": "Seville",
    "images": [
@@ -1727,21 +1638,21 @@
     },
     {
      "src": "/city-media/porto/2.jpg",
-     "creator": "Deensel",
+     "creator": "Sergei Gussev",
      "licence": "CC BY 2.0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Porto_Cathedral_(37008796341).jpg"
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Dom_Lu%C3%ADs_I_Bridge_over_the_river_Douro,_Vila_Nova_de_Gaia,_Porto,_Portugal,_April_2023_(52797327010).jpg"
     },
     {
-     "src": "/city-media/porto/3.png",
-     "creator": "Terry Kearney from liverpool, merseyside",
-     "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ribeira_Square_on_the_River_Douro_Porto_Portugal_(16440390624).png"
+     "src": "/city-media/porto/3.jpg",
+     "creator": "Michael Gaylard from Horsham, UK",
+     "licence": "CC BY 4.0",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:A_panoramic_view_of_the_Dom_Lu%C3%ADs_I_Bridge_spanning_the_Douro_River_in_Porto,_Portugal,_with_a_yellow_tram_crossing_and_the_historic_city_skyline_in_the_background._(55246746406).jpg"
     },
     {
      "src": "/city-media/porto/4.jpg",
-     "creator": "dlovins99",
-     "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:View_from_Porto_Cathedral_2023-08-04_17.52.57_(53111242902).jpg"
+     "creator": "Michael Gaylard from Horsham, UK",
+     "licence": "CC BY 4.0",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Porto_Cathedral_Square_-_A_Sunny_Day_for_Sightseeing_(55249576428).jpg"
     }
    ]
   },
@@ -1970,9 +1881,9 @@
     },
     {
      "src": "/city-media/chengdu/4.jpg",
-     "creator": "FISU",
-     "licence": "CC BY 3.0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:%E9%9B%AA%E5%B1%B1%E4%B8%8B%E7%9A%84%E6%88%90%E9%83%BD%E5%B8%82%E5%A4%A9%E9%99%85%E7%BA%BF_Chengdu_skyline_with_snow_capped_mountains.jpg"
+     "creator": "George N",
+     "licence": "CC BY 2.0",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Chengdu_skyline_June_2017.jpg"
     }
    ]
   },
@@ -2042,6 +1953,12 @@
      "creator": "Bernard Spragg. NZ from Christchurch, New Zealand",
      "licence": "CC0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Batu_Caves_Sri_Subramaniam_Temple,_Kuala_Lumpur_(10184880654).jpg"
+    },
+    {
+     "src": "/city-media/kuala-lumpur/4.jpg",
+     "creator": "Unknown author Unknown author",
+     "licence": "CC0",
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Kuala_Lumpur_skyline_long_exposure.jpg"
     }
    ]
   },
@@ -2087,19 +2004,19 @@
      "src": "/city-media/manila/2.jpg",
      "creator": "Judgefloro",
      "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:933Manila_Cathedral_Intramuros_Manila_Landmarks_35.jpg"
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:933Manila_Cathedral_Intramuros_Manila_Landmarks_16.jpg"
     },
     {
      "src": "/city-media/manila/3.jpg",
      "creator": "Judgefloro",
      "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:983Manila_Cathedral_Intramuros_Manila_Landmarks_08.jpg"
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:983Manila_Cathedral_Intramuros_Manila_Landmarks_30.jpg"
     },
     {
      "src": "/city-media/manila/4.jpg",
      "creator": "Judgefloro",
      "licence": "CC0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:983Manila_Cathedral_Intramuros_Manila_Landmarks_11.jpg"
+     "sourceUrl": "https://commons.wikimedia.org/wiki/File:983Manila_Cathedral_Intramuros_Manila_Landmarks_31.jpg"
     }
    ]
   },
@@ -2244,12 +2161,6 @@
      "creator": "Gihanud2001",
      "licence": "CC0",
      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Colombo_city_skyline_at_night.png"
-    },
-    {
-     "src": "/city-media/colombo/2.jpg",
-     "creator": "Pierre André Leclercq",
-     "licence": "CC BY 4.0",
-     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Rolls-Royce_Twenty_in_Gangaramaya_temple_(Colombo).jpg"
     }
    ]
   },
